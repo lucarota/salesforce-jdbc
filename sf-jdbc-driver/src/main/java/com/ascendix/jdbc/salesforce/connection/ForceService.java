@@ -85,7 +85,6 @@ public class ForceService {
             partnerConfig.setAuthEndpoint(buildAuthEndpoint(info));
             connection = Connector.newConnection(partnerConfig);
         } else {
-
             try {
                 info.setSandbox(false);
                 partnerConfig.setAuthEndpoint(buildAuthEndpoint(info));

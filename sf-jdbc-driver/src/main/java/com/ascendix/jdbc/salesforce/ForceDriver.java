@@ -4,7 +4,7 @@ import com.ascendix.jdbc.salesforce.connection.ForceConnection;
 import com.ascendix.jdbc.salesforce.connection.ForceConnectionInfo;
 import com.ascendix.jdbc.salesforce.connection.ForceService;
 import com.sforce.soap.partner.PartnerConnection;
-import com.sforce.soap.partner.fault.UnexpectedErrorFault;
+import com.sforce.soap.partner.fault.ApiFault;
 import com.sforce.ws.ConnectionException;
 import lombok.extern.slf4j.Slf4j;
 
@@ -71,6 +71,7 @@ public class ForceDriver implements Driver {
             properties.putAll(connStringProps);
             ForceConnectionInfo info = new ForceConnectionInfo();
             info.setUserName(properties.getProperty("user"));
+            info.setClientName(properties.getProperty("client"));
             info.setPassword(properties.getProperty("password"));
             info.setClientName(properties.getProperty("client"));
             info.setSessionId(properties.getProperty("sessionId"));
@@ -97,10 +98,8 @@ public class ForceDriver implements Driver {
                         logger.log(Level.WARNING, "[ForceDriver] relogin helper failed - url parsing error", e);
                     }
                 }
-                if (userName != null) {
+                if (userName != null && userPassword != null) {
                     newProperties.setProperty("user", userName);
-                }
-                if (userPassword != null) {
                     newProperties.setProperty("password", userPassword);
                 }
                 newInfo.setUserName(newProperties.getProperty("user"));
@@ -120,7 +119,7 @@ public class ForceDriver implements Driver {
                     newPartnerConnection = ForceService.createPartnerConnection(newInfo);
                     logger.log(Level.WARNING, "[ForceDriver] relogin helper success="+(newPartnerConnection != null));
                     return newPartnerConnection;
-                } catch (UnexpectedErrorFault e) {
+                } catch (ApiFault e) {
                     logger.log(Level.WARNING, "[ForceDriver] relogin helper failed "+ e.getMessage(), e);
                     throw new ConnectionException("Relogin failed ("+e.getExceptionCode()+") "+ e.getExceptionMessage(), e);
                 } catch (ConnectionException e) {
@@ -170,8 +169,12 @@ public class ForceDriver implements Driver {
         Matcher authMatcher = URL_HAS_AUTHORIZATION_SEGMENT.matcher(urlString);
 
         if (authMatcher.matches()) {
-            result.put("user", authMatcher.group(1));
-            result.put("password", authMatcher.group(2));
+            if (authMatcher.group(1) != null) {
+                result.put("user", authMatcher.group(1));
+            }
+            if (authMatcher.group(2) != null) {
+                result.put("password", authMatcher.group(2));
+            }
             result.put("loginDomain", authMatcher.group(3));
             if (authMatcher.groupCount() > 4 && authMatcher.group(5) != null) {
                 // has some other parameters - parse them from standard URL format like
@@ -185,7 +188,15 @@ public class ForceDriver implements Driver {
                 }
             }
         } else if (stdMatcher.matches()) {
-            urlProperties = stdMatcher.group(1);
+            String dataString = stdMatcher.group(1);
+            int endOfHost = dataString.contains(";") ? dataString.indexOf(";")-1 : dataString.length()-1;
+            String possibleHost = dataString.substring(0, endOfHost+1);
+            if (possibleHost.trim().length() > 0 && !possibleHost.contains("=")) {
+                result.put("loginDomain", possibleHost);
+                urlProperties = dataString.substring(endOfHost+1);
+            } else {
+                urlProperties = dataString;
+            }
             urlProperties = urlProperties.replaceAll(";", "\n");
         } else {
             Matcher ipMatcher = VALID_IP_ADDRESS_REGEX.matcher(urlString);

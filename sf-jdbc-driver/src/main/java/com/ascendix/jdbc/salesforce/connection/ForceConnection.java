@@ -131,7 +131,6 @@ public class ForceConnection implements Connection {
     public Statement createStatement() {
         logger.info("[Conn] createStatement 1 IMPLEMENTED ");
         return new ForcePreparedStatement(this);
-
     }
 
     @Override
