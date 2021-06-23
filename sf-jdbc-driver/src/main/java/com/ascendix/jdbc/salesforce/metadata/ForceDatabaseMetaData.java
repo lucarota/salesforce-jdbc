@@ -120,7 +120,7 @@ public class ForceDatabaseMetaData implements DatabaseMetaData, Serializable {
                     put("SCOPE_SCHEMA", null);
                     put("SCOPE_TABLE", null);
                     put("SOURCE_DATA_TYPE", column.getType());
-
+                    put("CASE_SENSITIVE", 0);
                     put("NULLABLE",
                             column.isNillable() ? DatabaseMetaData.columnNullable : DatabaseMetaData.columnNoNulls);
 
@@ -441,7 +441,7 @@ public class ForceDatabaseMetaData implements DatabaseMetaData, Serializable {
 
     @Override
     public String getDriverVersion() throws SQLException {
-        return getDriverMajorVersion()+"."+getDriverMinorVersion()+".0.0";
+        return getDriverMajorVersion()+"."+getDriverMinorVersion()+".1";
     }
 
     @Override
@@ -468,8 +468,8 @@ public class ForceDatabaseMetaData implements DatabaseMetaData, Serializable {
 
     @Override
     public boolean supportsMixedCaseIdentifiers() throws SQLException {
-        // TODO Auto-generated method stub
-        return false;
+        // Retrieves whether this database treats mixed case unquoted SQL identifiers as case insensitive and stores them in mixed case.
+        return true;
     }
 
     @Override
@@ -486,8 +486,8 @@ public class ForceDatabaseMetaData implements DatabaseMetaData, Serializable {
 
     @Override
     public boolean storesMixedCaseIdentifiers() throws SQLException {
-        // TODO Auto-generated method stub
-        return false;
+        // Retrieves whether this database treats mixed case unquoted SQL identifiers as case insensitive and stores them in mixed case.
+        return true;
     }
 
     @Override
@@ -1289,7 +1289,7 @@ public class ForceDatabaseMetaData implements DatabaseMetaData, Serializable {
 
     @Override
     public int getDatabaseMajorVersion() throws SQLException {
-        return 51;
+        return 52;
     }
 
     @Override

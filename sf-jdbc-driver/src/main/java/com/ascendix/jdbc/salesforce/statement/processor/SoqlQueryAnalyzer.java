@@ -1,5 +1,6 @@
-package com.ascendix.jdbc.salesforce.statement;
+package com.ascendix.jdbc.salesforce.statement.processor;
 
+import com.ascendix.jdbc.salesforce.statement.FieldDef;
 import com.sforce.soap.partner.ChildRelationship;
 import com.sforce.soap.partner.DescribeSObjectResult;
 import com.sforce.soap.partner.Field;
@@ -143,7 +144,7 @@ public class SoqlQueryAnalyzer {
         }
     }
 
-    protected String getFromObjectName() {
+    public String getFromObjectName() {
         return getQueryData().getFromClause().getMainObjectSpec().getObjectName();
     }
 

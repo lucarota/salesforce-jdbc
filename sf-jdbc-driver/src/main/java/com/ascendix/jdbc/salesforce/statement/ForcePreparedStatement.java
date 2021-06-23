@@ -56,6 +56,7 @@ public class ForcePreparedStatement implements PreparedStatement {
 
     private final static String CACHE_HINT = "(?is)\\A\\s*(CACHE\\s*(GLOBAL|SESSION)).*";
     private final static int GB = 1073741824;
+    private static final String SOSL_QUERY_RESULT = "SOSL_QUERY_RESULT";
 
     protected enum CacheMode {
         NO_CACHE, GLOBAL, SESSION
@@ -150,6 +151,14 @@ public class ForcePreparedStatement implements PreparedStatement {
         if (UpdateQueryProcessor.isUpdateQuery(soqlQuery, updateQueryAnalyzer)) {
             try {
                 return UpdateQueryProcessor.processQuery(this, soqlQuery, getPartnerService(), updateQueryAnalyzer);
+            } catch (ConnectionException | SOQLParsingException e) {
+                throw new SQLException(e);
+            }
+        }
+        SoslQueryAnalyzer soslQueryAnalyzer = getSoslQueryAnalyzer();
+        if (SoslQueryProcessor.isSoslQuery(soqlQuery, soslQueryAnalyzer)) {
+            try {
+                return SoslQueryProcessor.processQuery(this, soqlQuery, getPartnerService(), soslQueryAnalyzer);
             } catch (ConnectionException | SOQLParsingException e) {
                 throw new SQLException(e);
             }
@@ -291,6 +300,7 @@ public class ForcePreparedStatement implements PreparedStatement {
                 result.setSchemaName(i, ForceDatabaseMetaData.DEFAULT_SCHEMA);
                 result.setCatalogName(i, ForceDatabaseMetaData.DEFAULT_CATALOG);
                 result.setTableName(i, null);
+                result.setCaseSensitive(i, false);
             }
             return result;
         } catch (Exception e) {
@@ -322,6 +332,8 @@ public class ForcePreparedStatement implements PreparedStatement {
                     result.setSchemaName(i, ForceDatabaseMetaData.DEFAULT_SCHEMA);
                     result.setCatalogName(i, ForceDatabaseMetaData.DEFAULT_CATALOG);
                     result.setTableName(i, queryAnalyzer.getFromObjectName());
+//                    result.setTableName(i, SOSL_QUERY_RESULT);
+                    result.setCaseSensitive(i, false);
                 }
                 metadata = result;
             }
@@ -352,6 +364,7 @@ public class ForcePreparedStatement implements PreparedStatement {
         return fieldDefinitions;
     }
 
+    private SoslQueryAnalyzer soslQueryAnalyzer;
     private SoqlQueryAnalyzer soqlQueryAnalyzer;
     private InsertQueryAnalyzer insertQueryAnalyzer;
     private UpdateQueryAnalyzer updateQueryAnalyzer;
@@ -368,6 +381,20 @@ public class ForcePreparedStatement implements PreparedStatement {
             }, connection.getCache());
         }
         return soqlQueryAnalyzer;
+    }
+
+    private SoslQueryAnalyzer getSoslQueryAnalyzer() {
+        logger.info("[PrepStat] getSoslQueryAnalyzer IMPLEMENTED "+soqlQuery);
+        if (soslQueryAnalyzer == null) {
+            soslQueryAnalyzer = new SoslQueryAnalyzer(prepareQuery(), (objName) -> {
+                try {
+                    return getPartnerService().describeSObject(objName);
+                } catch (ConnectionException e) {
+                    throw new RuntimeException(e);
+                }
+            }, connection.getCache());
+        }
+        return soslQueryAnalyzer;
     }
 
     private InsertQueryAnalyzer getInsertQueryAnalyzer() {
