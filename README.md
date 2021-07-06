@@ -21,7 +21,7 @@ The current version of the driver should be compatible with **Salesforce Partner
 ## Get the driver
 Download the driver JAR file:
 1. Read-Only version 1.3.1 : from [here](https://spuliaiev-sfdc.github.io/salesforce-jdbc/deliverables/sf-jdbc-driver-1.3.1-SNAPSHOT-jar-with-dependencies.jar)
-2. Write support version 1.4.0 : from [here](https://spuliaiev-sfdc.github.io/salesforce-jdbc/deliverables/sf-jdbc-driver-1.4.0-SNAPSHOT-jar-with-dependencies.jar)
+2. Write/Delete support version 1.4.1 : from [here](https://spuliaiev-sfdc.github.io/salesforce-jdbc/deliverables/sf-jdbc-driver-1.4.1-SNAPSHOT-jar-with-dependencies.jar)
 
 ## Supported features
 1. Queries support native SOQL;
