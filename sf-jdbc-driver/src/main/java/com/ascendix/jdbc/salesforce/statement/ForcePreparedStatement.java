@@ -155,6 +155,14 @@ public class ForcePreparedStatement implements PreparedStatement {
                 throw new SQLException(e);
             }
         }
+        DeleteQueryAnalyzer deleteQueryAnalyzer = getDeleteQueryAnalyzer();
+        if (DeleteQueryProcessor.isDeleteQuery(soqlQuery, deleteQueryAnalyzer)) {
+            try {
+                return DeleteQueryProcessor.processQuery(this, soqlQuery, getPartnerService(), deleteQueryAnalyzer);
+            } catch (ConnectionException | SOQLParsingException e) {
+                throw new SQLException(e);
+            }
+        }
         SoslQueryAnalyzer soslQueryAnalyzer = getSoslQueryAnalyzer();
         if (SoslQueryProcessor.isSoslQuery(soqlQuery, soslQueryAnalyzer)) {
             try {
@@ -368,6 +376,7 @@ public class ForcePreparedStatement implements PreparedStatement {
     private SoqlQueryAnalyzer soqlQueryAnalyzer;
     private InsertQueryAnalyzer insertQueryAnalyzer;
     private UpdateQueryAnalyzer updateQueryAnalyzer;
+    private DeleteQueryAnalyzer deleteQueryAnalyzer;
 
     private SoqlQueryAnalyzer getSoqlQueryAnalyzer() {
         logger.info("[PrepStat] getSoqlQueryAnalyzer IMPLEMENTED "+soqlQuery);
@@ -407,7 +416,7 @@ public class ForcePreparedStatement implements PreparedStatement {
                     throw new RuntimeException(e);
                 }
             }, connection.getCache(),
-                    soql -> runResolveSubselect(soql));
+                    this::runResolveSubselect);
         }
         return insertQueryAnalyzer;
     }
@@ -422,9 +431,18 @@ public class ForcePreparedStatement implements PreparedStatement {
                     throw new RuntimeException(e);
                 }
             }, connection.getCache(),
-                    soql -> runResolveSubselect(soql));
+                    this::runResolveSubselect);
         }
         return updateQueryAnalyzer;
+    }
+
+    private DeleteQueryAnalyzer getDeleteQueryAnalyzer() {
+        logger.info("[PrepStat] getDeleteQueryAnalyzer IMPLEMENTED "+soqlQuery);
+        if (deleteQueryAnalyzer == null) {
+            deleteQueryAnalyzer = new DeleteQueryAnalyzer(prepareQuery(),
+                    this::runResolveSubselect);
+        }
+        return deleteQueryAnalyzer;
     }
 
     private List<Map<String, Object>> runResolveSubselect(String soql) {
@@ -853,8 +871,8 @@ public class ForcePreparedStatement implements PreparedStatement {
 
     @Override
     public Connection getConnection() throws SQLException {
-        logger.info("[PrepStat] getConnection NOT_IMPLEMENTED "+soqlQuery);
-        return null;
+        logger.info("[PrepStat] getConnection IMPLEMENTED "+soqlQuery);
+        return connection;
     }
 
     @Override

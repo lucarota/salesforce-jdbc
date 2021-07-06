@@ -11,9 +11,9 @@ However that version is not compatible with IntelliJ because of a lot of unsuppo
 
 These issues were fixed in the current version in this fork.
 
-[Watch the demo video](https://spuliaiev-sfdc.github.io/salesforce-jdbc/docs/SOQL-JDBC-IntelliJ-demo-264.mp4)
+[Watch the demo video](docs/SOQL-JDBC-IntelliJ-demo-264.mp4)
 
-[![Watch the demo video](https://spuliaiev-sfdc.github.io/salesforce-jdbc/docs/intelliJ.png)](https://spuliaiev-sfdc.github.io/salesforce-jdbc/docs/SOQL-JDBC-IntelliJ-demo-264.mp4)
+[![Watch the demo video](docs/intelliJ.png)](docs/SOQL-JDBC-IntelliJ-demo-264.mp4)
 
 ## Supported Salesforce and Java versions
 The current version of the driver should be compatible with **Salesforce Partner API version 39.0 and higher** and **Java 8**.
@@ -51,7 +51,13 @@ Download the driver JAR file:
                 SELECT ID from Account where Phone = '555-123-1111'
         );
 ```
-4. Request caching support on local drive. Caching supports 2 modes: global and session. Global mode means that the cached result will be accessible for all system users for certain JVM session. Session cache mode works for each Salesforce connection session separately. Both modes cache stores request result while JVM still running but no longer than for 1 hour. The cache mode can be enabled with a prefix of SOQL query. 
+4. DELETE is supported for version >= 1.4.1
+```SQL
+DELETE from Opportunity where name like 'Pushed Out Insightor Opp%';
+```   
+   ![Example of response](docs/delete_where.png)
+
+5. Request caching support on local drive. Caching supports 2 modes: global and session. Global mode means that the cached result will be accessible for all system users for certain JVM session. Session cache mode works for each Salesforce connection session separately. Both modes cache stores request result while JVM still running but no longer than for 1 hour. The cache mode can be enabled with a prefix of SOQL query. 
 
 How to use:
  * Global cache mode:
@@ -65,7 +71,7 @@ How to use:
 5. Reconnect to other organization at the same host
 ```SQL
 -- Postgres Notation
-CONNECT USER admin@OtherOrg.com IDENTIFIED by "123456"
+CONNECT USER admin@OtherOrg.com IDENTIFIED BY "123456"
 
 -- Oracle Notation
 CONNECT admin@OtherOrg.com/123456
@@ -73,18 +79,19 @@ CONNECT admin@OtherOrg.com/123456
 -- Postgres Notation to a different host using secure connection (by default)
 CONNECT 
     TO ap1.stmpa.stm.salesforce.com
-    USER admin@OtherOrg.com IDENTIFIED by "123456"
+    USER admin@OtherOrg.com IDENTIFIED BY "123456"
 
 -- Postgres Notation to a different host - local host using insecure connection
 CONNECT 
     TO http://localhost:6109
-    USER admin@OtherOrg.com IDENTIFIED by "123456"
+    USER admin@OtherOrg.com IDENTIFIED BY "123456"
 ```
 P.S. You need to use the machine host name in the connection url - not MyDomain org host name.
 
 ## Limitations
 1. ***Version < 1.4.0*** The driver is only for read-only purposes now. Insert/update/delete functionality is not implemented yet.
 2. ***Version >= 1.4.0*** Limited support of INSERT/UPDATE operations
+3. ***Version >= 1.4.1*** Limited support of DELETE operations
 
 
 ## With Maven
@@ -154,7 +161,7 @@ jdbc:ascendix:salesforce://;sessionId=uniqueIdAssociatedWithTheSession
 
     Birt provides various ways to set parameters for JDBC driver. For example, it can be done with the property binding feature in the data source editor and a report parameter. 
   
-    ![image](/docs/birt/Data%20source%20-%20property%20binding.png)
+    ![image](docs/birt/Data%20source%20-%20property%20binding.png)
   
      See how it's done in [Salesforce JDBC report sample](docs/birt/Salesforce JDBC sample.rptdesign)
   
@@ -172,7 +179,7 @@ jdbc:ascendix:salesforce://;sessionId=uniqueIdAssociatedWithTheSession
     Please check what kind of access do you have to your org - HTTP or HTTPS and the API version to use.
     Here is screenshot about results output and autocomplete support for SOQL queries in IntelliJ:
   
-    ![image](/docs/Autocomplete-SOQL.png)
+    ![image](docs/Autocomplete-SOQL.png)
   
 
 ## In case of issues with the WSDL
@@ -192,6 +199,12 @@ It could be obtained from here:  https://github.com/spuliaiev-sfdc/salesforce-so
 
 
 ## Version History
+
+### 1.4.1
+DELETE command parsing
+
+### 1.4.0
+INSERT/UPDATE command parsing
 
 ### 1.3.1.3
 CONNECT command parsing fixes

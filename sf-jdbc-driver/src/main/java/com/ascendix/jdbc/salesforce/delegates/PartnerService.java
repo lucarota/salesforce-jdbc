@@ -232,7 +232,6 @@ public class PartnerService {
 
         SObject[] records = new SObject[recordsDefinitions.size()];
 
-
         for (int i = 0; i < recordsDefinitions.size(); i++) {
             Map<String, Object> recordDef = recordsDefinitions.get(i);
             SObject record = records[i] = new SObject();
@@ -243,6 +242,11 @@ public class PartnerService {
         }
         // Make a create call and pass it the array of sObjects
         SaveResult[] results = partnerConnection.update(records);
+        return results;
+    }
+
+    public DeleteResult[] deleteRecords(String entityName, Collection<String> recordsIds) throws ConnectionException {
+        DeleteResult[] results = partnerConnection.delete(recordsIds.toArray(new String[]{}));
         return results;
     }
 }

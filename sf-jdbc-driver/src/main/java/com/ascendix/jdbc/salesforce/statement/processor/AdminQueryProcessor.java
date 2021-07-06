@@ -26,6 +26,9 @@ public class AdminQueryProcessor {
     private static final Pattern LOGIN_COMMAND_PG = Pattern.compile("CONNECT(\\s+TO\\s+(?<url>\\S+))?(\\s+USER\\s+(?<username>\\S+)\\s+IDENTIFIED BY\\s+(?<userpass>\\S+))?\\s*;?", Pattern.CASE_INSENSITIVE);
 
     private static final Pattern LOGIN_COMMAND_ORA = Pattern.compile("CONN(?:ECT)?(?<url>)\\s+(?<username>\\S+)/(?<userpass>\\S+)\\s*;?", Pattern.CASE_INSENSITIVE);
+
+    private static final Pattern LOGIN_INFO_COMMAND = Pattern.compile("CONNECT\\s+INFO;?", Pattern.CASE_INSENSITIVE);
+
     private static final String EXISTING_HOST = "existing host";
 
 
@@ -35,7 +38,11 @@ public class AdminQueryProcessor {
         }
         soqlQuery = soqlQuery.trim();
 
-        Matcher matcherLogin = LOGIN_COMMAND_PG.matcher(soqlQuery);
+        Matcher matcherLogin = LOGIN_INFO_COMMAND.matcher(soqlQuery);
+        if (matcherLogin.matches()) {
+            return true;
+        }
+        matcherLogin = LOGIN_COMMAND_PG.matcher(soqlQuery);
         if (matcherLogin.matches()) {
             return true;
         }
@@ -50,6 +57,8 @@ public class AdminQueryProcessor {
             return resultSet;
         }
         soqlQuery = soqlQuery.trim();
+
+        processLoginInfoCommand(statement, soqlQuery, resultSet);
 
         processLoginCommand(soqlQuery, resultSet, (url, userName, userPass, host) -> {
             try {
@@ -72,6 +81,17 @@ public class AdminQueryProcessor {
     @FunctionalInterface
     public interface LoginCommandProcessor {
         boolean processCommand(String url, String userName, String userPass, String host) throws SQLException;
+    }
+
+    static boolean processLoginInfoCommand(ForcePreparedStatement statement, String soqlQuery, CommandLogCachedResultSet resultSet) throws SQLException {
+        Matcher matcher = LOGIN_INFO_COMMAND.matcher(soqlQuery);
+        if (matcher.matches()) {
+            if (resultSet != null) {
+                resultSet.log("Admin query: CONNECT INFO");
+                resultSet.log("Host: " + statement.getConnection());
+            }
+        }
+        return true;
     }
 
     static boolean processLoginCommand(String soqlQuery, CommandLogCachedResultSet resultSet, LoginCommandProcessor processor) throws SQLException {
