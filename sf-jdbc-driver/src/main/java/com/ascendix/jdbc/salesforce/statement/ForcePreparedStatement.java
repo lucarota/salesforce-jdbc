@@ -191,9 +191,11 @@ public class ForcePreparedStatement implements PreparedStatement {
         return setParams(soqlQuery);
     }
 
-    private ColumnMap<String, Object> convertToColumnMap(List<ForceResultField> record) {
+    private ColumnMap<String, Object> convertToColumnMap(List<ForceResultField> recordFields) {
         ColumnMap<String, Object> columnMap = new ColumnMap<>();
-        record.stream()
+        // Flatten not only child records, but also Lists of Lists - for Relations - list of subrecords
+        recordFields = flatten(recordFields);
+        recordFields.stream()
                 .map(field -> field == null ? new ForceResultField(null, null, null, null) : field)
                 .forEach(field -> {
                     columnMap.put(field.getFullName(), field.getValue());
@@ -351,13 +353,16 @@ public class ForcePreparedStatement implements PreparedStatement {
         }
     }
 
-    private List<FieldDef> flatten(List fieldDefinitions) {
+    private <T> List<T> flatten(List<T> listWithLists) {
         logger.info("[PrepStat] flatten IMPLEMENTED "+soqlQuery);
-        return (List<FieldDef>) fieldDefinitions.stream()
-                .flatMap(def -> def instanceof List
-                        ? ((List) def).stream()
-                        : Stream.of(def))
+        List<T> listPlain =  (List<T>) listWithLists.stream()
+                .flatMap(
+                        def -> def instanceof Collection
+                        ? flatten((List<T>) def).stream() // MultiLevel flattening
+                        : Stream.of(def)
+                )
                 .collect(Collectors.toList());
+        return listPlain;
     }
 
     private List<FieldDef> fieldDefinitions;
@@ -366,6 +371,7 @@ public class ForcePreparedStatement implements PreparedStatement {
         logger.info("[PrepStat] getFieldDefinitions IMPLEMENTED "+soqlQuery);
         if (fieldDefinitions == null) {
             fieldDefinitions = getSoqlQueryAnalyzer().getFieldDefinitions();
+            fieldDefinitions = flatten(fieldDefinitions);
             logger.info("[PrepStat] getFieldDefinitions:\n  "+
                     fieldDefinitions.stream().map( fd -> fd.getName()+":"+fd.getType()).collect(Collectors.joining("\n  ")));
         }
