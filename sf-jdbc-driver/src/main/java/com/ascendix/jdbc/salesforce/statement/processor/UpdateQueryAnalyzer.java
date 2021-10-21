@@ -56,7 +56,7 @@ public class UpdateQueryAnalyzer {
             return false;
         }
         this.soql = soql;
-        return getQueryData() != null;
+        return getQueryData(true) != null;
     }
 
     public class UpdateItemsListVisitor implements ItemsListVisitor {
@@ -124,7 +124,12 @@ public class UpdateQueryAnalyzer {
         return queryData.getTable().getName();
     }
 
+
     private Update getQueryData() {
+        return getQueryData(false);
+    }
+
+    private Update getQueryData(boolean silentMode) {
         if (queryData == null) {
             try {
                 Statement statement = CCJSqlParserUtil.parse(soql);
@@ -132,7 +137,9 @@ public class UpdateQueryAnalyzer {
                     queryData = (Update) statement;
                 }
             } catch (JSQLParserException e) {
-                logger.log(Level.SEVERE,"Failed request to create entities with error: "+e.getMessage(), e);
+                if (!silentMode) {
+                    logger.log(Level.SEVERE, "Failed request to create entities with error: " + e.getMessage(), e);
+                }
             }
         }
         return queryData;

@@ -34,7 +34,7 @@ public class ForcePreparedStatementTest {
         assertEquals("123.45", ForcePreparedStatement.convertToSoqlParam(123.45f));
         assertEquals("123", ForcePreparedStatement.convertToSoqlParam(123L));
         assertEquals("123.45", ForcePreparedStatement.convertToSoqlParam(new BigDecimal("123.45")));
-        assertEquals("2017-03-06T12:34:56", ForcePreparedStatement.convertToSoqlParam(new GregorianCalendar(2017, 2, 6, 12, 34, 56).getTime()));
+        assertEquals("2017-03-06T12:34:56-0800", ForcePreparedStatement.convertToSoqlParam(new GregorianCalendar(2017, 2, 6, 12, 34, 56).getTime()));
         assertEquals("'\\'test\\'\\\\'", ForcePreparedStatement.convertToSoqlParam("'test'\\"));
         assertEquals("NULL", ForcePreparedStatement.convertToSoqlParam(null));
     }

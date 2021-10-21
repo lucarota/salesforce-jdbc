@@ -51,7 +51,7 @@ public class InsertQueryAnalyzer {
             return false;
         }
         this.soql = soql;
-        return getQueryData() != null;
+        return getQueryData(true) != null;
     }
 
     public class InsertItemsListVisitor implements ItemsListVisitor {
@@ -120,6 +120,10 @@ public class InsertQueryAnalyzer {
     }
 
     private Insert getQueryData() {
+        return getQueryData(false);
+    }
+
+    private Insert getQueryData(boolean silentMode) {
         if (queryData == null) {
             try {
                 Statement statement = CCJSqlParserUtil.parse(soql);
@@ -127,7 +131,9 @@ public class InsertQueryAnalyzer {
                     queryData = (Insert) statement;
                 }
             } catch (JSQLParserException e) {
-                logger.log(Level.SEVERE,"Failed request to create entities with error: "+e.getMessage(), e);
+                if (!silentMode) {
+                    logger.log(Level.SEVERE, "Failed request to create entities with error: " + e.getMessage(), e);
+                }
             }
         }
         return queryData;

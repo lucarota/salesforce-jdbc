@@ -1,8 +1,5 @@
 package com.ascendix.jdbc.salesforce.statement.processor;
 
-import com.ascendix.jdbc.salesforce.statement.processor.utils.ValueToStringVisitor;
-import com.sforce.soap.partner.DescribeSObjectResult;
-import com.sforce.soap.partner.Field;
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.expression.StringValue;
 import net.sf.jsqlparser.expression.operators.relational.*;
@@ -12,7 +9,6 @@ import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.delete.Delete;
 import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.Select;
-import net.sf.jsqlparser.statement.select.SubSelect;
 import net.sf.jsqlparser.util.SelectUtils;
 
 import java.util.*;
@@ -42,7 +38,7 @@ public class DeleteQueryAnalyzer {
             return false;
         }
         this.soql = soql;
-        return getQueryData() != null;
+        return getQueryData(true) != null;
     }
 
     protected String getFromObjectName() {
@@ -50,6 +46,10 @@ public class DeleteQueryAnalyzer {
     }
 
     private Delete getQueryData() {
+        return getQueryData(false);
+    }
+
+    private Delete getQueryData(boolean silentMode) {
         if (queryData == null) {
             try {
                 Statement statement = CCJSqlParserUtil.parse(soql);
@@ -57,7 +57,9 @@ public class DeleteQueryAnalyzer {
                     queryData = (Delete) statement;
                 }
             } catch (JSQLParserException e) {
-                logger.log(Level.SEVERE,"Failed request to create entities with error: "+e.getMessage(), e);
+                if (!silentMode) {
+                    logger.log(Level.SEVERE, "Failed request to create entities with error: " + e.getMessage(), e);
+                }
             }
         }
         return queryData;

@@ -38,6 +38,7 @@ import java.sql.SQLXML;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -62,6 +63,7 @@ public class ForcePreparedStatement implements PreparedStatement {
         NO_CACHE, GLOBAL, SESSION
     }
 
+    private String soqlQueryOriginal;
     private String soqlQuery;
     private ForceConnection connection;
     private PartnerService partnerService;
@@ -188,7 +190,23 @@ public class ForcePreparedStatement implements PreparedStatement {
 
     private String prepareQuery() {
         logger.info("[PrepStat] prepareQuery IMPLEMENTED "+soqlQuery);
+        soqlQueryOriginal = soqlQuery;
+        soqlQuery = preprocessQuery(soqlQuery);
         return setParams(soqlQuery);
+    }
+
+    private String preprocessQuery(String soqlQuery) {
+        // Preprocess sume sugar like Date Literals into SOQL format
+        // {ts '2021-10-12 00:00:12Z'}
+        // 2021-10-12T00:00:12Z
+        if (soqlQuery == null) {
+            return soqlQuery;
+        }
+        String soqlQueryProcessed = soqlQuery;
+        if (soqlQuery.contains("{ts")) {
+            soqlQueryProcessed = soqlQuery.trim().replaceAll("\\{ts\\s*'(\\d\\d\\d\\d-\\d\\d-\\d\\d)(T|\\s)(\\d\\d:\\d\\d:\\d\\d)(Z|[+-]\\d\\d\\d\\d|)'\\}", "$1T$3$4");
+        }
+        return soqlQueryProcessed;
     }
 
     private ColumnMap<String, Object> convertToColumnMap(List<ForceResultField> recordFields) {
@@ -251,7 +269,7 @@ public class ForcePreparedStatement implements PreparedStatement {
         return result;
     }
 
-    private final static DateFormat SF_DATETIME_FORMATTER = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+    private final static DateFormat SF_DATETIME_FORMATTER = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
     private static Map<Class<?>, Function<Object, String>> paramConverters = new HashMap<>();
 
     static {
@@ -275,7 +293,28 @@ public class ForcePreparedStatement implements PreparedStatement {
 
     protected static String convertToSoqlParam(Object paramValue) {
         Class<?> paramClass = getParamClass(paramValue);
+        // Convert the string date representation to SOQL
+        // like {ts '2021-10-21 12:01:02Z'}
+        // to 2021-10-21 12:01:02-0000
+        if (java.lang.String.class.equals(paramClass) && ((String) paramValue).startsWith("{ts")) {
+            paramValue = convertStringToDate((String)paramValue);
+            paramClass = getParamClass(paramValue);
+        }
         return paramConverters.get(paramClass).apply(paramValue);
+    }
+
+    private static java.util.Date convertStringToDate(String paramValue) {
+        if (paramValue == null) {
+            return null;
+        }
+        try {
+            String paramValueCleared = paramValue.trim().replaceAll("^\\{ts\\s*'(.*)'\\}$", "$1").replaceAll("Z$", "+0000");
+            java.util.Date parsed = SF_DATETIME_FORMATTER.parse(paramValueCleared);
+            return parsed;
+        } catch (ParseException e) {
+            logger.log(Level.SEVERE, "Failed to convert value to date ["+paramValue+"]", e);
+        }
+        return null;
     }
 
     protected static Class<?> getParamClass(Object paramValue) {

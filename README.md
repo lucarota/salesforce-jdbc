@@ -48,7 +48,7 @@ Download the driver JAR file:
 
     UPDATE Contact SET LastName = 'Updated_Now_'+NOW()
         WHERE AccountId IN (
-                SELECT ID from Account where Phone = '555-123-1111'
+            SELECT ID from Account where Phone = '555-123-1111' AND CreatedDate > {ts '2020-01-01 00:10:12Z'}
         );
 ```
 4. DELETE is supported for version >= 1.4.1
@@ -199,6 +199,11 @@ It could be obtained from here:  https://github.com/spuliaiev-sfdc/salesforce-so
 
 
 ## Version History
+
+### 1.4.3
+Parsing of Date Value into SOQL date for IntelliJ.
+
+Example: {ts '2021-10-21 12:01:02Z'}
 
 ### 1.4.2
 SELECT of child relationship command parsing
