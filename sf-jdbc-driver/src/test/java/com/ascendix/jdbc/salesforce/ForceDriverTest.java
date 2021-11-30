@@ -142,4 +142,18 @@ public class ForceDriverTest {
         assertEquals("false", actuals.getProperty("https"));
         assertEquals("48.0", actuals.getProperty("api"));
     }
+
+    @Test
+    public void testGetConnStringProperties_ClientDecoder() throws  IOException {
+        Properties actuals = driver.getConnStringProperties("jdbc:ascendix:salesforce://test@test.ru:aaaa!aaa@login.salesforce.ru?https=false&client=SfdcInternalQA%2F%2e%2e%2e&api=48.0");
+
+        assertEquals(6, actuals.size());
+        assertTrue(actuals.containsKey("user"));
+        assertEquals("test@test.ru", actuals.getProperty("user"));
+        assertEquals("aaaa!aaa", actuals.getProperty("password"));
+        assertEquals("login.salesforce.ru", actuals.getProperty("loginDomain"));
+        assertEquals("false", actuals.getProperty("https"));
+        assertEquals("48.0", actuals.getProperty("api"));
+        assertEquals("SfdcInternalQA/...", actuals.getProperty("client"));
+    }
 }

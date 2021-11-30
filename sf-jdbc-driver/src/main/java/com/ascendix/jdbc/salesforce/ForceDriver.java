@@ -12,6 +12,7 @@ import javax.net.ssl.*;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
@@ -184,7 +185,7 @@ public class ForceDriver implements Driver {
                 while(matcher.find()) {
                     String param = matcher.group(2);
                     String value = 3 >= matcher.groupCount() ? matcher.group(3) : null;
-                    result.put(param, value);
+                    result.put(param, URLDecoder.decode(value, "utf-8"));
                 }
             }
         } else if (stdMatcher.matches()) {
