@@ -132,8 +132,10 @@ public class ForcePreparedStatement implements PreparedStatement {
         logger.info("[PrepStat] query IMPLEMENTED "+soqlQuery);
         if ("SELECT 'keep alive'".equals(soqlQuery)) {
             logger.info("[PrepStat] query KEEP ALIVE ");
-            return new CachedResultSet(Collections.emptyList(), getMetaData());
+            return new CachedResultSet(Collections.emptyList(), new RowSetMetaDataImpl());
         }
+        prepareQuery();
+
         if (AdminQueryProcessor.isAdminQuery(soqlQuery)) {
             try {
                 return AdminQueryProcessor.processQuery(this, soqlQuery, getPartnerService());
@@ -174,8 +176,8 @@ public class ForcePreparedStatement implements PreparedStatement {
             }
         }
         try {
-            String preparedSoql = prepareQuery();
-            List<List> forceQueryResult = getPartnerService().query(preparedSoql, getFieldDefinitions());
+            List<FieldDef> fieldDefinitions = getRootEntityFieldDefinitions();
+            List<List> forceQueryResult = getPartnerService().query(soqlQuery, fieldDefinitions);
             if (!forceQueryResult.isEmpty()) {
                 List<ColumnMap<String, Object>> maps = Collections.synchronizedList(new LinkedList<>());
                 forceQueryResult.forEach(record -> maps.add(convertToColumnMap(record)));
@@ -365,7 +367,7 @@ public class ForcePreparedStatement implements PreparedStatement {
             if (metadata == null) {
                 RowSetMetaDataImpl result = new RowSetMetaDataImpl();
                 SoqlQueryAnalyzer queryAnalyzer = getSoqlQueryAnalyzer();
-                List<FieldDef> resultFieldDefinitions = flatten(getFieldDefinitions());
+                List<FieldDef> resultFieldDefinitions = flatten(getRootEntityFieldDefinitions());
                 int columnsCount = resultFieldDefinitions.size();
                 result.setColumnCount(columnsCount);
                 for (int i = 1; i <= columnsCount; i++) {
@@ -406,7 +408,7 @@ public class ForcePreparedStatement implements PreparedStatement {
 
     private List<FieldDef> fieldDefinitions;
 
-    private List<FieldDef> getFieldDefinitions() {
+    private List<FieldDef> getRootEntityFieldDefinitions() {
         logger.info("[PrepStat] getFieldDefinitions IMPLEMENTED "+soqlQuery);
         if (fieldDefinitions == null) {
             fieldDefinitions = getSoqlQueryAnalyzer().getFieldDefinitions();
@@ -426,13 +428,17 @@ public class ForcePreparedStatement implements PreparedStatement {
     private SoqlQueryAnalyzer getSoqlQueryAnalyzer() {
         logger.info("[PrepStat] getSoqlQueryAnalyzer IMPLEMENTED "+soqlQuery);
         if (soqlQueryAnalyzer == null) {
-            soqlQueryAnalyzer = new SoqlQueryAnalyzer(prepareQuery(), (objName) -> {
+            soqlQueryAnalyzer = new SoqlQueryAnalyzer(soqlQuery, (objName) -> {
                 try {
                     return getPartnerService().describeSObject(objName);
                 } catch (ConnectionException e) {
                     throw new RuntimeException(e);
                 }
             }, connection.getCache());
+            if (soqlQueryAnalyzer.isExpandedStarSyntaxForFields()) {
+                this.soqlQuery = soqlQueryAnalyzer.getSoqlQuery();
+                logger.info("[PrepStat] Expanded Star Syntax to "+soqlQuery);
+            }
         }
         return soqlQueryAnalyzer;
     }
@@ -440,7 +446,7 @@ public class ForcePreparedStatement implements PreparedStatement {
     private SoslQueryAnalyzer getSoslQueryAnalyzer() {
         logger.info("[PrepStat] getSoslQueryAnalyzer IMPLEMENTED "+soqlQuery);
         if (soslQueryAnalyzer == null) {
-            soslQueryAnalyzer = new SoslQueryAnalyzer(prepareQuery(), (objName) -> {
+            soslQueryAnalyzer = new SoslQueryAnalyzer(soqlQuery, (objName) -> {
                 try {
                     return getPartnerService().describeSObject(objName);
                 } catch (ConnectionException e) {
@@ -454,7 +460,7 @@ public class ForcePreparedStatement implements PreparedStatement {
     private InsertQueryAnalyzer getInsertQueryAnalyzer() {
         logger.info("[PrepStat] getInsertQueryAnalyzer IMPLEMENTED "+soqlQuery);
         if (insertQueryAnalyzer == null) {
-            insertQueryAnalyzer = new InsertQueryAnalyzer(prepareQuery(), (objName) -> {
+            insertQueryAnalyzer = new InsertQueryAnalyzer(soqlQuery, (objName) -> {
                 try {
                     return getPartnerService().describeSObject(objName);
                 } catch (ConnectionException e) {
@@ -469,7 +475,7 @@ public class ForcePreparedStatement implements PreparedStatement {
     private UpdateQueryAnalyzer getUpdateQueryAnalyzer() {
         logger.info("[PrepStat] getUpdateQueryAnalyzer IMPLEMENTED "+soqlQuery);
         if (updateQueryAnalyzer == null) {
-            updateQueryAnalyzer = new UpdateQueryAnalyzer(prepareQuery(), (objName) -> {
+            updateQueryAnalyzer = new UpdateQueryAnalyzer(soqlQuery, (objName) -> {
                 try {
                     return getPartnerService().describeSObject(objName);
                 } catch (ConnectionException e) {
@@ -484,7 +490,7 @@ public class ForcePreparedStatement implements PreparedStatement {
     private DeleteQueryAnalyzer getDeleteQueryAnalyzer() {
         logger.info("[PrepStat] getDeleteQueryAnalyzer IMPLEMENTED "+soqlQuery);
         if (deleteQueryAnalyzer == null) {
-            deleteQueryAnalyzer = new DeleteQueryAnalyzer(prepareQuery(),
+            deleteQueryAnalyzer = new DeleteQueryAnalyzer(soqlQuery,
                     this::runResolveSubselect);
         }
         return deleteQueryAnalyzer;

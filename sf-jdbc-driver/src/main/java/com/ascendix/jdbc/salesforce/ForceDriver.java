@@ -65,6 +65,7 @@ public class ForceDriver implements Driver {
              *
              * Source: https://docs.oracle.com/javase/8/docs/api/java/sql/Driver.html#connect-java.lang.String-java.util.Properties-
              */
+            logger.log(Level.SEVERE, "The URL provided is not acceptable: "+url);
             return null;
         }
         try {

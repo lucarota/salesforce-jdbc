@@ -11,6 +11,7 @@ import org.junit.Test;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -90,7 +91,7 @@ public class SoqlQueryAnalyzerTest {
     }
 
     @Test
-    public void testGetFromObjectName() {
+    public void testGetFromObjectName() throws SQLException {
         SoqlQueryAnalyzer analyzer = new SoqlQueryAnalyzer(" select Id , Account.Name \r\nfrom Contact\r\n where something = 'nothing' ", n -> this.describeSObject(n));
         String expected = "Contact";
         String actual = analyzer.getFromObjectName();

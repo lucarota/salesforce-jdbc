@@ -6,6 +6,7 @@ import com.sforce.soap.partner.DescribeSObjectResult;
 import com.sforce.soap.partner.Field;
 import org.mule.tools.soql.SOQLDataBaseVisitor;
 import org.mule.tools.soql.SOQLParserHelper;
+import org.mule.tools.soql.exception.SOQLParsingException;
 import org.mule.tools.soql.query.SOQLQuery;
 import org.mule.tools.soql.query.SOQLSubQuery;
 import org.mule.tools.soql.query.clause.FromClause;
@@ -13,19 +14,29 @@ import org.mule.tools.soql.query.from.ObjectSpec;
 import org.mule.tools.soql.query.select.FieldSpec;
 import org.mule.tools.soql.query.select.FunctionCallSpec;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
+
+import static com.ascendix.jdbc.salesforce.statement.processor.InsertQueryProcessor.SF_JDBC_DRIVER_NAME;
 
 public class SoqlQueryAnalyzer {
 
+    private static final Logger logger = Logger.getLogger(SF_JDBC_DRIVER_NAME);
     private String soql;
     private Function<String, DescribeSObjectResult> objectDescriptor;
     private Map<String, DescribeSObjectResult> describedObjectsCache;
     private SOQLQuery queryData;
+    private boolean expandedStarSyntaxForFields = false;
+    private List fieldDefinitions;
+
 
     public SoqlQueryAnalyzer(String soql, Function<String, DescribeSObjectResult> objectDescriptor) {
         this(soql, objectDescriptor, new HashMap<>());
@@ -35,9 +46,13 @@ public class SoqlQueryAnalyzer {
         this.soql = soql;
         this.objectDescriptor = objectDescriptor;
         this.describedObjectsCache = describedObjectsCache;
+        // to parse the query and process the expansion if needed
+        getQueryData();
     }
 
-    private List fieldDefinitions;
+    public String getSoqlQuery() {
+        return this.soql;
+    }
 
     private class SelectSpecVisitor extends SOQLDataBaseVisitor<Void> {
 
@@ -116,6 +131,10 @@ public class SoqlQueryAnalyzer {
 
     }
 
+    public boolean isExpandedStarSyntaxForFields() {
+        return expandedStarSyntaxForFields;
+    }
+
     public List getFieldDefinitions() {
         if (fieldDefinitions == null) {
             fieldDefinitions = new ArrayList<>();
@@ -150,7 +169,30 @@ public class SoqlQueryAnalyzer {
 
     private SOQLQuery getQueryData() {
         if (queryData == null) {
-            queryData = SOQLParserHelper.createSOQLData(soql);
+            try {
+                queryData = SOQLParserHelper.createSOQLData(soql);
+            } catch (SOQLParsingException e) {
+                if (e.getMessage().startsWith("There was a SOQL parsing error close to '*'")) {
+                    String soqlExpandedToId = soql.replace("*", " Id ");
+                    try {
+                        queryData = SOQLParserHelper.createSOQLData(soqlExpandedToId);
+                        this.expandedStarSyntaxForFields = true;
+                        DescribeSObjectResult describeSObjectResult = describeObject(queryData.getMainObjectSpec().getObjectName());
+                        String fields = Arrays.stream(describeSObjectResult.getFields())
+                                .limit(100) // Limit to first 100 fields
+                                .map(Field::getName).collect(Collectors.joining(", "));
+                        logger.log(Level.INFO,"Warning in SOQL query parsing. Expansion of * fields to first 100 of "+describeSObjectResult.getFields().length+". Please fix the query as SOQL does not support * to fetch all the fields");
+                        String soqlExpanded = soql.replace("*", fields);
+                        queryData = SOQLParserHelper.createSOQLData(soqlExpanded);
+                        this.soql = soqlExpanded;
+                    } catch (SOQLParsingException e2) {
+                        logger.log(Level.WARNING,"Error in SOQL query parsing. Expansion of * failed. Please fix the query as SOQL does not support * to fetch all the fields", e2);
+                        throw new SOQLParsingException("Error in SOQL query parsing. Expansion of * failed. Please fix the query as SOQL does not support * to fetch all the fields", e);
+                    }
+                } else {
+                    throw e;
+                }
+            }
         }
         return queryData;
     }

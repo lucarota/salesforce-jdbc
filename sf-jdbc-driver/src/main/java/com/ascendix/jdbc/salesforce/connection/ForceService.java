@@ -3,6 +3,8 @@ package com.ascendix.jdbc.salesforce.connection;
 import com.ascendix.salesforce.oauth.ForceOAuthClient;
 import com.sforce.soap.partner.Connector;
 import com.sforce.soap.partner.PartnerConnection;
+import com.sforce.soap.partner.QueryResult;
+import com.sforce.soap.partner.fault.UnexpectedErrorFault;
 import com.sforce.ws.ConnectionException;
 import com.sforce.ws.ConnectorConfig;
 import lombok.experimental.UtilityClass;
@@ -14,6 +16,10 @@ import org.mapdb.DBMaker;
 import org.mapdb.HTreeMap;
 import org.mapdb.Serializer;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.concurrent.TimeUnit;
 
 @UtilityClass
@@ -98,7 +104,39 @@ public class ForceService {
         if (connection != null && StringUtils.isNotBlank(info.getClientName())) {
             connection.setCallOptions(info.getClientName(), null);
         }
+        verifyConnectivity(connection);
         return connection;
+    }
+
+    private static void verifyConnectivity(PartnerConnection connection) throws ConnectionException {
+        try {
+            QueryResult select_name_from_organization = connection.query("Select Name from Organization");
+            if (select_name_from_organization.getSize() != 1) {
+                log.error("Unable to verify connectivity for URL provided");
+            }
+        } catch (UnexpectedErrorFault e) {
+            if (e.getExceptionCode() != null && "INVALID_SESSION_ID".equals(e.getExceptionCode().name())) {
+                // Original EndPoint    : connection.getConfig().getAuthEndpoint()
+                // Real Service EndPoint: connection.getConfig().getServiceEndpoint()
+                try {
+                    URL serviceUrl = new URL(connection.getConfig().getServiceEndpoint());
+                    URLConnection urlConnection = serviceUrl.openConnection();
+                    urlConnection.connect();
+                } catch (MalformedURLException ex) {
+                    log.error("The format of the URL is wrong", ex);
+                    throw new ConnectionException("Failed to connect to the host", ex);
+                } catch (IOException ioException) {
+                    log.error("Failed to connect to the host", ioException);
+                    throw new ConnectionException("Failed to connect to the host", ioException);
+                }
+            }
+        } catch (ConnectionException e) {
+            log.error("Failed to establish connection", e);
+            throw new ConnectionException("Failed to connect, unexpected error:", e);
+        } catch (Exception e) {
+            log.error("Failed to connect, unexpected error:", e);
+            throw new ConnectionException("Failed to connect, unexpected error:", e);
+        }
     }
 
     private static String buildAuthEndpoint(ForceConnectionInfo info) {
