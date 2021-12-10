@@ -200,6 +200,9 @@ It could be obtained from here:  https://github.com/spuliaiev-sfdc/salesforce-so
 
 ## Version History
 
+### 1.4.4
+SOQL queries will try to expand the `SELECT * from Account` syntax for root query entity into up to 100 fields.
+
 ### 1.4.3
 Parsing of Date Value into SOQL date for IntelliJ.
 
