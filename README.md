@@ -26,7 +26,10 @@ Download the driver JAR file:
 ## Supported features
 1. Queries support native SOQL;
   ```SQL
-   select Id, Account.Name, Owner.id, Owner.Name from Account
+   select Id, Account.Name, Owner.id, Owner.Name from Account;
+   
+   -- * fields reference will expand into up to 100 first fields of the entity for root entity
+   select * from Account;
 ```
 2. Nested queries are supported;
 3. Write is supported as INSERT/UPDATE statements for version >= 1.4.0
