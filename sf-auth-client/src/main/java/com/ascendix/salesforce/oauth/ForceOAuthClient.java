@@ -13,13 +13,12 @@ import com.google.api.client.http.HttpStatusCodes;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
-import com.google.api.client.json.jackson2.JacksonFactory;
+import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.client.util.BackOff;
 import com.google.api.client.util.ExponentialBackOff;
+import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-
-import java.io.IOException;
 
 @Slf4j
 public class ForceOAuthClient {
@@ -36,7 +35,7 @@ public class ForceOAuthClient {
     private static final int MAX_RETRIES = 5;
 
     private static final HttpTransport HTTP_TRANSPORT = new NetHttpTransport();
-    private static final JsonFactory JSON_FACTORY = new JacksonFactory();
+    private static final JsonFactory JSON_FACTORY = new GsonFactory();
 
     private final long connectTimeout;
     private final long readTimeout;
@@ -75,20 +74,19 @@ public class ForceOAuthClient {
 
     private HttpRequestFactory buildHttpRequestFactory(String accessToken) {
         Credential credential = new Credential(BearerToken.authorizationHeaderAccessMethod())
-                .setAccessToken(accessToken);
+            .setAccessToken(accessToken);
 
         return HTTP_TRANSPORT.createRequestFactory(
-                request -> {
-                    request.setConnectTimeout(Math.toIntExact(connectTimeout));
-                    request.setReadTimeout(Math.toIntExact(readTimeout));
-                    request.setParser(JSON_FACTORY.createJsonObjectParser());
-                    request.setInterceptor(credential);
-                    request.setUnsuccessfulResponseHandler(buildUnsuccessfulResponseHandler());
-                    request.setIOExceptionHandler(buildIOExceptionHandler());
-                    request.setNumberOfRetries(MAX_RETRIES);
-                });
+            request -> {
+                request.setConnectTimeout(Math.toIntExact(connectTimeout));
+                request.setReadTimeout(Math.toIntExact(readTimeout));
+                request.setParser(JSON_FACTORY.createJsonObjectParser());
+                request.setInterceptor(credential);
+                request.setUnsuccessfulResponseHandler(buildUnsuccessfulResponseHandler());
+                request.setIOExceptionHandler(buildIOExceptionHandler());
+                request.setNumberOfRetries(MAX_RETRIES);
+            });
     }
-
 
     private static void extractPartnerUrl(ForceUserInfo userInfo) {
         if (userInfo.getUrls() == null || !userInfo.getUrls().containsKey("partner")) {
@@ -99,26 +97,26 @@ public class ForceOAuthClient {
 
     private boolean isBadTokenError(HttpResponseException e) {
         return ((e.getStatusCode() == HttpStatusCodes.STATUS_CODE_FORBIDDEN)
-                && StringUtils.equalsAnyIgnoreCase(e.getContent(),
-                BAD_TOKEN_SF_ERROR_CODE, MISSING_TOKEN_SF_ERROR_CODE, WRONG_ORG_SF_ERROR_CODE))
-                ||
-                (e.getStatusCode() == HttpStatusCodes.STATUS_CODE_NOT_FOUND &&
-                        StringUtils.equalsIgnoreCase(e.getContent(), BAD_ID_SF_ERROR_CODE));
+            && StringUtils.equalsAnyIgnoreCase(e.getContent(),
+            BAD_TOKEN_SF_ERROR_CODE, MISSING_TOKEN_SF_ERROR_CODE, WRONG_ORG_SF_ERROR_CODE))
+            ||
+            (e.getStatusCode() == HttpStatusCodes.STATUS_CODE_NOT_FOUND &&
+                StringUtils.equalsIgnoreCase(e.getContent(), BAD_ID_SF_ERROR_CODE));
     }
 
     private boolean isForceInternalError(HttpResponseException e) {
         return e.getStatusCode() == HttpStatusCodes.STATUS_CODE_NOT_FOUND &&
-                StringUtils.equalsIgnoreCase(e.getContent(), INTERNAL_SERVER_ERROR_SF_ERROR_CODE);
+            StringUtils.equalsIgnoreCase(e.getContent(), INTERNAL_SERVER_ERROR_SF_ERROR_CODE);
     }
 
     private BackOff getBackOff() {
         return new ExponentialBackOff.Builder()
-                .setInitialIntervalMillis(500)
-                .setMaxElapsedTimeMillis(30000)
-                .setMaxIntervalMillis(10000)
-                .setMultiplier(1.5)
-                .setRandomizationFactor(0.5)
-                .build();
+            .setInitialIntervalMillis(500)
+            .setMaxElapsedTimeMillis(30000)
+            .setMaxIntervalMillis(10000)
+            .setMultiplier(1.5)
+            .setRandomizationFactor(0.5)
+            .build();
     }
 
     private HttpBackOffUnsuccessfulResponseHandler buildUnsuccessfulResponseHandler() {
@@ -142,5 +140,4 @@ public class ForceOAuthClient {
             log.error("Failed to parse instance name from profile: {}", profileUrl, e);
         }
     }
-
 }

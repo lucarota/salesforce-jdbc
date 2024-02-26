@@ -1,30 +1,100 @@
 package com.ascendix.jdbc.salesforce.statement.processor.utils;
 
-import com.ascendix.jdbc.salesforce.exceptions.UnsupportedArgumentTypeException;
-import net.sf.jsqlparser.expression.*;
-import net.sf.jsqlparser.expression.operators.arithmetic.*;
-import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
-import net.sf.jsqlparser.expression.operators.conditional.OrExpression;
-import net.sf.jsqlparser.expression.operators.relational.*;
-import net.sf.jsqlparser.schema.Column;
-import net.sf.jsqlparser.statement.select.SubSelect;
+import static com.ascendix.jdbc.salesforce.statement.processor.InsertQueryProcessor.SF_JDBC_DRIVER_NAME;
 
+import com.ascendix.jdbc.salesforce.exceptions.UnsupportedArgumentTypeException;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.sql.Time;
-
-import java.time.*;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.Period;
 import java.util.Date;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import static com.ascendix.jdbc.salesforce.statement.processor.InsertQueryProcessor.SF_JDBC_DRIVER_NAME;
+import lombok.Getter;
+import net.sf.jsqlparser.expression.AllComparisonExpression;
+import net.sf.jsqlparser.expression.AnalyticExpression;
+import net.sf.jsqlparser.expression.AnyComparisonExpression;
+import net.sf.jsqlparser.expression.ArrayExpression;
+import net.sf.jsqlparser.expression.CaseExpression;
+import net.sf.jsqlparser.expression.CastExpression;
+import net.sf.jsqlparser.expression.CollateExpression;
+import net.sf.jsqlparser.expression.DateTimeLiteralExpression;
+import net.sf.jsqlparser.expression.DateValue;
+import net.sf.jsqlparser.expression.DoubleValue;
+import net.sf.jsqlparser.expression.ExpressionVisitor;
+import net.sf.jsqlparser.expression.ExtractExpression;
+import net.sf.jsqlparser.expression.Function;
+import net.sf.jsqlparser.expression.HexValue;
+import net.sf.jsqlparser.expression.IntervalExpression;
+import net.sf.jsqlparser.expression.JdbcNamedParameter;
+import net.sf.jsqlparser.expression.JdbcParameter;
+import net.sf.jsqlparser.expression.JsonExpression;
+import net.sf.jsqlparser.expression.KeepExpression;
+import net.sf.jsqlparser.expression.LongValue;
+import net.sf.jsqlparser.expression.MySQLGroupConcat;
+import net.sf.jsqlparser.expression.NextValExpression;
+import net.sf.jsqlparser.expression.NotExpression;
+import net.sf.jsqlparser.expression.NullValue;
+import net.sf.jsqlparser.expression.NumericBind;
+import net.sf.jsqlparser.expression.OracleHierarchicalExpression;
+import net.sf.jsqlparser.expression.OracleHint;
+import net.sf.jsqlparser.expression.Parenthesis;
+import net.sf.jsqlparser.expression.RowConstructor;
+import net.sf.jsqlparser.expression.SignedExpression;
+import net.sf.jsqlparser.expression.StringValue;
+import net.sf.jsqlparser.expression.TimeKeyExpression;
+import net.sf.jsqlparser.expression.TimeValue;
+import net.sf.jsqlparser.expression.TimestampValue;
+import net.sf.jsqlparser.expression.UserVariable;
+import net.sf.jsqlparser.expression.ValueListExpression;
+import net.sf.jsqlparser.expression.VariableAssignment;
+import net.sf.jsqlparser.expression.WhenClause;
+import net.sf.jsqlparser.expression.XMLSerializeExpr;
+import net.sf.jsqlparser.expression.operators.arithmetic.Addition;
+import net.sf.jsqlparser.expression.operators.arithmetic.BitwiseAnd;
+import net.sf.jsqlparser.expression.operators.arithmetic.BitwiseLeftShift;
+import net.sf.jsqlparser.expression.operators.arithmetic.BitwiseOr;
+import net.sf.jsqlparser.expression.operators.arithmetic.BitwiseRightShift;
+import net.sf.jsqlparser.expression.operators.arithmetic.BitwiseXor;
+import net.sf.jsqlparser.expression.operators.arithmetic.Concat;
+import net.sf.jsqlparser.expression.operators.arithmetic.Division;
+import net.sf.jsqlparser.expression.operators.arithmetic.IntegerDivision;
+import net.sf.jsqlparser.expression.operators.arithmetic.Modulo;
+import net.sf.jsqlparser.expression.operators.arithmetic.Multiplication;
+import net.sf.jsqlparser.expression.operators.arithmetic.Subtraction;
+import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
+import net.sf.jsqlparser.expression.operators.conditional.OrExpression;
+import net.sf.jsqlparser.expression.operators.relational.Between;
+import net.sf.jsqlparser.expression.operators.relational.EqualsTo;
+import net.sf.jsqlparser.expression.operators.relational.ExistsExpression;
+import net.sf.jsqlparser.expression.operators.relational.FullTextSearch;
+import net.sf.jsqlparser.expression.operators.relational.GreaterThan;
+import net.sf.jsqlparser.expression.operators.relational.GreaterThanEquals;
+import net.sf.jsqlparser.expression.operators.relational.InExpression;
+import net.sf.jsqlparser.expression.operators.relational.IsBooleanExpression;
+import net.sf.jsqlparser.expression.operators.relational.IsNullExpression;
+import net.sf.jsqlparser.expression.operators.relational.JsonOperator;
+import net.sf.jsqlparser.expression.operators.relational.LikeExpression;
+import net.sf.jsqlparser.expression.operators.relational.Matches;
+import net.sf.jsqlparser.expression.operators.relational.MinorThan;
+import net.sf.jsqlparser.expression.operators.relational.MinorThanEquals;
+import net.sf.jsqlparser.expression.operators.relational.NotEqualsTo;
+import net.sf.jsqlparser.expression.operators.relational.RegExpMatchOperator;
+import net.sf.jsqlparser.expression.operators.relational.RegExpMySQLOperator;
+import net.sf.jsqlparser.expression.operators.relational.SimilarToExpression;
+import net.sf.jsqlparser.schema.Column;
+import net.sf.jsqlparser.statement.select.SubSelect;
 
 public class EvaluateExpressionVisitor implements ExpressionVisitor {
 
     protected static final Logger logger = Logger.getLogger(SF_JDBC_DRIVER_NAME);
     protected Map<String, Object> recordFieldsFromDB;
+    @Getter
     protected Object result;
 
     public EvaluateExpressionVisitor(Map<String, Object> recordFieldsFromDB) {
@@ -35,10 +105,6 @@ public class EvaluateExpressionVisitor implements ExpressionVisitor {
         return new EvaluateExpressionVisitor(recordFieldsFromDB);
     }
 
-    public Object getResult() {
-        return result;
-    }
-
     public String getResultString() {
         return (String) result;
     }
@@ -47,7 +113,9 @@ public class EvaluateExpressionVisitor implements ExpressionVisitor {
         if (result == null) {
             return ifNull;
         }
-        if (result instanceof String) return ((String) result);
+        if (result instanceof String) {
+            return ((String) result);
+        }
         return result.toString();
     }
 
@@ -55,11 +123,21 @@ public class EvaluateExpressionVisitor implements ExpressionVisitor {
         if (result == null) {
             return 0;
         }
-        if (result instanceof Double) return ((Double) result).longValue();
-        if (result instanceof Float) return ((Float) result).longValue();
-        if (result instanceof Long) return ((Long) result);
-        if (result instanceof Integer) return ((Integer) result).longValue();
-        if (result instanceof String) return Long.parseLong((String)result);
+        if (result instanceof Double) {
+            return ((Double) result).longValue();
+        }
+        if (result instanceof Float) {
+            return ((Float) result).longValue();
+        }
+        if (result instanceof Long) {
+            return ((Long) result);
+        }
+        if (result instanceof Integer) {
+            return ((Integer) result).longValue();
+        }
+        if (result instanceof String) {
+            return Long.parseLong((String) result);
+        }
         String message = String.format("Cannot convert to Fixed type %s value %s", result.getClass().getName(), result);
         logger.log(Level.SEVERE, message);
         throw new UnsupportedArgumentTypeException(message);
@@ -69,11 +147,21 @@ public class EvaluateExpressionVisitor implements ExpressionVisitor {
         if (result == null) {
             return 0d;
         }
-        if (result instanceof Double) return (Double) result;
-        if (result instanceof Float) return ((Float) result).doubleValue();
-        if (result instanceof Long) return ((Long) result).doubleValue();
-        if (result instanceof Integer) return ((Integer) result).doubleValue();
-        if (result instanceof String) return Double.parseDouble((String)result);
+        if (result instanceof Double) {
+            return (Double) result;
+        }
+        if (result instanceof Float) {
+            return ((Float) result).doubleValue();
+        }
+        if (result instanceof Long) {
+            return ((Long) result).doubleValue();
+        }
+        if (result instanceof Integer) {
+            return ((Integer) result).doubleValue();
+        }
+        if (result instanceof String) {
+            return Double.parseDouble((String) result);
+        }
         String message = String.format("Cannot convert to Float type %s value %s", result.getClass().getName(), result);
         logger.log(Level.SEVERE, message);
         throw new UnsupportedArgumentTypeException(message);
@@ -85,30 +173,30 @@ public class EvaluateExpressionVisitor implements ExpressionVisitor {
 
     public boolean isResultFixedNumber() {
         return result != null && (
-                        result instanceof Long ||
-                        result instanceof Integer);
+            result instanceof Long ||
+                result instanceof Integer);
     }
 
     public boolean isResultFloatNumber() {
         return result != null && (
-                        result instanceof Double ||
-                        result instanceof Float);
+            result instanceof Double ||
+                result instanceof Float);
     }
 
     public boolean isResultDateTime() {
         return result != null && (
-                        result instanceof Instant ||
-                        result instanceof java.sql.Timestamp);
+            result instanceof Instant ||
+                result instanceof java.sql.Timestamp);
     }
 
     public boolean isResultTime() {
         return result != null && (
-                        result instanceof java.sql.Time);
+            result instanceof java.sql.Time);
     }
 
     public boolean isResultDate() {
         return result != null && (
-                        result instanceof java.sql.Date);
+            result instanceof java.sql.Date);
     }
 
     public boolean isResultNull() {
@@ -133,7 +221,7 @@ public class EvaluateExpressionVisitor implements ExpressionVisitor {
 
     @Override
     public void visit(Function function) {
-        System.out.println("[UpdateVisitor] Function function="+function.getName());
+        System.out.println("[UpdateVisitor] Function function=" + function.getName());
         if ("now".equalsIgnoreCase(function.getName())) {
             result = new Date();
             return;
@@ -142,7 +230,7 @@ public class EvaluateExpressionVisitor implements ExpressionVisitor {
             result = LocalDate.now();
             return;
         }
-        throw new RuntimeException("Function '"+function.getName()+"' is not implemented.");
+        throw new RuntimeException("Function '" + function.getName() + "' is not implemented.");
     }
 
     @Override
@@ -162,19 +250,19 @@ public class EvaluateExpressionVisitor implements ExpressionVisitor {
 
     @Override
     public void visit(DoubleValue doubleValue) {
-        System.out.println("[UpdateVisitor] DoubleValue="+doubleValue.getValue());
+        System.out.println("[UpdateVisitor] DoubleValue=" + doubleValue.getValue());
         result = doubleValue.getValue();
     }
 
     @Override
     public void visit(LongValue longValue) {
-        System.out.println("[UpdateVisitor] LongValue="+longValue.getValue());
+        System.out.println("[UpdateVisitor] LongValue=" + longValue.getValue());
         result = longValue.getValue();
     }
 
     @Override
     public void visit(HexValue hexValue) {
-        System.out.println("[UpdateVisitor] HexValue="+hexValue.getValue());
+        System.out.println("[UpdateVisitor] HexValue=" + hexValue.getValue());
         result = hexValue.getValue();
     }
 
@@ -206,37 +294,39 @@ public class EvaluateExpressionVisitor implements ExpressionVisitor {
 
     @Override
     public void visit(StringValue stringValue) {
-        System.out.println("[UpdateVisitor] StringValue="+stringValue.getValue());
+        System.out.println("[UpdateVisitor] StringValue=" + stringValue.getValue());
         result = stringValue.getValue();
     }
 
-    Object processDateNumberOperation(EvaluateExpressionVisitor left, EvaluateExpressionVisitor right, boolean isAdding) {
+    Object processDateNumberOperation(EvaluateExpressionVisitor left, EvaluateExpressionVisitor right,
+        boolean isAdding) {
         BigDecimal changeValue = BigDecimal.valueOf(right.getResultFloatNumber());
         // https://oracle-base.com/articles/misc/oracle-dates-timestamps-and-intervals
         // Also rounding - because otherwise 1 second will be 0.999993600
-        long secondsValue = changeValue.subtract(BigDecimal.valueOf(changeValue.intValue())).multiply(BigDecimal.valueOf(86400), new MathContext(4)).longValue();
+        long secondsValue = changeValue.subtract(BigDecimal.valueOf(changeValue.intValue()))
+            .multiply(BigDecimal.valueOf(86400), new MathContext(4))
+            .longValue();
 
         Period changeDays = Period.ofDays(isAdding ? changeValue.intValue() : -changeValue.intValue());
         Duration changeSec = Duration.ofSeconds(isAdding ? secondsValue : -secondsValue);
         if (left.result instanceof java.sql.Date) {
-            LocalDate instant = ((java.sql.Date)left.result).toLocalDate();
+            LocalDate instant = ((java.sql.Date) left.result).toLocalDate();
             instant = instant.plus(changeDays);
             result = java.sql.Date.valueOf(instant);
         }
-        if (left.result instanceof Instant) {
-            Instant instant = ((Instant)left.result);
+        if (left.result instanceof Instant instant) {
             instant = instant.plus(changeDays);
             instant = instant.plus(changeSec);
             result = instant;
         }
         if (left.result instanceof java.sql.Timestamp) {
-            Instant instant = ((java.sql.Timestamp)left.result).toInstant();
+            Instant instant = ((java.sql.Timestamp) left.result).toInstant();
             instant = instant.plus(changeDays);
             instant = instant.plus(changeSec);
             result = new java.sql.Timestamp(instant.toEpochMilli());
         }
         if (left.result instanceof Time) {
-            LocalTime instant = ((java.sql.Time)left.result).toLocalTime();
+            LocalTime instant = ((java.sql.Time) left.result).toLocalTime();
             instant = instant.plus(changeSec);
             result = java.sql.Time.valueOf(instant);
         }
@@ -252,9 +342,10 @@ public class EvaluateExpressionVisitor implements ExpressionVisitor {
         EvaluateExpressionVisitor subEvaluatorRight = subVisitor();
         addition.getRightExpression().accept(subEvaluatorRight);
 
-        if (!subEvaluatorLeft.isResultNull() && !subEvaluatorRight.isResultNull()){
-            if ((subEvaluatorLeft.isResultDateTime() || subEvaluatorLeft.isResultDate() || subEvaluatorLeft.isResultTime())  &&
-                (subEvaluatorRight.isResultFloatNumber() || subEvaluatorRight.isResultFixedNumber()) ) {
+        if (!subEvaluatorLeft.isResultNull() && !subEvaluatorRight.isResultNull()) {
+            if ((subEvaluatorLeft.isResultDateTime() || subEvaluatorLeft.isResultDate()
+                || subEvaluatorLeft.isResultTime()) &&
+                (subEvaluatorRight.isResultFloatNumber() || subEvaluatorRight.isResultFixedNumber())) {
                 result = processDateNumberOperation(subEvaluatorLeft, subEvaluatorRight, true);
                 return;
             }
@@ -286,7 +377,9 @@ public class EvaluateExpressionVisitor implements ExpressionVisitor {
             return;
         }
         result = null;
-        String message = String.format("Addition not implemented for types %s and %s", subEvaluatorLeft.result.getClass().getName(), subEvaluatorRight.result.getClass().getName());
+        String message = String.format("Addition not implemented for types %s and %s",
+            subEvaluatorLeft.result.getClass().getName(),
+            subEvaluatorRight.result.getClass().getName());
         logger.log(Level.SEVERE, message);
         throw new UnsupportedArgumentTypeException(message);
     }
@@ -305,9 +398,11 @@ public class EvaluateExpressionVisitor implements ExpressionVisitor {
             return;
         }
 
-        boolean isString = subEvaluatorLeft.isResultString()|| subEvaluatorRight.isResultString();
+        boolean isString = subEvaluatorLeft.isResultString() || subEvaluatorRight.isResultString();
         if (isString) {
-            String message = String.format("Division not implemented for types %s and %s", subEvaluatorLeft.result.getClass().getName(), subEvaluatorRight.result.getClass().getName());
+            String message = String.format("Division not implemented for types %s and %s",
+                subEvaluatorLeft.result.getClass().getName(),
+                subEvaluatorRight.result.getClass().getName());
             logger.log(Level.SEVERE, message);
             throw new UnsupportedArgumentTypeException(message);
         }
@@ -321,7 +416,9 @@ public class EvaluateExpressionVisitor implements ExpressionVisitor {
             return;
         }
         result = null;
-        String message = String.format("Division not implemented for types %s and %s", subEvaluatorLeft.result.getClass().getName(), subEvaluatorRight.result.getClass().getName());
+        String message = String.format("Division not implemented for types %s and %s",
+            subEvaluatorLeft.result.getClass().getName(),
+            subEvaluatorRight.result.getClass().getName());
         logger.log(Level.SEVERE, message);
         throw new UnsupportedArgumentTypeException(message);
     }
@@ -342,20 +439,25 @@ public class EvaluateExpressionVisitor implements ExpressionVisitor {
 
         boolean isString = subEvaluatorLeft.isResultString() || subEvaluatorRight.isResultString();
         if (isString) {
-            String message = String.format("Division not implemented for types %s and %s", subEvaluatorLeft.result.getClass().getName(), subEvaluatorRight.result.getClass().getName());
+            String message = String.format("Division not implemented for types %s and %s",
+                subEvaluatorLeft.result.getClass().getName(),
+                subEvaluatorRight.result.getClass().getName());
             logger.log(Level.SEVERE, message);
             throw new UnsupportedArgumentTypeException(message);
         }
 
         if (subEvaluatorLeft.isResultFloatNumber() || subEvaluatorRight.isResultFloatNumber()) {
-            result = Double.doubleToLongBits(subEvaluatorLeft.getResultFloatNumber() / subEvaluatorRight.getResultFloatNumber());
+            result = Double.doubleToLongBits(
+                subEvaluatorLeft.getResultFloatNumber() / subEvaluatorRight.getResultFloatNumber());
             return;
         }
         if (subEvaluatorLeft.isResultFixedNumber() || subEvaluatorRight.isResultFixedNumber()) {
             result = subEvaluatorLeft.getResultFixedNumber() / subEvaluatorRight.getResultFixedNumber();
             return;
         }
-        String message = String.format("Division not implemented for types %s and %s", subEvaluatorLeft.result.getClass().getName(), subEvaluatorRight.result.getClass().getName());
+        String message = String.format("Division not implemented for types %s and %s",
+            subEvaluatorLeft.result.getClass().getName(),
+            subEvaluatorRight.result.getClass().getName());
         logger.log(Level.SEVERE, message);
         throw new UnsupportedArgumentTypeException(message);
     }
@@ -376,7 +478,9 @@ public class EvaluateExpressionVisitor implements ExpressionVisitor {
 
         boolean isString = subEvaluatorLeft.isResultString() || subEvaluatorRight.isResultString();
         if (isString) {
-            String message = String.format("Multiplication not implemented for types %s and %s", subEvaluatorLeft.result.getClass().getName(), subEvaluatorRight.result.getClass().getName());
+            String message = String.format("Multiplication not implemented for types %s and %s",
+                subEvaluatorLeft.result.getClass().getName(),
+                subEvaluatorRight.result.getClass().getName());
             logger.log(Level.SEVERE, message);
             throw new UnsupportedArgumentTypeException(message);
         }
@@ -390,7 +494,9 @@ public class EvaluateExpressionVisitor implements ExpressionVisitor {
             return;
         }
         result = null;
-        String message = String.format("Multiplication not implemented for types %s and %s", subEvaluatorLeft.result.getClass().getName(), subEvaluatorRight.result.getClass().getName());
+        String message = String.format("Multiplication not implemented for types %s and %s",
+            subEvaluatorLeft.result.getClass().getName(),
+            subEvaluatorRight.result.getClass().getName());
         logger.log(Level.SEVERE, message);
         throw new UnsupportedArgumentTypeException(message);
     }
@@ -403,9 +509,10 @@ public class EvaluateExpressionVisitor implements ExpressionVisitor {
         EvaluateExpressionVisitor subEvaluatorRight = subVisitor();
         subtraction.getRightExpression().accept(subEvaluatorRight);
 
-        if (!subEvaluatorLeft.isResultNull() && !subEvaluatorRight.isResultNull()){
-            if ((subEvaluatorLeft.isResultDateTime() || subEvaluatorLeft.isResultDate() || subEvaluatorLeft.isResultTime())  &&
-                    (subEvaluatorRight.isResultFloatNumber() || subEvaluatorRight.isResultFixedNumber()) ) {
+        if (!subEvaluatorLeft.isResultNull() && !subEvaluatorRight.isResultNull()) {
+            if ((subEvaluatorLeft.isResultDateTime() || subEvaluatorLeft.isResultDate()
+                || subEvaluatorLeft.isResultTime()) &&
+                (subEvaluatorRight.isResultFloatNumber() || subEvaluatorRight.isResultFixedNumber())) {
                 result = processDateNumberOperation(subEvaluatorLeft, subEvaluatorRight, false);
                 return;
             }
@@ -419,7 +526,9 @@ public class EvaluateExpressionVisitor implements ExpressionVisitor {
 
         boolean isString = subEvaluatorLeft.isResultString() || subEvaluatorRight.isResultString();
         if (isString) {
-            String message = String.format("Subtraction not implemented for types %s and %s", subEvaluatorLeft.result.getClass().getName(), subEvaluatorRight.result.getClass().getName());
+            String message = String.format("Subtraction not implemented for types %s and %s",
+                subEvaluatorLeft.result.getClass().getName(),
+                subEvaluatorRight.result.getClass().getName());
             logger.log(Level.SEVERE, message);
             throw new UnsupportedArgumentTypeException(message);
         }
@@ -432,7 +541,9 @@ public class EvaluateExpressionVisitor implements ExpressionVisitor {
             result = subEvaluatorLeft.getResultFixedNumber() - subEvaluatorRight.getResultFixedNumber();
             return;
         }
-        String message = String.format("Subtraction not implemented for types %s and %s", subEvaluatorLeft.result.getClass().getName(), subEvaluatorRight.result.getClass().getName());
+        String message = String.format("Subtraction not implemented for types %s and %s",
+            subEvaluatorLeft.result.getClass().getName(),
+            subEvaluatorRight.result.getClass().getName());
         logger.log(Level.SEVERE, message);
         result = null;
         throw new UnsupportedArgumentTypeException(message);
@@ -441,19 +552,16 @@ public class EvaluateExpressionVisitor implements ExpressionVisitor {
     @Override
     public void visit(AndExpression andExpression) {
         System.out.println("[UpdateVisitor] AndExpression");
-
     }
 
     @Override
     public void visit(OrExpression orExpression) {
         System.out.println("[UpdateVisitor] OrExpression");
-
     }
 
     @Override
     public void visit(Between between) {
         System.out.println("[UpdateVisitor] Between");
-
     }
 
     @Override
@@ -464,72 +572,62 @@ public class EvaluateExpressionVisitor implements ExpressionVisitor {
     @Override
     public void visit(GreaterThan greaterThan) {
         System.out.println("[UpdateVisitor] GreaterThan");
-
     }
 
     @Override
     public void visit(GreaterThanEquals greaterThanEquals) {
         System.out.println("[UpdateVisitor] GreaterThanEquals");
-
     }
 
     @Override
     public void visit(InExpression inExpression) {
         System.out.println("[UpdateVisitor] InExpression");
-
     }
 
     @Override
     public void visit(FullTextSearch fullTextSearch) {
         System.out.println("[UpdateVisitor] FullTextSearch");
-
     }
 
     @Override
     public void visit(IsNullExpression isNullExpression) {
         System.out.println("[UpdateVisitor] IsNullExpression");
-
     }
 
     @Override
     public void visit(IsBooleanExpression isBooleanExpression) {
         System.out.println("[UpdateVisitor] IsBooleanExpression");
-
     }
 
     @Override
     public void visit(LikeExpression likeExpression) {
         System.out.println("[UpdateVisitor] LikeExpression");
-
     }
 
     @Override
     public void visit(MinorThan minorThan) {
         System.out.println("[UpdateVisitor] MinorThan");
-
     }
 
     @Override
     public void visit(MinorThanEquals minorThanEquals) {
         System.out.println("[UpdateVisitor] MinorThanEquals");
-
     }
 
     @Override
     public void visit(NotEqualsTo notEqualsTo) {
         System.out.println("[UpdateVisitor] NotEqualsTo");
-
     }
 
     @Override
     public void visit(Column tableColumn) {
-        System.out.println("[UpdateVisitor] Column column="+tableColumn.getColumnName());
+        System.out.println("[UpdateVisitor] Column column=" + tableColumn.getColumnName());
         result = recordFieldsFromDB.get(tableColumn.getColumnName());
     }
 
     @Override
     public void visit(SubSelect subSelect) {
-        System.out.println("[VtoxSVisitor] SubSelect="+subSelect.toString());
+        System.out.println("[VtoxSVisitor] SubSelect=" + subSelect.toString());
     }
 
     @Override
@@ -552,13 +650,11 @@ public class EvaluateExpressionVisitor implements ExpressionVisitor {
     @Override
     public void visit(AllComparisonExpression allComparisonExpression) {
         System.out.println("[UpdateVisitor] AllComparisonExpression");
-
     }
 
     @Override
     public void visit(AnyComparisonExpression anyComparisonExpression) {
         System.out.println("[UpdateVisitor] AnyComparisonExpression");
-
     }
 
     @Override
@@ -575,180 +671,150 @@ public class EvaluateExpressionVisitor implements ExpressionVisitor {
     @Override
     public void visit(Matches matches) {
         System.out.println("[UpdateVisitor] Matches");
-
     }
 
     @Override
     public void visit(BitwiseAnd bitwiseAnd) {
         System.out.println("[UpdateVisitor] BitwiseAnd");
-
     }
 
     @Override
     public void visit(BitwiseOr bitwiseOr) {
         System.out.println("[UpdateVisitor] BitwiseOr");
-
     }
 
     @Override
     public void visit(BitwiseXor bitwiseXor) {
         System.out.println("[UpdateVisitor] BitwiseXor");
-
     }
 
     @Override
     public void visit(CastExpression cast) {
         System.out.println("[UpdateVisitor] CastExpression");
-
     }
 
     @Override
     public void visit(Modulo modulo) {
         System.out.println("[UpdateVisitor] Modulo");
-
     }
 
     @Override
     public void visit(AnalyticExpression aexpr) {
         System.out.println("[UpdateVisitor] AnalyticExpression");
-
     }
 
     @Override
     public void visit(ExtractExpression eexpr) {
         System.out.println("[UpdateVisitor] BitwiseRightShift");
-
     }
 
     @Override
     public void visit(IntervalExpression iexpr) {
         System.out.println("[UpdateVisitor] IntervalExpression");
-
     }
 
     @Override
     public void visit(OracleHierarchicalExpression oexpr) {
         System.out.println("[UpdateVisitor] OracleHierarchicalExpression");
-
     }
 
     @Override
     public void visit(RegExpMatchOperator rexpr) {
         System.out.println("[UpdateVisitor] RegExpMatchOperator");
-
     }
 
     @Override
     public void visit(JsonExpression jsonExpr) {
         System.out.println("[UpdateVisitor] JsonExpression");
-
     }
 
     @Override
     public void visit(JsonOperator jsonExpr) {
         System.out.println("[UpdateVisitor] JsonOperator");
-
     }
 
     @Override
     public void visit(RegExpMySQLOperator regExpMySQLOperator) {
         System.out.println("[UpdateVisitor] RegExpMySQLOperator");
-
     }
 
     @Override
     public void visit(UserVariable var) {
         System.out.println("[UpdateVisitor] UserVariable");
-
     }
 
     @Override
     public void visit(NumericBind bind) {
         System.out.println("[UpdateVisitor] NumericBind");
-
     }
 
     @Override
     public void visit(KeepExpression aexpr) {
         System.out.println("[UpdateVisitor] KeepExpression");
-
     }
 
     @Override
     public void visit(MySQLGroupConcat groupConcat) {
         System.out.println("[UpdateVisitor] MySQLGroupConcat");
-
     }
 
     @Override
     public void visit(ValueListExpression valueList) {
         System.out.println("[UpdateVisitor] ValueListExpression");
-
     }
 
     @Override
     public void visit(RowConstructor rowConstructor) {
         System.out.println("[UpdateVisitor] RowConstructor");
-
     }
 
     @Override
     public void visit(OracleHint hint) {
         System.out.println("[UpdateVisitor] OracleHint");
-
     }
 
     @Override
     public void visit(TimeKeyExpression timeKeyExpression) {
         System.out.println("[UpdateVisitor] TimeKeyExpression");
-
     }
 
     @Override
     public void visit(DateTimeLiteralExpression literal) {
         System.out.println("[UpdateVisitor] DateTimeLiteralExpression");
-
     }
 
     @Override
     public void visit(NotExpression aThis) {
         System.out.println("[UpdateVisitor] NotExpression");
-
     }
 
     @Override
     public void visit(NextValExpression aThis) {
         System.out.println("[UpdateVisitor] NextValExpression");
-
     }
 
     @Override
     public void visit(CollateExpression aThis) {
         System.out.println("[UpdateVisitor] CollateExpression");
-
     }
 
     @Override
     public void visit(SimilarToExpression aThis) {
         System.out.println("[UpdateVisitor] SimilarToExpression");
-
     }
 
     @Override
     public void visit(ArrayExpression aThis) {
         System.out.println("[UpdateVisitor] ArrayExpression");
-
     }
 
     @Override
     public void visit(VariableAssignment aThis) {
         System.out.println("[UpdateVisitor] VariableAssignment");
-
     }
 
     @Override
     public void visit(XMLSerializeExpr aThis) {
         System.out.println("[UpdateVisitor] XMLSerializeExpr");
-
     }
 }

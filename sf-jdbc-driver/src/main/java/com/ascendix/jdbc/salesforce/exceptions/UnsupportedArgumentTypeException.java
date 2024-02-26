@@ -9,5 +9,4 @@ public class UnsupportedArgumentTypeException extends RuntimeException {
     public UnsupportedArgumentTypeException(String message, Throwable cause) {
         super(message, cause);
     }
-
 }

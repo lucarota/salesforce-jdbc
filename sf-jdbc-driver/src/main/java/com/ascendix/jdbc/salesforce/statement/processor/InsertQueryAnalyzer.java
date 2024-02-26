@@ -1,8 +1,18 @@
 package com.ascendix.jdbc.salesforce.statement.processor;
 
+import static com.ascendix.jdbc.salesforce.statement.processor.InsertQueryProcessor.SF_JDBC_DRIVER_NAME;
+
 import com.ascendix.jdbc.salesforce.statement.processor.utils.ValueToStringVisitor;
 import com.sforce.soap.partner.DescribeSObjectResult;
 import com.sforce.soap.partner.Field;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.expression.operators.relational.ExpressionList;
 import net.sf.jsqlparser.expression.operators.relational.ItemsListVisitor;
@@ -14,21 +24,14 @@ import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.insert.Insert;
 import net.sf.jsqlparser.statement.select.SubSelect;
 
-import java.util.*;
-import java.util.function.Function;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import static com.ascendix.jdbc.salesforce.statement.processor.InsertQueryProcessor.SF_JDBC_DRIVER_NAME;
-
 public class InsertQueryAnalyzer {
 
     private static final Logger logger = Logger.getLogger(SF_JDBC_DRIVER_NAME);
 
     private String soql;
-    private Function<String, DescribeSObjectResult> objectDescriptor;
-    private Map<String, DescribeSObjectResult> describedObjectsCache;
-    private Function<String, List<Map<String, Object>>> subSelectResolver;
+    private final Function<String, DescribeSObjectResult> objectDescriptor;
+    private final Map<String, DescribeSObjectResult> describedObjectsCache;
+    private final Function<String, List<Map<String, Object>>> subSelectResolver;
     private Insert queryData;
     private List<Map<String, Object>> records;
 
@@ -37,9 +40,9 @@ public class InsertQueryAnalyzer {
     }
 
     public InsertQueryAnalyzer(String soql,
-                               Function<String, DescribeSObjectResult> objectDescriptor,
-                               Map<String, DescribeSObjectResult> describedObjectsCache,
-                               Function<String, List<Map<String, Object>>> subSelectResolver) {
+        Function<String, DescribeSObjectResult> objectDescriptor,
+        Map<String, DescribeSObjectResult> describedObjectsCache,
+        Function<String, List<Map<String, Object>>> subSelectResolver) {
         this.soql = soql;
         this.objectDescriptor = objectDescriptor;
         this.describedObjectsCache = describedObjectsCache;
@@ -47,7 +50,7 @@ public class InsertQueryAnalyzer {
     }
 
     public boolean analyse(String soql) {
-        if (soql == null || soql.trim().length() == 0) {
+        if (soql == null || soql.trim().isEmpty()) {
             return false;
         }
         this.soql = soql;
@@ -55,6 +58,7 @@ public class InsertQueryAnalyzer {
     }
 
     public class InsertItemsListVisitor implements ItemsListVisitor {
+
         List<Column> columns;
         List<Map<String, Object>> records;
 
@@ -74,12 +78,12 @@ public class InsertQueryAnalyzer {
             HashMap<String, Object> fieldValues = new HashMap<>();
             records.add(fieldValues);
 
-            for(int i = 0; i < columns.size(); i++) {
+            for (int i = 0; i < columns.size(); i++) {
                 expressionList.getExpressions().get(i).accept(
-                        new ValueToStringVisitor(
-                                fieldValues,
-                                columns.get(i).getColumnName(),
-                                subSelectResolver)
+                    new ValueToStringVisitor(
+                        fieldValues,
+                        columns.get(i).getColumnName(),
+                        subSelectResolver)
                 );
             }
         }
@@ -100,9 +104,10 @@ public class InsertQueryAnalyzer {
 
     private Field findField(String name, DescribeSObjectResult objectDesc, Function<Field, String> nameFetcher) {
         return Arrays.stream(objectDesc.getFields())
-                .filter(field -> name.equalsIgnoreCase(nameFetcher.apply(field)))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Unknown field name \"" + name + "\" in object \"" + objectDesc.getName() + "\""));
+            .filter(field -> name.equalsIgnoreCase(nameFetcher.apply(field)))
+            .findFirst()
+            .orElseThrow(() -> new IllegalArgumentException(
+                "Unknown field name \"" + name + "\" in object \"" + objectDesc.getName() + "\""));
     }
 
     private DescribeSObjectResult describeObject(String fromObjectName) {
@@ -147,26 +152,25 @@ public class InsertQueryAnalyzer {
             } else {
                 if (getQueryData().getSelect() != null) {
                     if (subSelectResolver != null) {
-                        logger.info("Insert/Update has a sub-select: "+getQueryData().getSelect().toString());
-                        List<Map<String, Object>> subRecords = subSelectResolver.apply(getQueryData().getSelect().toString());
-                        logger.info("Insert/Update fetched " +subRecords.size()+ " records from a sub-select: "+getQueryData().getSelect().toString());
-                        for (Map<String, Object> subRecord: subRecords) {
+                        logger.info("Insert/Update has a sub-select: " + getQueryData().getSelect().toString());
+                        List<Map<String, Object>> subRecords = subSelectResolver.apply(getQueryData().getSelect()
+                            .toString());
+                        logger.info("Insert/Update fetched " + subRecords.size() + " records from a sub-select: "
+                            + getQueryData().getSelect().toString());
+                        for (Map<String, Object> subRecord : subRecords) {
                             // this subRecord is LinkedHashMap - so the order of fields is determined by soql
                             Map<String, Object> record = new HashMap<>();
                             records.add(record);
                             int fieldIndex = 0;
-                            Iterator<Map.Entry<String, Object>> fieldsIterator = subRecord.entrySet().iterator();
-                            while(fieldsIterator.hasNext()) {
-                                Map.Entry<String, Object> fieldEntry = fieldsIterator.next();
+                            for (final Map.Entry<String, Object> fieldEntry : subRecord.entrySet()) {
                                 String insertFieldName = queryData.getColumns().get(fieldIndex).getColumnName();
                                 String subSelectFieldName = fieldEntry.getKey();
                                 Object subSelectFieldValue = fieldEntry.getValue();
                                 record.put(insertFieldName, subSelectFieldValue);
 
-                                fieldIndex ++;
+                                fieldIndex++;
                             }
                         }
-
                     }
                 }
             }

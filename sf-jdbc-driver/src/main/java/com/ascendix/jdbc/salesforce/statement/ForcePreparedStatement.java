@@ -1,21 +1,22 @@
 package com.ascendix.jdbc.salesforce.statement;
 
-import com.ascendix.jdbc.salesforce.delegates.PartnerService;
-import com.ascendix.jdbc.salesforce.resultset.CachedResultSet;
 import com.ascendix.jdbc.salesforce.connection.ForceConnection;
 import com.ascendix.jdbc.salesforce.delegates.ForceResultField;
+import com.ascendix.jdbc.salesforce.delegates.PartnerService;
 import com.ascendix.jdbc.salesforce.metadata.ColumnMap;
 import com.ascendix.jdbc.salesforce.metadata.ForceDatabaseMetaData;
-import com.ascendix.jdbc.salesforce.statement.processor.*;
+import com.ascendix.jdbc.salesforce.resultset.CachedResultSet;
+import com.ascendix.jdbc.salesforce.statement.processor.AdminQueryProcessor;
+import com.ascendix.jdbc.salesforce.statement.processor.DeleteQueryAnalyzer;
+import com.ascendix.jdbc.salesforce.statement.processor.DeleteQueryProcessor;
+import com.ascendix.jdbc.salesforce.statement.processor.InsertQueryAnalyzer;
+import com.ascendix.jdbc.salesforce.statement.processor.InsertQueryProcessor;
+import com.ascendix.jdbc.salesforce.statement.processor.SoqlQueryAnalyzer;
+import com.ascendix.jdbc.salesforce.statement.processor.SoslQueryAnalyzer;
+import com.ascendix.jdbc.salesforce.statement.processor.SoslQueryProcessor;
+import com.ascendix.jdbc.salesforce.statement.processor.UpdateQueryAnalyzer;
+import com.ascendix.jdbc.salesforce.statement.processor.UpdateQueryProcessor;
 import com.sforce.ws.ConnectionException;
-import org.apache.commons.lang3.StringUtils;
-import org.mapdb.DB;
-import org.mapdb.DBMaker;
-import org.mapdb.HTreeMap;
-import org.mapdb.Serializer;
-import org.mule.tools.soql.exception.SOQLParsingException;
-
-import javax.sql.rowset.RowSetMetaDataImpl;
 import java.io.InputStream;
 import java.io.Reader;
 import java.math.BigDecimal;
@@ -40,7 +41,15 @@ import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.logging.Level;
@@ -49,6 +58,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import javax.sql.rowset.RowSetMetaDataImpl;
+import org.apache.commons.lang3.StringUtils;
+import org.mapdb.DB;
+import org.mapdb.DBMaker;
+import org.mapdb.HTreeMap;
+import org.mapdb.Serializer;
+import org.mule.tools.soql.exception.SOQLParsingException;
 
 public class ForcePreparedStatement implements PreparedStatement {
 
@@ -65,14 +81,14 @@ public class ForcePreparedStatement implements PreparedStatement {
 
     private String soqlQueryOriginal;
     private String soqlQuery;
-    private ForceConnection connection;
+    private final ForceConnection connection;
     private PartnerService partnerService;
     private ResultSetMetaData metadata;
     private int fetchSize;
     private int maxRows;
-    private List<Object> parameters = new ArrayList<>();
+    private final List<Object> parameters = new ArrayList<>();
     private CacheMode cacheMode;
-    private static DB cacheDb = DBMaker.tempFileDB().closeOnJvmShutdown().make();
+    private static final DB cacheDb = DBMaker.tempFileDB().closeOnJvmShutdown().make();
     private int updateCount = -1;
     private boolean updateCountReturned = false;
     private ResultSet resultSet;
@@ -81,16 +97,16 @@ public class ForcePreparedStatement implements PreparedStatement {
 
     // TODO: Join caches and move it to ForceConnection class. Divide to session
     // and static global cache.
-    private static HTreeMap<String, ResultSet> dataCache = cacheDb
-            .hashMap("DataCache", Serializer.STRING, Serializer.ELSA)
-            .expireAfterCreate(60, TimeUnit.MINUTES)
-            .expireStoreSize(16 * GB)
-            .create();
-    private static HTreeMap<String, ResultSetMetaData> metadataCache = cacheDb
-            .hashMap("MetadataCache", Serializer.STRING, Serializer.ELSA)
-            .expireAfterCreate(60, TimeUnit.MINUTES)
-            .expireStoreSize(1 * GB)
-            .create();
+    private static final HTreeMap<String, ResultSet> dataCache = cacheDb
+        .hashMap("DataCache", Serializer.STRING, Serializer.ELSA)
+        .expireAfterCreate(60, TimeUnit.MINUTES)
+        .expireStoreSize(16L * GB)
+        .create();
+    private static final HTreeMap<String, ResultSetMetaData> metadataCache = cacheDb
+        .hashMap("MetadataCache", Serializer.STRING, Serializer.ELSA)
+        .expireAfterCreate(60, TimeUnit.MINUTES)
+        .expireStoreSize(GB)
+        .create();
 
     public ForcePreparedStatement(ForceConnection connection) {
         logger.info("[PrepStat] constructor conn IMPLEMENTED ");
@@ -98,7 +114,7 @@ public class ForcePreparedStatement implements PreparedStatement {
     }
 
     public ForcePreparedStatement(ForceConnection connection, String soql) {
-        logger.info("[PrepStat] constructor soql IMPLEMENTED "+soql);
+        logger.info("[PrepStat] constructor soql IMPLEMENTED " + soql);
         this.connection = connection;
         this.cacheMode = getCacheMode(soql);
         this.soqlQuery = removeCacheHints(soql);
@@ -110,26 +126,26 @@ public class ForcePreparedStatement implements PreparedStatement {
 
     @Override
     public ResultSet executeQuery() throws SQLException {
-        logger.info("[PrepStat] executeQuery IMPLEMENTED "+soqlQuery);
+        logger.info("[PrepStat] executeQuery IMPLEMENTED " + soqlQuery);
         this.updateCount = -1;
         this.updateCountReturned = false;
         this.resultSetReturned = false;
         this.resultSet = null;
 
         return cacheMode == CacheMode.NO_CACHE
-                ? query()
-                : dataCache.computeIfAbsent(getCacheKey(), s -> {
-            try {
-                return query();
-            } catch (SQLException e) {
-                rethrowAsNonChecked(e);
-                return null;
-            }
-        });
+            ? query()
+            : dataCache.computeIfAbsent(getCacheKey(), s -> {
+                try {
+                    return query();
+                } catch (SQLException e) {
+                    rethrowAsNonChecked(e);
+                    return null;
+                }
+            });
     }
 
     private ResultSet query() throws SQLException {
-        logger.info("[PrepStat] query IMPLEMENTED "+soqlQuery);
+        logger.info("[PrepStat] query IMPLEMENTED " + soqlQuery);
         if ("SELECT 'keep alive'".equals(soqlQuery)) {
             logger.info("[PrepStat] query KEEP ALIVE ");
             return new CachedResultSet(Collections.emptyList(), new RowSetMetaDataImpl());
@@ -191,7 +207,7 @@ public class ForcePreparedStatement implements PreparedStatement {
     }
 
     private String prepareQuery() {
-        logger.info("[PrepStat] prepareQuery IMPLEMENTED "+soqlQuery);
+        logger.info("[PrepStat] prepareQuery IMPLEMENTED " + soqlQuery);
         soqlQueryOriginal = soqlQuery;
         soqlQuery = preprocessQuery(soqlQuery);
         return setParams(soqlQuery);
@@ -206,7 +222,10 @@ public class ForcePreparedStatement implements PreparedStatement {
         }
         String soqlQueryProcessed = soqlQuery;
         if (soqlQuery.contains("{ts")) {
-            soqlQueryProcessed = soqlQuery.trim().replaceAll("\\{ts\\s*'(\\d\\d\\d\\d-\\d\\d-\\d\\d)(T|\\s)(\\d\\d:\\d\\d:\\d\\d)(Z|[+-]\\d\\d\\d\\d|)'\\}", "$1T$3$4");
+            soqlQueryProcessed = soqlQuery.trim()
+                .replaceAll(
+                    "\\{ts\\s*'(\\d\\d\\d\\d-\\d\\d-\\d\\d)(T|\\s)(\\d\\d:\\d\\d:\\d\\d)(Z|[+-]\\d\\d\\d\\d|)'\\}",
+                    "$1T$3$4");
         }
         return soqlQueryProcessed;
     }
@@ -216,10 +235,10 @@ public class ForcePreparedStatement implements PreparedStatement {
         // Flatten not only child records, but also Lists of Lists - for Relations - list of subrecords
         recordFields = flatten(recordFields);
         recordFields.stream()
-                .map(field -> field == null ? new ForceResultField(null, null, null, null) : field)
-                .forEach(field -> {
-                    columnMap.put(field.getFullName(), field.getValue());
-                });
+            .map(field -> field == null ? new ForceResultField(null, null, null, null) : field)
+            .forEach(field -> {
+                columnMap.put(field.getFullName(), field.getValue());
+            });
         return columnMap;
     }
 
@@ -246,15 +265,15 @@ public class ForcePreparedStatement implements PreparedStatement {
     private String getCacheKey() {
         String preparedQuery = prepareQuery();
         return cacheMode == CacheMode.GLOBAL
-                ? preparedQuery
-                : connection.getPartnerConnection().getSessionHeader().getSessionId() + preparedQuery;
+            ? preparedQuery
+            : connection.getPartnerConnection().getSessionHeader().getSessionId() + preparedQuery;
     }
 
     public List<Object> getParameters() {
-        logger.info("[PrepStat] getParameters IMPLEMENTED "+soqlQuery);
+        logger.info("[PrepStat] getParameters IMPLEMENTED " + soqlQuery);
         int paramsCountInQuery = StringUtils.countMatches(soqlQuery, '?');
-        logger.info("[PrepStat] getParameters   detected "+paramsCountInQuery+" parameters");
-        logger.info("[PrepStat] getParameters   parameters provided "+parameters.size());
+        logger.info("[PrepStat] getParameters   detected " + paramsCountInQuery + " parameters");
+        logger.info("[PrepStat] getParameters   parameters provided " + parameters.size());
         if (parameters.size() < paramsCountInQuery) {
             parameters.addAll(Collections.nCopies(paramsCountInQuery - parameters.size(), null));
         }
@@ -262,7 +281,7 @@ public class ForcePreparedStatement implements PreparedStatement {
     }
 
     protected String setParams(String soql) {
-        logger.info("[PrepStat] setParams IMPLEMENTED "+soql);
+        logger.info("[PrepStat] setParams IMPLEMENTED " + soql);
         String result = soql;
         for (Object param : getParameters()) {
             String paramRepresentation = convertToSoqlParam(param);
@@ -272,7 +291,7 @@ public class ForcePreparedStatement implements PreparedStatement {
     }
 
     private final static DateFormat SF_DATETIME_FORMATTER = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
-    private static Map<Class<?>, Function<Object, String>> paramConverters = new HashMap<>();
+    private static final Map<Class<?>, Function<Object, String>> paramConverters = new HashMap<>();
 
     static {
         paramConverters.put(String.class, ForcePreparedStatement::toSoqlStringParam);
@@ -299,7 +318,7 @@ public class ForcePreparedStatement implements PreparedStatement {
         // like {ts '2021-10-21 12:01:02Z'}
         // to 2021-10-21 12:01:02-0000
         if (java.lang.String.class.equals(paramClass) && ((String) paramValue).startsWith("{ts")) {
-            paramValue = convertStringToDate((String)paramValue);
+            paramValue = convertStringToDate((String) paramValue);
             paramClass = getParamClass(paramValue);
         }
         return paramConverters.get(paramClass).apply(paramValue);
@@ -310,11 +329,13 @@ public class ForcePreparedStatement implements PreparedStatement {
             return null;
         }
         try {
-            String paramValueCleared = paramValue.trim().replaceAll("^\\{ts\\s*'(.*)'\\}$", "$1").replaceAll("Z$", "+0000");
+            String paramValueCleared = paramValue.trim()
+                .replaceAll("^\\{ts\\s*'(.*)'\\}$", "$1")
+                .replaceAll("Z$", "+0000");
             java.util.Date parsed = SF_DATETIME_FORMATTER.parse(paramValueCleared);
             return parsed;
         } catch (ParseException e) {
-            logger.log(Level.SEVERE, "Failed to convert value to date ["+paramValue+"]", e);
+            logger.log(Level.SEVERE, "Failed to convert value to date [" + paramValue + "]", e);
         }
         return null;
     }
@@ -337,14 +358,15 @@ public class ForcePreparedStatement implements PreparedStatement {
             int columnsCount = row.size();
             result.setColumnCount(columnsCount);
             for (int i = 1; i <= columnsCount; i++) {
-                String fieldName = row.getColumnNames().get(i-1);
+                String fieldName = row.getColumnNames().get(i - 1);
                 result.setAutoIncrement(i, false);
                 result.setColumnName(i, fieldName);
                 result.setColumnLabel(i, fieldName);
-                Object value = row.getValues().get(i-1);
+                Object value = row.getValues().get(i - 1);
                 String javaTypeName = value == null ? "string" : value.getClass().getName();
                 ForceDatabaseMetaData.TypeInfo typeInfo = ForceDatabaseMetaData.lookupTypeInfoFromJavaType(javaTypeName);
-                logger.info("[PrepStat] dummyMetaData ("+i+") "+fieldName+" : "+javaTypeName+" => "+typeInfo.sqlDataType);
+                logger.info("[PrepStat] dummyMetaData (" + i + ") " + fieldName + " : " + javaTypeName + " => "
+                    + typeInfo.sqlDataType);
                 result.setColumnType(i, typeInfo.sqlDataType);
                 result.setColumnTypeName(i, typeInfo.typeName);
                 result.setPrecision(i, typeInfo.precision);
@@ -363,7 +385,7 @@ public class ForcePreparedStatement implements PreparedStatement {
 
     private ResultSetMetaData loadMetaData() throws SQLException {
         try {
-            logger.info("[PrepStat] loadMetaData IMPLEMENTED "+soqlQuery);
+            logger.info("[PrepStat] loadMetaData IMPLEMENTED " + soqlQuery);
             if (metadata == null) {
                 RowSetMetaDataImpl result = new RowSetMetaDataImpl();
                 SoqlQueryAnalyzer queryAnalyzer = getSoqlQueryAnalyzer();
@@ -395,26 +417,28 @@ public class ForcePreparedStatement implements PreparedStatement {
     }
 
     private <T> List<T> flatten(List<T> listWithLists) {
-        logger.info("[PrepStat] flatten IMPLEMENTED "+soqlQuery);
-        List<T> listPlain =  (List<T>) listWithLists.stream()
-                .flatMap(
-                        def -> def instanceof Collection
-                        ? flatten((List<T>) def).stream() // MultiLevel flattening
-                        : Stream.of(def)
-                )
-                .collect(Collectors.toList());
+        logger.info("[PrepStat] flatten IMPLEMENTED " + soqlQuery);
+        List<T> listPlain = listWithLists.stream()
+            .flatMap(
+                def -> def instanceof Collection
+                    ? flatten((List<T>) def).stream() // MultiLevel flattening
+                    : Stream.of(def)
+            )
+            .collect(Collectors.toList());
         return listPlain;
     }
 
     private List<FieldDef> fieldDefinitions;
 
     private List<FieldDef> getRootEntityFieldDefinitions() {
-        logger.info("[PrepStat] getFieldDefinitions IMPLEMENTED "+soqlQuery);
+        logger.info("[PrepStat] getFieldDefinitions IMPLEMENTED " + soqlQuery);
         if (fieldDefinitions == null) {
             fieldDefinitions = getSoqlQueryAnalyzer().getFieldDefinitions();
             fieldDefinitions = flatten(fieldDefinitions);
-            logger.info("[PrepStat] getFieldDefinitions:\n  "+
-                    fieldDefinitions.stream().map( fd -> fd.getName()+":"+fd.getType()).collect(Collectors.joining("\n  ")));
+            logger.info("[PrepStat] getFieldDefinitions:\n  " +
+                fieldDefinitions.stream()
+                    .map(fd -> fd.getName() + ":" + fd.getType())
+                    .collect(Collectors.joining("\n  ")));
         }
         return fieldDefinitions;
     }
@@ -426,7 +450,7 @@ public class ForcePreparedStatement implements PreparedStatement {
     private DeleteQueryAnalyzer deleteQueryAnalyzer;
 
     private SoqlQueryAnalyzer getSoqlQueryAnalyzer() {
-        logger.info("[PrepStat] getSoqlQueryAnalyzer IMPLEMENTED "+soqlQuery);
+        logger.info("[PrepStat] getSoqlQueryAnalyzer IMPLEMENTED " + soqlQuery);
         if (soqlQueryAnalyzer == null) {
             soqlQueryAnalyzer = new SoqlQueryAnalyzer(soqlQuery, (objName) -> {
                 try {
@@ -437,14 +461,14 @@ public class ForcePreparedStatement implements PreparedStatement {
             }, connection.getCache());
             if (soqlQueryAnalyzer.isExpandedStarSyntaxForFields()) {
                 this.soqlQuery = soqlQueryAnalyzer.getSoqlQuery();
-                logger.info("[PrepStat] Expanded Star Syntax to "+soqlQuery);
+                logger.info("[PrepStat] Expanded Star Syntax to " + soqlQuery);
             }
         }
         return soqlQueryAnalyzer;
     }
 
     private SoslQueryAnalyzer getSoslQueryAnalyzer() {
-        logger.info("[PrepStat] getSoslQueryAnalyzer IMPLEMENTED "+soqlQuery);
+        logger.info("[PrepStat] getSoslQueryAnalyzer IMPLEMENTED " + soqlQuery);
         if (soslQueryAnalyzer == null) {
             soslQueryAnalyzer = new SoslQueryAnalyzer(soqlQuery, (objName) -> {
                 try {
@@ -458,7 +482,7 @@ public class ForcePreparedStatement implements PreparedStatement {
     }
 
     private InsertQueryAnalyzer getInsertQueryAnalyzer() {
-        logger.info("[PrepStat] getInsertQueryAnalyzer IMPLEMENTED "+soqlQuery);
+        logger.info("[PrepStat] getInsertQueryAnalyzer IMPLEMENTED " + soqlQuery);
         if (insertQueryAnalyzer == null) {
             insertQueryAnalyzer = new InsertQueryAnalyzer(soqlQuery, (objName) -> {
                 try {
@@ -467,13 +491,13 @@ public class ForcePreparedStatement implements PreparedStatement {
                     throw new RuntimeException(e);
                 }
             }, connection.getCache(),
-                    this::runResolveSubselect);
+                this::runResolveSubselect);
         }
         return insertQueryAnalyzer;
     }
 
     private UpdateQueryAnalyzer getUpdateQueryAnalyzer() {
-        logger.info("[PrepStat] getUpdateQueryAnalyzer IMPLEMENTED "+soqlQuery);
+        logger.info("[PrepStat] getUpdateQueryAnalyzer IMPLEMENTED " + soqlQuery);
         if (updateQueryAnalyzer == null) {
             updateQueryAnalyzer = new UpdateQueryAnalyzer(soqlQuery, (objName) -> {
                 try {
@@ -482,40 +506,41 @@ public class ForcePreparedStatement implements PreparedStatement {
                     throw new RuntimeException(e);
                 }
             }, connection.getCache(),
-                    this::runResolveSubselect);
+                this::runResolveSubselect);
         }
         return updateQueryAnalyzer;
     }
 
     private DeleteQueryAnalyzer getDeleteQueryAnalyzer() {
-        logger.info("[PrepStat] getDeleteQueryAnalyzer IMPLEMENTED "+soqlQuery);
+        logger.info("[PrepStat] getDeleteQueryAnalyzer IMPLEMENTED " + soqlQuery);
         if (deleteQueryAnalyzer == null) {
             deleteQueryAnalyzer = new DeleteQueryAnalyzer(soqlQuery,
-                    this::runResolveSubselect);
+                this::runResolveSubselect);
         }
         return deleteQueryAnalyzer;
     }
 
     private List<Map<String, Object>> runResolveSubselect(String soql) {
         List<Map<String, Object>> results = new ArrayList<>();
-        logger.info("Resolving subselect \n"+soql);
+        logger.info("Resolving subselect \n" + soql);
         try {
             ForcePreparedStatement forcePreparedStatement = new ForcePreparedStatement(connection, soql);
             ResultSet resultSet = forcePreparedStatement.query();
 
-            while(resultSet.next()) {
+            while (resultSet.next()) {
                 // LinkedHashMap is needed to save the order of the fields
                 Map<String, Object> record = new LinkedHashMap<>();
                 results.add(record);
-                for(int i = 0; i < resultSet.getMetaData().getColumnCount(); i++) {
-                     record.put(resultSet.getMetaData().getColumnName(i+1), resultSet.getString(i+1));
+                for (int i = 0; i < resultSet.getMetaData().getColumnCount(); i++) {
+                    record.put(resultSet.getMetaData().getColumnName(i + 1), resultSet.getString(i + 1));
                 }
             }
-            logger.info("  "+results.size()+" records resolved with "+resultSet.getMetaData().getColumnCount()+" columns");
+            logger.info("  " + results.size() + " records resolved with " + resultSet.getMetaData().getColumnCount()
+                + " columns");
         } catch (Exception e) {
-            logger.log(Level.WARNING, "Failed to resolve sub-select \n"+soql, e);
-            this.warnings.addSuppressed(new SQLWarning("Failed to resolve sub-select \n"+soql, e));
-            throw new java.lang.IllegalArgumentException("Failed to resolve sub-select: "+e.getMessage());
+            logger.log(Level.WARNING, "Failed to resolve sub-select \n" + soql, e);
+            this.warnings.addSuppressed(new SQLWarning("Failed to resolve sub-select \n" + soql, e));
+            throw new java.lang.IllegalArgumentException("Failed to resolve sub-select: " + e.getMessage());
         }
 
         return results;
@@ -527,21 +552,21 @@ public class ForcePreparedStatement implements PreparedStatement {
     }
 
     public ResultSetMetaData getMetaData() throws SQLException {
-        logger.info("[PrepStat] getMetaData IMPLEMENTED "+soqlQuery);
+        logger.info("[PrepStat] getMetaData IMPLEMENTED " + soqlQuery);
         return cacheMode == CacheMode.NO_CACHE
-                ? loadMetaData()
-                : metadataCache.computeIfAbsent(getCacheKey(), s -> {
-            try {
-                return loadMetaData();
-            } catch (SQLException e) {
-                rethrowAsNonChecked(e);
-                return null;
-            }
-        });
+            ? loadMetaData()
+            : metadataCache.computeIfAbsent(getCacheKey(), s -> {
+                try {
+                    return loadMetaData();
+                } catch (SQLException e) {
+                    rethrowAsNonChecked(e);
+                    return null;
+                }
+            });
     }
 
     private PartnerService getPartnerService() throws ConnectionException {
-        logger.info("[PrepStat] getPartnerService IMPLEMENTED "+soqlQuery);
+        logger.info("[PrepStat] getPartnerService IMPLEMENTED " + soqlQuery);
         if (partnerService == null) {
             logger.info("[PrepStat] getPartnerService creating service ");
             partnerService = new PartnerService(connection.getPartnerConnection());
@@ -550,7 +575,7 @@ public class ForcePreparedStatement implements PreparedStatement {
     }
 
     public boolean reconnect(String url, String userName, String userPass) throws ConnectionException {
-        logger.info("[PrepStat] RECONNECT IMPLEMENTED newUserName="+userName + " url="+url);
+        logger.info("[PrepStat] RECONNECT IMPLEMENTED newUserName=" + userName + " url=" + url);
         boolean updated = connection.updatePartnerConnection(url, userName, userPass);
         partnerService = null;
         return updated;
@@ -573,23 +598,23 @@ public class ForcePreparedStatement implements PreparedStatement {
     }
 
     public void setArray(int i, Array x) throws SQLException {
-        logger.info("[PrepStat] setArray NOT_IMPLEMENTED "+soqlQuery);
+        logger.info("[PrepStat] setArray NOT_IMPLEMENTED " + soqlQuery);
         throw new UnsupportedOperationException("The setArray is not implemented yet.");
     }
 
     public void setAsciiStream(int parameterIndex, InputStream x, int length)
-            throws SQLException {
-        logger.info("[PrepStat] setAsciiStream NOT_IMPLEMENTED "+soqlQuery);
+        throws SQLException {
+        logger.info("[PrepStat] setAsciiStream NOT_IMPLEMENTED " + soqlQuery);
         throw new UnsupportedOperationException("The setAsciiStream is not implemented yet.");
     }
 
     public void setBigDecimal(int parameterIndex, BigDecimal x)
-            throws SQLException {
+        throws SQLException {
         addParameter(parameterIndex, x);
     }
 
     protected void addParameter(int parameterIndex, Object x) {
-        logger.info("[PrepStat] addParameter "+parameterIndex+" IMPLEMENTED "+soqlQuery);
+        logger.info("[PrepStat] addParameter " + parameterIndex + " IMPLEMENTED " + soqlQuery);
         parameterIndex--;
         if (parameters.size() < parameterIndex) {
             parameters.addAll(Collections.nCopies(parameterIndex - parameters.size(), null));
@@ -598,13 +623,13 @@ public class ForcePreparedStatement implements PreparedStatement {
     }
 
     public void setBinaryStream(int parameterIndex, InputStream x, int length)
-            throws SQLException {
-        logger.info("[PrepStat] setBinaryStream NOT_IMPLEMENTED "+soqlQuery);
+        throws SQLException {
+        logger.info("[PrepStat] setBinaryStream NOT_IMPLEMENTED " + soqlQuery);
         throw new UnsupportedOperationException("The setBinaryStream is not implemented yet.");
     }
 
     public void setBlob(int i, Blob x) throws SQLException {
-        logger.info("[PrepStat] setBlob NOT_IMPLEMENTED "+soqlQuery);
+        logger.info("[PrepStat] setBlob NOT_IMPLEMENTED " + soqlQuery);
         throw new UnsupportedOperationException("The setBlob is not implemented yet.");
     }
 
@@ -613,23 +638,23 @@ public class ForcePreparedStatement implements PreparedStatement {
     }
 
     public void setByte(int parameterIndex, byte x) throws SQLException {
-        logger.info("[PrepStat] setByte NOT_IMPLEMENTED "+soqlQuery);
+        logger.info("[PrepStat] setByte NOT_IMPLEMENTED " + soqlQuery);
         throw new UnsupportedOperationException("The setByte is not implemented yet.");
     }
 
     public void setBytes(int parameterIndex, byte[] x) throws SQLException {
-        logger.info("[PrepStat] setBytes NOT_IMPLEMENTED "+soqlQuery);
+        logger.info("[PrepStat] setBytes NOT_IMPLEMENTED " + soqlQuery);
         throw new UnsupportedOperationException("The setBytes is not implemented yet.");
     }
 
     public void setCharacterStream(int parameterIndex, Reader reader, int length)
-            throws SQLException {
-        logger.info("[PrepStat] setCharacterStream NOT_IMPLEMENTED "+soqlQuery);
+        throws SQLException {
+        logger.info("[PrepStat] setCharacterStream NOT_IMPLEMENTED " + soqlQuery);
         throw new UnsupportedOperationException("The setCharacterStream is not implemented yet.");
     }
 
     public void setClob(int i, Clob x) throws SQLException {
-        logger.info("[PrepStat] setClob NOT_IMPLEMENTED "+soqlQuery);
+        logger.info("[PrepStat] setClob NOT_IMPLEMENTED " + soqlQuery);
         throw new UnsupportedOperationException("The setClob is not implemented yet.");
     }
 
@@ -638,8 +663,8 @@ public class ForcePreparedStatement implements PreparedStatement {
     }
 
     public void setDate(int parameterIndex, Date x, Calendar cal)
-            throws SQLException {
-        logger.info("[PrepStat] setDate NOT_IMPLEMENTED "+soqlQuery);
+        throws SQLException {
+        logger.info("[PrepStat] setDate NOT_IMPLEMENTED " + soqlQuery);
         throw new UnsupportedOperationException("The setDate is not implemented yet.");
     }
 
@@ -664,24 +689,24 @@ public class ForcePreparedStatement implements PreparedStatement {
     }
 
     public void setNull(int paramIndex, int sqlType, String typeName)
-            throws SQLException {
+        throws SQLException {
         addParameter(paramIndex, null);
     }
 
     public void setObject(int parameterIndex, Object x) throws SQLException {
-        logger.info("[PrepStat] setObject 1 NOT_IMPLEMENTED "+soqlQuery);
+        logger.info("[PrepStat] setObject 1 NOT_IMPLEMENTED " + soqlQuery);
         throw new UnsupportedOperationException("The setObject 1 is not implemented yet.");
     }
 
     public void setObject(int parameterIndex, Object x, int targetSqlType)
-            throws SQLException {
-        logger.info("[PrepStat] setObject 2 NOT_IMPLEMENTED "+soqlQuery);
+        throws SQLException {
+        logger.info("[PrepStat] setObject 2 NOT_IMPLEMENTED " + soqlQuery);
         throw new UnsupportedOperationException("The setObject 2 is not implemented yet.");
     }
 
     public void setObject(int parameterIndex, Object x, int targetSqlType,
-                          int scale) throws SQLException {
-        logger.info("[PrepStat] setObject 3 NOT_IMPLEMENTED "+soqlQuery);
+        int scale) throws SQLException {
+        logger.info("[PrepStat] setObject 3 NOT_IMPLEMENTED " + soqlQuery);
         throw new UnsupportedOperationException("The setObject 3  is not implemented yet.");
     }
 
@@ -706,15 +731,14 @@ public class ForcePreparedStatement implements PreparedStatement {
     }
 
     public void setTime(int parameterIndex, Time x, Calendar cal)
-            throws SQLException {
+        throws SQLException {
         String methodName = this.getClass().getSimpleName() + "." + new Object() {
         }.getClass().getEnclosingMethod().getName();
         throw new UnsupportedOperationException("The " + methodName + " is not implemented yet.");
-
     }
 
     public void setTimestamp(int parameterIndex, Timestamp x)
-            throws SQLException {
+        throws SQLException {
         addParameter(parameterIndex, x);
     }
 
@@ -722,18 +746,17 @@ public class ForcePreparedStatement implements PreparedStatement {
         String methodName = this.getClass().getSimpleName() + "." + new Object() {
         }.getClass().getEnclosingMethod().getName();
         throw new UnsupportedOperationException("The " + methodName + " is not implemented yet.");
-
     }
 
     public void setURL(int parameterIndex, URL x) throws SQLException {
         String methodName = this.getClass().getSimpleName() + "." + new Object() {
         }.getClass().getEnclosingMethod().getName();
         throw new UnsupportedOperationException("The " + methodName + " is not implemented yet.");
-
     }
 
+    @Deprecated
     public void setUnicodeStream(int parameterIndex, InputStream x, int length)
-            throws SQLException {
+        throws SQLException {
         String methodName = this.getClass().getSimpleName() + "." + new Object() {
         }.getClass().getEnclosingMethod().getName();
         throw new UnsupportedOperationException("The " + methodName + " is not implemented yet.");
@@ -743,7 +766,7 @@ public class ForcePreparedStatement implements PreparedStatement {
 
     @Override
     public ResultSet executeQuery(String sql) throws SQLException {
-        logger.info("[PrepStat] executeQuery IMPLEMENTED "+sql);
+        logger.info("[PrepStat] executeQuery IMPLEMENTED " + sql);
         this.cacheMode = getCacheMode(sql);
         this.soqlQuery = removeCacheHints(sql);
         this.resultSet = executeQuery();
@@ -752,7 +775,7 @@ public class ForcePreparedStatement implements PreparedStatement {
 
     @Override
     public int executeUpdate(String sql) throws SQLException {
-        logger.info("[PrepStat] executeUpdate IMPLEMENTED "+sql);
+        logger.info("[PrepStat] executeUpdate IMPLEMENTED " + sql);
         this.cacheMode = getCacheMode(sql);
         this.soqlQuery = removeCacheHints(sql);
 
@@ -814,7 +837,7 @@ public class ForcePreparedStatement implements PreparedStatement {
     @Override
     public void clearWarnings() throws SQLException {
         logger.info("[PrepStat] clearWarnings IMPLEMENTED ");
-        if(resultSet != null) {
+        if (resultSet != null) {
             resultSet.clearWarnings();
         }
         warnings = new SQLWarning();
@@ -828,7 +851,7 @@ public class ForcePreparedStatement implements PreparedStatement {
 
     @Override
     public boolean execute(String sql) throws SQLException {
-        logger.info("[PrepStat] execute IMPLEMENTED "+sql);
+        logger.info("[PrepStat] execute IMPLEMENTED " + sql);
         this.cacheMode = getCacheMode(sql);
         this.soqlQuery = removeCacheHints(sql);
 
@@ -837,7 +860,7 @@ public class ForcePreparedStatement implements PreparedStatement {
         this.resultSet = executeQuery();
         this.resultSetReturned = false;
         boolean result = this.updateCount < 0;
-        logger.info("[PrepStat] execute IMPLEMENTED ("+result+")"+sql);
+        logger.info("[PrepStat] execute IMPLEMENTED (" + result + ")" + sql);
         return result;
     }
 
@@ -846,36 +869,38 @@ public class ForcePreparedStatement implements PreparedStatement {
         ResultSet toReturn = updateCount < 0 ? resultSet : null;
         if (this.resultSetReturned) {
             logger.info("[PrepStat] getResultSet IMPLEMENTED Already Returned " + soqlQuery + "\n " +
-                    (resultSet == null ? " resultSet is NULL" : "resultSet is present") +
-                    (toReturn == null ? " -> Not to be returned" : " -> Returning"));
+                (resultSet == null ? " resultSet is NULL" : "resultSet is present") +
+                (toReturn == null ? " -> Not to be returned" : " -> Returning"));
             return null;
         }
         this.resultSetReturned = true;
         logger.info("[PrepStat] getResultSet IMPLEMENTED " + soqlQuery + "\n " +
-                (resultSet == null ? " resultSet is NULL" : "resultSet is present") +
-                (toReturn == null ? " -> Not to be returned" : " -> Returning"));
+            (resultSet == null ? " resultSet is NULL" : "resultSet is present") +
+            (toReturn == null ? " -> Not to be returned" : " -> Returning"));
         return toReturn;
     }
 
     @Override
     public int getUpdateCount() throws SQLException {
         if (this.updateCountReturned) {
-            logger.info("[PrepStat] getUpdateCount Already Returned "+updateCount+" IMPLEMENTED "+soqlQuery);
+            logger.info("[PrepStat] getUpdateCount Already Returned " + updateCount + " IMPLEMENTED " + soqlQuery);
             return -1;
         }
-        logger.info("[PrepStat] getUpdateCount "+updateCount+" IMPLEMENTED "+soqlQuery);
+        logger.info("[PrepStat] getUpdateCount " + updateCount + " IMPLEMENTED " + soqlQuery);
         this.updateCountReturned = true;
         return updateCount;
     }
 
     @Override
     public boolean getMoreResults() throws SQLException {
-        if (updateCount >=0 ) {
-            logger.info("[PrepStat] getMoreResults IMPLEMENTED (false) updateCount="+updateCount+" sql="+soqlQuery);
+        if (updateCount >= 0) {
+            logger.info(
+                "[PrepStat] getMoreResults IMPLEMENTED (false) updateCount=" + updateCount + " sql=" + soqlQuery);
             return false;
         }
         boolean more = resultSet != null && resultSet.next();
-        logger.info("[PrepStat] getMoreResults IMPLEMENTED ("+more+") updateCount="+updateCount+" sql="+soqlQuery);
+        logger.info(
+            "[PrepStat] getMoreResults IMPLEMENTED (" + more + ") updateCount=" + updateCount + " sql=" + soqlQuery);
         return more;
     }
 
@@ -899,36 +924,35 @@ public class ForcePreparedStatement implements PreparedStatement {
 
     @Override
     public int getResultSetType() throws SQLException {
-        logger.info("[PrepStat] getResultSetType NOT_IMPLEMENTED "+soqlQuery);
+        logger.info("[PrepStat] getResultSetType NOT_IMPLEMENTED " + soqlQuery);
         return 0;
     }
 
     @Override
     public void addBatch(String sql) throws SQLException {
-        logger.info("[PrepStat] addBatch NOT_IMPLEMENTED "+sql);
-
+        logger.info("[PrepStat] addBatch NOT_IMPLEMENTED " + sql);
     }
 
     @Override
     public void clearBatch() throws SQLException {
-        logger.info("[PrepStat] clearBatch NOT_IMPLEMENTED "+soqlQuery);
+        logger.info("[PrepStat] clearBatch NOT_IMPLEMENTED " + soqlQuery);
     }
 
     @Override
     public int[] executeBatch() throws SQLException {
-        logger.info("[PrepStat] executeBatch NOT_IMPLEMENTED "+soqlQuery);
+        logger.info("[PrepStat] executeBatch NOT_IMPLEMENTED " + soqlQuery);
         return null;
     }
 
     @Override
     public Connection getConnection() throws SQLException {
-        logger.info("[PrepStat] getConnection IMPLEMENTED "+soqlQuery);
+        logger.info("[PrepStat] getConnection IMPLEMENTED " + soqlQuery);
         return connection;
     }
 
     @Override
     public boolean getMoreResults(int current) throws SQLException {
-        logger.info("[PrepStat] getMoreResults NOT_IMPLEMENTED "+soqlQuery);
+        logger.info("[PrepStat] getMoreResults NOT_IMPLEMENTED " + soqlQuery);
         return false;
     }
 
@@ -940,37 +964,37 @@ public class ForcePreparedStatement implements PreparedStatement {
 
     @Override
     public int executeUpdate(String sql, int autoGeneratedKeys) throws SQLException {
-        logger.info("[PrepStat] executeUpdate 1 NOT_IMPLEMENTED "+sql);
+        logger.info("[PrepStat] executeUpdate 1 NOT_IMPLEMENTED " + sql);
         return executeUpdate(sql);
     }
 
     @Override
     public int executeUpdate(String sql, int[] columnIndexes) throws SQLException {
-        logger.info("[PrepStat] executeUpdate 2 NOT_IMPLEMENTED "+sql);
+        logger.info("[PrepStat] executeUpdate 2 NOT_IMPLEMENTED " + sql);
         return executeUpdate(sql);
     }
 
     @Override
     public int executeUpdate(String sql, String[] columnNames) throws SQLException {
-        logger.info("[PrepStat] executeUpdate 3 NOT_IMPLEMENTED "+sql);
+        logger.info("[PrepStat] executeUpdate 3 NOT_IMPLEMENTED " + sql);
         return executeUpdate(sql);
     }
 
     @Override
     public boolean execute(String sql, int autoGeneratedKeys) throws SQLException {
-        logger.info("[PrepStat] execute 1 NOT_IMPLEMENTED "+sql);
+        logger.info("[PrepStat] execute 1 NOT_IMPLEMENTED " + sql);
         return executeUpdate(sql) > 0;
     }
 
     @Override
     public boolean execute(String sql, int[] columnIndexes) throws SQLException {
-        logger.info("[PrepStat] execute 2 NOT_IMPLEMENTED "+sql);
+        logger.info("[PrepStat] execute 2 NOT_IMPLEMENTED " + sql);
         return executeUpdate(sql) > 0;
     }
 
     @Override
     public boolean execute(String sql, String[] columnNames) throws SQLException {
-        logger.info("[PrepStat] execute 3 NOT_IMPLEMENTED "+sql);
+        logger.info("[PrepStat] execute 3 NOT_IMPLEMENTED " + sql);
         return executeUpdate(sql) > 0;
     }
 
@@ -1024,26 +1048,26 @@ public class ForcePreparedStatement implements PreparedStatement {
 
     @Override
     public int executeUpdate() throws SQLException {
-        logger.info("[PrepStat] executeUpdate 2 NOT_IMPLEMENTED "+soqlQuery);
+        logger.info("[PrepStat] executeUpdate 2 NOT_IMPLEMENTED " + soqlQuery);
         return executeUpdate(soqlQuery);
     }
 
     @Override
     public void clearParameters() throws SQLException {
-        logger.info("[PrepStat] clearParameters 2 NOT_IMPLEMENTED "+soqlQuery);
+        logger.info("[PrepStat] clearParameters 2 NOT_IMPLEMENTED " + soqlQuery);
         // TODO Auto-generated method stub
 
     }
 
     @Override
     public boolean execute() throws SQLException {
-        logger.info("[PrepStat] execute NOT_IMPLEMENTED "+soqlQuery);
+        logger.info("[PrepStat] execute NOT_IMPLEMENTED " + soqlQuery);
         return executeUpdate(soqlQuery) > 0;
     }
 
     @Override
     public void addBatch() throws SQLException {
-        logger.info("[PrepStat] addBatch NOT_IMPLEMENTED "+soqlQuery);
+        logger.info("[PrepStat] addBatch NOT_IMPLEMENTED " + soqlQuery);
         // TODO Auto-generated method stub
 
     }
@@ -1051,111 +1075,110 @@ public class ForcePreparedStatement implements PreparedStatement {
     @Override
     public void setRowId(int parameterIndex, RowId x) throws SQLException {
         // TODO Auto-generated method stub
-        logger.info("[PrepStat] setRowId NOT_IMPLEMENTED "+soqlQuery);
-
+        logger.info("[PrepStat] setRowId NOT_IMPLEMENTED " + soqlQuery);
     }
 
     @Override
     public void setNString(int parameterIndex, String value) throws SQLException {
-        logger.info("[PrepStat] setNString NOT_IMPLEMENTED "+soqlQuery);
+        logger.info("[PrepStat] setNString NOT_IMPLEMENTED " + soqlQuery);
         // TODO Auto-generated method stub
 
     }
 
     @Override
     public void setNCharacterStream(int parameterIndex, Reader value, long length) throws SQLException {
-        logger.info("[PrepStat] setNCharacterStream NOT_IMPLEMENTED "+soqlQuery);
+        logger.info("[PrepStat] setNCharacterStream NOT_IMPLEMENTED " + soqlQuery);
         // TODO Auto-generated method stub
 
     }
 
     @Override
     public void setNClob(int parameterIndex, NClob value) throws SQLException {
-        logger.info("[PrepStat] setNClob NOT_IMPLEMENTED "+soqlQuery);
+        logger.info("[PrepStat] setNClob NOT_IMPLEMENTED " + soqlQuery);
         // TODO Auto-generated method stub
 
     }
 
     @Override
     public void setClob(int parameterIndex, Reader reader, long length) throws SQLException {
-        logger.info("[PrepStat] setClob NOT_IMPLEMENTED "+soqlQuery);
+        logger.info("[PrepStat] setClob NOT_IMPLEMENTED " + soqlQuery);
         // TODO Auto-generated method stub
 
     }
 
     @Override
     public void setBlob(int parameterIndex, InputStream inputStream, long length) throws SQLException {
-        logger.info("[PrepStat] setBlob NOT_IMPLEMENTED "+soqlQuery);
+        logger.info("[PrepStat] setBlob NOT_IMPLEMENTED " + soqlQuery);
         // TODO Auto-generated method stub
 
     }
 
     @Override
     public void setNClob(int parameterIndex, Reader reader, long length) throws SQLException {
-        logger.info("[PrepStat] setNClob NOT_IMPLEMENTED "+soqlQuery);
+        logger.info("[PrepStat] setNClob NOT_IMPLEMENTED " + soqlQuery);
         // TODO Auto-generated method stub
 
     }
 
     @Override
     public void setSQLXML(int parameterIndex, SQLXML xmlObject) throws SQLException {
-        logger.info("[PrepStat] setSQLXML NOT_IMPLEMENTED "+soqlQuery);
+        logger.info("[PrepStat] setSQLXML NOT_IMPLEMENTED " + soqlQuery);
         // TODO Auto-generated method stub
 
     }
 
     @Override
     public void setAsciiStream(int parameterIndex, InputStream x, long length) throws SQLException {
-        logger.info("[PrepStat] setAsciiStream NOT_IMPLEMENTED "+soqlQuery);
+        logger.info("[PrepStat] setAsciiStream NOT_IMPLEMENTED " + soqlQuery);
         // TODO Auto-generated method stub
 
     }
 
     @Override
     public void setBinaryStream(int parameterIndex, InputStream x, long length) throws SQLException {
-        logger.info("[PrepStat] setBinaryStream NOT_IMPLEMENTED "+soqlQuery);
+        logger.info("[PrepStat] setBinaryStream NOT_IMPLEMENTED " + soqlQuery);
         // TODO Auto-generated method stub
 
     }
 
     @Override
     public void setCharacterStream(int parameterIndex, Reader reader, long length) throws SQLException {
-        logger.info("[PrepStat] setCharacterStream NOT_IMPLEMENTED "+soqlQuery);
+        logger.info("[PrepStat] setCharacterStream NOT_IMPLEMENTED " + soqlQuery);
         // TODO Auto-generated method stub
 
     }
 
     @Override
     public void setAsciiStream(int parameterIndex, InputStream x) throws SQLException {
-        logger.info("[PrepStat] setAsciiStream NOT_IMPLEMENTED "+soqlQuery);
+        logger.info("[PrepStat] setAsciiStream NOT_IMPLEMENTED " + soqlQuery);
         // TODO Auto-generated method stub
 
     }
 
     @Override
     public void setBinaryStream(int parameterIndex, InputStream x) throws SQLException {
-        logger.info("[PrepStat] setBinaryStream NOT_IMPLEMENTED "+soqlQuery);
+        logger.info("[PrepStat] setBinaryStream NOT_IMPLEMENTED " + soqlQuery);
         // TODO Auto-generated method stub
 
     }
 
     @Override
     public void setCharacterStream(int parameterIndex, Reader reader) throws SQLException {
-        logger.info("[PrepStat] setCharacterStream NOT_IMPLEMENTED "+soqlQuery);
+        logger.info("[PrepStat] setCharacterStream NOT_IMPLEMENTED " + soqlQuery);
         // TODO Auto-generated method stub
 
     }
 
     @Override
     public void setNCharacterStream(int parameterIndex, Reader value) throws SQLException {
-        logger.info("[PrepStat] setNCharacterStream NOT_IMPLEMENTED "+soqlQuery);
+        logger.info("[PrepStat] setNCharacterStream NOT_IMPLEMENTED " + soqlQuery);
         // TODO Auto-generated method stub
 
     }
 
     @Override
     public void setClob(int parameterIndex, Reader reader) throws SQLException {
-        logger.info("[PrepStat] setClob NOT_IMPLEMENTED "+soqlQuery);
+        logger.info("[PrepStat] setClob NOT_IMPLEMENTED " + soqlQuery);
         // TODO Auto-generated method stub
 
     }
@@ -1163,15 +1186,13 @@ public class ForcePreparedStatement implements PreparedStatement {
     @Override
     public void setBlob(int parameterIndex, InputStream inputStream) throws SQLException {
         // TODO Auto-generated method stub
-        logger.info("[PrepStat] setBlob NOT_IMPLEMENTED "+soqlQuery);
-
+        logger.info("[PrepStat] setBlob NOT_IMPLEMENTED " + soqlQuery);
     }
 
     @Override
     public void setNClob(int parameterIndex, Reader reader) throws SQLException {
         // TODO Auto-generated method stub
-        logger.info("[PrepStat] setNClob NOT_IMPLEMENTED "+soqlQuery);
-
+        logger.info("[PrepStat] setNClob NOT_IMPLEMENTED " + soqlQuery);
     }
 
     public void setUpdateCount(int updateCount) {

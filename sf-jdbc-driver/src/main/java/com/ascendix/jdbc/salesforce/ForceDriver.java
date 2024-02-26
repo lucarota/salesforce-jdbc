@@ -6,9 +6,6 @@ import com.ascendix.jdbc.salesforce.connection.ForceService;
 import com.sforce.soap.partner.PartnerConnection;
 import com.sforce.soap.partner.fault.ApiFault;
 import com.sforce.ws.ConnectionException;
-import lombok.extern.slf4j.Slf4j;
-
-import javax.net.ssl.*;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,7 +26,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class ForceDriver implements Driver {
@@ -39,17 +40,19 @@ public class ForceDriver implements Driver {
 
     private static final String ACCEPTABLE_URL = "jdbc:ascendix:salesforce";
     private static final Pattern URL_PATTERN = Pattern.compile("\\A" + ACCEPTABLE_URL + "://(.*)");
-    private static final Pattern URL_HAS_AUTHORIZATION_SEGMENT = Pattern.compile("\\A" + ACCEPTABLE_URL + "://([^:]+):([^@]+)@([^?]*)([?](.*))?");
+    private static final Pattern URL_HAS_AUTHORIZATION_SEGMENT = Pattern.compile(
+        "\\A" + ACCEPTABLE_URL + "://([^:]+):([^@]+)@([^?]*)([?](.*))?");
     private static final Pattern PARAM_STANDARD_PATTERN = Pattern.compile("(([^=]+)=([^&]*)&?)");
 
-    private static final Pattern VALID_IP_ADDRESS_REGEX = Pattern.compile("^(?<protocol>https?://)?(?<loginDomain>(?<host>(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5]))(:(?<port>[0-9]+))?)$");
-    private static final Pattern VALID_HOST_NAME_REGEX = Pattern.compile("^(?<protocol>https?://)?(?<loginDomain>(?<host>(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9]))(:(?<port>[0-9]+))?)$");
+    private static final Pattern VALID_IP_ADDRESS_REGEX = Pattern.compile(
+        "^(?<protocol>https?://)?(?<loginDomain>(?<host>(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5]))(:(?<port>[0-9]+))?)$");
+    private static final Pattern VALID_HOST_NAME_REGEX = Pattern.compile(
+        "^(?<protocol>https?://)?(?<loginDomain>(?<host>(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9]))(:(?<port>[0-9]+))?)$");
 
     static {
         try {
             logger.info("[ForceDriver] registration");
             DriverManager.registerDriver(new ForceDriver());
-
         } catch (Exception e) {
             throw new RuntimeException("Failed register ForceDriver: " + e.getMessage(), e);
         }
@@ -65,7 +68,7 @@ public class ForceDriver implements Driver {
              *
              * Source: https://docs.oracle.com/javase/8/docs/api/java/sql/Driver.html#connect-java.lang.String-java.util.Properties-
              */
-            logger.log(Level.SEVERE, "The URL provided is not acceptable: "+url);
+            logger.log(Level.SEVERE, "The URL provided is not acceptable: " + url);
             return null;
         }
         try {
@@ -114,18 +117,21 @@ public class ForceDriver implements Driver {
                     HttpsTrustManager.allowAllSSL();
                 }
                 newInfo.setApiVersion(resolveStringProperty(newProperties, "api", ForceService.DEFAULT_API_VERSION));
-                newInfo.setLoginDomain(resolveStringProperty(newProperties, "loginDomain", ForceService.DEFAULT_LOGIN_DOMAIN));
+                newInfo.setLoginDomain(resolveStringProperty(newProperties,
+                    "loginDomain",
+                    ForceService.DEFAULT_LOGIN_DOMAIN));
 
                 PartnerConnection newPartnerConnection;
                 try {
                     newPartnerConnection = ForceService.createPartnerConnection(newInfo);
-                    logger.log(Level.WARNING, "[ForceDriver] relogin helper success="+(newPartnerConnection != null));
+                    logger.log(Level.WARNING, "[ForceDriver] relogin helper success=" + (newPartnerConnection != null));
                     return newPartnerConnection;
                 } catch (ApiFault e) {
-                    logger.log(Level.WARNING, "[ForceDriver] relogin helper failed "+ e.getMessage(), e);
-                    throw new ConnectionException("Relogin failed ("+e.getExceptionCode()+") "+ e.getExceptionMessage(), e);
+                    logger.log(Level.WARNING, "[ForceDriver] relogin helper failed " + e.getMessage(), e);
+                    throw new ConnectionException(
+                        "Relogin failed (" + e.getExceptionCode() + ") " + e.getExceptionMessage(), e);
                 } catch (ConnectionException e) {
-                    logger.log(Level.WARNING, "[ForceDriver] relogin helper failed "+ e.getMessage(), e);
+                    logger.log(Level.WARNING, "[ForceDriver] relogin helper failed " + e.getMessage(), e);
                     throw new ConnectionException("Relogin failed", e);
                 }
             });
@@ -162,7 +168,6 @@ public class ForceDriver implements Driver {
         return defaultValue;
     }
 
-
     public static Properties getConnStringProperties(String urlString) throws IOException {
         Properties result = new Properties();
         String urlProperties = null;
@@ -183,19 +188,20 @@ public class ForceDriver implements Driver {
                 // ?param1=value1&param2=value2
                 String parameters = authMatcher.group(5);
                 Matcher matcher = PARAM_STANDARD_PATTERN.matcher(parameters);
-                while(matcher.find()) {
+                while (matcher.find()) {
                     String param = matcher.group(2);
                     String value = 3 >= matcher.groupCount() ? matcher.group(3) : null;
-                    result.put(param, URLDecoder.decode(value, "utf-8"));
+                    assert value != null;
+                    result.put(param, URLDecoder.decode(value, StandardCharsets.UTF_8));
                 }
             }
         } else if (stdMatcher.matches()) {
             String dataString = stdMatcher.group(1);
-            int endOfHost = dataString.contains(";") ? dataString.indexOf(";")-1 : dataString.length()-1;
-            String possibleHost = dataString.substring(0, endOfHost+1);
-            if (possibleHost.trim().length() > 0 && !possibleHost.contains("=")) {
+            int endOfHost = dataString.contains(";") ? dataString.indexOf(";") - 1 : dataString.length() - 1;
+            String possibleHost = dataString.substring(0, endOfHost + 1);
+            if (!possibleHost.trim().isEmpty() && !possibleHost.contains("=")) {
                 result.put("loginDomain", possibleHost);
-                urlProperties = dataString.substring(endOfHost+1);
+                urlProperties = dataString.substring(endOfHost + 1);
             } else {
                 urlProperties = dataString;
             }
@@ -205,7 +211,7 @@ public class ForceDriver implements Driver {
             if (ipMatcher.matches()) {
                 result.put("loginDomain", ipMatcher.group("loginDomain"));
                 result.put("https", "true");
-                if (ipMatcher.group("protocol") != null && ipMatcher.group("protocol").toLowerCase().equals("http://")) {
+                if (ipMatcher.group("protocol") != null && ipMatcher.group("protocol").equalsIgnoreCase("http://")) {
                     result.put("https", "false");
                 }
             } else {
@@ -213,7 +219,8 @@ public class ForceDriver implements Driver {
                 if (hostMatcher.matches()) {
                     result.put("loginDomain", hostMatcher.group("loginDomain"));
                     result.put("https", "true");
-                    if (hostMatcher.group("protocol") != null && hostMatcher.group("protocol").toLowerCase().equals("http://")) {
+                    if (hostMatcher.group("protocol") != null && hostMatcher.group("protocol")
+                        .equalsIgnoreCase("http://")) {
                         result.put("https", "false");
                     }
                 }
@@ -260,20 +267,21 @@ public class ForceDriver implements Driver {
     }
 
     public static class HttpsTrustManager implements X509TrustManager {
+
         private static TrustManager[] trustManagers;
         private static final X509Certificate[] _AcceptedIssuers = new X509Certificate[]{};
 
         @Override
         public void checkClientTrusted(
-                X509Certificate[] x509Certificates, String s)
-                throws java.security.cert.CertificateException {
+            X509Certificate[] x509Certificates, String s)
+            throws java.security.cert.CertificateException {
 
         }
 
         @Override
         public void checkServerTrusted(
-                X509Certificate[] x509Certificates, String s)
-                throws java.security.cert.CertificateException {
+            X509Certificate[] x509Certificates, String s)
+            throws java.security.cert.CertificateException {
 
         }
 
@@ -304,8 +312,6 @@ public class ForceDriver implements Driver {
             } catch (NoSuchAlgorithmException | KeyManagementException e) {
                 e.printStackTrace();
             }
-
         }
     }
-
 }
