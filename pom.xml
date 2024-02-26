@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.ascendix.salesforce</groupId>
     <artifactId>salesforce-jdbc</artifactId>
-    <version>${revision}</version>
+    <version>1.0.0</version>
     <packaging>pom</packaging>
 
     <scm>
@@ -18,7 +18,6 @@
     </modules>
 
     <properties>
-        <revision>1.4.5-SNAPSHOT</revision>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -49,13 +48,6 @@
         <xstream.version>1.4.18</xstream.version>
         <org.apache.commons.io.version>2.4</org.apache.commons.io.version>
     </properties>
-
-    <distributionManagement>
-        <repository>
-            <id>acx.com-maven-repo</id>
-            <url>default_url</url>
-        </repository>
-    </distributionManagement>
 
     <dependencyManagement>
         <dependencies>
@@ -119,7 +111,7 @@
                 <version>${antlr.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.apache.commons</groupId>
+                <groupId>commons-io</groupId>
                 <artifactId>commons-io</artifactId>
                 <version>${commons-io.version}</version>
             </dependency>
