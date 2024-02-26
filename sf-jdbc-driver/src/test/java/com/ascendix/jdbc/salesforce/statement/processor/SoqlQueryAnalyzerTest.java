@@ -175,7 +175,6 @@ public class SoqlQueryAnalyzerTest {
         try {
             String xml = new String(Files.readAllBytes(Paths.get("src/test/resources/" + sObjectType + "_desription.xml")));
             XStream xstream = new XStream();
-            XStream.setupDefaultSecurity(xstream);
 
             // clear out existing permissions and set own ones
             xstream.addPermission(NoTypePermission.NONE);
@@ -188,8 +187,6 @@ public class SoqlQueryAnalyzerTest {
             xstream.addImmutableType(com.sforce.soap.partner.FieldType.class, true);
             xstream.allowTypesByRegExp(new String[] { ".*" });
             return (DescribeSObjectResult) xstream.fromXML(xml);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

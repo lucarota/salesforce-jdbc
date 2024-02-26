@@ -1,17 +1,16 @@
 package com.ascendix.jdbc.salesforce.statement;
 
-import org.apache.commons.lang3.StringUtils;
-
 import java.sql.ParameterMetaData;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import org.apache.commons.lang3.StringUtils;
 
 public class ParameterMetadataImpl implements ParameterMetaData {
 
-    private List<Object> parameters = new ArrayList<>();
+    private final List<Object> parameters = new ArrayList<>();
 
     public ParameterMetadataImpl(List<Object> parameters, String query) {
         super();
@@ -78,5 +77,4 @@ public class ParameterMetadataImpl implements ParameterMetaData {
     public int getParameterMode(int param) throws SQLException {
         return ParameterMetaData.parameterModeIn;
     }
-
 }

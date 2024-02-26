@@ -1,6 +1,5 @@
 package com.ascendix.jdbc.salesforce.delegates;
 
-import com.ascendix.jdbc.salesforce.delegates.PartnerResultToCrtesianTable;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -11,7 +10,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 
-public class PartnerResultToCrtesianTableTest {
+public class PartnerResultToCartesianTableTest {
 
     @Test
     public void testExpandSimple() {
@@ -21,7 +20,7 @@ public class PartnerResultToCrtesianTableTest {
                 (List) Arrays.asList(1, 2, 3, 4)
         );
 
-        List<List> actual = PartnerResultToCrtesianTable.expand(expected, schema);
+        List<List> actual = PartnerResultToCartesianTable.expand(expected, schema);
 
         assertEquals(actual, expected);
     }
@@ -37,7 +36,7 @@ public class PartnerResultToCrtesianTableTest {
                 Arrays.asList("21", "22", "23", "24")
         );
 
-        List<List> actual = PartnerResultToCrtesianTable.expand(expected, schema);
+        List<List> actual = PartnerResultToCartesianTable.expand(expected, schema);
 
         assertEquals(actual, expected);
     }
@@ -56,7 +55,7 @@ public class PartnerResultToCrtesianTableTest {
                 Arrays.asList("1", "23", "3", "4")
         );
 
-        List<List> actual = PartnerResultToCrtesianTable.expand(list, schema);
+        List<List> actual = PartnerResultToCartesianTable.expand(list, schema);
 
         assertEquals(actual, expected);
     }
@@ -76,7 +75,7 @@ public class PartnerResultToCrtesianTableTest {
                 Arrays.asList(11, 3, 4, 12, 7, 8)
         );
 
-        List<List> actual = PartnerResultToCrtesianTable.expand(list, schema);
+        List<List> actual = PartnerResultToCartesianTable.expand(list, schema);
 
         assertEquals(expected.size(), actual.size());
         for (List l : expected) {
@@ -101,7 +100,7 @@ public class PartnerResultToCrtesianTableTest {
                 Arrays.asList(20, 25, 26, 41, 42)
         );
 
-        List<List> actual = PartnerResultToCrtesianTable.expand(list, schema);
+        List<List> actual = PartnerResultToCartesianTable.expand(list, schema);
 
         assertEquals(actual, expected);
     }
@@ -118,7 +117,7 @@ public class PartnerResultToCrtesianTableTest {
                 (List) Arrays.asList(11, null, null, 12, 13)
         );
 
-        List<List> actual = PartnerResultToCrtesianTable.expand(list, schema);
+        List<List> actual = PartnerResultToCartesianTable.expand(list, schema);
 
         assertEquals(actual, expected);
     }
@@ -135,7 +134,7 @@ public class PartnerResultToCrtesianTableTest {
                 (List) Arrays.asList(11, null, null)
         );
 
-        List<List> actual = PartnerResultToCrtesianTable.expand(list, schema);
+        List<List> actual = PartnerResultToCartesianTable.expand(list, schema);
 
         assertEquals(actual, expected);
     }

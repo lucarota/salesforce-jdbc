@@ -4,8 +4,6 @@ import com.ascendix.jdbc.salesforce.ForceDriver;
 import com.ascendix.jdbc.salesforce.delegates.PartnerService;
 import com.ascendix.jdbc.salesforce.resultset.CommandLogCachedResultSet;
 import com.ascendix.jdbc.salesforce.statement.ForcePreparedStatement;
-
-
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -23,17 +21,20 @@ public class AdminQueryProcessor {
       Example: CONNECT TO tcp:postgresql://localhost/connectdb USER connectuser IDENTIFIED BY connectpw;
       Local Syntax: CONNECT [ TO <smthg>] USER <user-name> IDENTIFIED BY <password>;
      */
-    private static final Pattern LOGIN_COMMAND_PG = Pattern.compile("CONNECT(\\s+TO\\s+(?<url>\\S+))?(\\s+USER\\s+(?<username>\\S+)\\s+IDENTIFIED BY\\s+(?<userpass>\\S+))?\\s*;?", Pattern.CASE_INSENSITIVE);
+    private static final Pattern LOGIN_COMMAND_PG = Pattern.compile(
+        "CONNECT(\\s+TO\\s+(?<url>\\S+))?(\\s+USER\\s+(?<username>\\S+)\\s+IDENTIFIED BY\\s+(?<userpass>\\S+))?\\s*;?",
+        Pattern.CASE_INSENSITIVE);
 
-    private static final Pattern LOGIN_COMMAND_ORA = Pattern.compile("CONN(?:ECT)?(?<url>)\\s+(?<username>\\S+)/(?<userpass>\\S+)\\s*;?", Pattern.CASE_INSENSITIVE);
+    private static final Pattern LOGIN_COMMAND_ORA = Pattern.compile(
+        "CONN(?:ECT)?(?<url>)\\s+(?<username>\\S+)/(?<userpass>\\S+)\\s*;?",
+        Pattern.CASE_INSENSITIVE);
 
     private static final Pattern LOGIN_INFO_COMMAND = Pattern.compile("CONNECT\\s+INFO;?", Pattern.CASE_INSENSITIVE);
 
     private static final String EXISTING_HOST = "existing host";
 
-
     public static boolean isAdminQuery(String soqlQuery) {
-        if (soqlQuery == null || soqlQuery.trim().length() == 0) {
+        if (soqlQuery == null || soqlQuery.trim().isEmpty()) {
             return false;
         }
         soqlQuery = soqlQuery.trim();
@@ -50,9 +51,10 @@ public class AdminQueryProcessor {
         return matcherLogin.matches();
     }
 
-    public static ResultSet processQuery(ForcePreparedStatement statement, String soqlQuery, PartnerService partnerService) throws SQLException {
+    public static ResultSet processQuery(ForcePreparedStatement statement, String soqlQuery,
+        PartnerService partnerService) throws SQLException {
         CommandLogCachedResultSet resultSet = new CommandLogCachedResultSet();
-        if (soqlQuery == null || soqlQuery.trim().length() == 0) {
+        if (soqlQuery == null || soqlQuery.trim().isEmpty()) {
             resultSet.log("No SOQL or ADMIN query found");
             return resultSet;
         }
@@ -70,8 +72,10 @@ public class AdminQueryProcessor {
                     return false;
                 }
             } catch (Exception e) {
-                resultSet.log("Admin query: CONNECTION ERROR as " + userName + " to " + host + " : " +e.getMessage());
-                throw new SQLException("CONNECTION ERROR as " + userName + " to " + host + " : " +e.getMessage(), "08000", e);
+                resultSet.log("Admin query: CONNECTION ERROR as " + userName + " to " + host + " : " + e.getMessage());
+                throw new SQLException("CONNECTION ERROR as " + userName + " to " + host + " : " + e.getMessage(),
+                    "08000",
+                    e);
             }
             return true;
         });
@@ -80,10 +84,12 @@ public class AdminQueryProcessor {
 
     @FunctionalInterface
     public interface LoginCommandProcessor {
+
         boolean processCommand(String url, String userName, String userPass, String host) throws SQLException;
     }
 
-    static boolean processLoginInfoCommand(ForcePreparedStatement statement, String soqlQuery, CommandLogCachedResultSet resultSet) throws SQLException {
+    static void processLoginInfoCommand(ForcePreparedStatement statement, String soqlQuery,
+        CommandLogCachedResultSet resultSet) throws SQLException {
         Matcher matcher = LOGIN_INFO_COMMAND.matcher(soqlQuery);
         if (matcher.matches()) {
             if (resultSet != null) {
@@ -91,10 +97,10 @@ public class AdminQueryProcessor {
                 resultSet.log("Host: " + statement.getConnection());
             }
         }
-        return true;
     }
 
-    static boolean processLoginCommand(String soqlQuery, CommandLogCachedResultSet resultSet, LoginCommandProcessor processor) throws SQLException {
+    static boolean processLoginCommand(String soqlQuery, CommandLogCachedResultSet resultSet,
+        LoginCommandProcessor processor) throws SQLException {
         Matcher matcher = LOGIN_COMMAND_PG.matcher(soqlQuery);
         if (!matcher.matches()) {
             // if no PG command - also check for ORA
@@ -150,11 +156,13 @@ public class AdminQueryProcessor {
                     host = EXISTING_HOST;
                 }
                 if (resultSet != null) {
-                    resultSet.log("Admin query: CONNECTION ERROR as " + userName + " to " + host + " : " + e.getMessage());
+                    resultSet.log(
+                        "Admin query: CONNECTION ERROR as " + userName + " to " + host + " : " + e.getMessage());
                 }
-                throw new SQLException("CONNECTION ERROR as " + userName + " to " + host + " : " +e.getMessage(), "08000", e);
+                throw new SQLException("CONNECTION ERROR as " + userName + " to " + host + " : " + e.getMessage(),
+                    "08000",
+                    e);
             }
-
         } else {
             return false;
         }

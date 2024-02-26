@@ -1,37 +1,103 @@
 package com.ascendix.jdbc.salesforce.statement.processor.utils;
 
-import net.sf.jsqlparser.expression.*;
-import net.sf.jsqlparser.expression.operators.arithmetic.*;
-import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
-import net.sf.jsqlparser.expression.operators.conditional.OrExpression;
-import net.sf.jsqlparser.expression.operators.relational.*;
-import net.sf.jsqlparser.schema.Column;
-import net.sf.jsqlparser.statement.select.SubSelect;
+import static com.ascendix.jdbc.salesforce.statement.processor.InsertQueryProcessor.SF_JDBC_DRIVER_NAME;
 
 import java.util.Set;
 import java.util.logging.Logger;
-
-import static com.ascendix.jdbc.salesforce.statement.processor.InsertQueryProcessor.SF_JDBC_DRIVER_NAME;
+import lombok.Getter;
+import net.sf.jsqlparser.expression.AllComparisonExpression;
+import net.sf.jsqlparser.expression.AnalyticExpression;
+import net.sf.jsqlparser.expression.AnyComparisonExpression;
+import net.sf.jsqlparser.expression.ArrayExpression;
+import net.sf.jsqlparser.expression.BinaryExpression;
+import net.sf.jsqlparser.expression.CaseExpression;
+import net.sf.jsqlparser.expression.CastExpression;
+import net.sf.jsqlparser.expression.CollateExpression;
+import net.sf.jsqlparser.expression.DateTimeLiteralExpression;
+import net.sf.jsqlparser.expression.DateValue;
+import net.sf.jsqlparser.expression.DoubleValue;
+import net.sf.jsqlparser.expression.Expression;
+import net.sf.jsqlparser.expression.ExpressionVisitor;
+import net.sf.jsqlparser.expression.ExtractExpression;
+import net.sf.jsqlparser.expression.Function;
+import net.sf.jsqlparser.expression.HexValue;
+import net.sf.jsqlparser.expression.IntervalExpression;
+import net.sf.jsqlparser.expression.JdbcNamedParameter;
+import net.sf.jsqlparser.expression.JdbcParameter;
+import net.sf.jsqlparser.expression.JsonExpression;
+import net.sf.jsqlparser.expression.KeepExpression;
+import net.sf.jsqlparser.expression.LongValue;
+import net.sf.jsqlparser.expression.MySQLGroupConcat;
+import net.sf.jsqlparser.expression.NextValExpression;
+import net.sf.jsqlparser.expression.NotExpression;
+import net.sf.jsqlparser.expression.NullValue;
+import net.sf.jsqlparser.expression.NumericBind;
+import net.sf.jsqlparser.expression.OracleHierarchicalExpression;
+import net.sf.jsqlparser.expression.OracleHint;
+import net.sf.jsqlparser.expression.Parenthesis;
+import net.sf.jsqlparser.expression.RowConstructor;
+import net.sf.jsqlparser.expression.SignedExpression;
+import net.sf.jsqlparser.expression.StringValue;
+import net.sf.jsqlparser.expression.TimeKeyExpression;
+import net.sf.jsqlparser.expression.TimeValue;
+import net.sf.jsqlparser.expression.TimestampValue;
+import net.sf.jsqlparser.expression.UserVariable;
+import net.sf.jsqlparser.expression.ValueListExpression;
+import net.sf.jsqlparser.expression.VariableAssignment;
+import net.sf.jsqlparser.expression.WhenClause;
+import net.sf.jsqlparser.expression.XMLSerializeExpr;
+import net.sf.jsqlparser.expression.operators.arithmetic.Addition;
+import net.sf.jsqlparser.expression.operators.arithmetic.BitwiseAnd;
+import net.sf.jsqlparser.expression.operators.arithmetic.BitwiseLeftShift;
+import net.sf.jsqlparser.expression.operators.arithmetic.BitwiseOr;
+import net.sf.jsqlparser.expression.operators.arithmetic.BitwiseRightShift;
+import net.sf.jsqlparser.expression.operators.arithmetic.BitwiseXor;
+import net.sf.jsqlparser.expression.operators.arithmetic.Concat;
+import net.sf.jsqlparser.expression.operators.arithmetic.Division;
+import net.sf.jsqlparser.expression.operators.arithmetic.IntegerDivision;
+import net.sf.jsqlparser.expression.operators.arithmetic.Modulo;
+import net.sf.jsqlparser.expression.operators.arithmetic.Multiplication;
+import net.sf.jsqlparser.expression.operators.arithmetic.Subtraction;
+import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
+import net.sf.jsqlparser.expression.operators.conditional.OrExpression;
+import net.sf.jsqlparser.expression.operators.relational.Between;
+import net.sf.jsqlparser.expression.operators.relational.EqualsTo;
+import net.sf.jsqlparser.expression.operators.relational.ExistsExpression;
+import net.sf.jsqlparser.expression.operators.relational.FullTextSearch;
+import net.sf.jsqlparser.expression.operators.relational.GreaterThan;
+import net.sf.jsqlparser.expression.operators.relational.GreaterThanEquals;
+import net.sf.jsqlparser.expression.operators.relational.InExpression;
+import net.sf.jsqlparser.expression.operators.relational.IsBooleanExpression;
+import net.sf.jsqlparser.expression.operators.relational.IsNullExpression;
+import net.sf.jsqlparser.expression.operators.relational.JsonOperator;
+import net.sf.jsqlparser.expression.operators.relational.LikeExpression;
+import net.sf.jsqlparser.expression.operators.relational.Matches;
+import net.sf.jsqlparser.expression.operators.relational.MinorThan;
+import net.sf.jsqlparser.expression.operators.relational.MinorThanEquals;
+import net.sf.jsqlparser.expression.operators.relational.NotEqualsTo;
+import net.sf.jsqlparser.expression.operators.relational.RegExpMatchOperator;
+import net.sf.jsqlparser.expression.operators.relational.RegExpMySQLOperator;
+import net.sf.jsqlparser.expression.operators.relational.SimilarToExpression;
+import net.sf.jsqlparser.schema.Column;
+import net.sf.jsqlparser.statement.select.SubSelect;
 
 public class ColumnsFinderVisitor implements ExpressionVisitor {
+
     private static final Logger logger = Logger.getLogger(SF_JDBC_DRIVER_NAME);
 
     private final Set<String> columns;
+    @Getter
     private boolean functionFound = false;
 
     public ColumnsFinderVisitor(Set<String> columns) {
         this.columns = columns;
     }
 
-    public boolean isFunctionFound() {
-        return functionFound;
-    }
-
     private void addColumn(Column column) {
         if (columns.add(column.getColumnName())) {
-            logger.info("New column found: "+column.getColumnName());
+            logger.info("New column found: " + column.getColumnName());
         } else {
-            logger.info("Already detected column: "+column.getColumnName());
+            logger.info("Already detected column: " + column.getColumnName());
         }
     }
 
@@ -201,7 +267,7 @@ public class ColumnsFinderVisitor implements ExpressionVisitor {
     @Override
     public void visit(FullTextSearch fullTextSearch) {
         System.out.println("[ColumnsFinder] FullTextSearch");
-        fullTextSearch.getMatchColumns().forEach( this::addColumn );
+        fullTextSearch.getMatchColumns().forEach(this::addColumn);
     }
 
     @Override
@@ -248,7 +314,7 @@ public class ColumnsFinderVisitor implements ExpressionVisitor {
 
     @Override
     public void visit(SubSelect subSelect) {
-        System.out.println("[VtoxSVisitor] SubSelect="+subSelect.toString());
+        System.out.println("[VtoxSVisitor] SubSelect=" + subSelect.toString());
 //        Object value = null;
 //        if (subSelectResolver != null) {
 //            subSelect.setUseBrackets(false);
@@ -272,7 +338,6 @@ public class ColumnsFinderVisitor implements ExpressionVisitor {
     @Override
     public void visit(WhenClause whenClause) {
         System.out.println("[ColumnsFinder] WhenClause");
-
     }
 
     @Override
@@ -284,13 +349,11 @@ public class ColumnsFinderVisitor implements ExpressionVisitor {
     @Override
     public void visit(AllComparisonExpression allComparisonExpression) {
         System.out.println("[ColumnsFinder] AllComparisonExpression NOT_SUPPORTED!!!");
-
     }
 
     @Override
     public void visit(AnyComparisonExpression anyComparisonExpression) {
         System.out.println("[ColumnsFinder] AnyComparisonExpression");
-
     }
 
     @Override
@@ -387,7 +450,6 @@ public class ColumnsFinderVisitor implements ExpressionVisitor {
     @Override
     public void visit(UserVariable var) {
         System.out.println("[ColumnsFinder] UserVariable");
-
     }
 
     @Override
@@ -398,25 +460,24 @@ public class ColumnsFinderVisitor implements ExpressionVisitor {
     @Override
     public void visit(KeepExpression aexpr) {
         System.out.println("[ColumnsFinder] KeepExpression");
-
     }
 
     @Override
     public void visit(MySQLGroupConcat groupConcat) {
         System.out.println("[ColumnsFinder] MySQLGroupConcat");
-        groupConcat.getExpressionList().getExpressions().forEach( expression ->  expression.accept(this));
+        groupConcat.getExpressionList().getExpressions().forEach(expression -> expression.accept(this));
     }
 
     @Override
     public void visit(ValueListExpression valueList) {
         System.out.println("[ColumnsFinder] ValueListExpression");
-        valueList.getExpressionList().getExpressions().forEach( expression ->  expression.accept(this));
+        valueList.getExpressionList().getExpressions().forEach(expression -> expression.accept(this));
     }
 
     @Override
     public void visit(RowConstructor rowConstructor) {
         System.out.println("[ColumnsFinder] RowConstructor");
-        rowConstructor.getExprList().getExpressions().forEach( expression ->  expression.accept(this));
+        rowConstructor.getExprList().getExpressions().forEach(expression -> expression.accept(this));
     }
 
     @Override

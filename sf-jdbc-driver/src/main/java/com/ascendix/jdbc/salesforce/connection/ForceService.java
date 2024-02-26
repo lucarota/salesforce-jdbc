@@ -7,6 +7,11 @@ import com.sforce.soap.partner.QueryResult;
 import com.sforce.soap.partner.fault.UnexpectedErrorFault;
 import com.sforce.ws.ConnectionException;
 import com.sforce.ws.ConnectorConfig;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
+import java.util.concurrent.TimeUnit;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
@@ -15,12 +20,6 @@ import org.mapdb.DB;
 import org.mapdb.DBMaker;
 import org.mapdb.HTreeMap;
 import org.mapdb.Serializer;
-
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
-import java.util.concurrent.TimeUnit;
 
 @UtilityClass
 @Slf4j
@@ -34,15 +33,13 @@ public class ForceService {
     public static final int EXPIRE_AFTER_CREATE = 60;
     public static final int EXPIRE_STORE_SIZE = 16;
 
-
     private static final DB cacheDb = DBMaker.tempFileDB().closeOnJvmShutdown().make();
 
-    private static HTreeMap<String, String> partnerUrlCache = cacheDb
-            .hashMap("PartnerUrlCache", Serializer.STRING, Serializer.STRING)
-            .expireAfterCreate(EXPIRE_AFTER_CREATE, TimeUnit.MINUTES)
-            .expireStoreSize(EXPIRE_STORE_SIZE * FileUtils.ONE_MB)
-            .create();
-
+    private static final HTreeMap<String, String> partnerUrlCache = cacheDb
+        .hashMap("PartnerUrlCache", Serializer.STRING, Serializer.STRING)
+        .expireAfterCreate(EXPIRE_AFTER_CREATE, TimeUnit.MINUTES)
+        .expireStoreSize(EXPIRE_STORE_SIZE * FileUtils.ONE_MB)
+        .create();
 
     private static String getPartnerUrl(String accessToken, boolean sandbox) {
         return partnerUrlCache.computeIfAbsent(accessToken, s -> getPartnerUrlFromUserInfo(accessToken, sandbox));
@@ -79,7 +76,7 @@ public class ForceService {
     }
 
     private static PartnerConnection createConnectionByUserCredential(ForceConnectionInfo info)
-            throws ConnectionException {
+        throws ConnectionException {
 
         ConnectorConfig partnerConfig = new ConnectorConfig();
         partnerConfig.setUsername(info.getUserName());
@@ -141,7 +138,8 @@ public class ForceService {
 
     private static String buildAuthEndpoint(ForceConnectionInfo info) {
         String protocol = info.getHttps() ? "https" : "http";
-        String domain = info.getSandbox() ? SANDBOX_LOGIN_DOMAIN : info.getLoginDomain() != null ? info.getLoginDomain() : DEFAULT_LOGIN_DOMAIN;
+        String domain = info.getSandbox() ? SANDBOX_LOGIN_DOMAIN
+            : info.getLoginDomain() != null ? info.getLoginDomain() : DEFAULT_LOGIN_DOMAIN;
         return String.format("%s://%s/services/Soap/u/%s", protocol, domain, info.getApiVersion());
     }
 }

@@ -1,10 +1,9 @@
 package com.ascendix.salesforce.oauth;
 
 import com.google.api.client.util.Key;
+import java.util.Map;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.Map;
 
 @Data
 @NoArgsConstructor

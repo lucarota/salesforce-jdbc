@@ -1,12 +1,12 @@
 package com.ascendix.jdbc.salesforce.resultset;
 
 import com.ascendix.jdbc.salesforce.metadata.ColumnMap;
-
-import javax.sql.rowset.serial.SerialBlob;
 import java.io.InputStream;
 import java.io.Reader;
+import java.io.Serial;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.net.URL;
 import java.sql.Array;
 import java.sql.Blob;
@@ -25,15 +25,24 @@ import java.sql.Time;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.GregorianCalendar;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.logging.Logger;
+import javax.sql.rowset.serial.SerialBlob;
 
 public class CachedResultSet implements ResultSet, Serializable {
 
     private static final String SF_JDBC_DRIVER_NAME = "SF JDBC driver RS";
     private static final Logger logger = Logger.getLogger(SF_JDBC_DRIVER_NAME);
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private transient Integer index;
@@ -42,25 +51,25 @@ public class CachedResultSet implements ResultSet, Serializable {
     private SQLWarning warningsChain;
 
     public CachedResultSet(List<ColumnMap<String, Object>> rows) {
-        this.rows = new ArrayList(rows);
+        this.rows = new ArrayList<>(rows);
     }
 
     public CachedResultSet(List<ColumnMap<String, Object>> rows, ResultSetMetaData metadata) {
-        this(new ArrayList(rows));
+        this(new ArrayList<>(rows));
         this.metadata = metadata;
     }
 
     public CachedResultSet(ResultSetMetaData metadata) {
-        this(new ArrayList());
+        this(new ArrayList<>());
         this.metadata = metadata;
     }
 
     public CachedResultSet(ColumnMap<String, Object> singleRow) {
-        this(new ArrayList(Arrays.asList(singleRow)));
+        this(new ArrayList<>(Collections.singletonList(singleRow)));
     }
 
     public CachedResultSet(ColumnMap<String, Object> singleRow, ResultSetMetaData metadata) {
-        this(new ArrayList(Arrays.asList(singleRow)), metadata);
+        this(new ArrayList<>(Collections.singletonList(singleRow)), metadata);
     }
 
     public Object getObject(String columnName) throws SQLException {
@@ -99,7 +108,7 @@ public class CachedResultSet implements ResultSet, Serializable {
     }
 
     public boolean first() throws SQLException {
-        if (rows.size() > 0) {
+        if (!rows.isEmpty()) {
             setIndex(0);
             return true;
         } else {
@@ -108,7 +117,7 @@ public class CachedResultSet implements ResultSet, Serializable {
     }
 
     public boolean last() throws SQLException {
-        if (rows.size() > 0) {
+        if (!rows.isEmpty()) {
             setIndex(rows.size() - 1);
             return true;
         } else {
@@ -117,7 +126,7 @@ public class CachedResultSet implements ResultSet, Serializable {
     }
 
     public boolean next() throws SQLException {
-        if (rows.size() > 0) {
+        if (!rows.isEmpty()) {
             increaseIndex();
             return getIndex() < rows.size();
         } else {
@@ -126,19 +135,19 @@ public class CachedResultSet implements ResultSet, Serializable {
     }
 
     public boolean isAfterLast() throws SQLException {
-        return rows.size() > 0 && getIndex() == rows.size();
+        return !rows.isEmpty() && getIndex() == rows.size();
     }
 
     public boolean isBeforeFirst() throws SQLException {
-        return rows.size() > 0 && getIndex() == -1;
+        return !rows.isEmpty() && getIndex() == -1;
     }
 
     public boolean isFirst() throws SQLException {
-        return rows.size() > 0 && getIndex() == 0;
+        return !rows.isEmpty() && getIndex() == 0;
     }
 
     public boolean isLast() throws SQLException {
-        return rows.size() > 0 && getIndex() == rows.size() - 1;
+        return !rows.isEmpty() && getIndex() == rows.size() - 1;
     }
 
     public ResultSetMetaData getMetaData() throws SQLException {
@@ -158,7 +167,7 @@ public class CachedResultSet implements ResultSet, Serializable {
 
     private class ColumnValueParser<T> {
 
-        private Function<String, T> conversion;
+        private final Function<String, T> conversion;
 
         public ColumnValueParser(Function<String, T> parser) {
             this.conversion = parser;
@@ -175,23 +184,26 @@ public class CachedResultSet implements ResultSet, Serializable {
         }
 
         private Optional<T> parse(Object o) {
-            if (o == null) return Optional.empty();
-            if (!(o instanceof String)) return (Optional<T>) Optional.of(o);
+            if (o == null) {
+                return Optional.empty();
+            }
+            if (!(o instanceof String)) {
+                return (Optional<T>) Optional.of(o);
+            }
             return Optional.of(conversion.apply((String) o));
         }
-
     }
 
     public BigDecimal getBigDecimal(int columnIndex) throws SQLException {
         return new ColumnValueParser<>(BigDecimal::new)
-                .parse(columnIndex)
-                .orElse(null);
+            .parse(columnIndex)
+            .orElse(null);
     }
 
     public BigDecimal getBigDecimal(String columnName) throws SQLException {
         return new ColumnValueParser<>(BigDecimal::new)
-                .parse(columnName)
-                .orElse(null);
+            .parse(columnName)
+            .orElse(null);
     }
 
     protected java.util.Date parseDate(String dateRepr) {
@@ -204,16 +216,16 @@ public class CachedResultSet implements ResultSet, Serializable {
 
     public Date getDate(int columnIndex) throws SQLException {
         return new ColumnValueParser<>(this::parseDate)
-                .parse(columnIndex)
-                .map(d -> new java.sql.Date(d.getTime()))
-                .orElse(null);
+            .parse(columnIndex)
+            .map(d -> new java.sql.Date(d.getTime()))
+            .orElse(null);
     }
 
     public Date getDate(String columnName) throws SQLException {
         return new ColumnValueParser<>(this::parseDate)
-                .parse(columnName)
-                .map(d -> new java.sql.Date(d.getTime()))
-                .orElse(null);
+            .parse(columnName)
+            .map(d -> new java.sql.Date(d.getTime()))
+            .orElse(null);
     }
 
     private java.util.Date parseDateTime(String dateRepr) {
@@ -230,9 +242,9 @@ public class CachedResultSet implements ResultSet, Serializable {
             return new java.sql.Timestamp(((GregorianCalendar) value).getTime().getTime());
         } else {
             return new ColumnValueParser<>(this::parseDateTime)
-                    .parse(columnIndex)
-                    .map(d -> new java.sql.Timestamp(d.getTime()))
-                    .orElse(null);
+                .parse(columnIndex)
+                .map(d -> new java.sql.Timestamp(d.getTime()))
+                .orElse(null);
         }
     }
 
@@ -241,10 +253,10 @@ public class CachedResultSet implements ResultSet, Serializable {
         if (value instanceof GregorianCalendar) {
             return new java.sql.Timestamp(((GregorianCalendar) value).getTime().getTime());
         } else {
-            return new ColumnValueParser<>((v) -> parseDateTime(v))
-                    .parse(columnName)
-                    .map(d -> new java.sql.Timestamp(d.getTime()))
-                    .orElse(null);
+            return new ColumnValueParser<>(this::parseDateTime)
+                .parse(columnName)
+                .map(d -> new java.sql.Timestamp(d.getTime()))
+                .orElse(null);
         }
     }
 
@@ -266,90 +278,91 @@ public class CachedResultSet implements ResultSet, Serializable {
 
     public Time getTime(String columnName) throws SQLException {
         return new ColumnValueParser<>(this::parseTime)
-                .parse(columnName)
-                .map(d -> new Time(d.getTime()))
-                .orElse(null);
+            .parse(columnName)
+            .map(d -> new Time(d.getTime()))
+            .orElse(null);
     }
 
     public Time getTime(int columnIndex) throws SQLException {
         return new ColumnValueParser<>(this::parseTime)
-                .parse(columnIndex)
-                .map(d -> new Time(d.getTime()))
-                .orElse(null);
+            .parse(columnIndex)
+            .map(d -> new Time(d.getTime()))
+            .orElse(null);
     }
 
+    @Deprecated
     public BigDecimal getBigDecimal(int columnIndex, int scale) {
         Optional<BigDecimal> result = new ColumnValueParser<>(BigDecimal::new)
-                .parse(columnIndex);
-        result.ifPresent(v -> v.setScale(scale));
-        return result.orElse(null);
+            .parse(columnIndex);
+
+        return result.map(bigDecimal -> bigDecimal.setScale(scale, RoundingMode.HALF_EVEN)).orElse(null);
     }
 
+    @Deprecated
     public BigDecimal getBigDecimal(String columnName, int scale) {
         Optional<BigDecimal> result = new ColumnValueParser<>(BigDecimal::new)
-                .parse(columnName);
-        result.ifPresent(v -> v.setScale(scale));
-        return result.orElse(null);
+            .parse(columnName);
+        return result.map(bigDecimal -> bigDecimal.setScale(scale, RoundingMode.HALF_EVEN)).orElse(null);
     }
 
     public float getFloat(int columnIndex) throws SQLException {
-        return new ColumnValueParser<>(Float::new)
-                .parse(columnIndex)
-                .orElse(0f);
+        return new ColumnValueParser<>(Float::parseFloat)
+            .parse(columnIndex)
+            .orElse(0f);
     }
 
     public float getFloat(String columnName) throws SQLException {
-        return new ColumnValueParser<>(Float::new)
-                .parse(columnName)
-                .orElse(0f);
+        return new ColumnValueParser<>(Float::parseFloat)
+            .parse(columnName)
+            .orElse(0f);
     }
 
     public double getDouble(int columnIndex) throws SQLException {
-        return new ColumnValueParser<>(Double::new)
-                .parse(columnIndex)
-                .orElse(0d);
+        return new ColumnValueParser<>(Double::parseDouble)
+            .parse(columnIndex)
+            .orElse(0d);
     }
 
     public double getDouble(String columnName) throws SQLException {
-        return new ColumnValueParser<>(Double::new)
-                .parse(columnName)
-                .orElse(0d);
+        return new ColumnValueParser<>(Double::parseDouble)
+            .parse(columnName)
+            .orElse(0d);
     }
 
     public long getLong(String columnName) throws SQLException {
-        return new ColumnValueParser<>(Long::new)
-                .parse(columnName)
-                .orElse(0L);
+        return new ColumnValueParser<>(Long::parseLong)
+            .parse(columnName)
+            .orElse(0L);
     }
 
     public long getLong(int columnIndex) throws SQLException {
-        return new ColumnValueParser<Long>(Long::new)
-                .parse(columnIndex)
-                .orElse(0L);
+        return new ColumnValueParser<Long>(Long::parseLong)
+            .parse(columnIndex)
+            .orElse(0L);
     }
 
     public int getInt(String columnName) throws SQLException {
-        return new ColumnValueParser<>(Integer::new)
-                .parse(columnName)
-                .orElse(0);
+        return new ColumnValueParser<>(Integer::parseInt)
+            .parse(columnName)
+            .orElse(0);
     }
 
     public int getInt(int columnIndex) throws SQLException {
-        return new ColumnValueParser<>(Integer::new)
-                .parse(columnIndex)
-                .orElse(0);
+        return new ColumnValueParser<>(Integer::parseInt)
+            .parse(columnIndex)
+            .orElse(0);
     }
 
     public short getShort(String columnName) throws SQLException {
-        return new ColumnValueParser<>(Short::new)
-                .parse(columnName)
-                .orElse((short) 0);
+        return new ColumnValueParser<>(Short::parseShort)
+            .parse(columnName)
+            .orElse((short) 0);
     }
 
     public short getShort(int columnIndex) throws SQLException {
-        return new ColumnValueParser<>(Short::new)
-                .parse(columnIndex)
-                .orElse((short) 0);
+        return new ColumnValueParser<>(Short::parseShort)
+            .parse(columnIndex)
+            .orElse((short) 0);
     }
 
     public InputStream getBinaryStream(int columnIndex) throws SQLException {
@@ -370,40 +383,40 @@ public class CachedResultSet implements ResultSet, Serializable {
 
     public Blob getBlob(int columnIndex) throws SQLException {
         return new ColumnValueParser<>((v) -> Base64.getDecoder().decode(v))
-                .parse(columnIndex)
-                .map(this::createBlob)
-                .orElse(null);
+            .parse(columnIndex)
+            .map(this::createBlob)
+            .orElse(null);
     }
 
     public Blob getBlob(String columnName) throws SQLException {
         return new ColumnValueParser<>((v) -> Base64.getDecoder().decode(v))
-                .parse(columnName)
-                .map(this::createBlob)
-                .orElse(null);
+            .parse(columnName)
+            .map(this::createBlob)
+            .orElse(null);
     }
 
     public boolean getBoolean(int columnIndex) throws SQLException {
-        return new ColumnValueParser<>(Boolean::new)
-                .parse(columnIndex)
-                .orElse(false);
+        return new ColumnValueParser<>(Boolean::parseBoolean)
+            .parse(columnIndex)
+            .orElse(false);
     }
 
     public boolean getBoolean(String columnName) throws SQLException {
-        return new ColumnValueParser<>(Boolean::new)
-                .parse(columnName)
-                .orElse(false);
+        return new ColumnValueParser<>(Boolean::parseBoolean)
+            .parse(columnName)
+            .orElse(false);
     }
 
     public byte getByte(int columnIndex) throws SQLException {
-        return new ColumnValueParser<>(Byte::new)
-                .parse(columnIndex)
-                .orElse((byte) 0);
+        return new ColumnValueParser<>(Byte::parseByte)
+            .parse(columnIndex)
+            .orElse((byte) 0);
     }
 
     public byte getByte(String columnName) throws SQLException {
-        return new ColumnValueParser<>(Byte::new)
-                .parse(columnName)
-                .orElse((byte) 0);
+        return new ColumnValueParser<>(Byte::parseByte)
+            .parse(columnName)
+            .orElse((byte) 0);
     }
 
     public byte[] getBytes(int columnIndex) throws SQLException {
@@ -446,134 +459,110 @@ public class CachedResultSet implements ResultSet, Serializable {
     }
 
     public int findColumn(String columnName) throws SQLException {
-
         return 0;
     }
 
     public Array getArray(int i) throws SQLException {
-
         return null;
     }
 
     public Array getArray(String colName) throws SQLException {
-
         return null;
     }
 
     public InputStream getAsciiStream(int columnIndex) throws SQLException {
-
         return null;
     }
 
     public InputStream getAsciiStream(String columnName) throws SQLException {
-
         return null;
     }
 
     public Reader getCharacterStream(int columnIndex) throws SQLException {
-
         return null;
     }
 
     public Reader getCharacterStream(String columnName) throws SQLException {
-
         return null;
     }
 
     public Clob getClob(int i) throws SQLException {
-
         return null;
     }
 
     public Clob getClob(String colName) throws SQLException {
-
         return null;
     }
 
     public int getConcurrency() throws SQLException {
-
-        return 0;
+        return ResultSet.CONCUR_READ_ONLY;
     }
 
     public String getCursorName() throws SQLException {
-
         return null;
     }
 
     public int getFetchDirection() throws SQLException {
-
-        return 0;
+        return ResultSet.FETCH_UNKNOWN;
     }
 
     public int getFetchSize() throws SQLException {
-
         return 0;
     }
 
     public Object getObject(int i, Map<String, Class<?>> map)
-            throws SQLException {
-
+        throws SQLException {
         return null;
     }
 
     public Object getObject(String colName, Map<String, Class<?>> map)
-            throws SQLException {
-
+        throws SQLException {
         return null;
     }
 
     public Ref getRef(int i) throws SQLException {
-
         return null;
     }
 
     public Ref getRef(String colName) throws SQLException {
-
         return null;
     }
 
     public int getRow() throws SQLException {
-
         return 0;
     }
 
     public Statement getStatement() throws SQLException {
-
         return null;
     }
 
     public Time getTime(int columnIndex, Calendar cal) throws SQLException {
-
         return null;
     }
 
     public Time getTime(String columnName, Calendar cal) throws SQLException {
-
         return null;
     }
 
     public int getType() throws SQLException {
-
-        return 0;
+        return ResultSet.TYPE_FORWARD_ONLY;
     }
 
     public URL getURL(int columnIndex) throws SQLException {
-
         return null;
     }
 
     public URL getURL(String columnName) throws SQLException {
-
         return null;
     }
 
+    @Deprecated
     public InputStream getUnicodeStream(int columnIndex) throws SQLException {
-
         return null;
     }
 
+    @Deprecated
     public InputStream getUnicodeStream(String columnName) throws SQLException {
-
         return null;
     }
 
@@ -582,10 +571,13 @@ public class CachedResultSet implements ResultSet, Serializable {
     }
 
     public void addWarning(SQLWarning warn) {
-        logger.info("Adding Warning: "+warn.getMessage());
+        logger.info("Adding Warning: " + warn.getMessage());
         if (warningsChain != null) {
             SQLWarning last = warningsChain;
-            while (last != null && last.getNextWarning() != null) last = last.getNextWarning();
+            while (last != null && last.getNextWarning() != null) {
+                last = last.getNextWarning();
+            }
+            assert last != null;
             last.setNextWarning(warn);
         } else {
             warningsChain = warn;
@@ -593,10 +585,13 @@ public class CachedResultSet implements ResultSet, Serializable {
     }
 
     public void addWarning(String reason) {
-        logger.info("Adding Warning: "+reason);
+        logger.info("Adding Warning: " + reason);
         if (warningsChain != null) {
             SQLWarning last = warningsChain;
-            while (last != null && last.getNextWarning() != null) last = last.getNextWarning();
+            while (last != null && last.getNextWarning() != null) {
+                last = last.getNextWarning();
+            }
+            assert last != null;
             last.setNextWarning(new SQLWarning(reason));
         } else {
             warningsChain = new SQLWarning(reason);
@@ -604,6 +599,7 @@ public class CachedResultSet implements ResultSet, Serializable {
     }
 
     public void insertRow() throws SQLException {
+        throw new SQLException("Feature is not supported.", "HY000", 1);
     }
 
     public void moveToCurrentRow() throws SQLException {
@@ -650,27 +646,27 @@ public class CachedResultSet implements ResultSet, Serializable {
     }
 
     public void updateAsciiStream(int columnIndex, InputStream x, int length)
-            throws SQLException {
+        throws SQLException {
     }
 
     public void updateAsciiStream(String columnName, InputStream x, int length)
-            throws SQLException {
+        throws SQLException {
     }
 
     public void updateBigDecimal(int columnIndex, BigDecimal x)
-            throws SQLException {
+        throws SQLException {
     }
 
     public void updateBigDecimal(String columnName, BigDecimal x)
-            throws SQLException {
+        throws SQLException {
     }
 
     public void updateBinaryStream(int columnIndex, InputStream x, int length)
-            throws SQLException {
+        throws SQLException {
     }
 
     public void updateBinaryStream(String columnName, InputStream x, int length)
-            throws SQLException {
+        throws SQLException {
     }
 
     public void updateBlob(int columnIndex, Blob x) throws SQLException {
@@ -698,11 +694,11 @@ public class CachedResultSet implements ResultSet, Serializable {
     }
 
     public void updateCharacterStream(int columnIndex, Reader x, int length)
-            throws SQLException {
+        throws SQLException {
     }
 
     public void updateCharacterStream(String columnName, Reader reader,
-                                      int length) throws SQLException {
+        int length) throws SQLException {
     }
 
     public void updateClob(int columnIndex, Clob x) throws SQLException {
@@ -754,11 +750,11 @@ public class CachedResultSet implements ResultSet, Serializable {
     }
 
     public void updateObject(int columnIndex, Object x, int scale)
-            throws SQLException {
+        throws SQLException {
     }
 
     public void updateObject(String columnName, Object x, int scale)
-            throws SQLException {
+        throws SQLException {
     }
 
     public void updateRef(int columnIndex, Ref x) throws SQLException {
@@ -789,11 +785,11 @@ public class CachedResultSet implements ResultSet, Serializable {
     }
 
     public void updateTimestamp(int columnIndex, Timestamp x)
-            throws SQLException {
+        throws SQLException {
     }
 
     public void updateTimestamp(String columnName, Timestamp x)
-            throws SQLException {
+        throws SQLException {
     }
 
     public boolean wasNull() throws SQLException {
@@ -828,8 +824,7 @@ public class CachedResultSet implements ResultSet, Serializable {
     }
 
     public int getHoldability() throws SQLException {
-
-        return 0;
+        return ResultSet.CLOSE_CURSORS_AT_COMMIT;
     }
 
     public boolean isClosed() throws SQLException {
@@ -981,13 +976,11 @@ public class CachedResultSet implements ResultSet, Serializable {
 
     @Override
     public <T> T getObject(int columnIndex, Class<T> type) throws SQLException {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public <T> T getObject(String columnLabel, Class<T> type) throws SQLException {
-        // TODO Auto-generated method stub
         return null;
     }
 }

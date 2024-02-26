@@ -2,13 +2,16 @@ package com.ascendix.jdbc.salesforce.metadata;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import lombok.Getter;
 
 public class ColumnMap<K, V> implements Serializable {
 
     private static final long serialVersionUID = 2705233366870541749L;
 
-    private ArrayList<K> columnNames = new ArrayList<>();
-    private ArrayList<V> values = new ArrayList<>();
+    @Getter
+    private final ArrayList<K> columnNames = new ArrayList<>();
+    @Getter
+    private final ArrayList<V> values = new ArrayList<>();
     private int columnPosition = 0;
 
     public V put(K key, V value) {
@@ -38,13 +41,5 @@ public class ColumnMap<K, V> implements Serializable {
 
     public int size() {
         return columnNames.size();
-    }
-
-    public ArrayList<K> getColumnNames() {
-        return columnNames;
-    }
-
-    public ArrayList<V> getValues() {
-        return values;
     }
 }

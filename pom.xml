@@ -19,13 +19,13 @@
 
     <properties>
         <revision>1.4.5-SNAPSHOT</revision>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <lombok.version>1.18.22</lombok.version>
         <slf4j.version>1.7.32</slf4j.version>
-        <google-oauth-client.version>1.32.1</google-oauth-client.version>
+        <google-oauth-client.version>1.35.0</google-oauth-client.version>
         <google-oauth-client-jackson2.version>1.40.1</google-oauth-client-jackson2.version>
         <commons-lang3.version>3.12.0</commons-lang3.version>
         <commons-collections4.version>4.1</commons-collections4.version>
@@ -42,7 +42,7 @@
         <maven-assembly-plugin.version>3.1.0</maven-assembly-plugin.version>
         <maven-deploy-plugin.version>2.8.2</maven-deploy-plugin.version>
         <salesforce-soql-parser.version>2.0</salesforce-soql-parser.version>
-        <force-partner-api.version>51.0.0</force-partner-api.version>
+        <force-partner-api.version>58.0.0</force-partner-api.version>
         <mapdb.version>3.0.5</mapdb.version>
         <antlr.version>3.5.2</antlr.version>
         <opencsv.version>4.2</opencsv.version>
@@ -180,7 +180,7 @@
         <repository>
             <id>mulesoft-releases</id>
             <name>MuleSoft Releases Repository</name>
-            <url>http://repository.mulesoft.org/releases/</url>
+            <url>https://repository.mulesoft.org/releases/</url>
             <layout>default</layout>
         </repository>
     </repositories>

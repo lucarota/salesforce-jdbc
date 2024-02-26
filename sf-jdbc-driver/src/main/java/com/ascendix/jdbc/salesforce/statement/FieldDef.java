@@ -2,13 +2,17 @@ package com.ascendix.jdbc.salesforce.statement;
 
 public class FieldDef {
 
-    /** Name of the field (or Name of the field used in aggregation) */
-    private String name;
-    /** Full bname of the field with sub entity or name of the aggregation function like:
+    /**
+     * Name of the field (or Name of the field used in aggregation)
+     */
+    private final String name;
+    /**
+     * Full bname of the field with sub entity or name of the aggregation function like:
      * 1) Owner.Name  for select Owner.Name from Account
-     * 2) maxLastName for MAX(LastName)*/
-    private String alias;
-    private String type;
+     * 2) maxLastName for MAX(LastName)
+     */
+    private final String alias;
+    private final String type;
 
     public FieldDef(String name, String alias, String type) {
         this.name = name;
@@ -39,24 +43,26 @@ public class FieldDef {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (obj == null)
+        }
+        if (obj == null) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()) {
             return false;
+        }
         FieldDef other = (FieldDef) obj;
         if (name == null) {
-            if (other.name != null)
+            if (other.name != null) {
                 return false;
-        } else if (!name.equals(other.name))
+            }
+        } else if (!name.equals(other.name)) {
             return false;
+        }
         if (type == null) {
-            if (other.type != null)
-                return false;
-        } else if (!type.equals(other.type))
-            return false;
-        return true;
+            return other.type == null;
+        } else
+            return type.equals(other.type);
     }
-
 }
