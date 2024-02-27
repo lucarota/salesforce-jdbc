@@ -45,12 +45,12 @@ public class ForcePreparedStatementTest {
         statement.addParameter(1, "one");
         statement.addParameter(3, "two");
 
-        List<Object> actuals = statement.getParameters();
+        List<Object> actual = statement.getParameters();
 
-        assertEquals(3, actuals.size());
-        assertEquals("one", actuals.get(0));
-        assertEquals("two", actuals.get(2));
-        assertNull(actuals.get(1));
+        assertEquals(3, actual.size());
+        assertEquals("one", actual.get(0));
+        assertEquals("two", actual.get(2));
+        assertNull(actual.get(1));
     }
 
     @Test
