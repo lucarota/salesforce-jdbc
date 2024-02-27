@@ -1,7 +1,6 @@
 package com.ascendix.jdbc.salesforce.delegates;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -21,20 +20,20 @@ public class PartnerResultToCartesianTable {
         return expander.expandOn(list, 0, 0);
     }
 
-    private List<List> expandOn(List<List> rows, int columnPosition, int schemaPosititon) {
+    private List<List> expandOn(List<List> rows, int columnPosition, int schemaPosition) {
         return rows.stream()
-            .map(row -> expandRow(row, columnPosition, schemaPosititon))
+            .map(row -> expandRow(row, columnPosition, schemaPosition))
             .flatMap(Collection::stream)
             .collect(Collectors.toList());
     }
 
-    private List<List> expandRow(List row, int columnPosition, int schemaPosititon) {
+    private List<List> expandRow(List row, int columnPosition, int schemaPosition) {
         List<List> result = new ArrayList<>();
-        if (schemaPosititon > schema.size() - 1) {
+        if (schemaPosition > schema.size() - 1) {
             result.add(row);
             return result;
-        } else if (schema.get(schemaPosititon) instanceof List) {
-            int nestedListSize = ((List) schema.get(schemaPosititon)).size();
+        } else if (schema.get(schemaPosition) instanceof List) {
+            int nestedListSize = ((List) schema.get(schemaPosition)).size();
             Object value = row.get(columnPosition);
             List nestedList = value instanceof List ? (List) value : Collections.emptyList();
             if (nestedList.isEmpty()) {
@@ -42,10 +41,10 @@ public class PartnerResultToCartesianTable {
             } else {
                 nestedList.forEach(item -> result.add(expandRow(row, item, columnPosition)));
             }
-            return expandOn(result, columnPosition + nestedListSize, schemaPosititon + 1);
+            return expandOn(result, columnPosition + nestedListSize, schemaPosition + 1);
         } else {
             result.add(row);
-            return expandOn(result, columnPosition + 1, schemaPosititon + 1);
+            return expandOn(result, columnPosition + 1, schemaPosition + 1);
         }
     }
 
