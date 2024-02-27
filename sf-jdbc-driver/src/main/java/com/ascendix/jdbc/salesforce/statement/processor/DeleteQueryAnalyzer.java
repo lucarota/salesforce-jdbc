@@ -1,7 +1,6 @@
 package com.ascendix.jdbc.salesforce.statement.processor;
 
-import static com.ascendix.jdbc.salesforce.statement.processor.InsertQueryProcessor.SF_JDBC_DRIVER_NAME;
-
+import com.ascendix.jdbc.salesforce.ForceDriver;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -21,7 +20,7 @@ import net.sf.jsqlparser.util.SelectUtils;
 
 public class DeleteQueryAnalyzer {
 
-    private static final Logger logger = Logger.getLogger(SF_JDBC_DRIVER_NAME);
+    private static final Logger logger = Logger.getLogger(ForceDriver.SF_JDBC_DRIVER_NAME);
 
     private String soql;
     private final Function<String, List<Map<String, Object>>> subSelectResolver;

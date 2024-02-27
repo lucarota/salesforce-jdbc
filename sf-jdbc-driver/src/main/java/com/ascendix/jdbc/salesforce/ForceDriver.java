@@ -35,8 +35,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ForceDriver implements Driver {
 
-    private static final String SF_JDBC_DRIVER_NAME = "SF JDBC driver";
-    private static final Logger logger = Logger.getLogger(SF_JDBC_DRIVER_NAME);
+    public static final String SF_JDBC_DRIVER_NAME = "SF JDBC driver";
+    private static final Logger logger = Logger.getLogger(ForceDriver.SF_JDBC_DRIVER_NAME);
 
     private static final String ACCEPTABLE_URL = "jdbc:ascendix:salesforce";
     private static final Pattern URL_PATTERN = Pattern.compile("\\A" + ACCEPTABLE_URL + "://(.*)");

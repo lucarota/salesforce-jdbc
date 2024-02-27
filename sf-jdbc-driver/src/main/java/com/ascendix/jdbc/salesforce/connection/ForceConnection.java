@@ -1,5 +1,6 @@
 package com.ascendix.jdbc.salesforce.connection;
 
+import com.ascendix.jdbc.salesforce.ForceDriver;
 import com.ascendix.jdbc.salesforce.metadata.ForceDatabaseMetaData;
 import com.ascendix.jdbc.salesforce.statement.ForcePreparedStatement;
 import com.sforce.soap.partner.DescribeSObjectResult;
@@ -54,8 +55,8 @@ public class ForceConnection implements Connection {
     UpdateLoginFunction loginHandler;
 
     private final DatabaseMetaData metadata;
-    private static final String SF_JDBC_DRIVER_NAME = "SF JDBC driver";
-    private static final Logger logger = Logger.getLogger(SF_JDBC_DRIVER_NAME);
+
+    private static final Logger logger = Logger.getLogger(ForceDriver.SF_JDBC_DRIVER_NAME);
 
     private final Map<String, DescribeSObjectResult> connectionCache = new HashMap<>();
     Properties clientInfo = new Properties();

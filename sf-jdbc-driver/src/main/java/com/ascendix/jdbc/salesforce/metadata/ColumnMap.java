@@ -1,11 +1,13 @@
 package com.ascendix.jdbc.salesforce.metadata;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import lombok.Getter;
 
 public class ColumnMap<K, V> implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 2705233366870541749L;
 
     @Getter

@@ -1,7 +1,6 @@
 package com.ascendix.jdbc.salesforce.statement.processor.utils;
 
-import static com.ascendix.jdbc.salesforce.statement.processor.InsertQueryProcessor.SF_JDBC_DRIVER_NAME;
-
+import com.ascendix.jdbc.salesforce.ForceDriver;
 import com.ascendix.jdbc.salesforce.exceptions.UnsupportedArgumentTypeException;
 import java.math.BigDecimal;
 import java.math.MathContext;
@@ -92,7 +91,7 @@ import net.sf.jsqlparser.statement.select.SubSelect;
 
 public class EvaluateExpressionVisitor implements ExpressionVisitor {
 
-    protected static final Logger logger = Logger.getLogger(SF_JDBC_DRIVER_NAME);
+    protected static final Logger logger = Logger.getLogger(ForceDriver.SF_JDBC_DRIVER_NAME);
     protected Map<String, Object> recordFieldsFromDB;
     @Getter
     protected Object result;
