@@ -1,7 +1,6 @@
 package com.ascendix.jdbc.salesforce.statement.processor.utils;
 
-import static com.ascendix.jdbc.salesforce.statement.processor.InsertQueryProcessor.SF_JDBC_DRIVER_NAME;
-
+import com.ascendix.jdbc.salesforce.ForceDriver;
 import java.util.Set;
 import java.util.logging.Logger;
 import lombok.Getter;
@@ -83,7 +82,7 @@ import net.sf.jsqlparser.statement.select.SubSelect;
 
 public class ColumnsFinderVisitor implements ExpressionVisitor {
 
-    private static final Logger logger = Logger.getLogger(SF_JDBC_DRIVER_NAME);
+    private static final Logger logger = Logger.getLogger(ForceDriver.SF_JDBC_DRIVER_NAME);
 
     private final Set<String> columns;
     @Getter

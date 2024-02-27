@@ -1,5 +1,6 @@
 package com.ascendix.jdbc.salesforce.statement.processor;
 
+import com.ascendix.jdbc.salesforce.ForceDriver;
 import com.ascendix.jdbc.salesforce.delegates.PartnerService;
 import com.ascendix.jdbc.salesforce.resultset.CommandLogCachedResultSet;
 import com.ascendix.jdbc.salesforce.statement.ForcePreparedStatement;
@@ -15,8 +16,7 @@ import java.util.stream.Collectors;
 
 public class DeleteQueryProcessor {
 
-    public static final String SF_JDBC_DRIVER_NAME = "SF JDBC driver";
-    private static final Logger logger = Logger.getLogger(SF_JDBC_DRIVER_NAME);
+    private static final Logger logger = Logger.getLogger(ForceDriver.SF_JDBC_DRIVER_NAME);
 
     public static boolean isDeleteQuery(String soqlQuery, DeleteQueryAnalyzer queryAnalyzer) {
         if (soqlQuery == null || soqlQuery.trim().isEmpty()) {

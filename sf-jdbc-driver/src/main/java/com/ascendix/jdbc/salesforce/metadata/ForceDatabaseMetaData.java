@@ -23,8 +23,7 @@ import java.util.stream.Collectors;
 
 public class ForceDatabaseMetaData implements DatabaseMetaData, Serializable {
 
-    private static final String SF_JDBC_DRIVER_NAME = "SF JDBC driver";
-    private static final Logger logger = Logger.getLogger(SF_JDBC_DRIVER_NAME);
+    private static final Logger logger = Logger.getLogger(ForceDriver.SF_JDBC_DRIVER_NAME);
 
     public static final String DEFAULT_SCHEMA = "Salesforce";
     public static final String DEFAULT_CATALOG = "database";

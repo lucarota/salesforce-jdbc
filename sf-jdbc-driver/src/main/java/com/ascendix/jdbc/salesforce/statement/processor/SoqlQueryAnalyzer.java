@@ -1,7 +1,6 @@
 package com.ascendix.jdbc.salesforce.statement.processor;
 
-import static com.ascendix.jdbc.salesforce.statement.processor.InsertQueryProcessor.SF_JDBC_DRIVER_NAME;
-
+import com.ascendix.jdbc.salesforce.ForceDriver;
 import com.ascendix.jdbc.salesforce.statement.FieldDef;
 import com.sforce.soap.partner.ChildRelationship;
 import com.sforce.soap.partner.DescribeSObjectResult;
@@ -28,7 +27,7 @@ import org.mule.tools.soql.query.select.FunctionCallSpec;
 
 public class SoqlQueryAnalyzer {
 
-    private static final Logger logger = Logger.getLogger(SF_JDBC_DRIVER_NAME);
+    private static final Logger logger = Logger.getLogger(ForceDriver.SF_JDBC_DRIVER_NAME);
     private String soql;
     private final Function<String, DescribeSObjectResult> objectDescriptor;
     private final Map<String, DescribeSObjectResult> describedObjectsCache;

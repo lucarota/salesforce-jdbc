@@ -1,5 +1,6 @@
 package com.ascendix.jdbc.salesforce.resultset;
 
+import com.ascendix.jdbc.salesforce.ForceDriver;
 import com.ascendix.jdbc.salesforce.metadata.ColumnMap;
 import java.io.InputStream;
 import java.io.Reader;
@@ -39,8 +40,7 @@ import javax.sql.rowset.serial.SerialBlob;
 
 public class CachedResultSet implements ResultSet, Serializable {
 
-    private static final String SF_JDBC_DRIVER_NAME = "SF JDBC driver RS";
-    private static final Logger logger = Logger.getLogger(SF_JDBC_DRIVER_NAME);
+    private static final Logger logger = Logger.getLogger(ForceDriver.SF_JDBC_DRIVER_NAME);
 
     @Serial
     private static final long serialVersionUID = 1L;

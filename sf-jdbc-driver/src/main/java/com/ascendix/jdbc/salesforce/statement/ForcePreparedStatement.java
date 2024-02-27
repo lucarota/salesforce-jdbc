@@ -1,5 +1,6 @@
 package com.ascendix.jdbc.salesforce.statement;
 
+import com.ascendix.jdbc.salesforce.ForceDriver;
 import com.ascendix.jdbc.salesforce.connection.ForceConnection;
 import com.ascendix.jdbc.salesforce.delegates.ForceResultField;
 import com.ascendix.jdbc.salesforce.delegates.PartnerService;
@@ -69,8 +70,7 @@ import org.mule.tools.soql.exception.SOQLParsingException;
 
 public class ForcePreparedStatement implements PreparedStatement {
 
-    private static final String SF_JDBC_DRIVER_NAME = "SF JDBC driver";
-    private static final Logger logger = Logger.getLogger(SF_JDBC_DRIVER_NAME);
+    private static final Logger logger = Logger.getLogger(ForceDriver.SF_JDBC_DRIVER_NAME);
 
     private final static String CACHE_HINT = "(?is)\\A\\s*(CACHE\\s*(GLOBAL|SESSION)).*";
     private final static int GB = 1073741824;

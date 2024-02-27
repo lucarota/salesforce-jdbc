@@ -1,7 +1,6 @@
 package com.ascendix.jdbc.salesforce.statement.processor;
 
-import static com.ascendix.jdbc.salesforce.statement.processor.InsertQueryProcessor.SF_JDBC_DRIVER_NAME;
-
+import com.ascendix.jdbc.salesforce.ForceDriver;
 import com.ascendix.jdbc.salesforce.statement.processor.utils.ValueToStringVisitor;
 import com.sforce.soap.partner.DescribeSObjectResult;
 import com.sforce.soap.partner.Field;
@@ -26,7 +25,7 @@ import net.sf.jsqlparser.statement.select.SubSelect;
 
 public class InsertQueryAnalyzer {
 
-    private static final Logger logger = Logger.getLogger(SF_JDBC_DRIVER_NAME);
+    private static final Logger logger = Logger.getLogger(ForceDriver.SF_JDBC_DRIVER_NAME);
 
     private String soql;
     private final Function<String, DescribeSObjectResult> objectDescriptor;

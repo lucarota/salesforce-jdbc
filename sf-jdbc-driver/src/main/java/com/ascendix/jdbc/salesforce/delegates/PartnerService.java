@@ -1,5 +1,6 @@
 package com.ascendix.jdbc.salesforce.delegates;
 
+import com.ascendix.jdbc.salesforce.ForceDriver;
 import com.ascendix.jdbc.salesforce.metadata.Column;
 import com.ascendix.jdbc.salesforce.metadata.Table;
 import com.ascendix.jdbc.salesforce.statement.FieldDef;
@@ -28,8 +29,7 @@ import org.apache.commons.collections4.IteratorUtils;
 
 public class PartnerService {
 
-    private static final String SF_JDBC_DRIVER_NAME = "SF JDBC driver";
-    private static final Logger logger = Logger.getLogger(SF_JDBC_DRIVER_NAME);
+    private static final Logger logger = Logger.getLogger(ForceDriver.SF_JDBC_DRIVER_NAME);
 
     private final PartnerConnection partnerConnection;
     private List<String> sObjectTypesCache;
@@ -242,8 +242,7 @@ public class PartnerService {
             }
         }
         // Make a create call and pass it the array of sObjects
-        SaveResult[] results = partnerConnection.create(records);
-        return results;
+        return partnerConnection.create(records);
     }
 
     public SaveResult[] saveRecords(String entityName, List<Map<String, Object>> recordsDefinitions)
@@ -262,12 +261,10 @@ public class PartnerService {
             }
         }
         // Make a create call and pass it the array of sObjects
-        SaveResult[] results = partnerConnection.update(records);
-        return results;
+        return partnerConnection.update(records);
     }
 
     public DeleteResult[] deleteRecords(String entityName, Collection<String> recordsIds) throws ConnectionException {
-        DeleteResult[] results = partnerConnection.delete(recordsIds.toArray(new String[]{}));
-        return results;
+        return partnerConnection.delete(recordsIds.toArray(new String[]{}));
     }
 }

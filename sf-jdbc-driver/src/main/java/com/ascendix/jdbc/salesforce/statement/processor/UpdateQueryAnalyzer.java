@@ -1,7 +1,6 @@
 package com.ascendix.jdbc.salesforce.statement.processor;
 
-import static com.ascendix.jdbc.salesforce.statement.processor.InsertQueryProcessor.SF_JDBC_DRIVER_NAME;
-
+import com.ascendix.jdbc.salesforce.ForceDriver;
 import com.ascendix.jdbc.salesforce.statement.processor.utils.ColumnsFinderVisitor;
 import com.ascendix.jdbc.salesforce.statement.processor.utils.UpdateRecordVisitor;
 import com.ascendix.jdbc.salesforce.statement.processor.utils.ValueToStringVisitor;
@@ -36,7 +35,7 @@ import net.sf.jsqlparser.util.SelectUtils;
 
 public class UpdateQueryAnalyzer {
 
-    private static final Logger logger = Logger.getLogger(SF_JDBC_DRIVER_NAME);
+    private static final Logger logger = Logger.getLogger(ForceDriver.SF_JDBC_DRIVER_NAME);
 
     private String soql;
     private final Function<String, DescribeSObjectResult> objectDescriptor;
