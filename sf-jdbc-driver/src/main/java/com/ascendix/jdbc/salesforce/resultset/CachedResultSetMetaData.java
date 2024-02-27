@@ -5,6 +5,8 @@ import java.sql.SQLException;
 
 public class CachedResultSetMetaData implements ResultSetMetaData {
 
+    public final static CachedResultSetMetaData EMPTY = new CachedResultSetMetaData();
+
     public String getCatalogName(int column) throws SQLException {
         return "";
     }

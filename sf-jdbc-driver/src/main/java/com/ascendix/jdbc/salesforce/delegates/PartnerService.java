@@ -39,7 +39,7 @@ public class PartnerService {
     }
 
     public List<Table> getTables() {
-        logger.info("[PartnerService] getTables IMPLEMENTED ");
+        logger.finest("[PartnerService] getTables IMPLEMENTED ");
         List<DescribeSObjectResult> sObjects = getSObjectsDescription();
         List<Table> tables = sObjects.stream()
             .map(this::convertToTable)
