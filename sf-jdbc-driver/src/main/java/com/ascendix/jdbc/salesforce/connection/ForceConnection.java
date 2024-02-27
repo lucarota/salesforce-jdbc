@@ -2,6 +2,7 @@ package com.ascendix.jdbc.salesforce.connection;
 
 import com.ascendix.jdbc.salesforce.metadata.ForceDatabaseMetaData;
 import com.ascendix.jdbc.salesforce.statement.ForcePreparedStatement;
+import com.sforce.soap.partner.DescribeSObjectResult;
 import com.sforce.soap.partner.PartnerConnection;
 import com.sforce.ws.ConnectionException;
 import java.sql.Array;
@@ -56,7 +57,7 @@ public class ForceConnection implements Connection {
     private static final String SF_JDBC_DRIVER_NAME = "SF JDBC driver";
     private static final Logger logger = Logger.getLogger(SF_JDBC_DRIVER_NAME);
 
-    private final Map connectionCache = new HashMap<>();
+    private final Map<String, DescribeSObjectResult> connectionCache = new HashMap<>();
     Properties clientInfo = new Properties();
 
     public ForceConnection(PartnerConnection partnerConnection, UpdateLoginFunction loginHandler) {
@@ -121,7 +122,7 @@ public class ForceConnection implements Connection {
         return "Salesforce";
     }
 
-    public Map getCache() {
+    public Map<String, DescribeSObjectResult> getCache() {
         return connectionCache;
     }
 
@@ -219,8 +220,7 @@ public class ForceConnection implements Connection {
 
     @Override
     public int getTransactionIsolation() throws SQLException {
-        // TODO Auto-generated method stub
-        return 0;
+        return Connection.TRANSACTION_NONE;
     }
 
     @Override

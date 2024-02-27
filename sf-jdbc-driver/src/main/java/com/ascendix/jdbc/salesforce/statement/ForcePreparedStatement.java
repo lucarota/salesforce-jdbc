@@ -193,7 +193,7 @@ public class ForcePreparedStatement implements PreparedStatement {
         }
         try {
             List<FieldDef> fieldDefinitions = getRootEntityFieldDefinitions();
-            List<List> forceQueryResult = getPartnerService().query(soqlQuery, fieldDefinitions);
+            List<List> forceQueryResult = getPartnerService().query(getSoqlQueryAnalyzer().getSoqlQuery(), fieldDefinitions);
             if (!forceQueryResult.isEmpty()) {
                 List<ColumnMap<String, Object>> maps = Collections.synchronizedList(new LinkedList<>());
                 forceQueryResult.forEach(record -> maps.add(convertToColumnMap(record)));
@@ -332,8 +332,7 @@ public class ForcePreparedStatement implements PreparedStatement {
             String paramValueCleared = paramValue.trim()
                 .replaceAll("^\\{ts\\s*'(.*)'\\}$", "$1")
                 .replaceAll("Z$", "+0000");
-            java.util.Date parsed = SF_DATETIME_FORMATTER.parse(paramValueCleared);
-            return parsed;
+            return SF_DATETIME_FORMATTER.parse(paramValueCleared);
         } catch (ParseException e) {
             logger.log(Level.SEVERE, "Failed to convert value to date [" + paramValue + "]", e);
         }
@@ -389,7 +388,7 @@ public class ForcePreparedStatement implements PreparedStatement {
             if (metadata == null) {
                 RowSetMetaDataImpl result = new RowSetMetaDataImpl();
                 SoqlQueryAnalyzer queryAnalyzer = getSoqlQueryAnalyzer();
-                List<FieldDef> resultFieldDefinitions = flatten(getRootEntityFieldDefinitions());
+                List<FieldDef> resultFieldDefinitions = getRootEntityFieldDefinitions();
                 int columnsCount = resultFieldDefinitions.size();
                 result.setColumnCount(columnsCount);
                 for (int i = 1; i <= columnsCount; i++) {
@@ -418,14 +417,13 @@ public class ForcePreparedStatement implements PreparedStatement {
 
     private <T> List<T> flatten(List<T> listWithLists) {
         logger.finest("[PrepStat] flatten IMPLEMENTED " + soqlQuery);
-        List<T> listPlain = listWithLists.stream()
+        return listWithLists.stream()
             .flatMap(
                 def -> def instanceof Collection
                     ? flatten((List<T>) def).stream() // MultiLevel flattening
                     : Stream.of(def)
             )
             .collect(Collectors.toList());
-        return listPlain;
     }
 
     private List<FieldDef> fieldDefinitions;
@@ -434,7 +432,6 @@ public class ForcePreparedStatement implements PreparedStatement {
         logger.finest("[PrepStat] getFieldDefinitions IMPLEMENTED " + soqlQuery);
         if (fieldDefinitions == null) {
             fieldDefinitions = getSoqlQueryAnalyzer().getFieldDefinitions();
-            fieldDefinitions = flatten(fieldDefinitions);
             logger.info("[PrepStat] getFieldDefinitions:\n  " +
                 fieldDefinitions.stream()
                     .map(fd -> fd.getName() + ":" + fd.getType())
@@ -460,7 +457,7 @@ public class ForcePreparedStatement implements PreparedStatement {
                 }
             }, connection.getCache());
             if (soqlQueryAnalyzer.isExpandedStarSyntaxForFields()) {
-                this.soqlQuery = soqlQueryAnalyzer.getSoqlQuery();
+                this.soqlQuery = soqlQueryAnalyzer.getOriginalSoqlQuery();
                 logger.info("[PrepStat] Expanded Star Syntax to " + soqlQuery);
             }
         }

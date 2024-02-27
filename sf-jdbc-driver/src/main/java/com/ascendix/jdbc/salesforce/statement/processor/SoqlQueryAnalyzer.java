@@ -35,7 +35,7 @@ public class SoqlQueryAnalyzer {
     private SOQLQuery queryData;
     @Getter
     private boolean expandedStarSyntaxForFields = false;
-    private List fieldDefinitions;
+    private List<FieldDef> fieldDefinitions;
 
     public SoqlQueryAnalyzer(String soql, Function<String, DescribeSObjectResult> objectDescriptor) {
         this(soql, objectDescriptor, new HashMap<>());
@@ -50,8 +50,12 @@ public class SoqlQueryAnalyzer {
         getQueryData();
     }
 
-    public String getSoqlQuery() {
+    public String getOriginalSoqlQuery() {
         return this.soql;
+    }
+
+    public String getSoqlQuery() {
+        return this.queryData.toSOQLText();
     }
 
     private class SelectSpecVisitor extends SOQLDataBaseVisitor<Void> {
@@ -144,12 +148,12 @@ public class SoqlQueryAnalyzer {
             SoqlQueryAnalyzer subqueryAnalyzer = new SoqlQueryAnalyzer(subquery.toSOQLText(),
                 objectDescriptor,
                 describedObjectsCache);
-            fieldDefinitions.add(new ArrayList(subqueryAnalyzer.getFieldDefinitions()));
+            fieldDefinitions.addAll(subqueryAnalyzer.getFieldDefinitions());
             return null;
         }
     }
 
-    public List getFieldDefinitions() {
+    public List<FieldDef> getFieldDefinitions() {
         if (fieldDefinitions == null) {
             fieldDefinitions = new ArrayList<>();
             String rootEntityName = getQueryData().getFromClause().getMainObjectSpec().getObjectName();
