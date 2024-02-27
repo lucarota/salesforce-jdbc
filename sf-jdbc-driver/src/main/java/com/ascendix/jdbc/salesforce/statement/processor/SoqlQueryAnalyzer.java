@@ -80,6 +80,8 @@ public class SoqlQueryAnalyzer {
             List<String> prefixNames = new ArrayList<>(fieldSpec.getObjectPrefixNames());
             FieldDef result = createFieldDef(name, alias, prefixNames);
             fieldDefinitions.add(result);
+            /* Remove alias from query */
+            fieldSpec.setAlias(null);
             return null;
         }
 
@@ -91,9 +93,7 @@ public class SoqlQueryAnalyzer {
             }
             while (!fieldPrefixes.isEmpty()) {
                 String referenceName = fieldPrefixes.get(0);
-                Field reference = findField(referenceName,
-                    describeObject(fromObject),
-                    Field::getRelationshipName);
+                Field reference = findField(referenceName, describeObject(fromObject), Field::getRelationshipName);
                 fromObject = reference.getReferenceTo()[0];
                 fieldPrefixes.remove(0);
             }
@@ -101,7 +101,7 @@ public class SoqlQueryAnalyzer {
             return new FieldDef(name, alias, type);
         }
 
-        private final List<String> FUNCTIONS_HAS_INT_RESULT = Arrays.asList("COUNT",
+        private static final List<String> FUNCTIONS_HAS_INT_RESULT = Arrays.asList("COUNT",
             "COUNT_DISTINCT",
             "CALENDAR_MONTH",
             "CALENDAR_QUARTER",
