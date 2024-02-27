@@ -38,7 +38,7 @@ public class SoslQueryAnalyzer {
         this.describedObjectsCache = describedObjectsCache;
     }
 
-    private List fieldDefinitions;
+    private List<Object> fieldDefinitions;
 
     public boolean analyse(String soql) {
         if (soql == null || soql.trim().isEmpty()) {
@@ -144,10 +144,10 @@ public class SoslQueryAnalyzer {
         }
     }
 
-    public List getFieldDefinitions() {
+    public List<Object> getFieldDefinitions() {
         if (fieldDefinitions == null) {
             fieldDefinitions = new ArrayList<>();
-            String rootEntityName = getQueryData().getFromClause().getMainObjectSpec().getObjectName();
+            String rootEntityName = getFromObjectName();
             SelectSpecVisitor visitor = new SelectSpecVisitor(rootEntityName);
             getQueryData().getSelectSpecs()
                 .forEach(spec -> spec.accept(visitor));

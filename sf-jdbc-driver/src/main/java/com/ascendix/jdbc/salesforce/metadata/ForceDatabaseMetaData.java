@@ -4,6 +4,7 @@ import com.ascendix.jdbc.salesforce.ForceDriver;
 import com.ascendix.jdbc.salesforce.connection.ForceConnection;
 import com.ascendix.jdbc.salesforce.delegates.PartnerService;
 import com.ascendix.jdbc.salesforce.resultset.CachedResultSet;
+import com.ascendix.jdbc.salesforce.resultset.CachedResultSetMetaData;
 import com.ascendix.jdbc.salesforce.statement.ForcePreparedStatement;
 import java.io.Serializable;
 import java.sql.Connection;
@@ -14,7 +15,6 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -46,7 +46,7 @@ public class ForceDatabaseMetaData implements DatabaseMetaData, Serializable {
 
     @Override
     public ResultSet getTables(String catalog, String schemaPattern, String tableNamePattern, String[] types) {
-        logger.info("[Meta] getTables catalog=" + catalog + " schema=" + schemaPattern + " table=" + tableNamePattern);
+        logger.fine("[Meta] getTables catalog=" + catalog + " schema=" + schemaPattern + " table=" + tableNamePattern);
         List<ColumnMap<String, Object>> rows = new ArrayList<>();
         ColumnMap<String, Object> firstRow = null;
         for (Table table : getTables()) {
@@ -370,7 +370,7 @@ public class ForceDatabaseMetaData implements DatabaseMetaData, Serializable {
 
     @Override
     public <T> T unwrap(Class<T> iface) throws SQLException {
-        logger.info("[Meta] unwrap requested NOT_IMPLEMENTED ifaceType=" + iface.getName());
+        logger.finer("[Meta] unwrap requested NOT_IMPLEMENTED ifaceType=" + iface.getName());
         return null;
     }
 
@@ -451,7 +451,7 @@ public class ForceDatabaseMetaData implements DatabaseMetaData, Serializable {
 
     @Override
     public String getDriverVersion() throws SQLException {
-        return getDriverMajorVersion() + "." + getDriverMinorVersion() + ".4";
+        return getDriverMajorVersion() + "." + getDriverMinorVersion() + ".0";
     }
 
     @Override
@@ -461,7 +461,7 @@ public class ForceDatabaseMetaData implements DatabaseMetaData, Serializable {
 
     @Override
     public int getDriverMinorVersion() {
-        return 4;
+        return 5;
     }
 
     @Override
@@ -1085,26 +1085,24 @@ public class ForceDatabaseMetaData implements DatabaseMetaData, Serializable {
     @Override
     public ResultSet getProcedures(String catalog, String schemaPattern, String procedureNamePattern)
         throws SQLException {
-        // TODO Auto-generated method stub
-        logger.info(
+        logger.finer(
             "[Meta] getProcedures requested NOT_IMPLEMENTED catalog=" + catalog + " schema=" + schemaPattern + " proc="
                 + procedureNamePattern);
-        return new CachedResultSet(Collections.EMPTY_LIST, null);
+        return new CachedResultSet(CachedResultSetMetaData.EMPTY);
     }
 
     @Override
     public ResultSet getProcedureColumns(String catalog, String schemaPattern, String procedureNamePattern,
         String columnNamePattern) throws SQLException {
-        // TODO Auto-generated method stub
-        logger.info(
+        logger.finer(
             "[Meta] getProcedureColumns requested NOT_IMPLEMENTED catalog=" + catalog + " schema=" + schemaPattern
                 + " procs=" + procedureNamePattern + " col=" + columnNamePattern);
-        return new CachedResultSet(Collections.EMPTY_LIST, null);
+        return new CachedResultSet(CachedResultSetMetaData.EMPTY);
     }
 
     @Override
     public ResultSet getTableTypes() throws SQLException {
-        logger.info("[Meta] getTableTypes requested IMPLEMENTED");
+        logger.finest("[Meta] getTableTypes requested IMPLEMENTED");
         ColumnMap<String, Object> row = new ColumnMap<>();
         row.put("TABLE_TYPE", DEFAULT_TABLE_TYPE);
         return new CachedResultSet(row, ForcePreparedStatement.dummyMetaData(row));
@@ -1113,72 +1111,64 @@ public class ForceDatabaseMetaData implements DatabaseMetaData, Serializable {
     @Override
     public ResultSet getColumnPrivileges(String catalog, String schema, String table, String columnNamePattern)
         throws SQLException {
-        logger.info(
+        logger.finer(
             "[Meta] getColumnPrivileges requested NOT_IMPLEMENTED catalog=" + catalog + " schema=" + schema + " table="
                 + table + " column=" + columnNamePattern);
-        // TODO Auto-generated method stub
-        return new CachedResultSet(Collections.EMPTY_LIST, null);
+        return new CachedResultSet(CachedResultSetMetaData.EMPTY);
     }
 
     @Override
     public ResultSet getTablePrivileges(String catalog, String schemaPattern, String tableNamePattern)
         throws SQLException {
-        logger.info(
+        logger.finer(
             "[Meta] getTablePrivileges requested NOT_IMPLEMENTED catalog=" + catalog + " schema=" + schemaPattern
                 + " table=" + tableNamePattern);
-        // TODO Auto-generated method stub
-        return new CachedResultSet(Collections.EMPTY_LIST, null);
+        return new CachedResultSet(CachedResultSetMetaData.EMPTY);
     }
 
     @Override
     public ResultSet getBestRowIdentifier(String catalog, String schema, String table, int scope, boolean nullable)
         throws SQLException {
-        logger.info(
+        logger.finer(
             "[Meta] getBestRowIdentifier requested NOT_IMPLEMENTED catalog=" + catalog + " schema=" + schema + " table="
                 + table);
-        // TODO Auto-generated method stub
-        return new CachedResultSet(Collections.EMPTY_LIST, null);
+        return new CachedResultSet(CachedResultSetMetaData.EMPTY);
     }
 
     @Override
     public ResultSet getVersionColumns(String catalog, String schema, String table) throws SQLException {
-        logger.info(
+        logger.finer(
             "[Meta] getVersionColumns requested NOT_IMPLEMENTED catalog=" + catalog + " schema=" + schema + " table="
                 + table);
-        // TODO Auto-generated method stub
-        return new CachedResultSet(Collections.EMPTY_LIST, null);
+        return new CachedResultSet(CachedResultSetMetaData.EMPTY);
     }
 
     @Override
     public ResultSet getExportedKeys(String catalog, String schema, String table) throws SQLException {
-        logger.info(
+        logger.finer(
             "[Meta] getExportedKeys requested NOT_IMPLEMENTED catalog=" + catalog + " schema=" + schema + " table="
                 + table);
-        // TODO Auto-generated method stub
-        return new CachedResultSet(Collections.EMPTY_LIST, null);
+        return new CachedResultSet(CachedResultSetMetaData.EMPTY);
     }
 
     @Override
     public ResultSet getCrossReference(String parentCatalog, String parentSchema, String parentTable,
         String foreignCatalog, String foreignSchema, String foreignTable) throws SQLException {
-        logger.info("[Meta] getCrossReference requested NOT_IMPLEMENTED parentCat=" + parentCatalog + " parentSc="
+        logger.finer("[Meta] getCrossReference requested NOT_IMPLEMENTED parentCat=" + parentCatalog + " parentSc="
             + parentSchema + " parentTable=" + parentTable + " catalog=" + foreignCatalog + " schema=" + foreignSchema
             + " table=" + foreignTable);
 
-        // TODO Auto-generated method stub
-        return new CachedResultSet(Collections.EMPTY_LIST, null);
+        return new CachedResultSet(CachedResultSetMetaData.EMPTY);
     }
 
     @Override
     public boolean supportsResultSetType(int type) throws SQLException {
-        // TODO Auto-generated method stub
-        return false;
+        return type == ResultSet.TYPE_FORWARD_ONLY;
     }
 
     @Override
     public boolean supportsResultSetConcurrency(int type, int concurrency) throws SQLException {
-        // TODO Auto-generated method stub
-        return false;
+        return type == ResultSet.TYPE_FORWARD_ONLY && concurrency == ResultSet.CONCUR_READ_ONLY;
     }
 
     @Override
@@ -1244,66 +1234,59 @@ public class ForceDatabaseMetaData implements DatabaseMetaData, Serializable {
     @Override
     public ResultSet getUDTs(String catalog, String schemaPattern, String typeNamePattern, int[] types)
         throws SQLException {
-        // TODO Auto-generated method stub
-        logger.info("[Meta] getUDTs requested NOT_IMPLEMENTED");
-        return new CachedResultSet(Collections.EMPTY_LIST, null);
+        logger.finer("[Meta] getUDTs requested NOT_IMPLEMENTED");
+        return new CachedResultSet(CachedResultSetMetaData.EMPTY);
     }
 
     @Override
     public Connection getConnection() throws SQLException {
-        // TODO Auto-generated method stub
         return connection;
     }
 
     @Override
     public boolean supportsSavepoints() throws SQLException {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public boolean supportsNamedParameters() throws SQLException {
-        // TODO Auto-generated method stub
+        // FIXME: ci servono
         return false;
     }
 
     @Override
     public boolean supportsMultipleOpenResults() throws SQLException {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public boolean supportsGetGeneratedKeys() throws SQLException {
-        // TODO Auto-generated method stub
+        // FIXME: ci servono
         return false;
     }
 
     @Override
     public ResultSet getSuperTypes(String catalog, String schemaPattern, String typeNamePattern) throws SQLException {
-        // TODO Auto-generated method stub
-        logger.info(
+        logger.finer(
             "[Meta] getSuperTypes requested NOT_IMPLEMENTED catalog=" + catalog + " schema=" + schemaPattern + " type="
                 + typeNamePattern);
-        return new CachedResultSet(Collections.EMPTY_LIST, null);
+        return new CachedResultSet(CachedResultSetMetaData.EMPTY);
     }
 
     @Override
     public ResultSet getSuperTables(String catalog, String schemaPattern, String tableNamePattern) throws SQLException {
-        // TODO Auto-generated method stub
-        logger.info("[Meta] getSuperTables requested NOT_IMPLEMENTED catalog=" + catalog + " schema=" + schemaPattern
+        logger.finer("[Meta] getSuperTables requested NOT_IMPLEMENTED catalog=" + catalog + " schema=" + schemaPattern
             + " table=" + tableNamePattern);
-        return new CachedResultSet(Collections.EMPTY_LIST, null);
+        return new CachedResultSet(CachedResultSetMetaData.EMPTY);
     }
 
     @Override
     public ResultSet getAttributes(String catalog, String schemaPattern, String typeNamePattern,
         String attributeNamePattern) throws SQLException {
-        // TODO Auto-generated method stub
-        logger.info(
+        logger.finer(
             "[Meta] getAttributes requested NOT_IMPLEMENTED catalog=" + catalog + " schema=" + schemaPattern + " type="
                 + typeNamePattern + " attr=" + attributeNamePattern);
-        return new CachedResultSet(Collections.EMPTY_LIST, null);
+        return new CachedResultSet(CachedResultSetMetaData.EMPTY);
     }
 
     @Override
@@ -1358,8 +1341,7 @@ public class ForceDatabaseMetaData implements DatabaseMetaData, Serializable {
 
     @Override
     public RowIdLifetime getRowIdLifetime() throws SQLException {
-        // TODO Auto-generated method stub
-        logger.info("[Meta] getRowIdLifetime requested NOT_IMPLEMENTED");
+        logger.finer("[Meta] getRowIdLifetime requested NOT_IMPLEMENTED");
         return null;
     }
 
@@ -1382,38 +1364,34 @@ public class ForceDatabaseMetaData implements DatabaseMetaData, Serializable {
 
     @Override
     public ResultSet getClientInfoProperties() throws SQLException {
-        // TODO Auto-generated method stub
-        logger.info("[Meta] getClientInfoProperties requested NOT_IMPLEMENTED");
-        return new CachedResultSet(Collections.EMPTY_LIST, null);
+        logger.finer("[Meta] getClientInfoProperties requested NOT_IMPLEMENTED");
+        return new CachedResultSet(CachedResultSetMetaData.EMPTY);
     }
 
     @Override
     public ResultSet getFunctions(String catalog, String schemaPattern, String functionNamePattern)
         throws SQLException {
-        // TODO Auto-generated method stub
-        logger.info(
+        logger.finer(
             "[Meta] getSuperTables requested NOT_IMPLEMENTED catalog=" + catalog + " schema=" + schemaPattern + " func="
                 + functionNamePattern);
-        return new CachedResultSet(Collections.EMPTY_LIST, null);
+        return new CachedResultSet(CachedResultSetMetaData.EMPTY);
     }
 
     @Override
     public ResultSet getFunctionColumns(String catalog, String schemaPattern, String functionNamePattern,
         String columnNamePattern) throws SQLException {
-        // TODO Auto-generated method stub
-        logger.info(
+        logger.finer(
             "[Meta] getSuperTables requested NOT_IMPLEMENTED catalog=" + catalog + " schema=" + schemaPattern + " func="
                 + functionNamePattern + " column=" + columnNamePattern);
-        return new CachedResultSet(Collections.EMPTY_LIST, null);
+        return new CachedResultSet(CachedResultSetMetaData.EMPTY);
     }
 
     @Override
     public ResultSet getPseudoColumns(String catalog, String schemaPattern, String tableNamePattern,
         String columnNamePattern) throws SQLException {
-        // TODO Auto-generated method stub
-        logger.info("[Meta] getPseudoColumns requested NOT_IMPLEMENTED catalog=" + catalog + " schema=" + schemaPattern
+        logger.finer("[Meta] getPseudoColumns requested NOT_IMPLEMENTED catalog=" + catalog + " schema=" + schemaPattern
             + " table=" + tableNamePattern + " column=" + columnNamePattern);
-        return new CachedResultSet(Collections.EMPTY_LIST, null);
+        return new CachedResultSet(CachedResultSetMetaData.EMPTY);
     }
 
     @Override

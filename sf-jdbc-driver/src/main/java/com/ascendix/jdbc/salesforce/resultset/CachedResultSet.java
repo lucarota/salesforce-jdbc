@@ -151,7 +151,7 @@ public class CachedResultSet implements ResultSet, Serializable {
     }
 
     public ResultSetMetaData getMetaData() throws SQLException {
-        return metadata != null ? metadata : new CachedResultSetMetaData();
+        return metadata != null ? metadata : CachedResultSetMetaData.EMPTY;
     }
 
     public void setFetchSize(int rows) throws SQLException {
