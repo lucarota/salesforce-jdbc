@@ -29,7 +29,7 @@ for version control and publishing an open source software.
 Hami
  */
 
-package net.efabrika.util;
+package util;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
