@@ -85,6 +85,8 @@ public class ForceDriver implements Driver {
             if (resolveBooleanProperty(properties, "insecurehttps", false)) {
                 HttpsTrustManager.allowAllSSL();
             }
+            info.setReadTimeout(resolveIntProperty(properties, "readTimeout", info.getReadTimeout()));
+            info.setConnectionTimeout(resolveIntProperty(properties, "connectionTimeout", info.getConnectionTimeout()));
             info.setApiVersion(resolveStringProperty(properties, "api", ForceService.DEFAULT_API_VERSION));
             info.setLoginDomain(resolveStringProperty(properties, "loginDomain", ForceService.DEFAULT_LOGIN_DOMAIN));
 
@@ -116,6 +118,10 @@ public class ForceDriver implements Driver {
                 if (resolveBooleanProperty(newProperties, "insecurehttps", false)) {
                     HttpsTrustManager.allowAllSSL();
                 }
+                newInfo.setReadTimeout(resolveIntProperty(newProperties, "readTimeout", newInfo.getReadTimeout()));
+                newInfo.setConnectionTimeout(resolveIntProperty(newProperties,
+                    "connectionTimeout",
+                    newInfo.getConnectionTimeout()));
                 newInfo.setApiVersion(resolveStringProperty(newProperties, "api", ForceService.DEFAULT_API_VERSION));
                 newInfo.setLoginDomain(resolveStringProperty(newProperties,
                     "loginDomain",
@@ -164,6 +170,19 @@ public class ForceDriver implements Driver {
         String boolValue = properties.getProperty(propertyName);
         if (boolValue != null) {
             return boolValue;
+        }
+        return defaultValue;
+    }
+
+    private static int resolveIntProperty(Properties properties, String propertyName, int defaultValue) {
+        String intVal = properties.getProperty(propertyName);
+        if (intVal != null) {
+            try {
+                return Integer.parseInt(intVal);
+            } catch (NumberFormatException ignored) {
+                logger.log(Level.WARNING,
+                    "[ForceDriver] ignored invalid int property=" + propertyName + " value=" + intVal);
+            }
         }
         return defaultValue;
     }
