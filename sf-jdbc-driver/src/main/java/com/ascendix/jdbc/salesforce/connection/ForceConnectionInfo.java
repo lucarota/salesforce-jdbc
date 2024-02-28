@@ -15,4 +15,6 @@ public class ForceConnectionInfo {
     private String apiVersion = ForceService.DEFAULT_API_VERSION;
     private String loginDomain;
     private String clientName;
+    private int connectionTimeout = 10 * 1000;
+    private int readTimeout = 30 * 1000;
 }
