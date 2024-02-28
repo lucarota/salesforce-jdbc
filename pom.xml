@@ -7,9 +7,9 @@
     <packaging>pom</packaging>
 
     <scm>
-        <connection>https://github.com/spuliaiev-sfdc/salesforce-jdbc.git</connection>
-        <developerConnection>https://github.com/spuliaiev-sfdc/salesforce-jdbc.git</developerConnection>
-        <url>https://github.com/spuliaiev-sfdc/salesforce-jdbc</url>
+        <connection>https://github.com/lucarota/salesforce-jdbc.git</connection>
+        <developerConnection>https://github.com/lucarota/salesforce-jdbc.git</developerConnection>
+        <url>https://github.com/lucarota/salesforce-jdbc</url>
     </scm>
 
     <modules>
