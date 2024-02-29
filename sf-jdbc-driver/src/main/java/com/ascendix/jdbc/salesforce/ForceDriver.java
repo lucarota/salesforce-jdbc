@@ -294,22 +294,12 @@ public class ForceDriver implements Driver {
         public void checkClientTrusted(
             X509Certificate[] x509Certificates, String s)
             throws java.security.cert.CertificateException {
-
         }
 
         @Override
         public void checkServerTrusted(
             X509Certificate[] x509Certificates, String s)
             throws java.security.cert.CertificateException {
-
-        }
-
-        public boolean isClientTrusted(X509Certificate[] chain) {
-            return true;
-        }
-
-        public boolean isServerTrusted(X509Certificate[] chain) {
-            return true;
         }
 
         @Override
@@ -329,7 +319,7 @@ public class ForceDriver implements Driver {
                 context.init(null, trustManagers, new SecureRandom());
                 HttpsURLConnection.setDefaultSSLSocketFactory(context.getSocketFactory());
             } catch (NoSuchAlgorithmException | KeyManagementException e) {
-                e.printStackTrace();
+                logger.log(Level.SEVERE, "SSL Exception", e);
             }
         }
     }
