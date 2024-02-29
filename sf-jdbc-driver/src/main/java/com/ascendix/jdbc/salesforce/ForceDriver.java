@@ -224,7 +224,7 @@ public class ForceDriver implements Driver {
             } else {
                 urlProperties = dataString;
             }
-            urlProperties = urlProperties.replaceAll(";", "\n");
+            urlProperties = urlProperties.replace(";", "\n").replace("\\", "\\\\");
         } else {
             Matcher ipMatcher = VALID_IP_ADDRESS_REGEX.matcher(urlString);
             if (ipMatcher.matches()) {
