@@ -1,11 +1,18 @@
 package com.ascendix.jdbc.salesforce.metadata;
 
+import static com.ascendix.jdbc.salesforce.metadata.TypeInfo.BOOL_TYPE_INFO;
+import static com.ascendix.jdbc.salesforce.metadata.TypeInfo.INT_TYPE_INFO;
+import static com.ascendix.jdbc.salesforce.metadata.TypeInfo.LONG_TYPE_INFO;
+import static com.ascendix.jdbc.salesforce.metadata.TypeInfo.SHORT_TYPE_INFO;
+import static com.ascendix.jdbc.salesforce.metadata.TypeInfo.STRING_TYPE_INFO;
+
 import com.ascendix.jdbc.salesforce.ForceDriver;
 import com.ascendix.jdbc.salesforce.connection.ForceConnection;
 import com.ascendix.jdbc.salesforce.delegates.PartnerService;
 import com.ascendix.jdbc.salesforce.resultset.CachedResultSet;
 import com.ascendix.jdbc.salesforce.resultset.CachedResultSetMetaData;
 import com.ascendix.jdbc.salesforce.statement.ForcePreparedStatement;
+import com.sforce.ws.ConnectorConfig;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -16,6 +23,7 @@ import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
@@ -28,15 +36,21 @@ public class ForceDatabaseMetaData implements DatabaseMetaData, Serializable {
     public static final String DEFAULT_SCHEMA = "Salesforce";
     public static final String DEFAULT_CATALOG = "database";
     public static final String DEFAULT_TABLE_TYPE = "TABLE";
+    public static final String ENTITY_TABLE_TYPE = "ENTITY";
 
     private final transient PartnerService partnerService;
     private transient ForceConnection connection;
     private List<Table> tablesCache;
     private int counter;
+    private final Properties connInfo = new Properties();
 
     public ForceDatabaseMetaData(ForceConnection connection) {
         this.connection = connection;
         this.partnerService = new PartnerService(connection.getPartnerConnection());
+        ConnectorConfig connectorConfig = this.connection.getPartnerConnection().getConfig();
+        connInfo.setProperty("config.auth_endpoint", connectorConfig.getAuthEndpoint());
+        connInfo.setProperty("config.rest_endpoint", Objects.toString(connectorConfig.getRestEndpoint(), ""));
+        connInfo.setProperty("config.service_endpoint", connectorConfig.getServiceEndpoint());
     }
 
     private ForceDatabaseMetaData() {
@@ -47,21 +61,26 @@ public class ForceDatabaseMetaData implements DatabaseMetaData, Serializable {
     public ResultSet getTables(String catalog, String schemaPattern, String tableNamePattern, String[] types) {
         logger.fine("[Meta] getTables catalog=" + catalog + " schema=" + schemaPattern + " table=" + tableNamePattern);
         List<ColumnMap<String, Object>> rows = new ArrayList<>();
+        List<String> typeList = types == null ? null : Arrays.asList(types);
         ColumnMap<String, Object> firstRow = null;
         for (Table table : getTables()) {
-            if (tableNamePattern == null || "%".equals(tableNamePattern.trim()) || table.getName()
-                .equalsIgnoreCase(tableNamePattern)) {
+            String name = table.getName();
+            boolean queryable = table.isQueryable();
+
+            if ((typeList == null || (queryable && typeList.contains(DEFAULT_TABLE_TYPE))) &&
+                (tableNamePattern == null || "%".equals(tableNamePattern.trim()) || name.equalsIgnoreCase(
+                    tableNamePattern))) {
                 ColumnMap<String, Object> map = new ColumnMap<>();
-                map.put("TABLE_CAT", DEFAULT_CATALOG);
-                map.put("TABLE_SCHEM", DEFAULT_SCHEMA);
-                map.put("TABLE_NAME", table.getName());
-                map.put("TABLE_TYPE", DEFAULT_TABLE_TYPE);
-                map.put("REMARKS", table.getComments());
-                map.put("TYPE_CAT", null);
-                map.put("TYPE_SCHEM", null);
-                map.put("TYPE_NAME", null);
-                map.put("SELF_REFERENCING_COL_NAME", null);
-                map.put("REF_GENERATION", null);
+                map.put("TABLE_CAT", DEFAULT_CATALOG, TypeInfo.STRING_TYPE_INFO);
+                map.put("TABLE_SCHEM", DEFAULT_SCHEMA, STRING_TYPE_INFO);
+                map.put("TABLE_NAME", name, STRING_TYPE_INFO);
+                map.put("TABLE_TYPE", queryable ? DEFAULT_TABLE_TYPE : ENTITY_TABLE_TYPE, STRING_TYPE_INFO);
+                map.put("REMARKS", table.getComments(), STRING_TYPE_INFO);
+                map.put("TYPE_CAT", null, STRING_TYPE_INFO);
+                map.put("TYPE_SCHEM", null, STRING_TYPE_INFO);
+                map.put("TYPE_NAME", null, STRING_TYPE_INFO);
+                map.put("SELF_REFERENCING_COL_NAME", null, STRING_TYPE_INFO);
+                map.put("REF_GENERATION", null, STRING_TYPE_INFO);
                 rows.add(map);
                 if (firstRow == null) {
                     firstRow = map;
@@ -71,7 +90,7 @@ public class ForceDatabaseMetaData implements DatabaseMetaData, Serializable {
         logger.info(
             "[Meta] getTables RESULT catalog=" + catalog + " schema=" + schemaPattern + " table=" + tableNamePattern +
                 "\n  firstRowFound=" + (firstRow != null ? "yes" : "no") + " TablesFound=" + rows.size());
-        return new CachedResultSet(rows, ForcePreparedStatement.dummyMetaData(firstRow));
+        return new CachedResultSet(rows, ForcePreparedStatement.createMetaData(firstRow));
     }
 
     private List<Table> getTables() {
@@ -104,32 +123,35 @@ public class ForceDatabaseMetaData implements DatabaseMetaData, Serializable {
             .filter(column -> columnNamePattern == null || "%".equals(columnNamePattern.trim()) || column.getName()
                 .equalsIgnoreCase(columnNamePattern))
             .map(column -> new ColumnMap<String, Object>() {{
-                TypeInfo typeInfo = lookupTypeInfo(column.getType());
-                put("TABLE_CAT", DEFAULT_CATALOG);
-                put("TABLE_SCHEM", DEFAULT_SCHEMA);
-                put("TABLE_NAME", column.getTable().getName());
-                put("COLUMN_NAME", column.getName());
-                put("DATA_TYPE", typeInfo != null ? typeInfo.sqlDataType : Types.OTHER);
-                put("TYPE_NAME", column.getType());
-                put("COLUMN_SIZE", column.getLength());
-                put("BUFFER_LENGTH", 0);
-                put("DECIMAL_DIGITS", 0);
-                put("NUM_PREC_RADIX", typeInfo != null ? typeInfo.radix : 10);
-                put("NULLABLE", 0);
-                put("REMARKS", column.getComments());
-                put("COLUMN_DEF", null);
-                put("SQL_DATA_TYPE", null);
-                put("SQL_DATETIME_SUB", null);
-                put("CHAR_OCTET_LENGTH", 0);
-                put("ORDINAL_POSITION", ordinal.getAndIncrement());
-                put("IS_NULLABLE", "");
-                put("SCOPE_CATLOG", null);
-                put("SCOPE_SCHEMA", null);
-                put("SCOPE_TABLE", null);
-                put("SOURCE_DATA_TYPE", column.getType());
-                put("CASE_SENSITIVE", 0);
+                TypeInfo typeInfo = TypeInfo.lookupTypeInfo(column.getType());
+                put("TABLE_CAT", DEFAULT_CATALOG, STRING_TYPE_INFO);
+                put("TABLE_SCHEM", DEFAULT_SCHEMA, STRING_TYPE_INFO);
+                put("TABLE_NAME", column.getTable().getName(), STRING_TYPE_INFO);
+                put("COLUMN_NAME", column.getName(), STRING_TYPE_INFO);
+                put("DATA_TYPE", typeInfo != null ? typeInfo.getSqlDataType() : Types.OTHER, INT_TYPE_INFO);
+                put("TYPE_NAME", column.getType(), STRING_TYPE_INFO);
+                put("COLUMN_SIZE", column.getLength(), INT_TYPE_INFO);
+                put("BUFFER_LENGTH", 0, INT_TYPE_INFO);
+                put("DECIMAL_DIGITS", 0, INT_TYPE_INFO);
+                put("NUM_PREC_RADIX", typeInfo != null ? typeInfo.getRadix() : 10, INT_TYPE_INFO);
                 put("NULLABLE",
-                    column.isNillable() ? DatabaseMetaData.columnNullable : DatabaseMetaData.columnNoNulls);
+                    column.isNillable() ? DatabaseMetaData.columnNullable : DatabaseMetaData.columnNoNulls,
+                    INT_TYPE_INFO);
+                put("REMARKS", column.getComments(), STRING_TYPE_INFO);
+                put("COLUMN_DEF", null, STRING_TYPE_INFO);
+                put("SQL_DATA_TYPE", null, INT_TYPE_INFO);
+                put("SQL_DATETIME_SUB", null, INT_TYPE_INFO);
+                put("CHAR_OCTET_LENGTH", 0, INT_TYPE_INFO);
+                put("ORDINAL_POSITION", ordinal.getAndIncrement(), INT_TYPE_INFO);
+                put("IS_NULLABLE", column.isNillable() ? "YES" : "NO", STRING_TYPE_INFO);
+                put("SCOPE_CATLOG", null, STRING_TYPE_INFO);
+                put("SCOPE_SCHEMA", null, STRING_TYPE_INFO);
+                put("SCOPE_TABLE", null, STRING_TYPE_INFO);
+                put("SOURCE_DATA_TYPE",
+                    (short) TypeInfo.lookupTypeInfo(column.getType()).getSqlDataType(),
+                    SHORT_TYPE_INFO);
+                put("IS_AUTOINCREMENT", "", STRING_TYPE_INFO);
+                put("IS_GENERATEDCOLUMN", "", STRING_TYPE_INFO);
             }})
             .collect(Collectors.toList());
         ColumnMap<String, Object> firstRow = !rows.isEmpty() ? rows.get(0) : null;
@@ -137,41 +159,16 @@ public class ForceDatabaseMetaData implements DatabaseMetaData, Serializable {
             "[Meta] getColumns RESULT catalog=" + catalog + " schema=" + schemaPattern + " table=" + tableNamePattern
                 + " column=" + columnNamePattern +
                 "\n  firstRowFound=" + (firstRow != null ? "yes" : "no") + " ColumnsFound=" + rows.size());
-        return new CachedResultSet(rows, ForcePreparedStatement.dummyMetaData(firstRow));
-    }
-
-    public static TypeInfo lookupTypeInfo(String forceTypeName) {
-        String typeName = forceTypeName.replaceFirst("\\A_+", "");
-        return Arrays.stream(TYPE_INFO_DATA)
-            .filter(entry -> typeName.equals(entry.typeName))
-            .findAny()
-            .orElse(OTHER_TYPE_INFO);
-    }
-
-    public static TypeInfo lookupTypeInfoFromJavaType(String javaTypeName) {
-        if (javaTypeName == null) {
-            javaTypeName = "string";
-        }
-        if (javaTypeName.equals("java.lang.Boolean")) {
-            javaTypeName = "boolean";
-        }
-        if (javaTypeName.equals("java.lang.String")) {
-            javaTypeName = "string";
-        }
-        String typeName = javaTypeName;
-        return Arrays.stream(TYPE_INFO_DATA)
-            .filter(entry -> typeName.equals(entry.typeName))
-            .findAny()
-            .orElse(OTHER_TYPE_INFO);
+        return new CachedResultSet(rows, ForcePreparedStatement.createMetaData(firstRow));
     }
 
     @Override
     public ResultSet getSchemas() throws SQLException {
         ColumnMap<String, Object> row = new ColumnMap<>();
-        row.put("TABLE_SCHEM", DEFAULT_SCHEMA);
-        row.put("TABLE_CATALOG", DEFAULT_CATALOG);
-        row.put("IS_DEFAULT", true);
-        return new CachedResultSet(row, ForcePreparedStatement.dummyMetaData(row));
+        row.put("TABLE_SCHEM", DEFAULT_SCHEMA, STRING_TYPE_INFO);
+        row.put("TABLE_CATALOG", DEFAULT_CATALOG, STRING_TYPE_INFO);
+        row.put("IS_DEFAULT", true, BOOL_TYPE_INFO);
+        return new CachedResultSet(row, ForcePreparedStatement.createMetaData(row));
     }
 
     @Override
@@ -184,12 +181,14 @@ public class ForceDatabaseMetaData implements DatabaseMetaData, Serializable {
                 for (Column column : table.getColumns()) {
                     if (column.getName().equalsIgnoreCase("Id")) {
                         ColumnMap<String, Object> map = new ColumnMap<>();
-                        map.put("TABLE_CAT", DEFAULT_CATALOG);
-                        map.put("TABLE_SCHEM", DEFAULT_SCHEMA);
-                        map.put("TABLE_NAME", table.getName());
-                        map.put("COLUMN_NAME", column.getName());
-                        map.put("KEY_SEQ", 0);
-                        map.put("PK_NAME", "FakePK" + counter);
+                        map.put("TABLE_CAT", DEFAULT_CATALOG, STRING_TYPE_INFO);
+                        map.put("TABLE_SCHEM", DEFAULT_SCHEMA, STRING_TYPE_INFO);
+                        map.put("TABLE_NAME", table.getName(), STRING_TYPE_INFO);
+                        map.put("COLUMN_NAME", column.getName(), STRING_TYPE_INFO);
+                        map.put("KEY_SEQ", (short) 1, SHORT_TYPE_INFO);
+                        map.put("PK_NAME",
+                            DEFAULT_CATALOG + "_" + DEFAULT_SCHEMA + table.getName() + "_PRIMARYKEY",
+                            STRING_TYPE_INFO);
                         maps.add(map);
                         if (firstRow == null) {
                             firstRow = map;
@@ -200,7 +199,7 @@ public class ForceDatabaseMetaData implements DatabaseMetaData, Serializable {
         }
         logger.info("[Meta] getPrimaryKeys RESULT catalog=" + catalog + " schema=" + schema + " table=" + tableName +
             "\n  firstRowFound=" + (firstRow != null ? "yes" : "no") + " KeysFound=" + maps.size());
-        return new CachedResultSet(maps, ForcePreparedStatement.dummyMetaData(firstRow));
+        return new CachedResultSet(maps, ForcePreparedStatement.createMetaData(firstRow));
     }
 
     @Override
@@ -212,21 +211,24 @@ public class ForceDatabaseMetaData implements DatabaseMetaData, Serializable {
                 for (Column column : table.getColumns()) {
                     if (column.getReferencedTable() != null && column.getReferencedColumn() != null) {
                         ColumnMap<String, Object> map = new ColumnMap<>();
-                        map.put("PKTABLE_CAT", null);
-                        map.put("PKTABLE_SCHEM", null);
-                        map.put("PKTABLE_NAME", column.getReferencedTable());
-                        map.put("PKCOLUMN_NAME", column.getReferencedColumn());
-                        map.put("FKTABLE_CAT", null);
-                        map.put("FKTABLE_SCHEM", null);
-                        map.put("FKTABLE_NAME", tableName);
-                        map.put("FKCOLUMN_NAME", column.getName());
-                        map.put("KEY_SEQ", counter);
-                        map.put("UPDATE_RULE", 0);
-                        map.put("DELETE_RULE", 0);
-                        map.put("FK_NAME", "FakeFK" + counter);
-                        map.put("PK_NAME", "FakePK" + counter);
-                        map.put("DEFERRABILITY", 0);
-                        counter++;
+                        map.put("PKTABLE_CAT", DEFAULT_CATALOG, STRING_TYPE_INFO);
+                        map.put("PKTABLE_SCHEM", DEFAULT_SCHEMA, STRING_TYPE_INFO);
+                        map.put("PKTABLE_NAME", column.getReferencedTable(), STRING_TYPE_INFO);
+                        map.put("PKCOLUMN_NAME", column.getReferencedColumn(), STRING_TYPE_INFO);
+                        map.put("FKTABLE_CAT", DEFAULT_CATALOG, STRING_TYPE_INFO);
+                        map.put("FKTABLE_SCHEM", DEFAULT_SCHEMA, STRING_TYPE_INFO);
+                        map.put("FKTABLE_NAME", tableName, STRING_TYPE_INFO);
+                        map.put("FKCOLUMN_NAME", column.getName(), STRING_TYPE_INFO);
+                        map.put("KEY_SEQ", Integer.valueOf(counter++).shortValue(), SHORT_TYPE_INFO);
+                        map.put("UPDATE_RULE", (short) 0, SHORT_TYPE_INFO);
+                        map.put("DELETE_RULE", (short) 0, STRING_TYPE_INFO);
+                        map.put("FK_NAME",
+                            DEFAULT_CATALOG + "_" + DEFAULT_SCHEMA + "_" + table.getName() + "_FOREIGNKEY",
+                            STRING_TYPE_INFO);
+                        map.put("PK_NAME",
+                            DEFAULT_CATALOG + "_" + DEFAULT_SCHEMA + "_" + table.getName() + "_PRIMARYKEY",
+                            STRING_TYPE_INFO);
+                        map.put("DEFERRABILITY", (short) 0, SHORT_TYPE_INFO);
                         maps.add(map);
                         if (firstRow == null) {
                             firstRow = map;
@@ -235,7 +237,7 @@ public class ForceDatabaseMetaData implements DatabaseMetaData, Serializable {
                 }
             }
         }
-        return new CachedResultSet(maps, ForcePreparedStatement.dummyMetaData(firstRow));
+        return new CachedResultSet(maps, ForcePreparedStatement.createMetaData(firstRow));
     }
 
     @Override
@@ -248,19 +250,21 @@ public class ForceDatabaseMetaData implements DatabaseMetaData, Serializable {
                 for (Column column : table.getColumns()) {
                     if (column.getName().equalsIgnoreCase("Id")) {
                         ColumnMap<String, Object> map = new ColumnMap<>();
-                        map.put("TABLE_CAT", DEFAULT_CATALOG);
-                        map.put("TABLE_SCHEM", DEFAULT_SCHEMA);
-                        map.put("TABLE_NAME", table.getName());
-                        map.put("NON_UNIQUE", true);
-                        map.put("INDEX_QUALIFIER", null);
-                        map.put("INDEX_NAME", "FakeIndex" + counter++);
-                        map.put("TYPE", DatabaseMetaData.tableIndexOther);
-                        map.put("ORDINAL_POSITION", counter);
-                        map.put("COLUMN_NAME", "Id");
-                        map.put("ASC_OR_DESC", "A");
-                        map.put("CARDINALITY", 1);
-                        map.put("PAGES", 1);
-                        map.put("FILTER_CONDITION", null);
+                        map.put("TABLE_CAT", DEFAULT_CATALOG, STRING_TYPE_INFO);
+                        map.put("TABLE_SCHEM", DEFAULT_SCHEMA, STRING_TYPE_INFO);
+                        map.put("TABLE_NAME", table.getName(), STRING_TYPE_INFO);
+                        map.put("NON_UNIQUE", true, BOOL_TYPE_INFO);
+                        map.put("INDEX_QUALIFIER", null, STRING_TYPE_INFO);
+                        map.put("INDEX_NAME",
+                            DEFAULT_CATALOG + "_" + DEFAULT_SCHEMA + "_" + table.getName() + "_Index_" + counter++,
+                            STRING_TYPE_INFO);
+                        map.put("TYPE", DatabaseMetaData.tableIndexOther, SHORT_TYPE_INFO);
+                        map.put("ORDINAL_POSITION", counter, SHORT_TYPE_INFO);
+                        map.put("COLUMN_NAME", "Id", STRING_TYPE_INFO);
+                        map.put("ASC_OR_DESC", "A", STRING_TYPE_INFO);
+                        map.put("CARDINALITY", 1, LONG_TYPE_INFO);
+                        map.put("PAGES", 1, LONG_TYPE_INFO);
+                        map.put("FILTER_CONDITION", null, STRING_TYPE_INFO);
 
                         maps.add(map);
 
@@ -271,112 +275,57 @@ public class ForceDatabaseMetaData implements DatabaseMetaData, Serializable {
                 }
             }
         }
-        return new CachedResultSet(maps, ForcePreparedStatement.dummyMetaData(firstRow));
+        return new CachedResultSet(maps, ForcePreparedStatement.createMetaData(firstRow));
     }
 
     @Override
     public ResultSet getCatalogs() throws SQLException {
         ColumnMap<String, Object> row = new ColumnMap<>();
-        row.put("TABLE_CAT", DEFAULT_CATALOG);
-        return new CachedResultSet(row, ForcePreparedStatement.dummyMetaData(row));
+        row.put("TABLE_CAT", DEFAULT_CATALOG, STRING_TYPE_INFO);
+        return new CachedResultSet(row, ForcePreparedStatement.createMetaData(row));
     }
-
-    public static class TypeInfo {
-
-        public TypeInfo(String typeName, int sqlDataType, int precision, int minScale, int maxScale, int radix) {
-            this.typeName = typeName;
-            this.sqlDataType = sqlDataType;
-            this.precision = precision;
-            this.minScale = minScale;
-            this.maxScale = maxScale;
-            this.radix = radix;
-        }
-
-        public String typeName;
-        public int sqlDataType;
-        public int precision;
-        public int minScale;
-        public int maxScale;
-        public int radix;
-    }
-
-    private static final TypeInfo OTHER_TYPE_INFO = new TypeInfo("other", Types.OTHER, 0x7fffffff, 0, 0, 0);
-
-    private static final TypeInfo[] TYPE_INFO_DATA = {
-        new TypeInfo("id", Types.VARCHAR, 0x7fffffff, 0, 0, 0),
-        new TypeInfo("masterrecord", Types.VARCHAR, 0x7fffffff, 0, 0, 0),
-        new TypeInfo("reference", Types.VARCHAR, 0x7fffffff, 0, 0, 0),
-        new TypeInfo("string", Types.VARCHAR, 0x7fffffff, 0, 0, 0),
-        new TypeInfo("encryptedstring", Types.VARCHAR, 0x7fffffff, 0, 0, 0),
-        new TypeInfo("email", Types.VARCHAR, 0x7fffffff, 0, 0, 0),
-        new TypeInfo("phone", Types.VARCHAR, 0x7fffffff, 0, 0, 0),
-        new TypeInfo("url", Types.VARCHAR, 0x7fffffff, 0, 0, 0),
-        new TypeInfo("textarea", Types.LONGVARCHAR, 0x7fffffff, 0, 0, 0),
-        new TypeInfo("base64", Types.BLOB, 0x7fffffff, 0, 0, 0),
-        new TypeInfo("boolean", Types.BOOLEAN, 1, 0, 0, 0),
-        new TypeInfo("_boolean", Types.BOOLEAN, 1, 0, 0, 0),
-        new TypeInfo("byte", Types.VARBINARY, 10, 0, 0, 10),
-        new TypeInfo("_byte", Types.VARBINARY, 10, 0, 0, 10),
-        new TypeInfo("int", Types.INTEGER, 10, 0, 0, 10),
-        new TypeInfo("_int", Types.INTEGER, 10, 0, 0, 10),
-        new TypeInfo("decimal", Types.DECIMAL, 17, -324, 306, 10),
-        new TypeInfo("double", Types.DOUBLE, 17, -324, 306, 10),
-        new TypeInfo("_double", Types.DOUBLE, 17, -324, 306, 10),
-        new TypeInfo("percent", Types.DOUBLE, 17, -324, 306, 10),
-        new TypeInfo("currency", Types.DOUBLE, 17, -324, 306, 10),
-        new TypeInfo("date", Types.DATE, 10, 0, 0, 0),
-        new TypeInfo("time", Types.TIME, 10, 0, 0, 0),
-        new TypeInfo("datetime", Types.TIMESTAMP, 10, 0, 0, 0),
-        new TypeInfo("picklist", Types.ARRAY, 0, 0, 0, 0),
-        new TypeInfo("multipicklist", Types.ARRAY, 0, 0, 0, 0),
-        new TypeInfo("combobox", Types.ARRAY, 0, 0, 0, 0),
-        new TypeInfo("anyType", Types.OTHER, 0, 0, 0, 0),
-    };
 
     @Override
     public ResultSet getTypeInfo() throws SQLException {
         ColumnMap<String, Object> firstRow = null;
         List<ColumnMap<String, Object>> rows = new ArrayList<>();
-        for (TypeInfo typeInfo : TYPE_INFO_DATA) {
+        for (TypeInfo typeInfo : TypeInfo.values()) {
             ColumnMap<String, Object> row = new ColumnMap<>();
-            row.put("TYPE_NAME", typeInfo.typeName);
-            row.put("DATA_TYPE", typeInfo.sqlDataType);
-            row.put("PRECISION", typeInfo.precision);
-            row.put("LITERAL_PREFIX", null);
-            row.put("LITERAL_SUFFIX", null);
-            row.put("CREATE_PARAMS", null);
-            row.put("NULLABLE", 1);
-            row.put("CASE_SENSITIVE", 0);
-            row.put("SEARCHABLE", 3);
-            row.put("UNSIGNED_ATTRIBUTE", false);
-            row.put("FIXED_PREC_SCALE", false);
-            row.put("AUTO_INCREMENT", false);
-            row.put("LOCAL_TYPE_NAME", typeInfo.typeName);
-            row.put("MINIMUM_SCALE", typeInfo.minScale);
-            row.put("MAXIMUM_SCALE", typeInfo.maxScale);
-            row.put("SQL_DATA_TYPE", typeInfo.sqlDataType);
-            row.put("SQL_DATETIME_SUB", null);
-            row.put("NUM_PREC_RADIX", typeInfo.radix);
-            row.put("TYPE_SUB", 1);
+            row.put("TYPE_NAME", typeInfo.getTypeName(), STRING_TYPE_INFO);
+            row.put("DATA_TYPE", typeInfo.getSqlDataType(), INT_TYPE_INFO);
+            row.put("PRECISION", typeInfo.getPrecision(), INT_TYPE_INFO);
+            row.put("LITERAL_PREFIX", typeInfo.getPrefix(), STRING_TYPE_INFO);
+            row.put("LITERAL_SUFFIX", typeInfo.getSuffix(), STRING_TYPE_INFO);
+            row.put("CREATE_PARAMS", null, STRING_TYPE_INFO);
+            row.put("NULLABLE", (short) 1, SHORT_TYPE_INFO);
+            row.put("CASE_SENSITIVE", false, BOOL_TYPE_INFO);
+            row.put("SEARCHABLE", (short) typeInfo.getSearchable(), SHORT_TYPE_INFO);
+            row.put("UNSIGNED_ATTRIBUTE", typeInfo.isUnsigned(), BOOL_TYPE_INFO);
+            row.put("FIXED_PREC_SCALE", false, BOOL_TYPE_INFO);
+            row.put("AUTO_INCREMENT", typeInfo.isAutoIncrement(), BOOL_TYPE_INFO);
+            row.put("LOCAL_TYPE_NAME", typeInfo.getTypeName(), STRING_TYPE_INFO);
+            row.put("MINIMUM_SCALE", typeInfo.getMinScale(), SHORT_TYPE_INFO);
+            row.put("MAXIMUM_SCALE", typeInfo.getMaxScale(), SHORT_TYPE_INFO);
+            row.put("SQL_DATA_TYPE", typeInfo.getSqlDataType(), INT_TYPE_INFO);
+            row.put("SQL_DATETIME_SUB", null, INT_TYPE_INFO);
+            row.put("NUM_PREC_RADIX", typeInfo.getRadix(), INT_TYPE_INFO);
 
             rows.add(row);
             if (firstRow == null) {
                 firstRow = row;
             }
         }
-        return new CachedResultSet(rows, ForcePreparedStatement.dummyMetaData(firstRow));
+        return new CachedResultSet(rows, ForcePreparedStatement.createMetaData(firstRow));
     }
 
     @Override
     public <T> T unwrap(Class<T> iface) throws SQLException {
-        logger.finer("[Meta] unwrap requested NOT_IMPLEMENTED ifaceType=" + iface.getName());
-        return null;
+        throw new UnsupportedOperationException("Feature is not supported.");
     }
 
     @Override
     public boolean isWrapperFor(Class<?> iface) throws SQLException {
-        // TODO Auto-generated method stub
-        return false;
+        throw new UnsupportedOperationException("Feature is not supported.");
     }
 
     @Override
@@ -597,14 +546,12 @@ public class ForceDatabaseMetaData implements DatabaseMetaData, Serializable {
 
     @Override
     public boolean supportsConvert() throws SQLException {
-        // TODO Auto-generated method stub
-        return false;
+        return true;
     }
 
     @Override
     public boolean supportsConvert(int fromType, int toType) throws SQLException {
-        // TODO Auto-generated method stub
-        return false;
+        throw new UnsupportedOperationException("Feature is not supported.");
     }
 
     @Override
@@ -1103,8 +1050,8 @@ public class ForceDatabaseMetaData implements DatabaseMetaData, Serializable {
     public ResultSet getTableTypes() throws SQLException {
         logger.finest("[Meta] getTableTypes requested IMPLEMENTED");
         ColumnMap<String, Object> row = new ColumnMap<>();
-        row.put("TABLE_TYPE", DEFAULT_TABLE_TYPE);
-        return new CachedResultSet(row, ForcePreparedStatement.dummyMetaData(row));
+        row.put("TABLE_TYPE", DEFAULT_TABLE_TYPE, STRING_TYPE_INFO);
+        return new CachedResultSet(row, ForcePreparedStatement.createMetaData(row));
     }
 
     @Override
@@ -1208,8 +1155,7 @@ public class ForceDatabaseMetaData implements DatabaseMetaData, Serializable {
 
     @Override
     public boolean updatesAreDetected(int type) throws SQLException {
-        // TODO Auto-generated method stub
-        return false;
+        throw new UnsupportedOperationException("Feature is not supported.");
     }
 
     @Override
@@ -1340,8 +1286,7 @@ public class ForceDatabaseMetaData implements DatabaseMetaData, Serializable {
 
     @Override
     public RowIdLifetime getRowIdLifetime() throws SQLException {
-        logger.finer("[Meta] getRowIdLifetime requested NOT_IMPLEMENTED");
-        return null;
+        throw new UnsupportedOperationException("Feature is not supported.");
     }
 
     @Override
@@ -1357,14 +1302,45 @@ public class ForceDatabaseMetaData implements DatabaseMetaData, Serializable {
 
     @Override
     public boolean autoCommitFailureClosesAllResultSets() throws SQLException {
-        // TODO Auto-generated method stub
-        return false;
+        throw new UnsupportedOperationException("Feature is not supported.");
     }
 
     @Override
     public ResultSet getClientInfoProperties() throws SQLException {
-        logger.finer("[Meta] getClientInfoProperties requested NOT_IMPLEMENTED");
-        return new CachedResultSet(CachedResultSetMetaData.EMPTY);
+        List<ColumnMap<String, Object>> rows = new ArrayList<>();
+        this.connInfo.forEach((k, v) -> {
+            ColumnMap<String, Object> row = new ColumnMap<>();
+            row.add("property", k, STRING_TYPE_INFO);
+            row.add("value", v, STRING_TYPE_INFO);
+            rows.add(row);
+        });
+        return new CachedResultSet(rows, new CachedResultSetMetaData() {
+            @Override
+            public int getColumnCount() throws SQLException {
+                return 2;
+            }
+
+            @Override
+            public String getColumnLabel(int column) throws SQLException {
+                return this.getColumnName(column);
+            }
+
+            public String getColumnName(int column) throws SQLException {
+                return switch (column) {
+                    case 1 -> "property";
+                    case 2 -> "value";
+                    default -> null;
+                };
+            }
+
+            public int getColumnType(int column) throws SQLException {
+                return java.sql.Types.VARCHAR;
+            }
+
+            public String getColumnTypeName(int column) throws SQLException {
+                return "text";
+            }
+        });
     }
 
     @Override

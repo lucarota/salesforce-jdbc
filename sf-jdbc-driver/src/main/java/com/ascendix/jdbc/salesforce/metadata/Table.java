@@ -10,11 +10,13 @@ public class Table implements Serializable {
     private final String name;
     private final String comments;
     private final List<Column> columns;
+    private final boolean queryable;
 
-    public Table(String name, String comments, List<Column> columns) {
+    public Table(String name, String comments, List<Column> columns, boolean queryable) {
         this.name = name;
         this.comments = comments;
         this.columns = columns;
+        this.queryable = queryable;
         for (Column c : columns) {
             c.setTable(this);
         }

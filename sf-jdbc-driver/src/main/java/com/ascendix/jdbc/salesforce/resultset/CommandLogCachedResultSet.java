@@ -1,6 +1,7 @@
 package com.ascendix.jdbc.salesforce.resultset;
 
 import com.ascendix.jdbc.salesforce.metadata.ColumnMap;
+import com.ascendix.jdbc.salesforce.metadata.TypeInfo;
 import com.ascendix.jdbc.salesforce.statement.ForcePreparedStatement;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -9,20 +10,20 @@ public class CommandLogCachedResultSet extends CachedResultSet {
 
     public static String LOG_COLUMN = "Log";
 
-    private static final ColumnMap<String, Object> DEFAULT_COLUMN_MAP = new ColumnMap<String, Object>().add(LOG_COLUMN,
-        "Value");
+    private static final ColumnMap<String, Object> DEFAULT_COLUMN_MAP = new ColumnMap<String, Object>()
+        .add(LOG_COLUMN,"Value", TypeInfo.SHORT_TYPE_INFO);
 
     public CommandLogCachedResultSet() {
-        super(ForcePreparedStatement.dummyMetaData(DEFAULT_COLUMN_MAP));
+        super(ForcePreparedStatement.createMetaData(DEFAULT_COLUMN_MAP));
     }
 
     public CommandLogCachedResultSet(List<String> commandLog) {
         super(commandLog.stream()
-            .map(logLine -> new ColumnMap<String, Object>().add(LOG_COLUMN, logLine))
-            .collect(Collectors.toList()), ForcePreparedStatement.dummyMetaData(DEFAULT_COLUMN_MAP));
+            .map(logLine -> new ColumnMap<String, Object>().add(LOG_COLUMN, logLine, TypeInfo.SHORT_TYPE_INFO))
+            .collect(Collectors.toList()), ForcePreparedStatement.createMetaData(DEFAULT_COLUMN_MAP));
     }
 
     public void log(String logLine) {
-        addRow(new ColumnMap<String, Object>().add(LOG_COLUMN, logLine));
+        addRow(new ColumnMap<String, Object>().add(LOG_COLUMN, logLine, TypeInfo.SHORT_TYPE_INFO));
     }
 }
