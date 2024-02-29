@@ -30,9 +30,7 @@ import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 public class ForceDriver implements Driver {
 
     public static final String SF_JDBC_DRIVER_NAME = "SF JDBC driver";

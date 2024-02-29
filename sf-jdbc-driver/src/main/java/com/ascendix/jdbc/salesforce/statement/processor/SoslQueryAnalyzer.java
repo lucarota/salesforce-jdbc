@@ -88,8 +88,7 @@ public class SoslQueryAnalyzer {
                 fieldPrefixes.remove(0);
             }
             String type = findField(name, describeObject(fromObject), Field::getName).getType().name();
-            FieldDef result = new FieldDef(name, alias, type);
-            return result;
+            return new FieldDef(name, alias, type);
         }
 
         private final List<String> FUNCTIONS_HAS_INT_RESULT = Arrays.asList("COUNT",
@@ -139,7 +138,7 @@ public class SoslQueryAnalyzer {
             SoslQueryAnalyzer subqueryAnalyzer = new SoslQueryAnalyzer(subquery.toSOQLText(),
                 objectDescriptor,
                 describedObjectsCache);
-            fieldDefinitions.add(new ArrayList(subqueryAnalyzer.getFieldDefinitions()));
+            fieldDefinitions.add(new ArrayList<>(subqueryAnalyzer.getFieldDefinitions()));
             return null;
         }
     }

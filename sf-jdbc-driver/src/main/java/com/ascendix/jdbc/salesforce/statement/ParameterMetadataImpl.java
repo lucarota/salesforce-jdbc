@@ -23,13 +23,11 @@ public class ParameterMetadataImpl implements ParameterMetaData {
 
     @Override
     public <T> T unwrap(Class<T> iface) throws SQLException {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public boolean isWrapperFor(Class<?> iface) throws SQLException {
-        // TODO Auto-generated method stub
         return false;
     }
 
