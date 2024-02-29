@@ -1,7 +1,6 @@
 package com.ascendix.jdbc.salesforce.statement.processor;
 
 import com.ascendix.jdbc.salesforce.ForceDriver;
-import com.ascendix.jdbc.salesforce.delegates.PartnerService;
 import com.ascendix.jdbc.salesforce.resultset.CommandLogCachedResultSet;
 import com.ascendix.jdbc.salesforce.statement.ForcePreparedStatement;
 import java.io.IOException;
@@ -51,8 +50,7 @@ public class AdminQueryProcessor {
         return matcherLogin.matches();
     }
 
-    public static ResultSet processQuery(ForcePreparedStatement statement, String soqlQuery,
-        PartnerService partnerService) throws SQLException {
+    public static ResultSet processQuery(ForcePreparedStatement statement, String soqlQuery) throws SQLException {
         CommandLogCachedResultSet resultSet = new CommandLogCachedResultSet();
         if (soqlQuery == null || soqlQuery.trim().isEmpty()) {
             resultSet.log("No SOQL or ADMIN query found");

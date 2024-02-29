@@ -288,7 +288,7 @@ public class PartnerService {
         return partnerConnection.update(records);
     }
 
-    public DeleteResult[] deleteRecords(String entityName, Collection<String> recordsIds) throws ConnectionException {
+    public DeleteResult[] deleteRecords(Collection<String> recordsIds) throws ConnectionException {
         return partnerConnection.delete(recordsIds.toArray(new String[]{}));
     }
 }

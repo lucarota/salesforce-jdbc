@@ -1,6 +1,7 @@
 package com.ascendix.jdbc.salesforce.statement;
 
 import com.ascendix.jdbc.salesforce.statement.ForcePreparedStatement;
+import java.sql.SQLException;
 import org.junit.Test;
 
 import java.math.BigDecimal;
@@ -40,7 +41,7 @@ public class ForcePreparedStatementTest {
     }
 
     @Test
-    public void testAddParameter() {
+    public void testAddParameter() throws SQLException {
         ForcePreparedStatement statement = new ForcePreparedStatement(null, "");
         statement.addParameter(1, "one");
         statement.addParameter(3, "two");
@@ -54,7 +55,7 @@ public class ForcePreparedStatementTest {
     }
 
     @Test
-    public void testSetParams() {
+    public void testSetParams() throws SQLException {
         ForcePreparedStatement statement = new ForcePreparedStatement(null, "");
         String query = "SELECT Something FROM Anything WERE name = ? AND age > ?";
         statement.addParameter(1, "one");

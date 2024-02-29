@@ -64,6 +64,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.sql.rowset.RowSetMetaDataImpl;
 import lombok.Setter;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
@@ -76,14 +77,11 @@ public class ForcePreparedStatement implements PreparedStatement, Iterator<List<
     private static final Logger logger = Logger.getLogger(ForceDriver.SF_JDBC_DRIVER_NAME);
 
     private final static String CACHE_HINT = "(?is)\\A\\s*(CACHE\\s*(GLOBAL|SESSION)).*";
-    private final static int GB = 1073741824;
-    private static final String SOSL_QUERY_RESULT = "SOSL_QUERY_RESULT";
 
     protected enum CacheMode {
         NO_CACHE, GLOBAL, SESSION
     }
 
-    private String soqlQueryOriginal;
     private String soqlQuery;
     private final ForceConnection connection;
     private PartnerService partnerService;
@@ -108,12 +106,12 @@ public class ForcePreparedStatement implements PreparedStatement, Iterator<List<
     private static final HTreeMap<String, ResultSet> dataCache = cacheDb
         .hashMap("DataCache", Serializer.STRING, Serializer.ELSA)
         .expireAfterCreate(60, TimeUnit.MINUTES)
-        .expireStoreSize(16L * GB)
+        .expireStoreSize(16L * FileUtils.ONE_GB)
         .create();
     private static final HTreeMap<String, ResultSetMetaData> metadataCache = cacheDb
         .hashMap("MetadataCache", Serializer.STRING, Serializer.ELSA)
         .expireAfterCreate(60, TimeUnit.MINUTES)
-        .expireStoreSize(GB)
+        .expireStoreSize(FileUtils.ONE_GB)
         .create();
 
     public ForcePreparedStatement(ForceConnection connection) {
@@ -128,7 +126,7 @@ public class ForcePreparedStatement implements PreparedStatement, Iterator<List<
         this.soqlQuery = removeCacheHints(soql);
     }
 
-    public static <T extends Throwable> RuntimeException rethrowAsNonChecked(Throwable throwable) throws T {
+    public static <T extends Throwable> void rethrowAsNonChecked(Throwable throwable) throws T {
         throw (T) throwable; // rely on vacuous cast
     }
 
@@ -162,8 +160,8 @@ public class ForcePreparedStatement implements PreparedStatement, Iterator<List<
 
         if (AdminQueryProcessor.isAdminQuery(soqlQuery)) {
             try {
-                return AdminQueryProcessor.processQuery(this, soqlQuery, getPartnerService());
-            } catch (ConnectionException | SOQLParsingException e) {
+                return AdminQueryProcessor.processQuery(this, soqlQuery);
+            } catch (SOQLParsingException e) {
                 throw new SQLException(e);
             }
         }
@@ -186,7 +184,7 @@ public class ForcePreparedStatement implements PreparedStatement, Iterator<List<
         DeleteQueryAnalyzer deleteQueryAnalyzer = getDeleteQueryAnalyzer();
         if (DeleteQueryProcessor.isDeleteQuery(soqlQuery, deleteQueryAnalyzer)) {
             try {
-                return DeleteQueryProcessor.processQuery(this, soqlQuery, getPartnerService(), deleteQueryAnalyzer);
+                return DeleteQueryProcessor.processQuery(soqlQuery, getPartnerService(), deleteQueryAnalyzer);
             } catch (ConnectionException | SOQLParsingException e) {
                 throw new SQLException(e);
             }
@@ -231,7 +229,8 @@ public class ForcePreparedStatement implements PreparedStatement, Iterator<List<
             Map.Entry<List<List>, String> resultEntry;
             if (this.neverQueriedMore) {
                 this.neverQueriedMore = false;
-                resultEntry = getPartnerService().queryStart(getSoqlQueryAnalyzer().getSoqlQuery(), getRootEntityFieldDefinitions());
+                resultEntry = getPartnerService().queryStart(getSoqlQueryAnalyzer().getSoqlQuery(),
+                    getRootEntityFieldDefinitions());
             } else if (this.queryMoreLocator != null) {
                 resultEntry = getPartnerService().queryMore(this.queryMoreLocator, getRootEntityFieldDefinitions());
             } else {
@@ -250,7 +249,6 @@ public class ForcePreparedStatement implements PreparedStatement, Iterator<List<
 
     private String prepareQuery() {
         logger.finest("[PrepStat] prepareQuery IMPLEMENTED " + soqlQuery);
-        soqlQueryOriginal = soqlQuery;
         soqlQuery = preprocessQuery(soqlQuery);
         return setParams(soqlQuery);
     }
@@ -405,8 +403,9 @@ public class ForcePreparedStatement implements PreparedStatement, Iterator<List<
                 result.setColumnLabel(i, fieldName);
                 Object value = row.getValues().get(i - 1);
                 TypeInfo typeInfo = row.getTypes().get(i - 1);
-                logger.finest("[PrepStat] createMetaData (" + i + ") " + fieldName + " : " + typeInfo.getTypeName() + " => "
-                    + typeInfo.getSqlDataType());
+                logger.finest(
+                    "[PrepStat] createMetaData (" + i + ") " + fieldName + " : " + typeInfo.getTypeName() + " => "
+                        + typeInfo.getSqlDataType());
                 result.setColumnType(i, typeInfo.getSqlDataType());
                 result.setColumnTypeName(i, typeInfo.getTypeName());
                 result.setPrecision(i, typeInfo.getPrecision());
@@ -665,12 +664,11 @@ public class ForcePreparedStatement implements PreparedStatement, Iterator<List<
     }
 
     @Override
-    public void setBigDecimal(int parameterIndex, BigDecimal x)
-        throws SQLException {
+    public void setBigDecimal(int parameterIndex, BigDecimal x) throws SQLException {
         addParameter(parameterIndex, x);
     }
 
-    protected void addParameter(int parameterIndex, Object x) {
+    protected void addParameter(int parameterIndex, Object x) throws SQLException {
         logger.finest("[PrepStat] addParameter " + parameterIndex + " IMPLEMENTED ");
         parameterIndex--;
         if (parameters.size() < parameterIndex) {
@@ -680,8 +678,7 @@ public class ForcePreparedStatement implements PreparedStatement, Iterator<List<
     }
 
     @Override
-    public void setBinaryStream(int parameterIndex, InputStream x, int length)
-        throws SQLException {
+    public void setBinaryStream(int parameterIndex, InputStream x, int length) throws SQLException {
         logger.finer("[PrepStat] setBinaryStream NOT_IMPLEMENTED ");
         throw new UnsupportedOperationException("The setBinaryStream is not implemented yet.");
     }

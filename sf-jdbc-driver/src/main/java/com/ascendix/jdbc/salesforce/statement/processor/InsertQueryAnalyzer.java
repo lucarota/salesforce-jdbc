@@ -101,24 +101,6 @@ public class InsertQueryAnalyzer {
         }
     }
 
-    private Field findField(String name, DescribeSObjectResult objectDesc, Function<Field, String> nameFetcher) {
-        return Arrays.stream(objectDesc.getFields())
-            .filter(field -> name.equalsIgnoreCase(nameFetcher.apply(field)))
-            .findFirst()
-            .orElseThrow(() -> new IllegalArgumentException(
-                "Unknown field name \"" + name + "\" in object \"" + objectDesc.getName() + "\""));
-    }
-
-    private DescribeSObjectResult describeObject(String fromObjectName) {
-        if (!describedObjectsCache.containsKey(fromObjectName)) {
-            DescribeSObjectResult description = objectDescriptor.apply(fromObjectName);
-            describedObjectsCache.put(fromObjectName, description);
-            return description;
-        } else {
-            return describedObjectsCache.get(fromObjectName);
-        }
-    }
-
     protected String getFromObjectName() {
         return queryData.getTable().getName();
     }
@@ -163,7 +145,6 @@ public class InsertQueryAnalyzer {
                             int fieldIndex = 0;
                             for (final Map.Entry<String, Object> fieldEntry : subRecord.entrySet()) {
                                 String insertFieldName = queryData.getColumns().get(fieldIndex).getColumnName();
-                                String subSelectFieldName = fieldEntry.getKey();
                                 Object subSelectFieldValue = fieldEntry.getValue();
                                 record.put(insertFieldName, subSelectFieldValue);
 

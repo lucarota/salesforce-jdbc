@@ -3,7 +3,6 @@ package com.ascendix.jdbc.salesforce.statement.processor;
 import com.ascendix.jdbc.salesforce.ForceDriver;
 import com.ascendix.jdbc.salesforce.delegates.PartnerService;
 import com.ascendix.jdbc.salesforce.resultset.CommandLogCachedResultSet;
-import com.ascendix.jdbc.salesforce.statement.ForcePreparedStatement;
 import com.sforce.soap.partner.DeleteResult;
 import com.sforce.soap.partner.IError;
 import com.sforce.ws.ConnectionException;
@@ -27,8 +26,8 @@ public class DeleteQueryProcessor {
         return queryAnalyzer.analyse(soqlQuery);
     }
 
-    public static ResultSet processQuery(ForcePreparedStatement statement, String soqlQuery,
-        PartnerService partnerService, DeleteQueryAnalyzer DeleteQueryAnalyzer) {
+    public static ResultSet processQuery(String soqlQuery, PartnerService partnerService,
+        DeleteQueryAnalyzer DeleteQueryAnalyzer) {
         CommandLogCachedResultSet resultSet = new CommandLogCachedResultSet();
         if (soqlQuery == null || soqlQuery.trim().isEmpty()) {
             resultSet.log("No DELETE query found");
@@ -37,8 +36,7 @@ public class DeleteQueryProcessor {
 
         try {
             List<String> recordsToDelete = DeleteQueryAnalyzer.getRecords();
-            DeleteResult[] records = partnerService.deleteRecords(DeleteQueryAnalyzer.getFromObjectName(),
-                recordsToDelete);
+            DeleteResult[] records = partnerService.deleteRecords(recordsToDelete);
             for (DeleteResult result : records) {
                 if (result.isSuccess()) {
                     resultSet.log(DeleteQueryAnalyzer.getFromObjectName() + " deleted with Id=" + result.getId());
