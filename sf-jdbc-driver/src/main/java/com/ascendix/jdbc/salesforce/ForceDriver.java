@@ -78,6 +78,7 @@ public class ForceDriver implements Driver {
             info.setPassword(properties.getProperty("password"));
             info.setClientName(properties.getProperty("client"));
             info.setSessionId(properties.getProperty("sessionId"));
+            info.setLogfile(properties.getProperty("logfile"));
             info.setSandbox(resolveSandboxProperty(properties));
             info.setHttps(resolveBooleanProperty(properties, "https", true));
             if (resolveBooleanProperty(properties, "insecurehttps", false)) {
@@ -111,6 +112,7 @@ public class ForceDriver implements Driver {
                 newInfo.setPassword(newProperties.getProperty("password"));
                 newInfo.setClientName(newProperties.getProperty("client"));
                 newInfo.setSessionId(newProperties.getProperty("sessionId"));
+                newInfo.setLogfile(properties.getProperty("logfile"));
                 newInfo.setSandbox(resolveSandboxProperty(newProperties));
                 newInfo.setHttps(resolveBooleanProperty(newProperties, "https", true));
                 if (resolveBooleanProperty(newProperties, "insecurehttps", false)) {
@@ -165,9 +167,9 @@ public class ForceDriver implements Driver {
     }
 
     private static String resolveStringProperty(Properties properties, String propertyName, String defaultValue) {
-        String boolValue = properties.getProperty(propertyName);
-        if (boolValue != null) {
-            return boolValue;
+        String value = properties.getProperty(propertyName);
+        if (value != null) {
+            return value;
         }
         return defaultValue;
     }
