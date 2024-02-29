@@ -62,6 +62,14 @@ public class ForceService {
         partnerConfig.setReadTimeout(info.getReadTimeout());
         partnerConfig.setConnectionTimeout(info.getConnectionTimeout());
         partnerConfig.setSessionId(info.getSessionId());
+        if (info.getLogfile() != null) {
+            try {
+                partnerConfig.setTraceFile(info.getLogfile());
+                partnerConfig.setTraceMessage(true);
+            } catch (FileNotFoundException e) {
+                logger.log(Level.WARNING, "Error creating log file", e);
+            }
+        }
 
         if (info.getSandbox() != null) {
             partnerConfig.setServiceEndpoint(ForceService.getPartnerUrl(info.getSessionId(), info.getSandbox()));
@@ -92,6 +100,7 @@ public class ForceService {
         if (info.getLogfile() != null) {
             try {
                 partnerConfig.setTraceFile(info.getLogfile());
+                partnerConfig.setTraceMessage(true);
             } catch (FileNotFoundException e) {
                 logger.log(Level.WARNING, "Error creating log file", e);
             }
