@@ -31,6 +31,7 @@ import java.util.Base64;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.GregorianCalendar;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -49,6 +50,8 @@ public class CachedResultSet implements ResultSet, Serializable {
     private List<ColumnMap<String, Object>> rows = new ArrayList<>();
     private ResultSetMetaData metadata;
     private SQLWarning warningsChain;
+
+    private transient Iterator<List<ColumnMap<String, Object>>> rowSupplier;
 
     public CachedResultSet(List<ColumnMap<String, Object>> rows) {
         this.rows = new ArrayList<>(rows);
@@ -72,8 +75,13 @@ public class CachedResultSet implements ResultSet, Serializable {
         this(new ArrayList<>(Collections.singletonList(singleRow)), metadata);
     }
 
+    public CachedResultSet(Iterator<List<ColumnMap<String, Object>>> rowSupplier, ResultSetMetaData metadata) {
+        this(metadata);
+        this.rowSupplier = rowSupplier;
+    }
+
     public Object getObject(String columnName) throws SQLException {
-        return rows.get(getIndex()).get(columnName.toUpperCase());
+        return rows.get(getIndex()).get(columnName);
     }
 
     public Object getObject(int columnIndex) throws SQLException {
@@ -99,15 +107,8 @@ public class CachedResultSet implements ResultSet, Serializable {
         index = getIndex() + 1;
     }
 
-    public String getString(String columnName) throws SQLException {
-        return (String) getObject(columnName);
-    }
-
-    public String getString(int columnIndex) throws SQLException {
-        return (String) getObject(columnIndex);
-    }
-
     public boolean first() throws SQLException {
+        if (this.rowSupplier != null) throw new UnsupportedOperationException("Not implemented yet.");
         if (!rows.isEmpty()) {
             setIndex(0);
             return true;
@@ -117,6 +118,7 @@ public class CachedResultSet implements ResultSet, Serializable {
     }
 
     public boolean last() throws SQLException {
+        if (this.rowSupplier != null) throw new UnsupportedOperationException("Not implemented yet.");
         if (!rows.isEmpty()) {
             setIndex(rows.size() - 1);
             return true;
@@ -125,28 +127,41 @@ public class CachedResultSet implements ResultSet, Serializable {
         }
     }
 
+    private boolean nextSupplied() throws SQLException {
+        if (this.rowSupplier == null || !this.rowSupplier.hasNext()) {
+            this.rows = Collections.emptyList();
+            return false;
+        }
+        this.rows = this.rowSupplier.next();
+        this.index = null;
+        return !rows.isEmpty();
+    }
+
     public boolean next() throws SQLException {
         if (!rows.isEmpty()) {
             increaseIndex();
-            return getIndex() < rows.size();
-        } else {
-            return false;
+            if (getIndex() < rows.size()) return true;
         }
+        return nextSupplied() && next();
     }
 
     public boolean isAfterLast() throws SQLException {
+        if (this.rowSupplier != null) throw new UnsupportedOperationException("Not implemented yet.");
         return !rows.isEmpty() && getIndex() == rows.size();
     }
 
     public boolean isBeforeFirst() throws SQLException {
+        if (this.rowSupplier != null) throw new UnsupportedOperationException("Not implemented yet.");
         return !rows.isEmpty() && getIndex() == -1;
     }
 
     public boolean isFirst() throws SQLException {
+        if (this.rowSupplier != null) throw new UnsupportedOperationException("Not implemented yet.");
         return !rows.isEmpty() && getIndex() == 0;
     }
 
     public boolean isLast() throws SQLException {
+        if (this.rowSupplier != null) throw new UnsupportedOperationException("Not implemented yet.");
         return !rows.isEmpty() && getIndex() == rows.size() - 1;
     }
 
@@ -173,13 +188,13 @@ public class CachedResultSet implements ResultSet, Serializable {
             this.conversion = parser;
         }
 
-        public Optional<T> parse(int columnIndex) {
-            Object value = rows.get(getIndex()).getByIndex(columnIndex);
+        public Optional<T> parse(int columnIndex) throws SQLException {
+            Object value = getObject(columnIndex);
             return parse(value);
         }
 
-        public Optional<T> parse(String columnName) {
-            Object value = rows.get(getIndex()).get(columnName.toUpperCase());
+        public Optional<T> parse(String columnName) throws SQLException {
+            Object value = getObject(columnName);
             return parse(value);
         }
 
@@ -187,11 +202,20 @@ public class CachedResultSet implements ResultSet, Serializable {
             if (o == null) {
                 return Optional.empty();
             }
+
             if (!(o instanceof String)) {
                 return (Optional<T>) Optional.of(o);
             }
             return Optional.of(conversion.apply((String) o));
         }
+    }
+
+    public String getString(String columnName) throws SQLException {
+        return convertToString(getObject(columnName));
+    }
+
+    public String getString(int columnIndex) throws SQLException {
+        return convertToString(getObject(columnIndex));
     }
 
     public BigDecimal getBigDecimal(int columnIndex) throws SQLException {
@@ -291,7 +315,7 @@ public class CachedResultSet implements ResultSet, Serializable {
     }
 
     @Deprecated
-    public BigDecimal getBigDecimal(int columnIndex, int scale) {
+    public BigDecimal getBigDecimal(int columnIndex, int scale) throws SQLException {
         Optional<BigDecimal> result = new ColumnValueParser<>(BigDecimal::new)
             .parse(columnIndex);
 
@@ -299,7 +323,7 @@ public class CachedResultSet implements ResultSet, Serializable {
     }
 
     @Deprecated
-    public BigDecimal getBigDecimal(String columnName, int scale) {
+    public BigDecimal getBigDecimal(String columnName, int scale) throws SQLException {
         Optional<BigDecimal> result = new ColumnValueParser<>(BigDecimal::new)
             .parse(columnName);
         return result.map(bigDecimal -> bigDecimal.setScale(scale, RoundingMode.HALF_EVEN)).orElse(null);
@@ -982,5 +1006,13 @@ public class CachedResultSet implements ResultSet, Serializable {
     @Override
     public <T> T getObject(String columnLabel, Class<T> type) throws SQLException {
         return null;
+    }
+
+    private String convertToString(Object o) {
+        if (o == null) {
+            return null;
+        } else {
+            return o instanceof String ? (String)o : String.valueOf(o);
+        }
     }
 }

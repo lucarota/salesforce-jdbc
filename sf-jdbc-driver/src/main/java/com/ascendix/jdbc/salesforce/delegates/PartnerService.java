@@ -15,6 +15,7 @@ import com.sforce.soap.partner.SaveResult;
 import com.sforce.soap.partner.sobject.SObject;
 import com.sforce.ws.ConnectionException;
 import com.sforce.ws.bind.XmlObject;
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -54,19 +55,20 @@ public class PartnerService {
     }
 
     private Table convertToTable(DescribeSObjectResult so) {
-        logger.info("[PartnerService] convertToTable " + so.getName());
+        logger.finest("[PartnerService] convertToTable " + so.getName());
         List<Field> fields = Arrays.asList(so.getFields());
         List<Column> columns = fields.stream()
             .map(this::convertToColumn)
             .collect(Collectors.toList());
-        return new Table(so.getName(), null, columns);
+        return new Table(so.getName(), null, columns, so.isQueryable());
     }
 
     private Column convertToColumn(Field field) {
         try {
             Column column = new Column(field.getName(), getType(field));
-            column.setNillable(false);
+            column.setNillable(field.isNillable());
             column.setCalculated(field.isCalculated() || field.isAutoNumber());
+            column.setLength(field.getLength());
             String[] referenceTos = field.getReferenceTo();
             if (referenceTos != null) {
                 for (String referenceTo : referenceTos) {
@@ -139,28 +141,50 @@ public class PartnerService {
         return result;
     }
 
+    private List<List> extractQueryResultData(QueryResult qr) {
+        List<XmlObject> rows = Arrays.asList(qr.getRecords());
+        // extract the root entity name
+        Object rootEntityName = rows.stream()
+            .filter(xmlo -> "type".equals(xmlo.getName().getLocalPart()))
+            .findFirst()
+            .map(XmlObject::getValue)
+            .orElse(null);
+        String parentName = null;
+        return removeServiceInfo(rows, parentName, rootEntityName == null ? null : (String) rootEntityName);
+    }
+
     public List<List> query(String soql, List<FieldDef> expectedSchema) throws ConnectionException {
-        logger.info("[PartnerService] query " + soql);
+        logger.finest("[PartnerService] query " + soql);
         List<List> resultRows = Collections.synchronizedList(new LinkedList<>());
         QueryResult queryResult = null;
         do {
             queryResult = queryResult == null ? partnerConnection.query(soql)
                 : partnerConnection.queryMore(queryResult.getQueryLocator());
 
-            List<XmlObject> rows = Arrays.asList(queryResult.getRecords());
-            // extract the root entity name
-            Object rootEntityName = rows.stream()
-                .filter(xmlo -> "type".equals(xmlo.getName().getLocalPart()))
-                .findFirst()
-                .map(XmlObject::getValue)
-                .orElse(null);
-            String parentName = null;
-            resultRows.addAll(removeServiceInfo(rows,
-                parentName,
-                rootEntityName == null ? null : (String) rootEntityName));
+            resultRows.addAll(extractQueryResultData(queryResult));
         } while (!queryResult.isDone());
 
         return PartnerResultToCartesianTable.expand(resultRows, expectedSchema);
+    }
+
+    public Map.Entry<List<List>, String> queryStart(String soql, List<FieldDef> expectedSchema)
+        throws ConnectionException {
+        logger.finest("[PartnerService] queryStart " + soql);
+        QueryResult queryResult = partnerConnection.query(soql);
+        String queryLocator = queryResult.isDone() ? null : queryResult.getQueryLocator();
+        return new AbstractMap.SimpleEntry<>(Collections.unmodifiableList(extractQueryResultData(queryResult)),
+            queryLocator
+        );
+    }
+
+    public Map.Entry<List<List>, String> queryMore(String queryLocator, List<FieldDef> expectedSchema)
+        throws ConnectionException {
+        logger.finest("[PartnerService] queryMore " + queryLocator);
+        QueryResult queryResult = partnerConnection.queryMore(queryLocator);
+        queryLocator = queryResult.isDone() ? null : queryResult.getQueryLocator();
+        return new AbstractMap.SimpleEntry<>(Collections.unmodifiableList(extractQueryResultData(queryResult)),
+            queryLocator
+        );
     }
 
     private List<List> removeServiceInfo(List<XmlObject> rows, String parentName, String rootEntityName) {
