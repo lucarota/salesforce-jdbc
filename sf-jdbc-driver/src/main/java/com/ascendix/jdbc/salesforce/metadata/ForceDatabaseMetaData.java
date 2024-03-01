@@ -12,6 +12,7 @@ import com.ascendix.jdbc.salesforce.delegates.PartnerService;
 import com.ascendix.jdbc.salesforce.resultset.CachedResultSet;
 import com.ascendix.jdbc.salesforce.resultset.CachedResultSetMetaData;
 import com.ascendix.jdbc.salesforce.statement.ForcePreparedStatement;
+import com.sforce.ws.ConnectionException;
 import com.sforce.ws.ConnectorConfig;
 import java.io.Serializable;
 import java.sql.Connection;
@@ -58,7 +59,7 @@ public class ForceDatabaseMetaData implements DatabaseMetaData, Serializable {
     }
 
     @Override
-    public ResultSet getTables(String catalog, String schemaPattern, String tableNamePattern, String[] types) {
+    public ResultSet getTables(String catalog, String schemaPattern, String tableNamePattern, String[] types)  throws SQLException{
         logger.fine("[Meta] getTables catalog=" + catalog + " schema=" + schemaPattern + " table=" + tableNamePattern);
         List<ColumnMap<String, Object>> rows = new ArrayList<>();
         List<String> typeList = types == null ? null : Arrays.asList(types);
@@ -93,17 +94,21 @@ public class ForceDatabaseMetaData implements DatabaseMetaData, Serializable {
         return new CachedResultSet(rows, ForcePreparedStatement.createMetaData(firstRow));
     }
 
-    private List<Table> getTables() {
+    private List<Table> getTables() throws SQLException {
         if (tablesCache == null) {
-            logger.info("[Meta] getTables requested - fetching");
-            tablesCache = partnerService.getTables();
+            try {
+                logger.info("[Meta] getTables requested - fetching");
+                tablesCache = partnerService.getTables();
+            } catch (ConnectionException e) {
+                throw new SQLException(e);
+            }
         } else {
             logger.info("[Meta] getTables requested - from cache");
         }
         return tablesCache;
     }
 
-    public Table findTableInfo(String tableName) {
+    public Table findTableInfo(String tableName) throws SQLException {
         return getTables().stream()
             .filter(table -> table.getName().equalsIgnoreCase(tableName))
             .findFirst()
@@ -112,7 +117,7 @@ public class ForceDatabaseMetaData implements DatabaseMetaData, Serializable {
 
     @Override
     public ResultSet getColumns(String catalog, String schemaPattern, String tableNamePattern,
-        String columnNamePattern) {
+        String columnNamePattern) throws SQLException {
         AtomicInteger ordinal = new AtomicInteger(1);
         logger.info("[Meta] getColumns catalog=" + catalog + " schema=" + schemaPattern + " table=" + tableNamePattern
             + " column=" + columnNamePattern);
@@ -242,7 +247,7 @@ public class ForceDatabaseMetaData implements DatabaseMetaData, Serializable {
 
     @Override
     public ResultSet getIndexInfo(String catalog, String schema, String tableName, boolean unique,
-        boolean approximate) {
+        boolean approximate) throws SQLException {
         List<ColumnMap<String, Object>> maps = new ArrayList<>();
         ColumnMap<String, Object> firstRow = null;
         for (Table table : getTables()) {
@@ -1373,6 +1378,10 @@ public class ForceDatabaseMetaData implements DatabaseMetaData, Serializable {
     public boolean generatedKeyAlwaysReturned() throws SQLException {
         // TODO Auto-generated method stub
         return false;
+    }
+
+    public synchronized void cleanupGlobalCache() {
+        this.partnerService.cleanupGlobalCache();
     }
 
     public static void main(String[] args) throws SQLException {

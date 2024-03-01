@@ -20,9 +20,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -33,16 +35,18 @@ public class PartnerService {
     private static final Logger logger = Logger.getLogger(ForceDriver.SF_JDBC_DRIVER_NAME);
 
     private final PartnerConnection partnerConnection;
-    private List<String> sObjectTypesCache;
+
+    private DescribeGlobalResult schemaCache = null;
+    private Map<String, DescribeSObjectResult> sObjectsCache = null;
 
     public PartnerService(PartnerConnection partnerConnection) {
         this.partnerConnection = partnerConnection;
     }
 
-    public List<Table> getTables() {
+    public List<Table> getTables() throws ConnectionException {
         logger.finest("[PartnerService] getTables IMPLEMENTED ");
-        List<DescribeSObjectResult> sObjects = getSObjectsDescription();
-        List<Table> tables = sObjects.stream()
+        Map<String, DescribeSObjectResult> sObjects = getSObjectsDescription();
+        List<Table> tables = sObjects.values().stream()
             .map(this::convertToTable)
             .collect(Collectors.toList());
         logger.info("[PartnerService] getTables tables count=" + tables.size());
@@ -50,8 +54,16 @@ public class PartnerService {
     }
 
     public DescribeSObjectResult describeSObject(String sObjectType) throws ConnectionException {
-        logger.info("[PartnerService] describeSObject " + sObjectType);
-        return partnerConnection.describeSObject(sObjectType);
+        if (sObjectsCache == null) {
+            logger.info("[PartnerService] describeSObject " + sObjectType);
+            return partnerConnection.describeSObject(sObjectType);
+        }
+        return sObjectsCache.get(sObjectType);
+    }
+
+    public synchronized void cleanupGlobalCache() {
+        this.schemaCache = null;
+        this.sObjectsCache = null;
     }
 
     private Table convertToTable(DescribeSObjectResult so) {
@@ -92,34 +104,38 @@ public class PartnerService {
         return s.equalsIgnoreCase("double") ? "decimal" : s;
     }
 
+    private synchronized DescribeGlobalResult getDescribeGlobal() throws ConnectionException {
+        if (this.schemaCache == null) {
+            this.schemaCache = partnerConnection.describeGlobal();
+        }
+
+        return this.schemaCache;
+    }
+
     private List<String> getSObjectTypes() throws ConnectionException {
-        if (sObjectTypesCache == null) {
-            DescribeGlobalSObjectResult[] sobs = partnerConnection.describeGlobal().getSobjects();
-            sObjectTypesCache = Arrays.stream(sobs)
+        final Map<String, DescribeSObjectResult> sObjects = getSObjectsDescription();
+        List<String> sObjectTypes = sObjects.values().stream()
+                .map(DescribeSObjectResult::getName)
+                .collect(Collectors.toList());
+        logger.info("[PartnerService] getSObjectTypes count=" + sObjectTypes.size());
+        return sObjectTypes;
+    }
+
+    private Map<String, DescribeSObjectResult> getSObjectsDescription() throws ConnectionException {
+        if (this.sObjectsCache == null) {
+            logger.finest("Load all SObjects");
+            Map<String, DescribeSObjectResult> cache = new LinkedHashMap<>();
+            DescribeGlobalResult describeGlobals = getDescribeGlobal();
+            List<String> tableNames = Arrays.stream(describeGlobals.getSobjects())
                 .map(DescribeGlobalSObjectResult::getName)
                 .collect(Collectors.toList());
-            logger.info("[PartnerService] getSObjectTypes count=" + sObjectTypesCache.size());
+            List<List<String>> tableNamesBatched = toBatches(tableNames, 100);
+            cache = tableNamesBatched.stream()
+                .flatMap(batch -> describeSObjects(batch).stream())
+                .collect(Collectors.toMap(DescribeSObjectResult::getName, Function.identity()));
+            this.sObjectsCache = cache;
         }
-        return sObjectTypesCache;
-    }
-
-    private List<DescribeSObjectResult> getSObjectsDescription() {
-        DescribeGlobalResult describeGlobals = describeGlobal();
-        List<String> tableNames = Arrays.stream(describeGlobals.getSobjects())
-            .map(DescribeGlobalSObjectResult::getName)
-            .collect(Collectors.toList());
-        List<List<String>> tableNamesBatched = toBatches(tableNames, 100);
-        return tableNamesBatched.stream()
-            .flatMap(batch -> describeSObjects(batch).stream())
-            .collect(Collectors.toList());
-    }
-
-    private DescribeGlobalResult describeGlobal() {
-        try {
-            return partnerConnection.describeGlobal();
-        } catch (ConnectionException e) {
-            throw new RuntimeException(e);
-        }
+        return this.sObjectsCache;
     }
 
     private List<DescribeSObjectResult> describeSObjects(List<String> batch) {

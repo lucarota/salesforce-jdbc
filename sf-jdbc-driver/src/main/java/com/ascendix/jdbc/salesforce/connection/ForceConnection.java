@@ -14,6 +14,7 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.NClob;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLClientInfoException;
 import java.sql.SQLException;
 import java.sql.SQLWarning;
@@ -52,7 +53,7 @@ public class ForceConnection implements Connection {
     /**
      * the function to provide partner connection in case if we want to support relogin command
      */
-    UpdateLoginFunction loginHandler;
+    private final UpdateLoginFunction loginHandler;
 
     private final DatabaseMetaData metadata;
 
@@ -129,31 +130,29 @@ public class ForceConnection implements Connection {
 
     @Override
     public <T> T unwrap(Class<T> iface) {
-        // TODO Auto-generated method stub
-        return null;
+        throw new UnsupportedOperationException("Feature is not supported.");
     }
 
     @Override
     public boolean isWrapperFor(Class<?> iface) {
-        // TODO Auto-generated method stub
-        return false;
+        throw new UnsupportedOperationException("Feature is not supported.");
     }
 
     @Override
     public Statement createStatement() {
-        logger.finest("[Conn] createStatement 1 IMPLEMENTED ");
+        logger.finest("[Conn] createStatement 1 IMPLEMENTED");
         return new ForcePreparedStatement(this);
     }
 
     @Override
     public CallableStatement prepareCall(String sql) {
-        logger.finer("[Conn] prepareCall NOT_IMPLEMENTED " + sql);
+        logger.finer("[Conn] prepareCall NOT_IMPLEMENTED");
         return null;
     }
 
     @Override
     public String nativeSQL(String sql) {
-        logger.finer("[Conn] nativeSQL NOT_IMPLEMENTED " + sql);
+        logger.finer("[Conn] nativeSQL NOT_IMPLEMENTED");
         return null;
     }
 
@@ -191,13 +190,10 @@ public class ForceConnection implements Connection {
 
     @Override
     public void setReadOnly(boolean readOnly) throws SQLException {
-        // TODO Auto-generated method stub
-
     }
 
     @Override
     public boolean isReadOnly() throws SQLException {
-        // TODO Auto-generated method stub
         return false;
     }
 
@@ -226,14 +222,11 @@ public class ForceConnection implements Connection {
 
     @Override
     public SQLWarning getWarnings() throws SQLException {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public void clearWarnings() throws SQLException {
-        // TODO Auto-generated method stub
-
     }
 
     @Override
@@ -257,43 +250,35 @@ public class ForceConnection implements Connection {
 
     @Override
     public Map<String, Class<?>> getTypeMap() throws SQLException {
-        logger.finer("[Conn] getTypeMap NOT_IMPLEMENTED ");
-        return null;
+        throw new UnsupportedOperationException("Feature is not supported.");
     }
 
     @Override
     public void setTypeMap(Map<String, Class<?>> map) throws SQLException {
-        // TODO Auto-generated method stub
-
     }
 
     @Override
     public void setHoldability(int holdability) throws SQLException {
-        // TODO Auto-generated method stub
-
     }
 
     @Override
     public int getHoldability() throws SQLException {
-        // TODO Auto-generated method stub
-        return 0;
+        return ResultSet.CLOSE_CURSORS_AT_COMMIT;
     }
 
     @Override
     public Savepoint setSavepoint() throws SQLException {
-        // TODO Auto-generated method stub
-        return null;
+        throw new UnsupportedOperationException("Feature is not supported.");
     }
 
     @Override
     public Savepoint setSavepoint(String name) throws SQLException {
-        // TODO Auto-generated method stub
-        return null;
+        throw new UnsupportedOperationException("Feature is not supported.");
     }
 
     @Override
     public void rollback(Savepoint savepoint) throws SQLException {
-        logger.finer("[Conn] rollback Savepoint NOT_IMPLEMENTED");
+        rollback();
     }
 
     @Override
