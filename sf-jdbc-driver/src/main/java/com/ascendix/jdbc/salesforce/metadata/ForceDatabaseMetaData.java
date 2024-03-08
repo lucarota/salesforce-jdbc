@@ -45,9 +45,9 @@ public class ForceDatabaseMetaData implements DatabaseMetaData, Serializable {
     private int counter;
     private final Properties connInfo = new Properties();
 
-    public ForceDatabaseMetaData(ForceConnection connection) {
+    public ForceDatabaseMetaData(ForceConnection connection, PartnerService partnerService) {
         this.connection = connection;
-        this.partnerService = new PartnerService(connection.getPartnerConnection());
+        this.partnerService = partnerService;
         ConnectorConfig connectorConfig = this.connection.getPartnerConnection().getConfig();
         connInfo.setProperty("config.auth_endpoint", connectorConfig.getAuthEndpoint());
         connInfo.setProperty("config.rest_endpoint", Objects.toString(connectorConfig.getRestEndpoint(), ""));
@@ -1394,7 +1394,7 @@ public class ForceDatabaseMetaData implements DatabaseMetaData, Serializable {
             ForceDriver driver = new ForceDriver();
             ForceConnection connection = (ForceConnection) driver.connect(args[0], new Properties());
 
-            ForceDatabaseMetaData metaData = new ForceDatabaseMetaData(connection);
+            ForceDatabaseMetaData metaData = new ForceDatabaseMetaData(connection, new PartnerService(connection.getPartnerConnection()));
             String[] types = null;
             ResultSet tables = metaData.getTables("catalog", "", "%", types);
             int count = 0;

@@ -3,6 +3,7 @@ package com.ascendix.jdbc.salesforce;
 import com.ascendix.jdbc.salesforce.connection.ForceConnection;
 import com.ascendix.jdbc.salesforce.connection.ForceConnectionInfo;
 import com.ascendix.jdbc.salesforce.connection.ForceService;
+import com.ascendix.jdbc.salesforce.delegates.PartnerService;
 import com.sforce.soap.partner.PartnerConnection;
 import com.sforce.soap.partner.fault.ApiFault;
 import com.sforce.ws.ConnectionException;
@@ -90,7 +91,8 @@ public class ForceDriver implements Driver {
             info.setLoginDomain(resolveStringProperty(properties, "loginDomain", ForceService.DEFAULT_LOGIN_DOMAIN));
 
             PartnerConnection partnerConnection = ForceService.createPartnerConnection(info);
-            return new ForceConnection(partnerConnection, (newUrl, userName, userPassword) -> {
+            PartnerService partnerService = new PartnerService(partnerConnection);
+            return new ForceConnection(partnerConnection, partnerService, (newUrl, userName, userPassword) -> {
                 logger.info("[ForceDriver] relogin helper ");
                 Properties newConnStringProps;
                 Properties newProperties = new Properties();
