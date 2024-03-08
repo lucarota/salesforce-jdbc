@@ -20,11 +20,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -37,11 +38,16 @@ public class PartnerService {
 
     private final PartnerConnection partnerConnection;
 
-    private DescribeGlobalResult schemaCache = null;
-    private Map<String, DescribeSObjectResult> sObjectsCache = null;
+    private DescribeGlobalResult schemaCache;
+    private final Map<String, DescribeSObjectResult> sObjectsCache = new ConcurrentHashMap<>();
 
     public PartnerService(PartnerConnection partnerConnection) {
         this.partnerConnection = partnerConnection;
+        try {
+            this.schemaCache = getDescribeGlobal();
+        } catch (ConnectionException e) {
+            logger.log(Level.SEVERE, e.getMessage());
+        }
     }
 
     public List<Table> getTables() throws ConnectionException {
@@ -69,9 +75,9 @@ public class PartnerService {
         }
     }
 
-    public synchronized void cleanupGlobalCache() {
-        this.schemaCache = null;
-        this.sObjectsCache = null;
+    public void cleanupGlobalCache() throws ConnectionException {
+        this.schemaCache = getDescribeGlobal();
+        this.sObjectsCache.clear();
     }
 
     private Table convertToTable(DescribeSObjectResult so) {
@@ -130,10 +136,10 @@ public class PartnerService {
     }
 
     private Map<String, DescribeSObjectResult> getSObjectsDescription() throws ConnectionException {
-        if (this.sObjectsCache == null) {
+        if (this.sObjectsCache.isEmpty()) {
             logger.finest("Load all SObjects");
-            Map<String, DescribeSObjectResult> cache = new LinkedHashMap<>();
-            DescribeGlobalResult describeGlobals = getDescribeGlobal();
+            Map<String, DescribeSObjectResult> cache;
+            DescribeGlobalResult describeGlobals = partnerConnection.describeGlobal();
             List<String> tableNames = Arrays.stream(describeGlobals.getSobjects())
                 .map(DescribeGlobalSObjectResult::getName)
                 .collect(Collectors.toList());
@@ -141,7 +147,7 @@ public class PartnerService {
             cache = tableNamesBatched.stream()
                 .flatMap(batch -> describeSObjects(batch).stream())
                 .collect(Collectors.toMap(DescribeSObjectResult::getName, Function.identity()));
-            this.sObjectsCache = cache;
+            this.sObjectsCache.putAll(cache);
         }
         return this.sObjectsCache;
     }
