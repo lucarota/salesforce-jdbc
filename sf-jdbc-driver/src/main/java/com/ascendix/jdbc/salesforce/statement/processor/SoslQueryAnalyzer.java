@@ -1,5 +1,6 @@
 package com.ascendix.jdbc.salesforce.statement.processor;
 
+import com.ascendix.jdbc.salesforce.delegates.PartnerService;
 import com.ascendix.jdbc.salesforce.statement.FieldDef;
 import com.sforce.soap.partner.ChildRelationship;
 import com.sforce.soap.partner.DescribeSObjectResult;
@@ -23,19 +24,12 @@ import org.mule.tools.soql.query.select.FunctionCallSpec;
 public class SoslQueryAnalyzer {
 
     private String soql;
-    private final Function<String, DescribeSObjectResult> objectDescriptor;
-    private final Map<String, DescribeSObjectResult> describedObjectsCache;
+    private final PartnerService partnerService;
     private SOQLQuery queryData;
 
-    public SoslQueryAnalyzer(String soql, Function<String, DescribeSObjectResult> objectDescriptor) {
-        this(soql, objectDescriptor, new HashMap<>());
-    }
-
-    public SoslQueryAnalyzer(String soql, Function<String, DescribeSObjectResult> objectDescriptor,
-        Map<String, DescribeSObjectResult> describedObjectsCache) {
+    public SoslQueryAnalyzer(String soql, PartnerService partnerService) {
         this.soql = soql;
-        this.objectDescriptor = objectDescriptor;
-        this.describedObjectsCache = describedObjectsCache;
+        this.partnerService = partnerService;
     }
 
     private List<Object> fieldDefinitions;
@@ -135,9 +129,7 @@ public class SoslQueryAnalyzer {
             String fromObject = relatedFrom.getChildSObject();
             subquery.setFromClause(new FromClause(new ObjectSpec(fromObject, null)));
 
-            SoslQueryAnalyzer subqueryAnalyzer = new SoslQueryAnalyzer(subquery.toSOQLText(),
-                objectDescriptor,
-                describedObjectsCache);
+            SoslQueryAnalyzer subqueryAnalyzer = new SoslQueryAnalyzer(subquery.toSOQLText(), partnerService);
             fieldDefinitions.add(new ArrayList<>(subqueryAnalyzer.getFieldDefinitions()));
             return null;
         }
@@ -163,13 +155,7 @@ public class SoslQueryAnalyzer {
     }
 
     private DescribeSObjectResult describeObject(String fromObjectName) {
-        if (!describedObjectsCache.containsKey(fromObjectName)) {
-            DescribeSObjectResult description = objectDescriptor.apply(fromObjectName);
-            describedObjectsCache.put(fromObjectName, description);
-            return description;
-        } else {
-            return describedObjectsCache.get(fromObjectName);
-        }
+        return partnerService.describeSObject(fromObjectName);
     }
 
     protected String getFromObjectName() {

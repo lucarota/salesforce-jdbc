@@ -2,10 +2,7 @@ package com.ascendix.jdbc.salesforce.statement.processor;
 
 import com.ascendix.jdbc.salesforce.ForceDriver;
 import com.ascendix.jdbc.salesforce.statement.processor.utils.ValueToStringVisitor;
-import com.sforce.soap.partner.DescribeSObjectResult;
-import com.sforce.soap.partner.Field;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,23 +25,12 @@ public class InsertQueryAnalyzer {
     private static final Logger logger = Logger.getLogger(ForceDriver.SF_JDBC_DRIVER_NAME);
 
     private String soql;
-    private final Function<String, DescribeSObjectResult> objectDescriptor;
-    private final Map<String, DescribeSObjectResult> describedObjectsCache;
     private final Function<String, List<Map<String, Object>>> subSelectResolver;
     private Insert queryData;
     private List<Map<String, Object>> records;
 
-    public InsertQueryAnalyzer(String soql, Function<String, DescribeSObjectResult> objectDescriptor) {
-        this(soql, objectDescriptor, new HashMap<>(), null);
-    }
-
-    public InsertQueryAnalyzer(String soql,
-        Function<String, DescribeSObjectResult> objectDescriptor,
-        Map<String, DescribeSObjectResult> describedObjectsCache,
-        Function<String, List<Map<String, Object>>> subSelectResolver) {
+    public InsertQueryAnalyzer(String soql, Function<String, List<Map<String, Object>>> subSelectResolver) {
         this.soql = soql;
-        this.objectDescriptor = objectDescriptor;
-        this.describedObjectsCache = describedObjectsCache;
         this.subSelectResolver = subSelectResolver;
     }
 

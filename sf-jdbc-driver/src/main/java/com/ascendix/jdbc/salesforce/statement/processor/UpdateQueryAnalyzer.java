@@ -1,6 +1,7 @@
 package com.ascendix.jdbc.salesforce.statement.processor;
 
 import com.ascendix.jdbc.salesforce.ForceDriver;
+import com.ascendix.jdbc.salesforce.delegates.PartnerService;
 import com.ascendix.jdbc.salesforce.statement.processor.utils.ColumnsFinderVisitor;
 import com.ascendix.jdbc.salesforce.statement.processor.utils.UpdateRecordVisitor;
 import com.ascendix.jdbc.salesforce.statement.processor.utils.ValueToStringVisitor;
@@ -38,23 +39,13 @@ public class UpdateQueryAnalyzer {
     private static final Logger logger = Logger.getLogger(ForceDriver.SF_JDBC_DRIVER_NAME);
 
     private String soql;
-    private final Function<String, DescribeSObjectResult> objectDescriptor;
-    private final Map<String, DescribeSObjectResult> describedObjectsCache;
     private final Function<String, List<Map<String, Object>>> subSelectResolver;
     private Update queryData;
     private List<Map<String, Object>> records;
 
-    public UpdateQueryAnalyzer(String soql, Function<String, DescribeSObjectResult> objectDescriptor) {
-        this(soql, objectDescriptor, new HashMap<>(), null);
-    }
-
-    public UpdateQueryAnalyzer(String soql,
-        Function<String, DescribeSObjectResult> objectDescriptor,
-        Map<String, DescribeSObjectResult> describedObjectsCache,
+    public UpdateQueryAnalyzer(String soql, PartnerService partnerService,
         Function<String, List<Map<String, Object>>> subSelectResolver) {
         this.soql = soql;
-        this.objectDescriptor = objectDescriptor;
-        this.describedObjectsCache = describedObjectsCache;
         this.subSelectResolver = subSelectResolver;
     }
 
@@ -117,16 +108,6 @@ public class UpdateQueryAnalyzer {
             .findFirst()
             .orElseThrow(() -> new IllegalArgumentException(
                 "Unknown field name \"" + name + "\" in object \"" + objectDesc.getName() + "\""));
-    }
-
-    private DescribeSObjectResult describeObject(String fromObjectName) {
-        if (!describedObjectsCache.containsKey(fromObjectName)) {
-            DescribeSObjectResult description = objectDescriptor.apply(fromObjectName);
-            describedObjectsCache.put(fromObjectName, description);
-            return description;
-        } else {
-            return describedObjectsCache.get(fromObjectName);
-        }
     }
 
     protected String getFromObjectName() {

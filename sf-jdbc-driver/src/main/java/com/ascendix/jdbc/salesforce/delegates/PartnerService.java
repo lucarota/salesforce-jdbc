@@ -29,6 +29,7 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.commons.collections4.IteratorUtils;
+import org.apache.commons.lang3.StringUtils;
 
 public class PartnerService {
 
@@ -53,12 +54,19 @@ public class PartnerService {
         return tables;
     }
 
-    public DescribeSObjectResult describeSObject(String sObjectType) throws ConnectionException {
-        if (sObjectsCache == null) {
-            logger.info("[PartnerService] describeSObject " + sObjectType);
-            return partnerConnection.describeSObject(sObjectType);
+    public DescribeSObjectResult describeSObject(String sObjectType) {
+        try {
+            final String obj = StringUtils.toRootLowerCase(sObjectType);
+            if (!sObjectsCache.containsKey(obj)) {
+                DescribeSObjectResult description = partnerConnection.describeSObject(obj);
+                sObjectsCache.put(obj, description);
+                return description;
+            } else {
+                return sObjectsCache.get(obj);
+            }
+        } catch (ConnectionException e) {
+            throw new RuntimeException(e);
         }
-        return sObjectsCache.get(sObjectType);
     }
 
     public synchronized void cleanupGlobalCache() {

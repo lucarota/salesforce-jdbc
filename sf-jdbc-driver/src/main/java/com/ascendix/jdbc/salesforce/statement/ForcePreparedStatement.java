@@ -167,35 +167,19 @@ public class ForcePreparedStatement implements PreparedStatement, Iterator<List<
         }
         InsertQueryAnalyzer insertQueryAnalyzer = getInsertQueryAnalyzer();
         if (InsertQueryProcessor.isInsertQuery(soqlQuery, insertQueryAnalyzer)) {
-            try {
-                return InsertQueryProcessor.processQuery(this, soqlQuery, getPartnerService(), insertQueryAnalyzer);
-            } catch (ConnectionException | SOQLParsingException e) {
-                throw new SQLException(e);
-            }
+            return InsertQueryProcessor.processQuery(this, soqlQuery, getPartnerService(), insertQueryAnalyzer);
         }
         UpdateQueryAnalyzer updateQueryAnalyzer = getUpdateQueryAnalyzer();
         if (UpdateQueryProcessor.isUpdateQuery(soqlQuery, updateQueryAnalyzer)) {
-            try {
-                return UpdateQueryProcessor.processQuery(this, soqlQuery, getPartnerService(), updateQueryAnalyzer);
-            } catch (ConnectionException | SOQLParsingException e) {
-                throw new SQLException(e);
-            }
+            return UpdateQueryProcessor.processQuery(this, soqlQuery, getPartnerService(), updateQueryAnalyzer);
         }
         DeleteQueryAnalyzer deleteQueryAnalyzer = getDeleteQueryAnalyzer();
         if (DeleteQueryProcessor.isDeleteQuery(soqlQuery, deleteQueryAnalyzer)) {
-            try {
-                return DeleteQueryProcessor.processQuery(soqlQuery, getPartnerService(), deleteQueryAnalyzer);
-            } catch (ConnectionException | SOQLParsingException e) {
-                throw new SQLException(e);
-            }
+            return DeleteQueryProcessor.processQuery(soqlQuery, getPartnerService(), deleteQueryAnalyzer);
         }
         SoslQueryAnalyzer soslQueryAnalyzer = getSoslQueryAnalyzer();
         if (SoslQueryProcessor.isSoslQuery(soqlQuery, soslQueryAnalyzer)) {
-            try {
-                return SoslQueryProcessor.processQuery(this, soqlQuery, getPartnerService(), soslQueryAnalyzer);
-            } catch (ConnectionException | SOQLParsingException e) {
-                throw new SQLException(e);
-            }
+            return SoslQueryProcessor.processQuery(this, soqlQuery, getPartnerService(), soslQueryAnalyzer);
         }
         try {
             if (cacheMode == CacheMode.NO_CACHE) {
@@ -489,13 +473,7 @@ public class ForcePreparedStatement implements PreparedStatement, Iterator<List<
     private SoqlQueryAnalyzer getSoqlQueryAnalyzer() {
         logger.finest("[PrepStat] getSoqlQueryAnalyzer IMPLEMENTED ");
         if (soqlQueryAnalyzer == null) {
-            soqlQueryAnalyzer = new SoqlQueryAnalyzer(soqlQuery, (objName) -> {
-                try {
-                    return getPartnerService().describeSObject(objName);
-                } catch (ConnectionException e) {
-                    throw new RuntimeException(e);
-                }
-            }, connection.getCache());
+            soqlQueryAnalyzer = new SoqlQueryAnalyzer(soqlQuery, getPartnerService());
             if (soqlQueryAnalyzer.isExpandedStarSyntaxForFields()) {
                 this.soqlQuery = soqlQueryAnalyzer.getOriginalSoqlQuery();
                 logger.info("[PrepStat] Expanded Star Syntax to " + soqlQuery);
@@ -507,13 +485,7 @@ public class ForcePreparedStatement implements PreparedStatement, Iterator<List<
     private SoslQueryAnalyzer getSoslQueryAnalyzer() {
         logger.finest("[PrepStat] getSoslQueryAnalyzer IMPLEMENTED ");
         if (soslQueryAnalyzer == null) {
-            soslQueryAnalyzer = new SoslQueryAnalyzer(soqlQuery, (objName) -> {
-                try {
-                    return getPartnerService().describeSObject(objName);
-                } catch (ConnectionException e) {
-                    throw new RuntimeException(e);
-                }
-            }, connection.getCache());
+            soslQueryAnalyzer = new SoslQueryAnalyzer(soqlQuery, getPartnerService());
         }
         return soslQueryAnalyzer;
     }
@@ -521,14 +493,7 @@ public class ForcePreparedStatement implements PreparedStatement, Iterator<List<
     private InsertQueryAnalyzer getInsertQueryAnalyzer() {
         logger.finest("[PrepStat] getInsertQueryAnalyzer IMPLEMENTED ");
         if (insertQueryAnalyzer == null) {
-            insertQueryAnalyzer = new InsertQueryAnalyzer(soqlQuery, (objName) -> {
-                try {
-                    return getPartnerService().describeSObject(objName);
-                } catch (ConnectionException e) {
-                    throw new RuntimeException(e);
-                }
-            }, connection.getCache(),
-                this::runResolveSubselect);
+            insertQueryAnalyzer = new InsertQueryAnalyzer(soqlQuery, this::runResolveSubselect);
         }
         return insertQueryAnalyzer;
     }
@@ -536,14 +501,7 @@ public class ForcePreparedStatement implements PreparedStatement, Iterator<List<
     private UpdateQueryAnalyzer getUpdateQueryAnalyzer() {
         logger.finest("[PrepStat] getUpdateQueryAnalyzer IMPLEMENTED ");
         if (updateQueryAnalyzer == null) {
-            updateQueryAnalyzer = new UpdateQueryAnalyzer(soqlQuery, (objName) -> {
-                try {
-                    return getPartnerService().describeSObject(objName);
-                } catch (ConnectionException e) {
-                    throw new RuntimeException(e);
-                }
-            }, connection.getCache(),
-                this::runResolveSubselect);
+            updateQueryAnalyzer = new UpdateQueryAnalyzer(soqlQuery, getPartnerService(), this::runResolveSubselect);
         }
         return updateQueryAnalyzer;
     }
@@ -602,7 +560,7 @@ public class ForcePreparedStatement implements PreparedStatement, Iterator<List<
             });
     }
 
-    private PartnerService getPartnerService() throws ConnectionException {
+    private PartnerService getPartnerService() {
         logger.finest("[PrepStat] getPartnerService IMPLEMENTED ");
         if (partnerService == null) {
             logger.info("[PrepStat] getPartnerService creating service ");
