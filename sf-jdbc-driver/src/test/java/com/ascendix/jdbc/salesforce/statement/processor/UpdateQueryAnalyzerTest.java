@@ -1,23 +1,32 @@
 package com.ascendix.jdbc.salesforce.statement.processor;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import com.ascendix.jdbc.salesforce.delegates.PartnerService;
 import com.ascendix.jdbc.salesforce.statement.processor.utils.RecordFieldsBuilder;
 import com.google.common.collect.Sets;
 import com.sforce.soap.partner.DescribeSObjectResult;
+import java.util.Arrays;
+import java.util.Map;
 import org.junit.Test;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-
-import static org.junit.Assert.*;
-
 public class UpdateQueryAnalyzerTest {
+
+    private final PartnerService partnerService;
+
+    public UpdateQueryAnalyzerTest() {
+        partnerService = mock(PartnerService.class);
+        when(partnerService.describeSObject(eq("Account"))).thenReturn(describeSObject("Account"));
+    }
 
     @Test
     public void testIsUpdateQuery_ById() {
         String soql = "Update Account set Name ='FirstAccount_new' where Id='001xx000003GeY0AAK'";
-        Map<String, DescribeSObjectResult> cache = new HashMap<>();
-        UpdateQueryAnalyzer analyzer = new UpdateQueryAnalyzer(soql, this::describeSObject, cache, null);
+        UpdateQueryAnalyzer analyzer = new UpdateQueryAnalyzer(soql, partnerService, null);
 
         assertTrue(analyzer.analyse(soql));
     }
@@ -31,8 +40,7 @@ public class UpdateQueryAnalyzerTest {
     @Test
     public void testProcessUpdate_One_ById() {
         String soql = "Update Account set Name ='FirstAccount_new' where Id='001xx000003GeY0AAK'";
-        Map<String, DescribeSObjectResult> cache = new HashMap<>();
-        UpdateQueryAnalyzer analyzer = new UpdateQueryAnalyzer(soql, this::describeSObject, cache, null);
+        UpdateQueryAnalyzer analyzer = new UpdateQueryAnalyzer(soql, partnerService, null);
 
         assertTrue(analyzer.analyse(soql));
         assertEquals("Account", analyzer.getFromObjectName());
@@ -51,8 +59,7 @@ public class UpdateQueryAnalyzerTest {
     @Test
     public void testProcessUpdate_One_ByName() {
         String soql = "Update Account set Name ='NEW_AccountName' where Name='FirstAccount_new'";
-        Map<String, DescribeSObjectResult> cache = new HashMap<>();
-        UpdateQueryAnalyzer analyzer = new UpdateQueryAnalyzer(soql, this::describeSObject, cache, subSoql -> {
+        UpdateQueryAnalyzer analyzer = new UpdateQueryAnalyzer(soql, partnerService, subSoql -> {
             if ("SELECT Id FROM Account WHERE Name = 'FirstAccount_new'".equals(subSoql)) {
                 return Arrays.asList(
                         RecordFieldsBuilder.id("005xx1111111111111"),
@@ -97,8 +104,7 @@ public class UpdateQueryAnalyzerTest {
     @Test
     public void testProcessUpdate_One_ByName_CALC() {
         String soql = "Update Account set Name=Name+'-' where Name='FirstAccount_new'";
-        Map<String, DescribeSObjectResult> cache = new HashMap<>();
-        UpdateQueryAnalyzer analyzer = new UpdateQueryAnalyzer(soql, this::describeSObject, cache, subSoql -> {
+        UpdateQueryAnalyzer analyzer = new UpdateQueryAnalyzer(soql, partnerService, subSoql -> {
             if ("SELECT Id, Name FROM Account WHERE Name = 'FirstAccount_new'".equals(subSoql)) {
                 return Arrays.asList(
                         RecordFieldsBuilder.setId("005xx1111111111111").set("Name", "Acc_01").build(),

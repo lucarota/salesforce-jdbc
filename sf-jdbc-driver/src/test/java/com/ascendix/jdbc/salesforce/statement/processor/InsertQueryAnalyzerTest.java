@@ -1,37 +1,32 @@
 package com.ascendix.jdbc.salesforce.statement.processor;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import com.google.common.collect.Sets;
 import com.sforce.soap.partner.DescribeSObjectResult;
-import org.junit.Test;
-
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-
-import static org.junit.Assert.*;
+import org.junit.Test;
 
 public class InsertQueryAnalyzerTest {
 
     @Test
     public void testIsInsertQuery() {
         String soql = "insert into Account(Name, OwnerId) values ('FirstAccount', '005xx1231231233123')";
-        Map<String, DescribeSObjectResult> cache = new HashMap<>();
-        InsertQueryAnalyzer analyzer = new InsertQueryAnalyzer(soql, this::describeSObject, cache, null);
+
+        InsertQueryAnalyzer analyzer = new InsertQueryAnalyzer(soql,null);
 
         assertTrue(analyzer.analyse(soql));
-    }
-
-    private DescribeSObjectResult describeSObject(String objName) {
-        DescribeSObjectResult result = new DescribeSObjectResult();
-        result.setName(objName);
-        return result;
     }
 
     @Test
     public void testProcessInsert_ValuesOne() {
         String soql = "insert into Account(Name, OwnerId, Title) values ('FirstAccount', '005xx1231231233123', Null)";
-        Map<String, DescribeSObjectResult> cache = new HashMap<>();
-        InsertQueryAnalyzer analyzer = new InsertQueryAnalyzer(soql, this::describeSObject, cache, null);
+
+        InsertQueryAnalyzer analyzer = new InsertQueryAnalyzer(soql, null);
 
         assertTrue(analyzer.analyse(soql));
         assertEquals("Account", analyzer.getFromObjectName());
@@ -55,7 +50,7 @@ public class InsertQueryAnalyzerTest {
                 " (SELECT Id from User where Name='CollectionOwner-f CollectionOwner-l' LIMIT 1) " +
                 ")";
         Map<String, DescribeSObjectResult> cache = new HashMap<>();
-        InsertQueryAnalyzer analyzer = new InsertQueryAnalyzer(soql, this::describeSObject, cache, subSoql -> {
+        InsertQueryAnalyzer analyzer = new InsertQueryAnalyzer(soql, subSoql -> {
             if ("SELECT Id FROM User WHERE Name = 'CollectionOwner-f CollectionOwner-l' LIMIT 1".equals(subSoql)) {
                 Map<String, Object> record = new HashMap<>();
                 record.put("id", "005xx1231231233123");
@@ -82,7 +77,7 @@ public class InsertQueryAnalyzerTest {
     public void testProcessInsert_ValuesTwo() {
         String soql = "insert into Account(Name, OwnerId) values ('FirstAccount', '005xx1111111111111'),  ('SecondAccount', '005xx2222222222222')";
         Map<String, DescribeSObjectResult> cache = new HashMap<>();
-        InsertQueryAnalyzer analyzer = new InsertQueryAnalyzer(soql, this::describeSObject, cache, null);
+        InsertQueryAnalyzer analyzer = new InsertQueryAnalyzer(soql, null);
 
         assertTrue(analyzer.analyse(soql));
         assertEquals("Account", analyzer.getFromObjectName());

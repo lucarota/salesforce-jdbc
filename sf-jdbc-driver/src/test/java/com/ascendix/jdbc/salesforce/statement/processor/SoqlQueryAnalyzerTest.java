@@ -1,7 +1,11 @@
 package com.ascendix.jdbc.salesforce.statement.processor;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
+import com.ascendix.jdbc.salesforce.delegates.PartnerService;
 import com.ascendix.jdbc.salesforce.statement.FieldDef;
 import com.sforce.soap.partner.DescribeSObjectResult;
 import com.thoughtworks.xstream.XStream;
@@ -18,10 +22,19 @@ import org.junit.Test;
 
 public class SoqlQueryAnalyzerTest {
 
+    private final PartnerService partnerService;
+
+    public SoqlQueryAnalyzerTest() {
+        partnerService = mock(PartnerService.class);
+        when(partnerService.describeSObject(eq("Account"))).thenReturn(describeSObject("Account"));
+        when(partnerService.describeSObject(eq("Contact"))).thenReturn(describeSObject("Contact"));
+        when(partnerService.describeSObject(eq("User"))).thenReturn(describeSObject("User"));
+    }
+
     @Test
     public void testGetFieldNames_SimpleQuery() {
         SoqlQueryAnalyzer analyzer = new SoqlQueryAnalyzer(" select Id ,Name \r\nfrom Account\r\n where something = 'nothing' ",
-            this::describeSObject);
+            partnerService);
         List<String> expected = Arrays.asList("Id", "Name");
         List<String> actual = listFlatFieldNames(analyzer);
 
@@ -43,7 +56,7 @@ public class SoqlQueryAnalyzerTest {
     @Test
     public void testGetFieldNames_SelectWithReferences() {
         SoqlQueryAnalyzer analyzer = new SoqlQueryAnalyzer(" select Id , Account.Name \r\nfrom Contact\r\n where something = 'nothing' ",
-            this::describeSObject);
+            partnerService);
         List<String> expected = Arrays.asList("Id", "Name");
         List<String> actual = listFlatFieldNames(analyzer);
 
@@ -53,7 +66,7 @@ public class SoqlQueryAnalyzerTest {
     @Test
     public void testGetFieldNames_SelectWithAggregateAliased() {
         SoqlQueryAnalyzer analyzer = new SoqlQueryAnalyzer(" select Id , Account.Name, count(id) aggrAlias1\r\nfrom Contact\r\n where something = 'nothing' ",
-            this::describeSObject);
+            partnerService);
         // Just Name is confusing - see the case
         List<String> expected = Arrays.asList("Id", "Name", "aggrAlias1");
         List<String> actual = listFlatFieldNames(analyzer);
@@ -64,7 +77,7 @@ public class SoqlQueryAnalyzerTest {
     @Test
     public void testGetFieldNames_SubSelectWithSameFields() {
         SoqlQueryAnalyzer analyzer = new SoqlQueryAnalyzer(" select Id, Account.Name, Owner.Id, Owner.Name from Account ",
-            this::describeSObject);
+            partnerService);
         // Just Name is confusing - see the case
         List<String> expected = Arrays.asList("Id", "Name", "Id", "Name");
         List<String> actual = listFlatFieldNames(analyzer);
@@ -75,7 +88,7 @@ public class SoqlQueryAnalyzerTest {
     @Test
     public void testGetFieldNames_SubSelectWithSameFieldAliases() {
         SoqlQueryAnalyzer analyzer = new SoqlQueryAnalyzer(" select Id, Account.Name, Owner.Id, Owner.Name from Account ",
-            this::describeSObject);
+            partnerService);
         // Just Name is confusing - see the case
         List<String> expected = Arrays.asList("Id", "Name", "Owner.Id", "Owner.Name");
         List<String> actual = listFlatFieldAliases(analyzer);
@@ -86,7 +99,7 @@ public class SoqlQueryAnalyzerTest {
     @Test
     public void testGetFieldNames_SelectWithAggregate() {
         SoqlQueryAnalyzer analyzer = new SoqlQueryAnalyzer(" select Id , Account.Name, count(id)\r\nfrom Contact\r\n where something = 'nothing' ",
-            this::describeSObject);
+            partnerService);
         List<String> expected = Arrays.asList("Id", "Name", "count");
         List<String> actual = listFlatFieldNames(analyzer);
 
@@ -96,7 +109,7 @@ public class SoqlQueryAnalyzerTest {
     @Test
     public void testGetFromObjectName() {
         SoqlQueryAnalyzer analyzer = new SoqlQueryAnalyzer(" select Id , Account.Name \r\nfrom Contact\r\n where something = 'nothing' ",
-            this::describeSObject);
+            partnerService);
         String expected = "Contact";
         String actual = analyzer.getFromObjectName();
 
@@ -105,7 +118,7 @@ public class SoqlQueryAnalyzerTest {
 
     @Test
     public void testGetSimpleFieldDefinitions() {
-        SoqlQueryAnalyzer analyzer = new SoqlQueryAnalyzer("SELECT Id, Name FROM Account", this::describeSObject);
+        SoqlQueryAnalyzer analyzer = new SoqlQueryAnalyzer("SELECT Id, Name FROM Account", partnerService);
 
         List<FieldDef> actual = analyzer.getFieldDefinitions();
         assertEquals(2, actual.size());
@@ -120,7 +133,7 @@ public class SoqlQueryAnalyzerTest {
 
     @Test
     public void testGetReferenceFieldDefinitions() {
-        SoqlQueryAnalyzer analyzer = new SoqlQueryAnalyzer("SELECT Account.Name FROM Contact", this::describeSObject);
+        SoqlQueryAnalyzer analyzer = new SoqlQueryAnalyzer("SELECT Account.Name FROM Contact", partnerService);
 
         List<FieldDef> actual = analyzer.getFieldDefinitions();
         assertEquals(1, actual.size());
@@ -130,7 +143,7 @@ public class SoqlQueryAnalyzerTest {
 
     @Test
     public void testGetAggregateFieldDefinition() {
-        SoqlQueryAnalyzer analyzer = new SoqlQueryAnalyzer("SELECT MIN(Name) FROM Contact", this::describeSObject);
+        SoqlQueryAnalyzer analyzer = new SoqlQueryAnalyzer("SELECT MIN(Name) FROM Contact", partnerService);
 
         List<FieldDef> actual = analyzer.getFieldDefinitions();
         assertEquals(1, actual.size());
@@ -140,7 +153,7 @@ public class SoqlQueryAnalyzerTest {
 
     @Test
     public void testGetAggregateFieldDefinitionWithoutParameter() {
-        SoqlQueryAnalyzer analyzer = new SoqlQueryAnalyzer("SELECT Count() FROM Contact", this::describeSObject);
+        SoqlQueryAnalyzer analyzer = new SoqlQueryAnalyzer("SELECT Count() FROM Contact", partnerService);
 
         List<FieldDef> actual = analyzer.getFieldDefinitions();
         assertEquals(1, actual.size());
@@ -150,7 +163,7 @@ public class SoqlQueryAnalyzerTest {
 
     @Test
     public void testGetSimpleFieldWithQualifier() {
-        SoqlQueryAnalyzer analyzer = new SoqlQueryAnalyzer("SELECT Contact.Id FROM Contact", this::describeSObject);
+        SoqlQueryAnalyzer analyzer = new SoqlQueryAnalyzer("SELECT Contact.Id FROM Contact", partnerService);
 
         List<FieldDef> actual = analyzer.getFieldDefinitions();
         assertEquals(1, actual.size());
@@ -161,7 +174,7 @@ public class SoqlQueryAnalyzerTest {
     @Test
     public void testGetNamedAggregateFieldDefinitions() {
         SoqlQueryAnalyzer analyzer = new SoqlQueryAnalyzer("SELECT count(Name) nameCount FROM Account",
-            this::describeSObject);
+            partnerService);
 
         List<FieldDef> actual = analyzer.getFieldDefinitions();
 
@@ -192,9 +205,9 @@ public class SoqlQueryAnalyzerTest {
     }
 
     @Test
-    public void testFetchFieldDefinitions_WithIncludedSeslect() {
+    public void testFetchFieldDefinitions_WithIncludedSelect() {
         SoqlQueryAnalyzer analyzer = new SoqlQueryAnalyzer("SELECT Name, (SELECT Id, max(LastName) maxLastName FROM Contacts), Id FROM Account",
-            this::describeSObject);
+            partnerService);
 
         List<FieldDef> actual = analyzer.getFieldDefinitions();
 

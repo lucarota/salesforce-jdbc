@@ -1,15 +1,14 @@
 package com.ascendix.jdbc.salesforce.statement.processor;
 
 import com.ascendix.jdbc.salesforce.ForceDriver;
+import com.ascendix.jdbc.salesforce.delegates.PartnerService;
 import com.ascendix.jdbc.salesforce.statement.FieldDef;
 import com.sforce.soap.partner.ChildRelationship;
 import com.sforce.soap.partner.DescribeSObjectResult;
 import com.sforce.soap.partner.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -29,22 +28,16 @@ public class SoqlQueryAnalyzer {
 
     private static final Logger logger = Logger.getLogger(ForceDriver.SF_JDBC_DRIVER_NAME);
     private String soql;
-    private final Function<String, DescribeSObjectResult> objectDescriptor;
-    private final Map<String, DescribeSObjectResult> describedObjectsCache;
+    private final PartnerService partnerService;
+
     private SOQLQuery queryData;
     @Getter
     private boolean expandedStarSyntaxForFields = false;
     private List<FieldDef> fieldDefinitions;
 
-    public SoqlQueryAnalyzer(String soql, Function<String, DescribeSObjectResult> objectDescriptor) {
-        this(soql, objectDescriptor, new HashMap<>());
-    }
-
-    public SoqlQueryAnalyzer(String soql, Function<String, DescribeSObjectResult> objectDescriptor,
-        Map<String, DescribeSObjectResult> describedObjectsCache) {
+    public SoqlQueryAnalyzer(String soql, PartnerService partnerService) {
         this.soql = soql;
-        this.objectDescriptor = objectDescriptor;
-        this.describedObjectsCache = describedObjectsCache;
+        this.partnerService = partnerService;
         // to parse the query and process the expansion if needed
         getQueryData();
     }
@@ -144,9 +137,7 @@ public class SoqlQueryAnalyzer {
             String fromObject = relatedFrom.getChildSObject();
             subquery.setFromClause(new FromClause(new ObjectSpec(fromObject, null)));
 
-            SoqlQueryAnalyzer subqueryAnalyzer = new SoqlQueryAnalyzer(subquery.toSOQLText(),
-                objectDescriptor,
-                describedObjectsCache);
+            SoqlQueryAnalyzer subqueryAnalyzer = new SoqlQueryAnalyzer(subquery.toSOQLText(), partnerService);
             fieldDefinitions.addAll(subqueryAnalyzer.getFieldDefinitions());
             return null;
         }
@@ -172,13 +163,7 @@ public class SoqlQueryAnalyzer {
     }
 
     private DescribeSObjectResult describeObject(String fromObjectName) {
-        if (!describedObjectsCache.containsKey(fromObjectName)) {
-            DescribeSObjectResult description = objectDescriptor.apply(fromObjectName);
-            describedObjectsCache.put(fromObjectName, description);
-            return description;
-        } else {
-            return describedObjectsCache.get(fromObjectName);
-        }
+        return partnerService.describeSObject(fromObjectName);
     }
 
     public String getFromObjectName() {
