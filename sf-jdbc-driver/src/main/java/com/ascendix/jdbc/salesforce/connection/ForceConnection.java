@@ -1,6 +1,7 @@
 package com.ascendix.jdbc.salesforce.connection;
 
 import com.ascendix.jdbc.salesforce.ForceDriver;
+import com.ascendix.jdbc.salesforce.delegates.PartnerService;
 import com.ascendix.jdbc.salesforce.metadata.ForceDatabaseMetaData;
 import com.ascendix.jdbc.salesforce.statement.ForcePreparedStatement;
 import com.sforce.soap.partner.DescribeSObjectResult;
@@ -28,6 +29,7 @@ import java.util.Properties;
 import java.util.concurrent.Executor;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import lombok.Getter;
 
 public class ForceConnection implements Connection {
 
@@ -57,15 +59,19 @@ public class ForceConnection implements Connection {
 
     private final DatabaseMetaData metadata;
 
+    @Getter
+    private final PartnerService partnerService;
+
     private static final Logger logger = Logger.getLogger(ForceDriver.SF_JDBC_DRIVER_NAME);
 
     private final Map<String, DescribeSObjectResult> connectionCache = new HashMap<>();
-    Properties clientInfo = new Properties();
+    private final Properties clientInfo = new Properties();
 
-    public ForceConnection(PartnerConnection partnerConnection, UpdateLoginFunction loginHandler) {
+    public ForceConnection(PartnerConnection partnerConnection, PartnerService partnerService, UpdateLoginFunction loginHandler) {
         this.partnerConnection = partnerConnection;
-        this.metadata = new ForceDatabaseMetaData(this);
+        this.partnerService = partnerService;
         this.loginHandler = loginHandler;
+        this.metadata = new ForceDatabaseMetaData(this, partnerService);
     }
 
     public PartnerConnection getPartnerConnection() {

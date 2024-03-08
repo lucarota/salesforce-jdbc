@@ -564,7 +564,7 @@ public class ForcePreparedStatement implements PreparedStatement, Iterator<List<
         logger.finest("[PrepStat] getPartnerService IMPLEMENTED ");
         if (partnerService == null) {
             logger.info("[PrepStat] getPartnerService creating service ");
-            partnerService = new PartnerService(connection.getPartnerConnection());
+            partnerService = connection.getPartnerService();
         }
         return partnerService;
     }
