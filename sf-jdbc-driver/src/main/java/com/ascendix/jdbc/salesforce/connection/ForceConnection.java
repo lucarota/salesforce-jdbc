@@ -7,6 +7,8 @@ import com.ascendix.jdbc.salesforce.statement.ForcePreparedStatement;
 import com.sforce.soap.partner.DescribeSObjectResult;
 import com.sforce.soap.partner.PartnerConnection;
 import com.sforce.ws.ConnectionException;
+
+import java.io.IOException;
 import java.sql.Array;
 import java.sql.Blob;
 import java.sql.CallableStatement;
@@ -29,33 +31,17 @@ import java.util.Properties;
 import java.util.concurrent.Executor;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import com.sforce.ws.ConnectorConfig;
 import lombok.Getter;
 
 public class ForceConnection implements Connection {
 
-    @FunctionalInterface
-    public interface UpdateLoginFunction {
-
-        /**
-         * Applies this function to the given arguments.
-         *
-         * @param url the first function argument
-         * @param user the second function argument
-         * @param pass the second function argument
-         * @return the function result
-         */
-        PartnerConnection apply(String url, String user, String pass) throws ConnectionException;
-    }
-
     private final PartnerConnection partnerConnection;
     /**
-     * the updated partner connection in case if we want to support relogin command
+     * the updated partner connection in case if we want to support re-login command
      */
     private PartnerConnection partnerConnectionUpdated;
-    /**
-     * the function to provide partner connection in case if we want to support relogin command
-     */
-    private final UpdateLoginFunction loginHandler;
 
     private final DatabaseMetaData metadata;
 
@@ -67,10 +53,9 @@ public class ForceConnection implements Connection {
     private final Map<String, DescribeSObjectResult> connectionCache = new HashMap<>();
     private final Properties clientInfo = new Properties();
 
-    public ForceConnection(PartnerConnection partnerConnection, PartnerService partnerService, UpdateLoginFunction loginHandler) {
+    public ForceConnection(PartnerConnection partnerConnection, PartnerService partnerService) {
         this.partnerConnection = partnerConnection;
         this.partnerService = partnerService;
-        this.loginHandler = loginHandler;
         this.metadata = new ForceDatabaseMetaData(this, partnerService);
     }
 
@@ -86,32 +71,30 @@ public class ForceConnection implements Connection {
         String currentUserName = null;
         try {
             currentUserName = partnerConnection.getUserInfo().getUserName();
-        } catch (ConnectionException e) {
-            // ignore
-        }
-        logger.finest(
+            logger.finest(
             "[Conn] updatePartnerConnection IMPLEMENTED newUserName=" + userName + " oldUserName=" + currentUserName
                 + " newUrl=" + url);
-        if (loginHandler != null) {
-            try {
-                PartnerConnection newPartnerConnection = loginHandler.apply(url, userName, userPass);
-                if (newPartnerConnection != null) {
-                    partnerConnectionUpdated = newPartnerConnection;
-                    logger.info("[Conn] updatePartnerConnection UPDATED to newUserName=" + userName);
-                    result = true;
-                } else {
-                    logger.log(Level.SEVERE,
-                        "[Conn] updatePartnerConnection UPDATE FAILED to newUserName=" + userName + " currentUserName="
-                            + currentUserName);
-                }
-            } catch (Exception e) {
-                logger.log(Level.SEVERE,
+            ConnectorConfig partnerConfig = partnerConnection.getConfig();
+            ForceConnectionInfo forceConnectionInfo = ForceDriver.parseConnectionUrl(url);
+            forceConnectionInfo.setUserName(userName);
+            forceConnectionInfo.setPassword(userPass);
+            partnerConnectionUpdated = ForceService.createPartnerConnection(forceConnectionInfo);
+            logger.info("[Conn] updatePartnerConnection UPDATED to newUserName=" + userName);
+            result = true;
+        } catch (IOException e) {
+            logger.log(Level.SEVERE,
                     "[Conn] updatePartnerConnection UPDATE FAILED to newUserName=" + userName + " currentUserName="
-                        + currentUserName,
+                            + currentUserName,
                     e);
-                throw e;
-            }
+            throw new ConnectionException(e.getMessage());
+        } catch (ConnectionException e) {
+            logger.log(Level.SEVERE,
+                "[Conn] updatePartnerConnection UPDATE FAILED to newUserName=" + userName + " currentUserName="
+                    + currentUserName,
+                e);
+            throw e;
         }
+
         return result;
     }
 

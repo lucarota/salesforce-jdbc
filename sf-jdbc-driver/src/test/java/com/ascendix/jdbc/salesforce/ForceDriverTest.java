@@ -23,10 +23,10 @@ public class ForceDriverTest {
 
     @Test
     public void testGetConnStringProperties_ListWithHost() throws IOException {
-        Properties actual = ForceDriver.getConnStringProperties("jdbc:ascendix:salesforce://login.salesforce.ru:7642;prop1=val1;prop2=val2");
+        Properties actual = ForceDriver.getConnStringProperties("jdbc:ascendix:salesforce://login.salesforce.com;prop1=val1;prop2=val2");
 
         assertEquals(3, actual.size());
-        assertEquals("login.salesforce.ru:7642", actual.getProperty("loginDomain"));
+        assertEquals("login.salesforce.com", actual.getProperty("loginDomain"));
         assertEquals("val1", actual.getProperty("prop1"));
         assertEquals("val2", actual.getProperty("prop2"));
     }
@@ -40,73 +40,41 @@ public class ForceDriverTest {
         assertEquals("", actual.getProperty("prop2"));
     }
 
-    private String renderResultSet(ResultSet results) throws SQLException {
-        StringBuilder out = new StringBuilder();
-
-        int count = 0;
-        int columnsCount = results.getMetaData().getColumnCount();
-
-        // print header
-        for(int i = 0; i < columnsCount; i++) {
-            out.append(results.getMetaData().getColumnName(i+1)).append("\t");
-        }
-        out.append("\n");
-
-        while(results.next()) {
-            for(int i = 0; i < columnsCount; i++) {
-                out.append(" " + results.getString(i+1)).append("\t");
-            }
-            out.append("\n");
-            count++;
-        }
-        out.append("-----------------\n");
-        out.append(count).append(" records\n");
-        if (results.getWarnings() != null) {
-            out.append("----------------- WARNINGS:\n");
-            SQLWarning warning = results.getWarnings();
-            while(warning != null) {
-                out.append(warning.getMessage()).append("\n");
-                warning = warning.getNextWarning();
-            }
-        }
-        return out.toString();
-    }
-
     @Test
     public void testGetConnStringProperties_StandartUrlFormat() throws  IOException {
-        Properties actual = ForceDriver.getConnStringProperties("jdbc:ascendix:salesforce://test@test.ru:aaaa!aaa@login.salesforce.ru:7642");
+        Properties actual = ForceDriver.getConnStringProperties("jdbc:ascendix:salesforce://test@test.ru:aaaa!aaa@login.salesforce.com");
 
         assertEquals(3, actual.size());
         assertTrue(actual.containsKey("user"));
         assertEquals("test@test.ru", actual.getProperty("user"));
         assertEquals("aaaa!aaa", actual.getProperty("password"));
-        assertEquals("login.salesforce.ru:7642", actual.getProperty("loginDomain"));
+        assertEquals("login.salesforce.com", actual.getProperty("loginDomain"));
     }
 
     @Test
     public void testGetConnStringProperties_JdbcUrlFormatNoUser() throws  IOException {
-        Properties actual = ForceDriver.getConnStringProperties("jdbc:ascendix:salesforce://login.salesforce.ru:7642");
+        Properties actual = ForceDriver.getConnStringProperties("jdbc:ascendix:salesforce://login.salesforce.com");
 
         assertEquals(1, actual.size());
-        assertEquals("login.salesforce.ru:7642", actual.getProperty("loginDomain"));
+        assertEquals("login.salesforce.com", actual.getProperty("loginDomain"));
     }
 
     @Test
     public void testGetConnStringProperties_HostName() throws  IOException {
-        Properties actual = ForceDriver.getConnStringProperties("login.salesforce.ru:7642");
+        Properties actual = ForceDriver.getConnStringProperties("login.salesforce.com");
 
         assertEquals(2, actual.size());
-        assertEquals("login.salesforce.ru:7642", actual.getProperty("loginDomain"));
-        assertEquals(true, ForceDriver.resolveBooleanProperty(actual, "https", true));
+        assertEquals("login.salesforce.com", actual.getProperty("loginDomain"));
+        assertEquals("true", actual.getProperty("https"));
     }
 
     @Test
     public void testGetConnStringProperties_HostNameHttp() throws  IOException {
-        Properties actual = ForceDriver.getConnStringProperties("http://login.salesforce.ru:7642");
+        Properties actual = ForceDriver.getConnStringProperties("http://login.salesforce.com");
 
         assertEquals(2, actual.size());
-        assertEquals("login.salesforce.ru:7642", actual.getProperty("loginDomain"));
-        assertEquals(false, ForceDriver.resolveBooleanProperty(actual, "https", true));
+        assertEquals("login.salesforce.com", actual.getProperty("loginDomain"));
+        assertEquals("false", actual.getProperty("https"));
     }
 
     @Test
@@ -115,11 +83,11 @@ public class ForceDriverTest {
 
         assertEquals(2, actual.size());
         assertEquals("192.168.0.2:7642", actual.getProperty("loginDomain"));
-        assertEquals(true, ForceDriver.resolveBooleanProperty(actual, "https", true));
+        assertEquals("true", actual.getProperty("https"));
     }
 
     @Test
-    public void testGetConnStringProperties_StandartUrlFormatHttpsApi() throws  IOException {
+    public void testGetConnStringProperties_StandardUrlFormatHttpsApi() throws  IOException {
         Properties actual = ForceDriver.getConnStringProperties("jdbc:ascendix:salesforce://test@test.ru:aaaa!aaa@login.salesforce.ru?https=false&api=48.0");
 
         assertEquals(5, actual.size());
