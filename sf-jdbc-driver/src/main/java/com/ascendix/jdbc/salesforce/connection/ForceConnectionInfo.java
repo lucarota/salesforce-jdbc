@@ -10,8 +10,9 @@ public class ForceConnectionInfo {
     private String userName;
     private String password;
     private String sessionId;
-    private Boolean sandbox;
-    private Boolean https = true;
+    private boolean sandbox;
+    private boolean https = true;
+    private boolean verifyConnectivity = false;
     private String apiVersion = ForceService.DEFAULT_API_VERSION;
     private String loginDomain;
     private String clientName;
