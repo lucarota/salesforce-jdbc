@@ -111,129 +111,129 @@ public class ColumnsFinderVisitor implements ExpressionVisitor {
 
     @Override
     public void visit(BitwiseRightShift aThis) {
-        System.out.println("[ColumnsFinder] BitwiseRightShift");
+        logger.finest("[ColumnsFinder] BitwiseRightShift");
         processBinaryExpression(aThis);
     }
 
     @Override
     public void visit(BitwiseLeftShift aThis) {
-        System.out.println("[ColumnsFinder] BitwiseLeftShift");
+        logger.finest("[ColumnsFinder] BitwiseLeftShift");
         processBinaryExpression(aThis);
     }
 
     @Override
     public void visit(NullValue nullValue) {
-        System.out.println("[ColumnsFinder] NullValue ");
+        logger.finest("[ColumnsFinder] NullValue ");
     }
 
     @Override
     public void visit(Function function) {
-        System.out.println("[ColumnsFinder] Function");
+        logger.finest("[ColumnsFinder] Function");
         functionFound = true;
     }
 
     @Override
     public void visit(SignedExpression signedExpression) {
-        System.out.println("[ColumnsFinder] SignedExpression");
+        logger.finest("[ColumnsFinder] SignedExpression");
         signedExpression.getExpression().accept(this);
     }
 
     @Override
     public void visit(JdbcParameter jdbcParameter) {
-        System.out.println("[ColumnsFinder] JdbcParameter");
+        logger.finest("[ColumnsFinder] JdbcParameter");
     }
 
     @Override
     public void visit(JdbcNamedParameter jdbcNamedParameter) {
-        System.out.println("[ColumnsFinder] JdbcNamedParameter");
+        logger.finest("[ColumnsFinder] JdbcNamedParameter");
     }
 
     @Override
     public void visit(DoubleValue doubleValue) {
-        System.out.println("[ColumnsFinder] DoubleValue");
+        logger.finest("[ColumnsFinder] DoubleValue");
     }
 
     @Override
     public void visit(LongValue longValue) {
-        System.out.println("[ColumnsFinder] LongValue");
+        logger.finest("[ColumnsFinder] LongValue");
     }
 
     @Override
     public void visit(HexValue hexValue) {
-        System.out.println("[ColumnsFinder] HexValue");
+        logger.finest("[ColumnsFinder] HexValue");
     }
 
     @Override
     public void visit(DateValue dateValue) {
-        System.out.println("[ColumnsFinder] DateValue");
+        logger.finest("[ColumnsFinder] DateValue");
     }
 
     @Override
     public void visit(TimeValue timeValue) {
-        System.out.println("[ColumnsFinder] BitwiseRightShift");
+        logger.finest("[ColumnsFinder] BitwiseRightShift");
     }
 
     @Override
     public void visit(TimestampValue timestampValue) {
-        System.out.println("[ColumnsFinder] TimestampValue");
+        logger.finest("[ColumnsFinder] TimestampValue");
     }
 
     @Override
     public void visit(Parenthesis parenthesis) {
-        System.out.println("[ColumnsFinder] Parenthesis");
+        logger.finest("[ColumnsFinder] Parenthesis");
         parenthesis.getExpression().accept(this);
     }
 
     @Override
     public void visit(StringValue stringValue) {
-        System.out.println("[ColumnsFinder] StringValue");
+        logger.finest("[ColumnsFinder] StringValue");
     }
 
     @Override
     public void visit(Addition addition) {
-        System.out.println("[ColumnsFinder] Addition");
+        logger.finest("[ColumnsFinder] Addition");
         processBinaryExpression(addition);
     }
 
     @Override
     public void visit(Division division) {
-        System.out.println("[ColumnsFinder] Division");
+        logger.finest("[ColumnsFinder] Division");
         processBinaryExpression(division);
     }
 
     @Override
     public void visit(IntegerDivision division) {
-        System.out.println("[ColumnsFinder] IntegerDivision");
+        logger.finest("[ColumnsFinder] IntegerDivision");
         processBinaryExpression(division);
     }
 
     @Override
     public void visit(Multiplication multiplication) {
-        System.out.println("[ColumnsFinder] Multiplication");
+        logger.finest("[ColumnsFinder] Multiplication");
         processBinaryExpression(multiplication);
     }
 
     @Override
     public void visit(Subtraction subtraction) {
-        System.out.println("[ColumnsFinder] Subtraction");
+        logger.finest("[ColumnsFinder] Subtraction");
         processBinaryExpression(subtraction);
     }
 
     @Override
     public void visit(AndExpression andExpression) {
-        System.out.println("[ColumnsFinder] AndExpression");
+        logger.finest("[ColumnsFinder] AndExpression");
         processBinaryExpression(andExpression);
     }
 
     @Override
     public void visit(OrExpression orExpression) {
-        System.out.println("[ColumnsFinder] OrExpression");
+        logger.finest("[ColumnsFinder] OrExpression");
         processBinaryExpression(orExpression);
     }
 
     @Override
     public void visit(Between between) {
-        System.out.println("[ColumnsFinder] Between");
+        logger.finest("[ColumnsFinder] Between");
         between.getLeftExpression().accept(this);
         between.getBetweenExpressionStart().accept(this);
         between.getBetweenExpressionEnd().accept(this);
@@ -241,79 +241,79 @@ public class ColumnsFinderVisitor implements ExpressionVisitor {
 
     @Override
     public void visit(EqualsTo equalsTo) {
-        System.out.println("[ColumnsFinder] EqualsTo");
+        logger.finest("[ColumnsFinder] EqualsTo");
         processBinaryExpression(equalsTo);
     }
 
     @Override
     public void visit(GreaterThan greaterThan) {
-        System.out.println("[ColumnsFinder] GreaterThan");
+        logger.finest("[ColumnsFinder] GreaterThan");
         processBinaryExpression(greaterThan);
     }
 
     @Override
     public void visit(GreaterThanEquals greaterThanEquals) {
-        System.out.println("[ColumnsFinder] GreaterThanEquals");
+        logger.finest("[ColumnsFinder] GreaterThanEquals");
         processBinaryExpression(greaterThanEquals);
     }
 
     @Override
     public void visit(InExpression inExpression) {
-        System.out.println("[ColumnsFinder] InExpression");
+        logger.finest("[ColumnsFinder] InExpression");
         inExpression.getLeftExpression().accept(this);
     }
 
     @Override
     public void visit(FullTextSearch fullTextSearch) {
-        System.out.println("[ColumnsFinder] FullTextSearch");
+        logger.finest("[ColumnsFinder] FullTextSearch");
         fullTextSearch.getMatchColumns().forEach(this::addColumn);
     }
 
     @Override
     public void visit(IsNullExpression isNullExpression) {
-        System.out.println("[ColumnsFinder] IsNullExpression");
+        logger.finest("[ColumnsFinder] IsNullExpression");
         isNullExpression.getLeftExpression().accept(this);
     }
 
     @Override
     public void visit(IsBooleanExpression isBooleanExpression) {
-        System.out.println("[ColumnsFinder] IsBooleanExpression");
+        logger.finest("[ColumnsFinder] IsBooleanExpression");
         isBooleanExpression.getLeftExpression().accept(this);
     }
 
     @Override
     public void visit(LikeExpression likeExpression) {
-        System.out.println("[ColumnsFinder] LikeExpression");
+        logger.finest("[ColumnsFinder] LikeExpression");
         processExpression(likeExpression);
     }
 
     @Override
     public void visit(MinorThan minorThan) {
-        System.out.println("[ColumnsFinder] MinorThan");
+        logger.finest("[ColumnsFinder] MinorThan");
         processBinaryExpression(minorThan);
     }
 
     @Override
     public void visit(MinorThanEquals minorThanEquals) {
-        System.out.println("[ColumnsFinder] MinorThanEquals");
+        logger.finest("[ColumnsFinder] MinorThanEquals");
         processBinaryExpression(minorThanEquals);
     }
 
     @Override
     public void visit(NotEqualsTo notEqualsTo) {
-        System.out.println("[ColumnsFinder] NotEqualsTo");
+        logger.finest("[ColumnsFinder] NotEqualsTo");
         processBinaryExpression(notEqualsTo);
     }
 
     @Override
     public void visit(Column tableColumn) {
-        System.out.println("[ColumnsFinder] Column");
+        logger.finest("[ColumnsFinder] Column");
         addColumn(tableColumn);
     }
 
     @Override
     public void visit(SubSelect subSelect) {
-        System.out.println("[VtoxSVisitor] SubSelect=" + subSelect.toString());
+        logger.finest("[VtoxSVisitor] SubSelect=" + subSelect.toString());
 //        Object value = null;
 //        if (subSelectResolver != null) {
 //            subSelect.setUseBrackets(false);
@@ -321,218 +321,218 @@ public class ColumnsFinderVisitor implements ExpressionVisitor {
 //            if (records.size() == 1 && records.get(0).size() == 1) {
 //                 return the value as plain value
 //                value = records.get(0).entrySet().iterator().next().getValue();
-//                System.out.println("[ColumnsFinder] resolved to "+value);
+//                logger.finest("[ColumnsFinder] resolved to "+value);
 //            }
 //        } else {
-//            System.out.println("[ColumnsFinder] subSelectResolver is undefined");
+//            logger.finest("[ColumnsFinder] subSelectResolver is undefined");
 //        }
 //        recordFieldsToUpdate.put(columnName, value);
     }
 
     @Override
     public void visit(CaseExpression caseExpression) {
-        System.out.println("[ColumnsFinder] CaseExpression NOT_SUPPORTED");
+        logger.finest("[ColumnsFinder] CaseExpression NOT_SUPPORTED");
     }
 
     @Override
     public void visit(WhenClause whenClause) {
-        System.out.println("[ColumnsFinder] WhenClause");
+        logger.finest("[ColumnsFinder] WhenClause");
     }
 
     @Override
     public void visit(ExistsExpression existsExpression) {
-        System.out.println("[ColumnsFinder] ExistsExpression");
+        logger.finest("[ColumnsFinder] ExistsExpression");
         existsExpression.getRightExpression().accept(this);
     }
 
     @Override
     public void visit(AllComparisonExpression allComparisonExpression) {
-        System.out.println("[ColumnsFinder] AllComparisonExpression NOT_SUPPORTED!!!");
+        logger.finest("[ColumnsFinder] AllComparisonExpression NOT_SUPPORTED!!!");
     }
 
     @Override
     public void visit(AnyComparisonExpression anyComparisonExpression) {
-        System.out.println("[ColumnsFinder] AnyComparisonExpression");
+        logger.finest("[ColumnsFinder] AnyComparisonExpression");
     }
 
     @Override
     public void visit(Concat concat) {
-        System.out.println("[ColumnsFinder] Concat");
+        logger.finest("[ColumnsFinder] Concat");
         processBinaryExpression(concat);
     }
 
     @Override
     public void visit(Matches matches) {
-        System.out.println("[ColumnsFinder] Matches");
+        logger.finest("[ColumnsFinder] Matches");
         processBinaryExpression(matches);
     }
 
     @Override
     public void visit(BitwiseAnd bitwiseAnd) {
-        System.out.println("[ColumnsFinder] BitwiseAnd");
+        logger.finest("[ColumnsFinder] BitwiseAnd");
         processBinaryExpression(bitwiseAnd);
     }
 
     @Override
     public void visit(BitwiseOr bitwiseOr) {
-        System.out.println("[ColumnsFinder] BitwiseOr");
+        logger.finest("[ColumnsFinder] BitwiseOr");
         processBinaryExpression(bitwiseOr);
     }
 
     @Override
     public void visit(BitwiseXor bitwiseXor) {
-        System.out.println("[ColumnsFinder] BitwiseXor");
+        logger.finest("[ColumnsFinder] BitwiseXor");
         processBinaryExpression(bitwiseXor);
     }
 
     @Override
     public void visit(CastExpression cast) {
-        System.out.println("[ColumnsFinder] CastExpression");
+        logger.finest("[ColumnsFinder] CastExpression");
         cast.getLeftExpression().accept(this);
     }
 
     @Override
     public void visit(Modulo modulo) {
-        System.out.println("[ColumnsFinder] Modulo");
+        logger.finest("[ColumnsFinder] Modulo");
         processBinaryExpression(modulo);
     }
 
     @Override
     public void visit(AnalyticExpression aexpr) {
-        System.out.println("[ColumnsFinder] AnalyticExpression");
+        logger.finest("[ColumnsFinder] AnalyticExpression");
         aexpr.getExpression().accept(this);
     }
 
     @Override
     public void visit(ExtractExpression eexpr) {
-        System.out.println("[ColumnsFinder] BitwiseRightShift");
+        logger.finest("[ColumnsFinder] BitwiseRightShift");
         eexpr.getExpression().accept(this);
     }
 
     @Override
     public void visit(IntervalExpression iexpr) {
-        System.out.println("[ColumnsFinder] IntervalExpression");
+        logger.finest("[ColumnsFinder] IntervalExpression");
         iexpr.getExpression().accept(this);
     }
 
     @Override
     public void visit(OracleHierarchicalExpression oexpr) {
-        System.out.println("[ColumnsFinder] OracleHierarchicalExpression");
+        logger.finest("[ColumnsFinder] OracleHierarchicalExpression");
         oexpr.getStartExpression().accept(this);
         oexpr.getConnectExpression().accept(this);
     }
 
     @Override
     public void visit(RegExpMatchOperator rexpr) {
-        System.out.println("[ColumnsFinder] RegExpMatchOperator");
+        logger.finest("[ColumnsFinder] RegExpMatchOperator");
         processBinaryExpression(rexpr);
     }
 
     @Override
     public void visit(JsonExpression jsonExpr) {
-        System.out.println("[ColumnsFinder] JsonExpression");
+        logger.finest("[ColumnsFinder] JsonExpression");
         addColumn(jsonExpr.getColumn());
     }
 
     @Override
     public void visit(JsonOperator jsonExpr) {
-        System.out.println("[ColumnsFinder] JsonOperator");
+        logger.finest("[ColumnsFinder] JsonOperator");
         processBinaryExpression(jsonExpr);
     }
 
     @Override
     public void visit(RegExpMySQLOperator regExpMySQLOperator) {
-        System.out.println("[ColumnsFinder] RegExpMySQLOperator");
+        logger.finest("[ColumnsFinder] RegExpMySQLOperator");
         processBinaryExpression(regExpMySQLOperator);
     }
 
     @Override
     public void visit(UserVariable var) {
-        System.out.println("[ColumnsFinder] UserVariable");
+        logger.finest("[ColumnsFinder] UserVariable");
     }
 
     @Override
     public void visit(NumericBind bind) {
-        System.out.println("[ColumnsFinder] NumericBind");
+        logger.finest("[ColumnsFinder] NumericBind");
     }
 
     @Override
     public void visit(KeepExpression aexpr) {
-        System.out.println("[ColumnsFinder] KeepExpression");
+        logger.finest("[ColumnsFinder] KeepExpression");
     }
 
     @Override
     public void visit(MySQLGroupConcat groupConcat) {
-        System.out.println("[ColumnsFinder] MySQLGroupConcat");
+        logger.finest("[ColumnsFinder] MySQLGroupConcat");
         groupConcat.getExpressionList().getExpressions().forEach(expression -> expression.accept(this));
     }
 
     @Override
     public void visit(ValueListExpression valueList) {
-        System.out.println("[ColumnsFinder] ValueListExpression");
+        logger.finest("[ColumnsFinder] ValueListExpression");
         valueList.getExpressionList().getExpressions().forEach(expression -> expression.accept(this));
     }
 
     @Override
     public void visit(RowConstructor rowConstructor) {
-        System.out.println("[ColumnsFinder] RowConstructor");
+        logger.finest("[ColumnsFinder] RowConstructor");
         rowConstructor.getExprList().getExpressions().forEach(expression -> expression.accept(this));
     }
 
     @Override
     public void visit(OracleHint hint) {
-        System.out.println("[ColumnsFinder] OracleHint");
+        logger.finest("[ColumnsFinder] OracleHint");
     }
 
     @Override
     public void visit(TimeKeyExpression timeKeyExpression) {
-        System.out.println("[ColumnsFinder] TimeKeyExpression");
+        logger.finest("[ColumnsFinder] TimeKeyExpression");
     }
 
     @Override
     public void visit(DateTimeLiteralExpression literal) {
-        System.out.println("[ColumnsFinder] DateTimeLiteralExpression");
+        logger.finest("[ColumnsFinder] DateTimeLiteralExpression");
     }
 
     @Override
     public void visit(NotExpression aThis) {
-        System.out.println("[ColumnsFinder] NotExpression");
+        logger.finest("[ColumnsFinder] NotExpression");
         aThis.getExpression().accept(this);
     }
 
     @Override
     public void visit(NextValExpression aThis) {
-        System.out.println("[ColumnsFinder] NextValExpression");
+        logger.finest("[ColumnsFinder] NextValExpression");
     }
 
     @Override
     public void visit(CollateExpression aThis) {
-        System.out.println("[ColumnsFinder] CollateExpression");
+        logger.finest("[ColumnsFinder] CollateExpression");
         aThis.getLeftExpression().accept(this);
     }
 
     @Override
     public void visit(SimilarToExpression aThis) {
-        System.out.println("[ColumnsFinder] SimilarToExpression");
+        logger.finest("[ColumnsFinder] SimilarToExpression");
         processBinaryExpression(aThis);
     }
 
     @Override
     public void visit(ArrayExpression aThis) {
-        System.out.println("[ColumnsFinder] ArrayExpression");
+        logger.finest("[ColumnsFinder] ArrayExpression");
         aThis.getIndexExpression().accept(this);
         aThis.getObjExpression().accept(this);
     }
 
     @Override
     public void visit(VariableAssignment aThis) {
-        System.out.println("[ColumnsFinder] VariableAssignment");
+        logger.finest("[ColumnsFinder] VariableAssignment");
         aThis.getExpression().accept(this);
     }
 
     @Override
     public void visit(XMLSerializeExpr aThis) {
-        System.out.println("[ColumnsFinder] XMLSerializeExpr");
+        logger.finest("[ColumnsFinder] XMLSerializeExpr");
         aThis.getExpression().accept(this);
     }
 }

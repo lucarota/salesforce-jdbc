@@ -1,7 +1,9 @@
 package com.ascendix.jdbc.salesforce.statement.processor.utils;
 
+import com.ascendix.jdbc.salesforce.ForceDriver;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 import net.sf.jsqlparser.expression.AllComparisonExpression;
 import net.sf.jsqlparser.expression.AnalyticExpression;
 import net.sf.jsqlparser.expression.AnyComparisonExpression;
@@ -78,6 +80,8 @@ import net.sf.jsqlparser.statement.select.SubSelect;
 
 public class ValueToStringVisitor implements ExpressionVisitor {
 
+    private static final Logger logger = Logger.getLogger(ForceDriver.SF_JDBC_DRIVER_NAME);
+
     private final Map<String, Object> fieldValues;
     private final String columnName;
     private final java.util.function.Function<String, List<Map<String, Object>>> subSelectResolver;
@@ -91,187 +95,187 @@ public class ValueToStringVisitor implements ExpressionVisitor {
 
     @Override
     public void visit(BitwiseRightShift aThis) {
-        System.out.println("[VtoSVisitor] BitwiseRightShift");
+        logger.warning("[VtoSVisitor] BitwiseRightShift");
     }
 
     @Override
     public void visit(BitwiseLeftShift aThis) {
-        System.out.println("[VtoSVisitor] BitwiseLeftShift");
+        logger.warning("[VtoSVisitor] BitwiseLeftShift");
     }
 
     @Override
     public void visit(NullValue nullValue) {
-        System.out.println("[VtoSVisitor] NullValue");
+        logger.finest("[VtoSVisitor] NullValue");
         fieldValues.put(columnName, null);
     }
 
     @Override
     public void visit(Function function) {
-        System.out.println("[VtoSVisitor] Function");
+        logger.warning("[VtoSVisitor] Function");
     }
 
     @Override
     public void visit(SignedExpression signedExpression) {
-        System.out.println("[VtoSVisitor] SignedExpression");
+        logger.warning("[VtoSVisitor] SignedExpression");
     }
 
     @Override
     public void visit(JdbcParameter jdbcParameter) {
-        System.out.println("[VtoSVisitor] BitwiseRightShift");
+        logger.warning("[VtoSVisitor] BitwiseRightShift");
     }
 
     @Override
     public void visit(JdbcNamedParameter jdbcNamedParameter) {
-        System.out.println("[VtoSVisitor] JdbcNamedParameter");
+        logger.warning("[VtoSVisitor] JdbcNamedParameter");
     }
 
     @Override
     public void visit(DoubleValue doubleValue) {
-        System.out.println("[VtoSVisitor] DoubleValue=" + doubleValue.getValue());
+        logger.warning("[VtoSVisitor] DoubleValue=" + doubleValue.getValue());
         fieldValues.put(columnName, doubleValue.getValue());
     }
 
     @Override
     public void visit(LongValue longValue) {
-        System.out.println("[VtoSVisitor] LongValue=" + longValue.getValue());
+        logger.warning("[VtoSVisitor] LongValue=" + longValue.getValue());
         fieldValues.put(columnName, longValue.getValue());
     }
 
     @Override
     public void visit(HexValue hexValue) {
-        System.out.println("[VtoSVisitor] HexValue=" + hexValue.getValue());
+        logger.warning("[VtoSVisitor] HexValue=" + hexValue.getValue());
         fieldValues.put(columnName, hexValue.getValue());
     }
 
     @Override
     public void visit(DateValue dateValue) {
-        System.out.println("[VtoSVisitor] DateValue");
+        logger.warning("[VtoSVisitor] DateValue");
     }
 
     @Override
     public void visit(TimeValue timeValue) {
-        System.out.println("[VtoSVisitor] BitwiseRightShift");
+        logger.warning("[VtoSVisitor] BitwiseRightShift");
     }
 
     @Override
     public void visit(TimestampValue timestampValue) {
-        System.out.println("[VtoSVisitor] TimestampValue");
+        logger.warning("[VtoSVisitor] TimestampValue");
     }
 
     @Override
     public void visit(Parenthesis parenthesis) {
-        System.out.println("[VtoSVisitor] Parenthesis");
+        logger.warning("[VtoSVisitor] Parenthesis");
     }
 
     @Override
     public void visit(StringValue stringValue) {
-        System.out.println("[VtoSVisitor] StringValue=" + stringValue.getValue());
+        logger.finest("[VtoSVisitor] StringValue=" + stringValue.getValue());
         fieldValues.put(columnName, stringValue.getValue());
     }
 
     @Override
     public void visit(Addition addition) {
-        System.out.println("[VtoSVisitor] Addition");
+        logger.warning("[VtoSVisitor] Addition");
     }
 
     @Override
     public void visit(Division division) {
-        System.out.println("[VtoSVisitor] Division");
+        logger.warning("[VtoSVisitor] Division");
     }
 
     @Override
     public void visit(IntegerDivision division) {
-        System.out.println("[VtoSVisitor] IntegerDivision");
+        logger.warning("[VtoSVisitor] IntegerDivision");
     }
 
     @Override
     public void visit(Multiplication multiplication) {
-        System.out.println("[VtoSVisitor] Multiplication");
+        logger.warning("[VtoSVisitor] Multiplication");
     }
 
     @Override
     public void visit(Subtraction subtraction) {
-        System.out.println("[VtoSVisitor] Subtraction");
+        logger.warning("[VtoSVisitor] Subtraction");
     }
 
     @Override
     public void visit(AndExpression andExpression) {
-        System.out.println("[VtoSVisitor] AndExpression");
+        logger.warning("[VtoSVisitor] AndExpression");
     }
 
     @Override
     public void visit(OrExpression orExpression) {
-        System.out.println("[VtoSVisitor] OrExpression");
+        logger.warning("[VtoSVisitor] OrExpression");
     }
 
     @Override
     public void visit(Between between) {
-        System.out.println("[VtoSVisitor] Between");
+        logger.warning("[VtoSVisitor] Between");
     }
 
     @Override
     public void visit(EqualsTo equalsTo) {
-        System.out.println("[VtoSVisitor] EqualsTo");
+        logger.warning("[VtoSVisitor] EqualsTo");
     }
 
     @Override
     public void visit(GreaterThan greaterThan) {
-        System.out.println("[VtoSVisitor] GreaterThan");
+        logger.warning("[VtoSVisitor] GreaterThan");
     }
 
     @Override
     public void visit(GreaterThanEquals greaterThanEquals) {
-        System.out.println("[VtoSVisitor] GreaterThanEquals");
+        logger.warning("[VtoSVisitor] GreaterThanEquals");
     }
 
     @Override
     public void visit(InExpression inExpression) {
-        System.out.println("[VtoSVisitor] InExpression");
+        logger.warning("[VtoSVisitor] InExpression");
     }
 
     @Override
     public void visit(FullTextSearch fullTextSearch) {
-        System.out.println("[VtoSVisitor] FullTextSearch");
+        logger.warning("[VtoSVisitor] FullTextSearch");
     }
 
     @Override
     public void visit(IsNullExpression isNullExpression) {
-        System.out.println("[VtoSVisitor] IsNullExpression");
+        logger.warning("[VtoSVisitor] IsNullExpression");
     }
 
     @Override
     public void visit(IsBooleanExpression isBooleanExpression) {
-        System.out.println("[VtoSVisitor] IsBooleanExpression");
+        logger.warning("[VtoSVisitor] IsBooleanExpression");
     }
 
     @Override
     public void visit(LikeExpression likeExpression) {
-        System.out.println("[VtoSVisitor] LikeExpression");
+        logger.warning("[VtoSVisitor] LikeExpression");
     }
 
     @Override
     public void visit(MinorThan minorThan) {
-        System.out.println("[VtoSVisitor] MinorThan");
+        logger.warning("[VtoSVisitor] MinorThan");
     }
 
     @Override
     public void visit(MinorThanEquals minorThanEquals) {
-        System.out.println("[VtoSVisitor] MinorThanEquals");
+        logger.warning("[VtoSVisitor] MinorThanEquals");
     }
 
     @Override
     public void visit(NotEqualsTo notEqualsTo) {
-        System.out.println("[VtoSVisitor] NotEqualsTo");
+        logger.warning("[VtoSVisitor] NotEqualsTo");
     }
 
     @Override
     public void visit(Column tableColumn) {
-        System.out.println("[VtoSVisitor] Column");
+        logger.warning("[VtoSVisitor] Column");
     }
 
     @Override
     public void visit(SubSelect subSelect) {
-        System.out.println("[VtoxSVisitor] SubSelect=" + subSelect.toString());
+        logger.finest("[VtoxSVisitor] SubSelect=" + subSelect.toString());
         Object value = null;
         if (subSelectResolver != null) {
             subSelect.setUseBrackets(false);
@@ -279,191 +283,191 @@ public class ValueToStringVisitor implements ExpressionVisitor {
             if (records.size() == 1 && records.get(0).size() == 1) {
                 // return the value as plain value
                 value = records.get(0).entrySet().iterator().next().getValue();
-                System.out.println("[VtoSVisitor] resolved to " + value);
+                logger.finest("[VtoSVisitor] resolved to " + value);
             }
         } else {
-            System.out.println("[VtoSVisitor] subSelectResolver is undefined");
+            logger.finest("[VtoSVisitor] subSelectResolver is undefined");
         }
         fieldValues.put(columnName, value);
     }
 
     @Override
     public void visit(CaseExpression caseExpression) {
-        System.out.println("[VtoSVisitor] CaseExpression");
+        logger.warning("[VtoSVisitor] CaseExpression");
     }
 
     @Override
     public void visit(WhenClause whenClause) {
-        System.out.println("[VtoSVisitor] WhenClause");
+        logger.warning("[VtoSVisitor] WhenClause");
     }
 
     @Override
     public void visit(ExistsExpression existsExpression) {
-        System.out.println("[VtoSVisitor] ExistsExpression");
+        logger.warning("[VtoSVisitor] ExistsExpression");
     }
 
     @Override
     public void visit(AllComparisonExpression allComparisonExpression) {
-        System.out.println("[VtoSVisitor] AllComparisonExpression");
+        logger.warning("[VtoSVisitor] AllComparisonExpression");
     }
 
     @Override
     public void visit(AnyComparisonExpression anyComparisonExpression) {
-        System.out.println("[VtoSVisitor] AnyComparisonExpression");
+        logger.warning("[VtoSVisitor] AnyComparisonExpression");
     }
 
     @Override
     public void visit(Concat concat) {
-        System.out.println("[VtoSVisitor] Concat");
+        logger.warning("[VtoSVisitor] Concat");
     }
 
     @Override
     public void visit(Matches matches) {
-        System.out.println("[VtoSVisitor] Matches");
+        logger.warning("[VtoSVisitor] Matches");
     }
 
     @Override
     public void visit(BitwiseAnd bitwiseAnd) {
-        System.out.println("[VtoSVisitor] BitwiseAnd");
+        logger.warning("[VtoSVisitor] BitwiseAnd");
     }
 
     @Override
     public void visit(BitwiseOr bitwiseOr) {
-        System.out.println("[VtoSVisitor] BitwiseOr");
+        logger.warning("[VtoSVisitor] BitwiseOr");
     }
 
     @Override
     public void visit(BitwiseXor bitwiseXor) {
-        System.out.println("[VtoSVisitor] BitwiseXor");
+        logger.warning("[VtoSVisitor] BitwiseXor");
     }
 
     @Override
     public void visit(CastExpression cast) {
-        System.out.println("[VtoSVisitor] CastExpression");
+        logger.warning("[VtoSVisitor] CastExpression");
     }
 
     @Override
     public void visit(Modulo modulo) {
-        System.out.println("[VtoSVisitor] Modulo");
+        logger.warning("[VtoSVisitor] Modulo");
     }
 
     @Override
     public void visit(AnalyticExpression aexpr) {
-        System.out.println("[VtoSVisitor] AnalyticExpression");
+        logger.warning("[VtoSVisitor] AnalyticExpression");
     }
 
     @Override
     public void visit(ExtractExpression eexpr) {
-        System.out.println("[VtoSVisitor] BitwiseRightShift");
+        logger.warning("[VtoSVisitor] BitwiseRightShift");
     }
 
     @Override
     public void visit(IntervalExpression iexpr) {
-        System.out.println("[VtoSVisitor] IntervalExpression");
+        logger.warning("[VtoSVisitor] IntervalExpression");
     }
 
     @Override
     public void visit(OracleHierarchicalExpression oexpr) {
-        System.out.println("[VtoSVisitor] OracleHierarchicalExpression");
+        logger.warning("[VtoSVisitor] OracleHierarchicalExpression");
     }
 
     @Override
     public void visit(RegExpMatchOperator rexpr) {
-        System.out.println("[VtoSVisitor] RegExpMatchOperator");
+        logger.warning("[VtoSVisitor] RegExpMatchOperator");
     }
 
     @Override
     public void visit(JsonExpression jsonExpr) {
-        System.out.println("[VtoSVisitor] JsonExpression");
+        logger.warning("[VtoSVisitor] JsonExpression");
     }
 
     @Override
     public void visit(JsonOperator jsonExpr) {
-        System.out.println("[VtoSVisitor] JsonOperator");
+        logger.warning("[VtoSVisitor] JsonOperator");
     }
 
     @Override
     public void visit(RegExpMySQLOperator regExpMySQLOperator) {
-        System.out.println("[VtoSVisitor] RegExpMySQLOperator");
+        logger.warning("[VtoSVisitor] RegExpMySQLOperator");
     }
 
     @Override
     public void visit(UserVariable var) {
-        System.out.println("[VtoSVisitor] UserVariable");
+        logger.warning("[VtoSVisitor] UserVariable");
     }
 
     @Override
     public void visit(NumericBind bind) {
-        System.out.println("[VtoSVisitor] NumericBind");
+        logger.warning("[VtoSVisitor] NumericBind");
     }
 
     @Override
     public void visit(KeepExpression aexpr) {
-        System.out.println("[VtoSVisitor] KeepExpression");
+        logger.warning("[VtoSVisitor] KeepExpression");
     }
 
     @Override
     public void visit(MySQLGroupConcat groupConcat) {
-        System.out.println("[VtoSVisitor] MySQLGroupConcat");
+        logger.warning("[VtoSVisitor] MySQLGroupConcat");
     }
 
     @Override
     public void visit(ValueListExpression valueList) {
-        System.out.println("[VtoSVisitor] ValueListExpression");
+        logger.warning("[VtoSVisitor] ValueListExpression");
     }
 
     @Override
     public void visit(RowConstructor rowConstructor) {
-        System.out.println("[VtoSVisitor] RowConstructor");
+        logger.warning("[VtoSVisitor] RowConstructor");
     }
 
     @Override
     public void visit(OracleHint hint) {
-        System.out.println("[VtoSVisitor] OracleHint");
+        logger.warning("[VtoSVisitor] OracleHint");
     }
 
     @Override
     public void visit(TimeKeyExpression timeKeyExpression) {
-        System.out.println("[VtoSVisitor] TimeKeyExpression");
+        logger.warning("[VtoSVisitor] TimeKeyExpression");
     }
 
     @Override
     public void visit(DateTimeLiteralExpression literal) {
-        System.out.println("[VtoSVisitor] DateTimeLiteralExpression");
+        logger.warning("[VtoSVisitor] DateTimeLiteralExpression");
     }
 
     @Override
     public void visit(NotExpression aThis) {
-        System.out.println("[VtoSVisitor] NotExpression");
+        logger.warning("[VtoSVisitor] NotExpression");
     }
 
     @Override
     public void visit(NextValExpression aThis) {
-        System.out.println("[VtoSVisitor] NextValExpression");
+        logger.warning("[VtoSVisitor] NextValExpression");
     }
 
     @Override
     public void visit(CollateExpression aThis) {
-        System.out.println("[VtoSVisitor] CollateExpression");
+        logger.warning("[VtoSVisitor] CollateExpression");
     }
 
     @Override
     public void visit(SimilarToExpression aThis) {
-        System.out.println("[VtoSVisitor] SimilarToExpression");
+        logger.warning("[VtoSVisitor] SimilarToExpression");
     }
 
     @Override
     public void visit(ArrayExpression aThis) {
-        System.out.println("[VtoSVisitor] ArrayExpression");
+        logger.warning("[VtoSVisitor] ArrayExpression");
     }
 
     @Override
     public void visit(VariableAssignment aThis) {
-        System.out.println("[VtoSVisitor] VariableAssignment");
+        logger.warning("[VtoSVisitor] VariableAssignment");
     }
 
     @Override
     public void visit(XMLSerializeExpr aThis) {
-        System.out.println("[VtoSVisitor] XMLSerializeExpr");
+        logger.warning("[VtoSVisitor] XMLSerializeExpr");
     }
 }

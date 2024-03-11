@@ -460,7 +460,7 @@ public class CachedResultSet implements ResultSet, Serializable {
     }
 
     public void afterLast() throws SQLException {
-        System.out.println("after last check");
+        logger.warning("after last check");
     }
 
     public void beforeFirst() throws SQLException {

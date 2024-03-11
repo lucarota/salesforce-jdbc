@@ -69,12 +69,12 @@ public class UpdateQueryAnalyzer {
 
         @Override
         public void visit(SubSelect subSelect) {
-            System.out.println("SubSelect Visitor");
+            logger.warning("SubSelect Visitor");
         }
 
         @Override
         public void visit(ExpressionList expressionList) {
-            System.out.println("Expression Visitor");
+            logger.finest("Expression Visitor");
             HashMap<String, Object> fieldValues = new HashMap<>();
             records.add(fieldValues);
 
@@ -90,12 +90,12 @@ public class UpdateQueryAnalyzer {
 
         @Override
         public void visit(NamedExpressionList namedExpressionList) {
-            System.out.println("NamedExpression Visitor");
+            logger.warning("NamedExpression Visitor");
         }
 
         @Override
         public void visit(MultiExpressionList multiExprList) {
-            System.out.println("MultiExpression Visitor");
+            logger.finest("MultiExpression Visitor");
             multiExprList.getExpressionLists().forEach(expressions -> {
                 expressions.accept(new UpdateItemsListVisitor(columns, records));
             });
