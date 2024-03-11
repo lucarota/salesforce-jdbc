@@ -5,8 +5,8 @@ import com.ascendix.jdbc.salesforce.connection.ForceConnectionInfo;
 import com.ascendix.jdbc.salesforce.connection.ForceService;
 import com.ascendix.jdbc.salesforce.delegates.PartnerService;
 import com.sforce.soap.partner.PartnerConnection;
-import com.sforce.soap.partner.fault.ApiFault;
 import com.sforce.ws.ConnectionException;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -48,12 +48,20 @@ public class ForceDriver implements Driver {
     private static final Pattern VALID_HOST_NAME_REGEX = Pattern.compile(
         "^(?<protocol>https?://)?(?<loginDomain>(?<host>(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9]))(:(?<port>[0-9]+))?)$");
 
+    private static ForceConnectionInfo connectionInfo = null;
+
     static {
         try {
             logger.info("[ForceDriver] registration");
             DriverManager.registerDriver(new ForceDriver());
         } catch (Exception e) {
             throw new RuntimeException("Failed register ForceDriver: " + e.getMessage(), e);
+        }
+    }
+
+    public static void setSessionId(String sessionId) {
+        if (connectionInfo != null) {
+            connectionInfo.setSessionId(sessionId);
         }
     }
 
@@ -71,96 +79,58 @@ public class ForceDriver implements Driver {
             return null;
         }
         try {
-            Properties connStringProps = getConnStringProperties(url);
-            properties.putAll(connStringProps);
-            ForceConnectionInfo info = new ForceConnectionInfo();
-            info.setUserName(properties.getProperty("user"));
-            info.setClientName(properties.getProperty("client"));
-            info.setPassword(properties.getProperty("password"));
-            info.setClientName(properties.getProperty("client"));
-            info.setSessionId(properties.getProperty("sessionId"));
-            info.setLogfile(properties.getProperty("logfile"));
-            info.setSandbox(resolveSandboxProperty(properties));
-            info.setHttps(resolveBooleanProperty(properties, "https", true));
-            if (resolveBooleanProperty(properties, "insecurehttps", false)) {
-                HttpsTrustManager.allowAllSSL();
+            if (connectionInfo == null) {
+                connectionInfo = parseConnectionUrl(url, properties);
             }
-            info.setReadTimeout(resolveIntProperty(properties, "readTimeout", info.getReadTimeout()));
-            info.setConnectionTimeout(resolveIntProperty(properties, "connectionTimeout", info.getConnectionTimeout()));
-            info.setApiVersion(resolveStringProperty(properties, "api", ForceService.DEFAULT_API_VERSION));
-            info.setLoginDomain(resolveStringProperty(properties, "loginDomain", ForceService.DEFAULT_LOGIN_DOMAIN));
 
-            PartnerConnection partnerConnection = ForceService.createPartnerConnection(info);
+            PartnerConnection partnerConnection = ForceService.createPartnerConnection(connectionInfo);
             PartnerService partnerService = new PartnerService(partnerConnection);
-            return new ForceConnection(partnerConnection, partnerService, (newUrl, userName, userPassword) -> {
-                logger.info("[ForceDriver] relogin helper ");
-                Properties newConnStringProps;
-                Properties newProperties = new Properties();
-                newProperties.putAll(properties);
-                ForceConnectionInfo newInfo = new ForceConnectionInfo();
-                if (newUrl != null) {
-                    try {
-                        newConnStringProps = getConnStringProperties(newUrl);
-                        newProperties.putAll(newConnStringProps);
-                    } catch (Exception e) {
-                        logger.log(Level.WARNING, "[ForceDriver] relogin helper failed - url parsing error", e);
-                    }
-                }
-                if (userName != null && userPassword != null) {
-                    newProperties.setProperty("user", userName);
-                    newProperties.setProperty("password", userPassword);
-                }
-                newInfo.setUserName(newProperties.getProperty("user"));
-                newInfo.setPassword(newProperties.getProperty("password"));
-                newInfo.setClientName(newProperties.getProperty("client"));
-                newInfo.setSessionId(newProperties.getProperty("sessionId"));
-                newInfo.setLogfile(properties.getProperty("logfile"));
-                newInfo.setSandbox(resolveSandboxProperty(newProperties));
-                newInfo.setHttps(resolveBooleanProperty(newProperties, "https", true));
-                if (resolveBooleanProperty(newProperties, "insecurehttps", false)) {
-                    HttpsTrustManager.allowAllSSL();
-                }
-                newInfo.setReadTimeout(resolveIntProperty(newProperties, "readTimeout", newInfo.getReadTimeout()));
-                newInfo.setConnectionTimeout(resolveIntProperty(newProperties,
-                    "connectionTimeout",
-                    newInfo.getConnectionTimeout()));
-                newInfo.setApiVersion(resolveStringProperty(newProperties, "api", ForceService.DEFAULT_API_VERSION));
-                newInfo.setLoginDomain(resolveStringProperty(newProperties,
-                    "loginDomain",
-                    ForceService.DEFAULT_LOGIN_DOMAIN));
-
-                PartnerConnection newPartnerConnection;
-                try {
-                    newPartnerConnection = ForceService.createPartnerConnection(newInfo);
-                    logger.log(Level.WARNING, "[ForceDriver] relogin helper success=" + (newPartnerConnection != null));
-                    return newPartnerConnection;
-                } catch (ApiFault e) {
-                    logger.log(Level.WARNING, "[ForceDriver] relogin helper failed " + e.getMessage(), e);
-                    throw new ConnectionException(
-                        "Relogin failed (" + e.getExceptionCode() + ") " + e.getExceptionMessage(), e);
-                } catch (ConnectionException e) {
-                    logger.log(Level.WARNING, "[ForceDriver] relogin helper failed " + e.getMessage(), e);
-                    throw new ConnectionException("Relogin failed", e);
-                }
-            });
+            return new ForceConnection(partnerConnection, partnerService);
         } catch (ConnectionException | IOException e) {
             throw new SQLException(e);
         }
     }
 
-    private static Boolean resolveSandboxProperty(Properties properties) {
+    public static ForceConnectionInfo parseConnectionUrl(String url) throws IOException {
+        return parseConnectionUrl(url, new Properties());
+    }
+
+    private static ForceConnectionInfo parseConnectionUrl(String url, Properties properties) throws IOException {
+        Properties connStringProps = getConnStringProperties(url);
+        properties.putAll(connStringProps);
+        ForceConnectionInfo info = new ForceConnectionInfo();
+        info.setUserName(properties.getProperty("user"));
+        info.setClientName(properties.getProperty("client"));
+        info.setPassword(properties.getProperty("password"));
+        info.setClientName(properties.getProperty("client"));
+        info.setSessionId(properties.getProperty("sessionId"));
+        info.setLogfile(properties.getProperty("logfile"));
+        info.setSandbox(resolveSandboxProperty(properties));
+        info.setHttps(resolveBooleanProperty(properties, "https", true));
+        info.setVerifyConnectivity(resolveBooleanProperty(properties, "verifyConnectivity", false));
+        if (resolveBooleanProperty(properties, "insecurehttps", false)) {
+            HttpsTrustManager.allowAllSSL();
+        }
+        info.setReadTimeout(resolveIntProperty(properties, "readTimeout", info.getReadTimeout()));
+        info.setConnectionTimeout(resolveIntProperty(properties, "connectionTimeout", info.getConnectionTimeout()));
+        info.setApiVersion(resolveStringProperty(properties, "api", ForceService.DEFAULT_API_VERSION));
+        info.setLoginDomain(resolveStringProperty(properties, "loginDomain", ForceService.DEFAULT_LOGIN_DOMAIN));
+        return info;
+    }
+
+    private static boolean resolveSandboxProperty(Properties properties) {
         String sandbox = properties.getProperty("sandbox");
         if (sandbox != null) {
-            return Boolean.valueOf(sandbox);
+            return Boolean.parseBoolean(sandbox);
         }
         String loginDomain = properties.getProperty("loginDomain");
         if (loginDomain != null) {
             return loginDomain.contains("test");
         }
-        return null;
+        return false;
     }
 
-    protected static Boolean resolveBooleanProperty(Properties properties, String propertyName, boolean defaultValue) {
+    private static Boolean resolveBooleanProperty(Properties properties, String propertyName, boolean defaultValue) {
         String boolValue = properties.getProperty(propertyName);
         if (boolValue != null) {
             return Boolean.valueOf(boolValue);
