@@ -37,17 +37,21 @@ public class UpdateQueryProcessor {
         }
 
         try {
+            int updateCount = 0;
             List<Map<String, Object>> recordsToUpdate = updateQueryAnalyzer.getRecords();
             ISaveResult[] records = partnerService.saveRecords(updateQueryAnalyzer.getFromObjectName(),
                 recordsToUpdate);
             for (ISaveResult result : records) {
                 if (result.isSuccess()) {
                     resultSet.log(updateQueryAnalyzer.getFromObjectName() + " updated with Id=" + result.getId());
+                    updateCount++;
                 } else {
                     resultSet.addWarning(updateQueryAnalyzer.getFromObjectName() + " failed to update with error="
                         + Arrays.stream(result.getErrors()).map(IError::getMessage).collect(Collectors.joining(",")));
                 }
             }
+            statement.setUpdateCount(updateCount);
+            statement.setResultSet(resultSet);
         } catch (ConnectionException e) {
             resultSet.addWarning("Failed request to update entities with error: " + e.getMessage());
             logger.log(Level.SEVERE, "Failed request to update entities with error: " + e.getMessage(), e);
