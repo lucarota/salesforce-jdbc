@@ -1,7 +1,6 @@
 package com.ascendix.jdbc.salesforce.connection;
 
 import com.ascendix.jdbc.salesforce.ForceDriver;
-import com.ascendix.jdbc.salesforce.transport.HttpClientTransport;
 import com.ascendix.salesforce.oauth.ForceOAuthClient;
 import com.sforce.soap.partner.Connector;
 import com.sforce.soap.partner.PartnerConnection;

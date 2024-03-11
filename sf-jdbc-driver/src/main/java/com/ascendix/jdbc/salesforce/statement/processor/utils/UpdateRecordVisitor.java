@@ -1,7 +1,9 @@
 package com.ascendix.jdbc.salesforce.statement.processor.utils;
 
+import com.ascendix.jdbc.salesforce.ForceDriver;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 import net.sf.jsqlparser.expression.AllComparisonExpression;
 import net.sf.jsqlparser.expression.AnalyticExpression;
 import net.sf.jsqlparser.expression.AnyComparisonExpression;
@@ -80,6 +82,8 @@ import net.sf.jsqlparser.statement.update.Update;
 
 public class UpdateRecordVisitor implements ExpressionVisitor {
 
+    private static final Logger logger = Logger.getLogger(ForceDriver.SF_JDBC_DRIVER_NAME);
+
     private final Update updateStatement;
     private final Map<String, Object> recordFieldsToUpdate;
     private final Map<String, Object> recordFieldsFromDB;
@@ -98,72 +102,72 @@ public class UpdateRecordVisitor implements ExpressionVisitor {
 
     @Override
     public void visit(BitwiseRightShift aThis) {
-        System.out.println("[UpdateVisitor] BitwiseRightShift");
+        logger.warning("[UpdateVisitor] BitwiseRightShift");
     }
 
     @Override
     public void visit(BitwiseLeftShift aThis) {
-        System.out.println("[UpdateVisitor] BitwiseLeftShift");
+        logger.warning("[UpdateVisitor] BitwiseLeftShift");
     }
 
     @Override
     public void visit(NullValue nullValue) {
-        System.out.println("[UpdateVisitor] NullValue column=" + columnName);
+        logger.finest("[UpdateVisitor] NullValue column=" + columnName);
         recordFieldsToUpdate.put(columnName, null);
     }
 
     @Override
     public void visit(Function function) {
-        System.out.println("[UpdateVisitor] Function function=" + function.getName());
+        logger.warning("[UpdateVisitor] Function function=" + function.getName());
     }
 
     @Override
     public void visit(SignedExpression signedExpression) {
-        System.out.println("[UpdateVisitor] SignedExpression");
+        logger.warning("[UpdateVisitor] SignedExpression");
     }
 
     @Override
     public void visit(JdbcParameter jdbcParameter) {
-        System.out.println("[UpdateVisitor] BitwiseRightShift");
+        logger.warning("[UpdateVisitor] BitwiseRightShift");
     }
 
     @Override
     public void visit(JdbcNamedParameter jdbcNamedParameter) {
-        System.out.println("[UpdateVisitor] JdbcNamedParameter");
+        logger.warning("[UpdateVisitor] JdbcNamedParameter");
     }
 
     @Override
     public void visit(DoubleValue doubleValue) {
-        System.out.println("[UpdateVisitor] DoubleValue=" + doubleValue.getValue() + " column=" + columnName);
+        logger.finest("[UpdateVisitor] DoubleValue=" + doubleValue.getValue() + " column=" + columnName);
         recordFieldsToUpdate.put(columnName, doubleValue.getValue());
     }
 
     @Override
     public void visit(LongValue longValue) {
-        System.out.println("[UpdateVisitor] LongValue=" + longValue.getValue() + " column=" + columnName);
+        logger.finest("[UpdateVisitor] LongValue=" + longValue.getValue() + " column=" + columnName);
         recordFieldsToUpdate.put(columnName, longValue.getValue());
     }
 
     @Override
     public void visit(HexValue hexValue) {
-        System.out.println("[UpdateVisitor] HexValue=" + hexValue.getValue() + " column=" + columnName);
+        logger.finest("[UpdateVisitor] HexValue=" + hexValue.getValue() + " column=" + columnName);
         recordFieldsToUpdate.put(columnName, hexValue.getValue());
     }
 
     @Override
     public void visit(DateValue dateValue) {
-        System.out.println("[UpdateVisitor] DateValue column=" + columnName);
+        logger.warning("[UpdateVisitor] DateValue column=" + columnName);
     }
 
     @Override
     public void visit(TimeValue timeValue) {
-        System.out.println("[UpdateVisitor] BitwiseRightShift");
+        logger.finest("[UpdateVisitor] BitwiseRightShift");
         recordFieldsToUpdate.put(columnName, timeValue.getValue());
     }
 
     @Override
     public void visit(TimestampValue timestampValue) {
-        System.out.println("[UpdateVisitor] TimestampValue");
+        logger.finest("[UpdateVisitor] TimestampValue");
         recordFieldsToUpdate.put(columnName, timestampValue.getValue());
     }
 
@@ -179,139 +183,139 @@ public class UpdateRecordVisitor implements ExpressionVisitor {
 
     @Override
     public void visit(Parenthesis parenthesis) {
-        System.out.println("[UpdateVisitor] Parenthesis");
+        logger.finest("[UpdateVisitor] Parenthesis");
         evaluate(parenthesis);
     }
 
     @Override
     public void visit(StringValue stringValue) {
-        System.out.println("[UpdateVisitor] StringValue=" + stringValue.getValue() + " column=" + columnName);
+        logger.finest("[UpdateVisitor] StringValue=" + stringValue.getValue() + " column=" + columnName);
         recordFieldsToUpdate.put(columnName, stringValue.getValue());
     }
 
     @Override
     public void visit(Addition addition) {
-        System.out.println("[UpdateVisitor] Addition");
+        logger.finest("[UpdateVisitor] Addition");
         evaluate(addition);
     }
 
     @Override
     public void visit(Division division) {
-        System.out.println("[UpdateVisitor] Division");
+        logger.finest("[UpdateVisitor] Division");
         evaluate(division);
     }
 
     @Override
     public void visit(IntegerDivision division) {
-        System.out.println("[UpdateVisitor] IntegerDivision");
+        logger.finest("[UpdateVisitor] IntegerDivision");
         evaluate(division);
     }
 
     @Override
     public void visit(Multiplication multiplication) {
-        System.out.println("[UpdateVisitor] Multiplication");
+        logger.finest("[UpdateVisitor] Multiplication");
         evaluate(multiplication);
     }
 
     @Override
     public void visit(Subtraction subtraction) {
-        System.out.println("[UpdateVisitor] Subtraction");
+        logger.finest("[UpdateVisitor] Subtraction");
         evaluate(subtraction);
     }
 
     @Override
     public void visit(AndExpression andExpression) {
-        System.out.println("[UpdateVisitor] AndExpression");
+        logger.finest("[UpdateVisitor] AndExpression");
         evaluate(andExpression);
     }
 
     @Override
     public void visit(OrExpression orExpression) {
-        System.out.println("[UpdateVisitor] OrExpression");
+        logger.finest("[UpdateVisitor] OrExpression");
         evaluate(orExpression);
     }
 
     @Override
     public void visit(Between between) {
-        System.out.println("[UpdateVisitor] Between");
+        logger.finest("[UpdateVisitor] Between");
         evaluate(between);
     }
 
     @Override
     public void visit(EqualsTo equalsTo) {
-        System.out.println("[UpdateVisitor] EqualsTo");
+        logger.finest("[UpdateVisitor] EqualsTo");
         evaluate(equalsTo);
     }
 
     @Override
     public void visit(GreaterThan greaterThan) {
-        System.out.println("[UpdateVisitor] GreaterThan");
+        logger.finest("[UpdateVisitor] GreaterThan");
         evaluate(greaterThan);
     }
 
     @Override
     public void visit(GreaterThanEquals greaterThanEquals) {
-        System.out.println("[UpdateVisitor] GreaterThanEquals");
+        logger.finest("[UpdateVisitor] GreaterThanEquals");
         evaluate(greaterThanEquals);
     }
 
     @Override
     public void visit(InExpression inExpression) {
-        System.out.println("[UpdateVisitor] InExpression");
+        logger.finest("[UpdateVisitor] InExpression");
         evaluate(inExpression);
     }
 
     @Override
     public void visit(FullTextSearch fullTextSearch) {
-        System.out.println("[UpdateVisitor] FullTextSearch");
+        logger.finest("[UpdateVisitor] FullTextSearch");
         evaluate(fullTextSearch);
     }
 
     @Override
     public void visit(IsNullExpression isNullExpression) {
-        System.out.println("[UpdateVisitor] IsNullExpression");
+        logger.finest("[UpdateVisitor] IsNullExpression");
         evaluate(isNullExpression);
     }
 
     @Override
     public void visit(IsBooleanExpression isBooleanExpression) {
-        System.out.println("[UpdateVisitor] IsBooleanExpression");
+        logger.finest("[UpdateVisitor] IsBooleanExpression");
         evaluate(isBooleanExpression);
     }
 
     @Override
     public void visit(LikeExpression likeExpression) {
-        System.out.println("[UpdateVisitor] LikeExpression");
+        logger.finest("[UpdateVisitor] LikeExpression");
         evaluate(likeExpression);
     }
 
     @Override
     public void visit(MinorThan minorThan) {
-        System.out.println("[UpdateVisitor] MinorThan");
+        logger.finest("[UpdateVisitor] MinorThan");
         evaluate(minorThan);
     }
 
     @Override
     public void visit(MinorThanEquals minorThanEquals) {
-        System.out.println("[UpdateVisitor] MinorThanEquals");
+        logger.finest("[UpdateVisitor] MinorThanEquals");
         evaluate(minorThanEquals);
     }
 
     @Override
     public void visit(NotEqualsTo notEqualsTo) {
-        System.out.println("[UpdateVisitor] NotEqualsTo");
+        logger.finest("[UpdateVisitor] NotEqualsTo");
         evaluate(notEqualsTo);
     }
 
     @Override
     public void visit(Column tableColumn) {
-        System.out.println("[UpdateVisitor] Column column=" + tableColumn.getColumnName());
+        logger.finest("[UpdateVisitor] Column column=" + tableColumn.getColumnName());
         evaluate(tableColumn);
     }
 
     @Override
     public void visit(SubSelect subSelect) {
-        System.out.println("[VtoxSVisitor] SubSelect=" + subSelect.toString() + " column=" + columnName);
+        logger.finest("[VtoxSVisitor] SubSelect=" + subSelect.toString() + " column=" + columnName);
 //        Object value = null;
 //        if (subSelectResolver != null) {
 //            subSelect.setUseBrackets(false);
@@ -319,227 +323,227 @@ public class UpdateRecordVisitor implements ExpressionVisitor {
 //            if (records.size() == 1 && records.get(0).size() == 1) {
 //                 return the value as plain value
 //                value = records.get(0).entrySet().iterator().next().getValue();
-//                System.out.println("[UpdateVisitor] resolved to "+value);
+//                logger.finest("[UpdateVisitor] resolved to "+value);
 //            }
 //        } else {
-//            System.out.println("[UpdateVisitor] subSelectResolver is undefined");
+//            logger.finest("[UpdateVisitor] subSelectResolver is undefined");
 //        }
 //        recordFieldsToUpdate.put(columnName, value);
     }
 
     @Override
     public void visit(CaseExpression caseExpression) {
-        System.out.println("[UpdateVisitor] CaseExpression");
+        logger.finest("[UpdateVisitor] CaseExpression");
         evaluate(caseExpression);
     }
 
     @Override
     public void visit(WhenClause whenClause) {
-        System.out.println("[UpdateVisitor] WhenClause");
+        logger.finest("[UpdateVisitor] WhenClause");
         evaluate(whenClause);
     }
 
     @Override
     public void visit(ExistsExpression existsExpression) {
-        System.out.println("[UpdateVisitor] ExistsExpression");
+        logger.finest("[UpdateVisitor] ExistsExpression");
         evaluate(existsExpression);
     }
 
     @Override
     public void visit(AllComparisonExpression allComparisonExpression) {
-        System.out.println("[UpdateVisitor] AllComparisonExpression");
+        logger.finest("[UpdateVisitor] AllComparisonExpression");
         evaluate(allComparisonExpression);
     }
 
     @Override
     public void visit(AnyComparisonExpression anyComparisonExpression) {
-        System.out.println("[UpdateVisitor] AnyComparisonExpression");
+        logger.finest("[UpdateVisitor] AnyComparisonExpression");
         evaluate(anyComparisonExpression);
     }
 
     @Override
     public void visit(Concat concat) {
-        System.out.println("[UpdateVisitor] Concat");
+        logger.finest("[UpdateVisitor] Concat");
         evaluate(concat);
     }
 
     @Override
     public void visit(Matches matches) {
-        System.out.println("[UpdateVisitor] Matches");
+        logger.finest("[UpdateVisitor] Matches");
         evaluate(matches);
     }
 
     @Override
     public void visit(BitwiseAnd bitwiseAnd) {
-        System.out.println("[UpdateVisitor] BitwiseAnd");
+        logger.finest("[UpdateVisitor] BitwiseAnd");
         evaluate(bitwiseAnd);
     }
 
     @Override
     public void visit(BitwiseOr aThis) {
-        System.out.println("[UpdateVisitor] BitwiseOr");
+        logger.finest("[UpdateVisitor] BitwiseOr");
         evaluate(aThis);
     }
 
     @Override
     public void visit(BitwiseXor aThis) {
-        System.out.println("[UpdateVisitor] BitwiseXor");
+        logger.finest("[UpdateVisitor] BitwiseXor");
         evaluate(aThis);
     }
 
     @Override
     public void visit(CastExpression aThis) {
-        System.out.println("[UpdateVisitor] CastExpression");
+        logger.finest("[UpdateVisitor] CastExpression");
         evaluate(aThis);
     }
 
     @Override
     public void visit(Modulo aThis) {
-        System.out.println("[UpdateVisitor] Modulo");
+        logger.finest("[UpdateVisitor] Modulo");
         evaluate(aThis);
     }
 
     @Override
     public void visit(AnalyticExpression aThis) {
-        System.out.println("[UpdateVisitor] AnalyticExpression");
+        logger.finest("[UpdateVisitor] AnalyticExpression");
         evaluate(aThis);
     }
 
     @Override
     public void visit(ExtractExpression aThis) {
-        System.out.println("[UpdateVisitor] BitwiseRightShift");
+        logger.finest("[UpdateVisitor] BitwiseRightShift");
         evaluate(aThis);
     }
 
     @Override
     public void visit(IntervalExpression aThis) {
-        System.out.println("[UpdateVisitor] IntervalExpression");
+        logger.finest("[UpdateVisitor] IntervalExpression");
         evaluate(aThis);
     }
 
     @Override
     public void visit(OracleHierarchicalExpression aThis) {
-        System.out.println("[UpdateVisitor] OracleHierarchicalExpression");
+        logger.finest("[UpdateVisitor] OracleHierarchicalExpression");
         evaluate(aThis);
     }
 
     @Override
     public void visit(RegExpMatchOperator aThis) {
-        System.out.println("[UpdateVisitor] RegExpMatchOperator");
+        logger.finest("[UpdateVisitor] RegExpMatchOperator");
         evaluate(aThis);
     }
 
     @Override
     public void visit(JsonExpression aThis) {
-        System.out.println("[UpdateVisitor] JsonExpression");
+        logger.finest("[UpdateVisitor] JsonExpression");
         evaluate(aThis);
     }
 
     @Override
     public void visit(JsonOperator aThis) {
-        System.out.println("[UpdateVisitor] JsonOperator");
+        logger.finest("[UpdateVisitor] JsonOperator");
         evaluate(aThis);
     }
 
     @Override
     public void visit(RegExpMySQLOperator aThis) {
-        System.out.println("[UpdateVisitor] RegExpMySQLOperator");
+        logger.finest("[UpdateVisitor] RegExpMySQLOperator");
         evaluate(aThis);
     }
 
     @Override
     public void visit(UserVariable aThis) {
-        System.out.println("[UpdateVisitor] UserVariable");
+        logger.finest("[UpdateVisitor] UserVariable");
         evaluate(aThis);
     }
 
     @Override
     public void visit(NumericBind aThis) {
-        System.out.println("[UpdateVisitor] NumericBind");
+        logger.finest("[UpdateVisitor] NumericBind");
         evaluate(aThis);
     }
 
     @Override
     public void visit(KeepExpression aThis) {
-        System.out.println("[UpdateVisitor] KeepExpression");
+        logger.finest("[UpdateVisitor] KeepExpression");
         evaluate(aThis);
     }
 
     @Override
     public void visit(MySQLGroupConcat aThis) {
-        System.out.println("[UpdateVisitor] MySQLGroupConcat");
+        logger.finest("[UpdateVisitor] MySQLGroupConcat");
         evaluate(aThis);
     }
 
     @Override
     public void visit(ValueListExpression aThis) {
-        System.out.println("[UpdateVisitor] ValueListExpression");
+        logger.finest("[UpdateVisitor] ValueListExpression");
         evaluate(aThis);
     }
 
     @Override
     public void visit(RowConstructor aThis) {
-        System.out.println("[UpdateVisitor] RowConstructor");
+        logger.finest("[UpdateVisitor] RowConstructor");
         evaluate(aThis);
     }
 
     @Override
     public void visit(OracleHint aThis) {
-        System.out.println("[UpdateVisitor] OracleHint");
+        logger.finest("[UpdateVisitor] OracleHint");
         evaluate(aThis);
     }
 
     @Override
     public void visit(TimeKeyExpression aThis) {
-        System.out.println("[UpdateVisitor] TimeKeyExpression");
+        logger.finest("[UpdateVisitor] TimeKeyExpression");
         evaluate(aThis);
     }
 
     @Override
     public void visit(DateTimeLiteralExpression aThis) {
-        System.out.println("[UpdateVisitor] DateTimeLiteralExpression");
+        logger.finest("[UpdateVisitor] DateTimeLiteralExpression");
         evaluate(aThis);
     }
 
     @Override
     public void visit(NotExpression aThis) {
-        System.out.println("[UpdateVisitor] NotExpression");
+        logger.finest("[UpdateVisitor] NotExpression");
         evaluate(aThis);
     }
 
     @Override
     public void visit(NextValExpression aThis) {
-        System.out.println("[UpdateVisitor] NextValExpression");
+        logger.finest("[UpdateVisitor] NextValExpression");
         evaluate(aThis);
     }
 
     @Override
     public void visit(CollateExpression aThis) {
-        System.out.println("[UpdateVisitor] CollateExpression");
+        logger.finest("[UpdateVisitor] CollateExpression");
         evaluate(aThis);
     }
 
     @Override
     public void visit(SimilarToExpression aThis) {
-        System.out.println("[UpdateVisitor] SimilarToExpression");
+        logger.finest("[UpdateVisitor] SimilarToExpression");
         evaluate(aThis);
     }
 
     @Override
     public void visit(ArrayExpression aThis) {
-        System.out.println("[UpdateVisitor] ArrayExpression");
+        logger.finest("[UpdateVisitor] ArrayExpression");
         evaluate(aThis);
     }
 
     @Override
     public void visit(VariableAssignment aThis) {
-        System.out.println("[UpdateVisitor] VariableAssignment");
+        logger.finest("[UpdateVisitor] VariableAssignment");
         evaluate(aThis);
     }
 
     @Override
     public void visit(XMLSerializeExpr aThis) {
-        System.out.println("[UpdateVisitor] XMLSerializeExpr");
+        logger.finest("[UpdateVisitor] XMLSerializeExpr");
         evaluate(aThis);
     }
 }
