@@ -38,7 +38,7 @@
         <maven-surefire-plugin.version>2.21.0</maven-surefire-plugin.version>
         <maven-source-plugin.version>3.0.1</maven-source-plugin.version>
         <maven-jar-plugin.version>3.1.0</maven-jar-plugin.version>
-        <maven-assembly-plugin.version>3.1.0</maven-assembly-plugin.version>
+        <maven-assembly-plugin.version>3.6.0</maven-assembly-plugin.version>
         <maven-deploy-plugin.version>2.8.2</maven-deploy-plugin.version>
         <salesforce-soql-parser.version>2.0</salesforce-soql-parser.version>
         <force-partner-api.version>58.0.0</force-partner-api.version>

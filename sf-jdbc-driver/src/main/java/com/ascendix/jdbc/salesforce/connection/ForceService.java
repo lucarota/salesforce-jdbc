@@ -6,6 +6,7 @@ import com.ascendix.salesforce.oauth.ForceOAuthClient;
 import com.sforce.soap.partner.Connector;
 import com.sforce.soap.partner.PartnerConnection;
 import com.sforce.soap.partner.QueryResult;
+import com.sforce.soap.partner.SessionHeader_element;
 import com.sforce.soap.partner.fault.UnexpectedErrorFault;
 import com.sforce.ws.ConnectionException;
 import com.sforce.ws.ConnectorConfig;
@@ -55,37 +56,27 @@ public class ForceService {
     }
 
     public static PartnerConnection createPartnerConnection(ForceConnectionInfo info) throws ConnectionException {
-        return info.getSessionId() != null ? createConnectionBySessionId(info) : createConnectionByUserCredential(info);
+        PartnerConnection partnerConnection = info.getSessionId() != null ? createConnectionBySessionId(info) : createConnectionByUserCredential(info);
+        SessionHeader_element sessionHeader = partnerConnection.getSessionHeader();
+        if (sessionHeader != null && sessionHeader.getSessionId() != null) {
+            info.setSessionId(sessionHeader.getSessionId());
+        }
+        return partnerConnection;
     }
 
     private static PartnerConnection createConnectionBySessionId(ForceConnectionInfo info) throws ConnectionException {
-        ConnectorConfig partnerConfig = new ConnectorConfig();
-        partnerConfig.setReadTimeout(info.getReadTimeout());
-        partnerConfig.setConnectionTimeout(info.getConnectionTimeout());
+        ConnectorConfig partnerConfig = convertForceConnectionInfo(info);
         partnerConfig.setSessionId(info.getSessionId());
-        if (info.getLogfile() != null) {
-            try {
-                partnerConfig.setTraceFile(info.getLogfile());
-                partnerConfig.setTraceMessage(true);
-            } catch (FileNotFoundException e) {
-                logger.log(Level.WARNING, "Error creating log file", e);
-            }
-        }
-
-        if (info.getSandbox() != null) {
-            partnerConfig.setServiceEndpoint(ForceService.getPartnerUrl(info.getSessionId(), info.getSandbox()));
-            return Connector.newConnection(partnerConfig);
-        }
+        partnerConfig.setServiceEndpoint(ForceService.getPartnerUrl(info.getSessionId(), info.isSandbox()));
 
         try {
-            partnerConfig.setServiceEndpoint(ForceService.getPartnerUrl(info.getSessionId(), false));
             return Connector.newConnection(partnerConfig);
-        } catch (RuntimeException re) {
-            try {
+        } catch (ConnectionException ce) {
+            if (!info.isSandbox()) {
                 partnerConfig.setServiceEndpoint(ForceService.getPartnerUrl(info.getSessionId(), true));
                 return Connector.newConnection(partnerConfig);
-            } catch (RuntimeException r) {
-                throw new ConnectionException(r.getMessage());
+            } else {
+                throw ce;
             }
         }
     }
@@ -93,12 +84,39 @@ public class ForceService {
     private static PartnerConnection createConnectionByUserCredential(ForceConnectionInfo info)
         throws ConnectionException {
 
-        ConnectorConfig partnerConfig = new ConnectorConfig();
+        ConnectorConfig partnerConfig = convertForceConnectionInfo(info);
         partnerConfig.setUsername(info.getUserName());
         partnerConfig.setPassword(info.getPassword());
+
+        PartnerConnection connection;
+
+        try {
+            partnerConfig.setAuthEndpoint(buildAuthEndpoint(info));
+            connection = Connector.newConnection(partnerConfig);
+        } catch (ConnectionException ce) {
+            if (!info.isSandbox()) {
+                info.setSandbox(true);
+                partnerConfig.setAuthEndpoint(buildAuthEndpoint(info));
+                connection = Connector.newConnection(partnerConfig);
+            } else {
+                throw ce;
+            }
+        }
+
+        if (StringUtils.isNotBlank(info.getClientName())) {
+            connection.setCallOptions(info.getClientName(), null);
+        }
+        if (info.isVerifyConnectivity()) {
+            verifyConnectivity(connection);
+        }
+        return connection;
+    }
+
+    private static ConnectorConfig convertForceConnectionInfo(ForceConnectionInfo info) {
+        ConnectorConfig partnerConfig = new ConnectorConfig();
         partnerConfig.setReadTimeout(info.getReadTimeout());
         partnerConfig.setConnectionTimeout(info.getConnectionTimeout());
-        partnerConfig.setTransport(HttpClientTransport.class);
+        partnerConfig.setSessionRenewer(new ForceSessionRenewal());
         if (info.getLogfile() != null) {
             try {
                 partnerConfig.setTraceFile(info.getLogfile());
@@ -108,27 +126,7 @@ public class ForceService {
             }
         }
 
-        PartnerConnection connection;
-
-        if (info.getSandbox() != null) {
-            partnerConfig.setAuthEndpoint(buildAuthEndpoint(info));
-            connection = Connector.newConnection(partnerConfig);
-        } else {
-            try {
-                info.setSandbox(false);
-                partnerConfig.setAuthEndpoint(buildAuthEndpoint(info));
-                connection = Connector.newConnection(partnerConfig);
-            } catch (ConnectionException ce) {
-                info.setSandbox(true);
-                partnerConfig.setAuthEndpoint(buildAuthEndpoint(info));
-                connection = Connector.newConnection(partnerConfig);
-            }
-        }
-        if (StringUtils.isNotBlank(info.getClientName())) {
-            connection.setCallOptions(info.getClientName(), null);
-        }
-        verifyConnectivity(connection);
-        return connection;
+        return partnerConfig;
     }
 
     private static void verifyConnectivity(PartnerConnection connection) throws ConnectionException {
@@ -163,8 +161,8 @@ public class ForceService {
     }
 
     private static String buildAuthEndpoint(ForceConnectionInfo info) {
-        String protocol = info.getHttps() ? "https" : "http";
-        String domain = info.getSandbox() ? SANDBOX_LOGIN_DOMAIN
+        String protocol = info.isHttps() ? "https" : "http";
+        String domain = info.isSandbox() ? SANDBOX_LOGIN_DOMAIN
             : info.getLoginDomain() != null ? info.getLoginDomain() : DEFAULT_LOGIN_DOMAIN;
         return String.format("%s://%s/services/Soap/u/%s", protocol, domain, info.getApiVersion());
     }

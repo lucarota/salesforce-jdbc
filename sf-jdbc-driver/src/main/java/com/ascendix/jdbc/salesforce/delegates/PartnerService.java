@@ -23,14 +23,12 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.function.Function;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.commons.collections4.IteratorUtils;
-import org.apache.commons.lang3.StringUtils;
 
 public class PartnerService {
 
@@ -38,16 +36,12 @@ public class PartnerService {
 
     private final PartnerConnection partnerConnection;
 
-    private DescribeGlobalResult schemaCache;
-    private final Map<String, DescribeSObjectResult> sObjectsCache = new ConcurrentHashMap<>();
+    private static DescribeGlobalResult schemaCache;
+    private final static Map<String, DescribeSObjectResult> sObjectsCache = new ConcurrentSkipListMap<>(
+            String.CASE_INSENSITIVE_ORDER);
 
     public PartnerService(PartnerConnection partnerConnection) {
         this.partnerConnection = partnerConnection;
-        try {
-            this.schemaCache = getDescribeGlobal();
-        } catch (ConnectionException e) {
-            logger.log(Level.SEVERE, e.getMessage());
-        }
     }
 
     public List<Table> getTables() throws ConnectionException {
@@ -62,13 +56,12 @@ public class PartnerService {
 
     public DescribeSObjectResult describeSObject(String sObjectType) {
         try {
-            final String obj = StringUtils.toRootLowerCase(sObjectType);
-            if (!sObjectsCache.containsKey(obj)) {
-                DescribeSObjectResult description = partnerConnection.describeSObject(obj);
-                sObjectsCache.put(obj, description);
+            if (!sObjectsCache.containsKey(sObjectType)) {
+                DescribeSObjectResult description = partnerConnection.describeSObject(sObjectType);
+                sObjectsCache.put(sObjectType, description);
                 return description;
             } else {
-                return sObjectsCache.get(obj);
+                return sObjectsCache.get(sObjectType);
             }
         } catch (ConnectionException e) {
             throw new RuntimeException(e);
@@ -76,8 +69,8 @@ public class PartnerService {
     }
 
     public void cleanupGlobalCache() throws ConnectionException {
-        this.schemaCache = getDescribeGlobal();
-        this.sObjectsCache.clear();
+        schemaCache = getDescribeGlobal();
+        sObjectsCache.clear();
     }
 
     private Table convertToTable(DescribeSObjectResult so) {
@@ -119,11 +112,11 @@ public class PartnerService {
     }
 
     private synchronized DescribeGlobalResult getDescribeGlobal() throws ConnectionException {
-        if (this.schemaCache == null) {
-            this.schemaCache = partnerConnection.describeGlobal();
+        if (schemaCache == null) {
+            schemaCache = partnerConnection.describeGlobal();
         }
 
-        return this.schemaCache;
+        return schemaCache;
     }
 
     private List<String> getSObjectTypes() throws ConnectionException {
@@ -136,10 +129,10 @@ public class PartnerService {
     }
 
     private Map<String, DescribeSObjectResult> getSObjectsDescription() throws ConnectionException {
-        if (this.sObjectsCache.isEmpty()) {
+        if (sObjectsCache.isEmpty()) {
             logger.finest("Load all SObjects");
             Map<String, DescribeSObjectResult> cache;
-            DescribeGlobalResult describeGlobals = partnerConnection.describeGlobal();
+            DescribeGlobalResult describeGlobals = getDescribeGlobal();
             List<String> tableNames = Arrays.stream(describeGlobals.getSobjects())
                 .map(DescribeGlobalSObjectResult::getName)
                 .collect(Collectors.toList());
@@ -147,9 +140,9 @@ public class PartnerService {
             cache = tableNamesBatched.stream()
                 .flatMap(batch -> describeSObjects(batch).stream())
                 .collect(Collectors.toMap(DescribeSObjectResult::getName, Function.identity()));
-            this.sObjectsCache.putAll(cache);
+            sObjectsCache.putAll(cache);
         }
-        return this.sObjectsCache;
+        return sObjectsCache;
     }
 
     private List<DescribeSObjectResult> describeSObjects(List<String> batch) {
