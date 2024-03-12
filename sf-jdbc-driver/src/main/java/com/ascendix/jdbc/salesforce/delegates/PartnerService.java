@@ -45,7 +45,7 @@ public class PartnerService {
     }
 
     public List<Table> getTables() throws ConnectionException {
-        logger.finest("[PartnerService] getTables IMPLEMENTED ");
+        logger.finest("[PartnerService] getTables IMPLEMENTED");
         Map<String, DescribeSObjectResult> sObjects = getSObjectsDescription();
         List<Table> tables = sObjects.values().stream()
             .map(this::convertToTable)
@@ -89,9 +89,10 @@ public class PartnerService {
             column.setCalculated(field.isCalculated() || field.isAutoNumber());
             column.setLength(field.getLength());
             String[] referenceTos = field.getReferenceTo();
+            List<String> sObjectTypes = getSObjectTypes();
             if (referenceTos != null) {
                 for (String referenceTo : referenceTos) {
-                    if (getSObjectTypes().contains(referenceTo)) {
+                    if (sObjectTypes.contains(referenceTo)) {
                         column.setReferencedTable(referenceTo);
                         column.setReferencedColumn("Id");
                     }
@@ -121,11 +122,9 @@ public class PartnerService {
 
     private List<String> getSObjectTypes() throws ConnectionException {
         final Map<String, DescribeSObjectResult> sObjects = getSObjectsDescription();
-        List<String> sObjectTypes = sObjects.values().stream()
+        return sObjects.values().stream()
                 .map(DescribeSObjectResult::getName)
                 .collect(Collectors.toList());
-        logger.info("[PartnerService] getSObjectTypes count=" + sObjectTypes.size());
-        return sObjectTypes;
     }
 
     private Map<String, DescribeSObjectResult> getSObjectsDescription() throws ConnectionException {
