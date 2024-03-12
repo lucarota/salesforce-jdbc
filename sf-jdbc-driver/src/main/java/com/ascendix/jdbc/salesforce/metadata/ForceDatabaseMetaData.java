@@ -98,13 +98,13 @@ public class ForceDatabaseMetaData implements DatabaseMetaData, Serializable {
     private List<Table> getTables() throws SQLException {
         if (tablesCache == null) {
             try {
-                logger.info("[Meta] getTables requested - fetching");
+                logger.fine("[Meta] getTables requested - fetching");
                 tablesCache = partnerService.getTables();
             } catch (ConnectionException e) {
                 throw new SQLException(e);
             }
         } else {
-            logger.info("[Meta] getTables requested - from cache");
+            logger.fine("[Meta] getTables requested - from cache");
         }
         return tablesCache;
     }
@@ -1212,8 +1212,7 @@ public class ForceDatabaseMetaData implements DatabaseMetaData, Serializable {
 
     @Override
     public boolean supportsGetGeneratedKeys() {
-        // FIXME: ci servono
-        return false;
+        return true;
     }
 
     @Override
