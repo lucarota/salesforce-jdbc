@@ -9,9 +9,11 @@ import java.util.stream.Collectors;
 public class CommandLogCachedResultSet extends CachedResultSet {
 
     public static String LOG_COLUMN = "Log";
+    public static String ID_COLUMN = "Id";
 
     private static final ColumnMap<String, Object> DEFAULT_COLUMN_MAP = new ColumnMap<String, Object>()
-        .add(LOG_COLUMN,"Value", TypeInfo.SHORT_TYPE_INFO);
+        .add(LOG_COLUMN,"Value", TypeInfo.SHORT_TYPE_INFO)
+        .add(ID_COLUMN,"Value", TypeInfo.ID_TYPE_INFO);
 
     public CommandLogCachedResultSet() {
         super(ForcePreparedStatement.createMetaData(DEFAULT_COLUMN_MAP));
@@ -24,6 +26,13 @@ public class CommandLogCachedResultSet extends CachedResultSet {
     }
 
     public void log(String logLine) {
-        addRow(new ColumnMap<String, Object>().add(LOG_COLUMN, logLine, TypeInfo.SHORT_TYPE_INFO));
+        log(logLine, null);
+    }
+
+    public void log(String logLine, Object generatedKey) {
+        ColumnMap<String, Object> columns = new ColumnMap<>();
+        columns.add(LOG_COLUMN, logLine, TypeInfo.SHORT_TYPE_INFO);
+        columns.add(ID_COLUMN, generatedKey, TypeInfo.ID_TYPE_INFO);
+        addRow(columns);
     }
 }
