@@ -47,7 +47,7 @@ public class CachedResultSet implements ResultSet, Serializable {
     private static final long serialVersionUID = 1L;
 
     private transient Integer index;
-    private List<ColumnMap<String, Object>> rows = new ArrayList<>();
+    private List<ColumnMap<String, Object>> rows;
     private ResultSetMetaData metadata;
     private SQLWarning warningsChain;
 
@@ -183,9 +183,11 @@ public class CachedResultSet implements ResultSet, Serializable {
     private class ColumnValueParser<T> {
 
         private final Function<String, T> conversion;
+        private final Class<T> clazz;
 
-        public ColumnValueParser(Function<String, T> parser) {
+        public ColumnValueParser(Function<String, T> parser, Class<T> clazz) {
             this.conversion = parser;
+            this.clazz = clazz;
         }
 
         public Optional<T> parse(int columnIndex) throws SQLException {
@@ -203,10 +205,21 @@ public class CachedResultSet implements ResultSet, Serializable {
                 return Optional.empty();
             }
 
-            if (!(o instanceof String)) {
+            if (o instanceof String val) {
+                return Optional.of(conversion.apply(val));
+            }
+
+            if (o.getClass().isAssignableFrom(clazz)) {
                 return (Optional<T>) Optional.of(o);
             }
-            return Optional.of(conversion.apply((String) o));
+
+            if (Boolean.class.isAssignableFrom(clazz)) {
+                if (o instanceof Number num) {
+                    return (Optional<T>) Optional.of(num.intValue() == 1);
+                }
+            }
+
+            return Optional.of(conversion.apply(o.toString()));
         }
     }
 
@@ -219,13 +232,13 @@ public class CachedResultSet implements ResultSet, Serializable {
     }
 
     public BigDecimal getBigDecimal(int columnIndex) throws SQLException {
-        return new ColumnValueParser<>(BigDecimal::new)
+        return new ColumnValueParser<>(BigDecimal::new, BigDecimal.class)
             .parse(columnIndex)
             .orElse(null);
     }
 
     public BigDecimal getBigDecimal(String columnName) throws SQLException {
-        return new ColumnValueParser<>(BigDecimal::new)
+        return new ColumnValueParser<>(BigDecimal::new, BigDecimal.class)
             .parse(columnName)
             .orElse(null);
     }
@@ -239,14 +252,14 @@ public class CachedResultSet implements ResultSet, Serializable {
     }
 
     public Date getDate(int columnIndex) throws SQLException {
-        return new ColumnValueParser<>(this::parseDate)
+        return new ColumnValueParser<>(this::parseDate, java.util.Date.class)
             .parse(columnIndex)
             .map(d -> new java.sql.Date(d.getTime()))
             .orElse(null);
     }
 
     public Date getDate(String columnName) throws SQLException {
-        return new ColumnValueParser<>(this::parseDate)
+        return new ColumnValueParser<>(this::parseDate, java.util.Date.class)
             .parse(columnName)
             .map(d -> new java.sql.Date(d.getTime()))
             .orElse(null);
@@ -265,7 +278,7 @@ public class CachedResultSet implements ResultSet, Serializable {
         if (value instanceof GregorianCalendar) {
             return new java.sql.Timestamp(((GregorianCalendar) value).getTime().getTime());
         } else {
-            return new ColumnValueParser<>(this::parseDateTime)
+            return new ColumnValueParser<>(this::parseDateTime, java.util.Date.class)
                 .parse(columnIndex)
                 .map(d -> new java.sql.Timestamp(d.getTime()))
                 .orElse(null);
@@ -277,7 +290,7 @@ public class CachedResultSet implements ResultSet, Serializable {
         if (value instanceof GregorianCalendar) {
             return new java.sql.Timestamp(((GregorianCalendar) value).getTime().getTime());
         } else {
-            return new ColumnValueParser<>(this::parseDateTime)
+            return new ColumnValueParser<>(this::parseDateTime, java.util.Date.class)
                 .parse(columnName)
                 .map(d -> new java.sql.Timestamp(d.getTime()))
                 .orElse(null);
@@ -301,14 +314,14 @@ public class CachedResultSet implements ResultSet, Serializable {
     }
 
     public Time getTime(String columnName) throws SQLException {
-        return new ColumnValueParser<>(this::parseTime)
+        return new ColumnValueParser<>(this::parseTime, java.util.Date.class)
             .parse(columnName)
             .map(d -> new Time(d.getTime()))
             .orElse(null);
     }
 
     public Time getTime(int columnIndex) throws SQLException {
-        return new ColumnValueParser<>(this::parseTime)
+        return new ColumnValueParser<>(this::parseTime, java.util.Date.class)
             .parse(columnIndex)
             .map(d -> new Time(d.getTime()))
             .orElse(null);
@@ -316,7 +329,7 @@ public class CachedResultSet implements ResultSet, Serializable {
 
     @Deprecated
     public BigDecimal getBigDecimal(int columnIndex, int scale) throws SQLException {
-        Optional<BigDecimal> result = new ColumnValueParser<>(BigDecimal::new)
+        Optional<BigDecimal> result = new ColumnValueParser<>(BigDecimal::new, BigDecimal.class)
             .parse(columnIndex);
 
         return result.map(bigDecimal -> bigDecimal.setScale(scale, RoundingMode.HALF_EVEN)).orElse(null);
@@ -324,67 +337,67 @@ public class CachedResultSet implements ResultSet, Serializable {
 
     @Deprecated
     public BigDecimal getBigDecimal(String columnName, int scale) throws SQLException {
-        Optional<BigDecimal> result = new ColumnValueParser<>(BigDecimal::new)
+        Optional<BigDecimal> result = new ColumnValueParser<>(BigDecimal::new, BigDecimal.class)
             .parse(columnName);
         return result.map(bigDecimal -> bigDecimal.setScale(scale, RoundingMode.HALF_EVEN)).orElse(null);
     }
 
     public float getFloat(int columnIndex) throws SQLException {
-        return new ColumnValueParser<>(Float::parseFloat)
+        return new ColumnValueParser<>(Float::parseFloat, Float.class)
             .parse(columnIndex)
             .orElse(0f);
     }
 
     public float getFloat(String columnName) throws SQLException {
-        return new ColumnValueParser<>(Float::parseFloat)
+        return new ColumnValueParser<>(Float::parseFloat, Float.class)
             .parse(columnName)
             .orElse(0f);
     }
 
     public double getDouble(int columnIndex) throws SQLException {
-        return new ColumnValueParser<>(Double::parseDouble)
+        return new ColumnValueParser<>(Double::parseDouble, Double.class)
             .parse(columnIndex)
             .orElse(0d);
     }
 
     public double getDouble(String columnName) throws SQLException {
-        return new ColumnValueParser<>(Double::parseDouble)
+        return new ColumnValueParser<>(Double::parseDouble, Double.class)
             .parse(columnName)
             .orElse(0d);
     }
 
     public long getLong(String columnName) throws SQLException {
-        return new ColumnValueParser<>(Long::parseLong)
+        return new ColumnValueParser<>(Long::parseLong, Long.class)
             .parse(columnName)
             .orElse(0L);
     }
 
     public long getLong(int columnIndex) throws SQLException {
-        return new ColumnValueParser<Long>(Long::parseLong)
+        return new ColumnValueParser<Long>(Long::parseLong, Long.class)
             .parse(columnIndex)
             .orElse(0L);
     }
 
     public int getInt(String columnName) throws SQLException {
-        return new ColumnValueParser<>(Integer::parseInt)
+        return new ColumnValueParser<>(Integer::parseInt, Integer.class)
             .parse(columnName)
             .orElse(0);
     }
 
     public int getInt(int columnIndex) throws SQLException {
-        return new ColumnValueParser<>(Integer::parseInt)
+        return new ColumnValueParser<>(Integer::parseInt, Integer.class)
             .parse(columnIndex)
             .orElse(0);
     }
 
     public short getShort(String columnName) throws SQLException {
-        return new ColumnValueParser<>(Short::parseShort)
+        return new ColumnValueParser<>(Short::parseShort, Short.class)
             .parse(columnName)
             .orElse((short) 0);
     }
 
     public short getShort(int columnIndex) throws SQLException {
-        return new ColumnValueParser<>(Short::parseShort)
+        return new ColumnValueParser<>(Short::parseShort, Short.class)
             .parse(columnIndex)
             .orElse((short) 0);
     }
@@ -406,39 +419,39 @@ public class CachedResultSet implements ResultSet, Serializable {
     }
 
     public Blob getBlob(int columnIndex) throws SQLException {
-        return new ColumnValueParser<>((v) -> Base64.getDecoder().decode(v))
+        return new ColumnValueParser<>((v) -> Base64.getDecoder().decode(v), byte[].class)
             .parse(columnIndex)
             .map(this::createBlob)
             .orElse(null);
     }
 
     public Blob getBlob(String columnName) throws SQLException {
-        return new ColumnValueParser<>((v) -> Base64.getDecoder().decode(v))
+        return new ColumnValueParser<>((v) -> Base64.getDecoder().decode(v), byte[].class)
             .parse(columnName)
             .map(this::createBlob)
             .orElse(null);
     }
 
     public boolean getBoolean(int columnIndex) throws SQLException {
-        return new ColumnValueParser<>(Boolean::parseBoolean)
+        return new ColumnValueParser<>(Boolean::parseBoolean, Boolean.class)
             .parse(columnIndex)
             .orElse(false);
     }
 
     public boolean getBoolean(String columnName) throws SQLException {
-        return new ColumnValueParser<>(Boolean::parseBoolean)
+        return new ColumnValueParser<>(Boolean::parseBoolean, Boolean.class)
             .parse(columnName)
             .orElse(false);
     }
 
     public byte getByte(int columnIndex) throws SQLException {
-        return new ColumnValueParser<>(Byte::parseByte)
+        return new ColumnValueParser<>(Byte::parseByte, Byte.class)
             .parse(columnIndex)
             .orElse((byte) 0);
     }
 
     public byte getByte(String columnName) throws SQLException {
-        return new ColumnValueParser<>(Byte::parseByte)
+        return new ColumnValueParser<>(Byte::parseByte, Byte.class)
             .parse(columnName)
             .orElse((byte) 0);
     }
