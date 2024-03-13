@@ -1,14 +1,12 @@
 package com.ascendix.jdbc.salesforce.statement.processor;
 
-import com.ascendix.jdbc.salesforce.ForceDriver;
 import com.ascendix.jdbc.salesforce.statement.processor.utils.ValueToStringVisitor;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import lombok.extern.slf4j.Slf4j;
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.expression.operators.relational.ExpressionList;
 import net.sf.jsqlparser.expression.operators.relational.ItemsListVisitor;
@@ -20,9 +18,8 @@ import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.insert.Insert;
 import net.sf.jsqlparser.statement.select.SubSelect;
 
+@Slf4j
 public class InsertQueryAnalyzer {
-
-    private static final Logger logger = Logger.getLogger(ForceDriver.SF_JDBC_DRIVER_NAME);
 
     private String soql;
     private final Function<String, List<Map<String, Object>>> subSelectResolver;
@@ -54,12 +51,12 @@ public class InsertQueryAnalyzer {
 
         @Override
         public void visit(SubSelect subSelect) {
-            logger.warning("SubSelect Visitor");
+            log.warn("SubSelect Visitor");
         }
 
         @Override
         public void visit(ExpressionList expressionList) {
-            logger.finest("Expression Visitor");
+            log.trace("Expression Visitor");
             HashMap<String, Object> fieldValues = new HashMap<>();
             records.add(fieldValues);
 
@@ -75,12 +72,12 @@ public class InsertQueryAnalyzer {
 
         @Override
         public void visit(NamedExpressionList namedExpressionList) {
-            logger.warning("NamedExpression Visitor");
+            log.warn("NamedExpression Visitor");
         }
 
         @Override
         public void visit(MultiExpressionList multiExprList) {
-            logger.finest("MultiExpression Visitor");
+            log.trace("MultiExpression Visitor");
             multiExprList.getExpressionLists().forEach(expressions -> {
                 expressions.accept(new InsertItemsListVisitor(columns, records));
             });
@@ -104,7 +101,7 @@ public class InsertQueryAnalyzer {
                 }
             } catch (JSQLParserException e) {
                 if (!silentMode) {
-                    logger.log(Level.SEVERE, "Failed request to create entities with error: " + e.getMessage(), e);
+                    log.error("Failed request to create entities with error: {}", e.getMessage(), e);
                 }
             }
         }
@@ -119,11 +116,11 @@ public class InsertQueryAnalyzer {
             } else {
                 if (getQueryData().getSelect() != null) {
                     if (subSelectResolver != null) {
-                        logger.info("Insert/Update has a sub-select: " + getQueryData().getSelect().toString());
+                        log.info("Insert/Update has a sub-select: {}", getQueryData().getSelect().toString());
                         List<Map<String, Object>> subRecords = subSelectResolver.apply(getQueryData().getSelect()
                             .toString());
-                        logger.info("Insert/Update fetched " + subRecords.size() + " records from a sub-select: "
-                            + getQueryData().getSelect().toString());
+                        log.info("Insert/Update fetched {} records from a sub-select: {}", subRecords.size(),
+                            getQueryData().getSelect().toString());
                         for (Map<String, Object> subRecord : subRecords) {
                             // this subRecord is LinkedHashMap - so the order of fields is determined by soql
                             Map<String, Object> record = new HashMap<>();

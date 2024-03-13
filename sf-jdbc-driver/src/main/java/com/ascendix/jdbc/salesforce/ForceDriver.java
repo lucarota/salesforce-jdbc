@@ -6,7 +6,6 @@ import com.ascendix.jdbc.salesforce.connection.ForceService;
 import com.ascendix.jdbc.salesforce.delegates.PartnerService;
 import com.sforce.soap.partner.PartnerConnection;
 import com.sforce.ws.ConnectionException;
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,7 +22,6 @@ import java.sql.DriverPropertyInfo;
 import java.sql.SQLException;
 import java.sql.SQLFeatureNotSupportedException;
 import java.util.Properties;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -31,11 +29,12 @@ import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class ForceDriver implements Driver {
 
     public static final String SF_JDBC_DRIVER_NAME = "SF JDBC driver";
-    private static final Logger logger = Logger.getLogger(ForceDriver.SF_JDBC_DRIVER_NAME);
 
     private static final String ACCEPTABLE_URL = "jdbc:ascendix:salesforce";
     private static final Pattern URL_PATTERN = Pattern.compile("\\A" + ACCEPTABLE_URL + "://(.*)");
@@ -52,7 +51,7 @@ public class ForceDriver implements Driver {
 
     static {
         try {
-            logger.info("[ForceDriver] registration");
+            log.info("[ForceDriver] registration");
             DriverManager.registerDriver(new ForceDriver());
         } catch (Exception e) {
             throw new RuntimeException("Failed register ForceDriver: " + e.getMessage(), e);
@@ -75,7 +74,7 @@ public class ForceDriver implements Driver {
              *
              * Source: https://docs.oracle.com/javase/8/docs/api/java/sql/Driver.html#connect-java.lang.String-java.util.Properties-
              */
-            logger.log(Level.SEVERE, "The URL provided is not acceptable: " + url);
+            log.error("The URL provided is not acceptable: {}", url);
             return null;
         }
         try {
@@ -152,8 +151,7 @@ public class ForceDriver implements Driver {
             try {
                 return Integer.parseInt(intVal);
             } catch (NumberFormatException ignored) {
-                logger.log(Level.WARNING,
-                    "[ForceDriver] ignored invalid int property=" + propertyName + " value=" + intVal);
+                log.warn("[ForceDriver] ignored invalid int property={} value={}", propertyName, intVal);
             }
         }
         return defaultValue;
@@ -291,7 +289,7 @@ public class ForceDriver implements Driver {
                 context.init(null, trustManagers, new SecureRandom());
                 HttpsURLConnection.setDefaultSSLSocketFactory(context.getSocketFactory());
             } catch (NoSuchAlgorithmException | KeyManagementException e) {
-                logger.log(Level.SEVERE, "SSL Exception", e);
+                log.error("SSL Exception", e);
             }
         }
     }

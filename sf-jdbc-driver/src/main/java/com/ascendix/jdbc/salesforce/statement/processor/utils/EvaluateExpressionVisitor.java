@@ -1,6 +1,5 @@
 package com.ascendix.jdbc.salesforce.statement.processor.utils;
 
-import com.ascendix.jdbc.salesforce.ForceDriver;
 import com.ascendix.jdbc.salesforce.exceptions.UnsupportedArgumentTypeException;
 import java.math.BigDecimal;
 import java.math.MathContext;
@@ -12,9 +11,8 @@ import java.time.LocalTime;
 import java.time.Period;
 import java.util.Date;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import net.sf.jsqlparser.expression.AllComparisonExpression;
 import net.sf.jsqlparser.expression.AnalyticExpression;
 import net.sf.jsqlparser.expression.AnyComparisonExpression;
@@ -89,9 +87,9 @@ import net.sf.jsqlparser.expression.operators.relational.SimilarToExpression;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.statement.select.SubSelect;
 
+@Slf4j
 public class EvaluateExpressionVisitor implements ExpressionVisitor {
 
-    protected static final Logger logger = Logger.getLogger(ForceDriver.SF_JDBC_DRIVER_NAME);
     protected Map<String, Object> recordFieldsFromDB;
     @Getter
     protected Object result;
@@ -138,7 +136,7 @@ public class EvaluateExpressionVisitor implements ExpressionVisitor {
             return Long.parseLong((String) result);
         }
         String message = String.format("Cannot convert to Fixed type %s value %s", result.getClass().getName(), result);
-        logger.log(Level.SEVERE, message);
+        log.error(message);
         throw new UnsupportedArgumentTypeException(message);
     }
 
@@ -162,7 +160,7 @@ public class EvaluateExpressionVisitor implements ExpressionVisitor {
             return Double.parseDouble((String) result);
         }
         String message = String.format("Cannot convert to Float type %s value %s", result.getClass().getName(), result);
-        logger.log(Level.SEVERE, message);
+        log.error(message);
         throw new UnsupportedArgumentTypeException(message);
     }
 
@@ -204,23 +202,23 @@ public class EvaluateExpressionVisitor implements ExpressionVisitor {
 
     @Override
     public void visit(BitwiseRightShift aThis) {
-        logger.warning("[EvaluateExpressionVisitor] BitwiseRightShift");
+        log.warn("[EvaluateExpressionVisitor] BitwiseRightShift");
     }
 
     @Override
     public void visit(BitwiseLeftShift aThis) {
-        logger.warning("[EvaluateExpressionVisitor] BitwiseLeftShift");
+        log.warn("[EvaluateExpressionVisitor] BitwiseLeftShift");
     }
 
     @Override
     public void visit(NullValue nullValue) {
-        logger.finest("[EvaluateExpressionVisitor] NullValue");
+        log.trace("[EvaluateExpressionVisitor] NullValue");
         result = null;
     }
 
     @Override
     public void visit(Function function) {
-        logger.finest("[EvaluateExpressionVisitor] Function function=" + function.getName());
+        log.trace("[EvaluateExpressionVisitor] Function function={}", function.getName());
         if ("now".equalsIgnoreCase(function.getName())) {
             result = new Date();
             return;
@@ -234,66 +232,66 @@ public class EvaluateExpressionVisitor implements ExpressionVisitor {
 
     @Override
     public void visit(SignedExpression signedExpression) {
-        logger.finest("[EvaluateExpressionVisitor] SignedExpression");
+        log.trace("[EvaluateExpressionVisitor] SignedExpression");
     }
 
     @Override
     public void visit(JdbcParameter jdbcParameter) {
-        logger.warning("[EvaluateExpressionVisitor] BitwiseRightShift");
+        log.warn("[EvaluateExpressionVisitor] BitwiseRightShift");
     }
 
     @Override
     public void visit(JdbcNamedParameter jdbcNamedParameter) {
-        logger.warning("[EvaluateExpressionVisitor] JdbcNamedParameter");
+        log.warn("[EvaluateExpressionVisitor] JdbcNamedParameter");
     }
 
     @Override
     public void visit(DoubleValue doubleValue) {
-        logger.finest("[EvaluateExpressionVisitor] DoubleValue=" + doubleValue.getValue());
+        log.trace("[EvaluateExpressionVisitor] DoubleValue={}", doubleValue.getValue());
         result = doubleValue.getValue();
     }
 
     @Override
     public void visit(LongValue longValue) {
-        logger.finest("[EvaluateExpressionVisitor] LongValue=" + longValue.getValue());
+        log.trace("[EvaluateExpressionVisitor] LongValue={}", longValue.getValue());
         result = longValue.getValue();
     }
 
     @Override
     public void visit(HexValue hexValue) {
-        logger.finest("[EvaluateExpressionVisitor] HexValue=" + hexValue.getValue());
+        log.trace("[EvaluateExpressionVisitor] HexValue={}", hexValue.getValue());
         result = hexValue.getValue();
     }
 
     @Override
     public void visit(DateValue dateValue) {
-        logger.finest("[EvaluateExpressionVisitor] DateValue ");
+        log.trace("[EvaluateExpressionVisitor] DateValue={}", dateValue.getValue());
         result = dateValue.getValue();
     }
 
     @Override
     public void visit(TimeValue timeValue) {
-        logger.finest("[EvaluateExpressionVisitor] BitwiseRightShift");
+        log.trace("[EvaluateExpressionVisitor] BitwiseRightShift={}", timeValue.getValue());
         result = timeValue.getValue();
     }
 
     @Override
     public void visit(TimestampValue timestampValue) {
-        logger.finest("[EvaluateExpressionVisitor] TimestampValue");
+        log.trace("[EvaluateExpressionVisitor] TimestampValue={}", timestampValue.getValue());
         result = timestampValue.getValue();
     }
 
     @Override
     public void visit(Parenthesis parenthesis) {
-        logger.finest("[EvaluateExpressionVisitor] Parenthesis");
         EvaluateExpressionVisitor subEvaluatorLeft = subVisitor();
         parenthesis.getExpression().accept(subEvaluatorLeft);
         result = subEvaluatorLeft.getResult();
+        log.trace("[EvaluateExpressionVisitor] Parenthesis={}", result);
     }
 
     @Override
     public void visit(StringValue stringValue) {
-        logger.finest("[EvaluateExpressionVisitor] StringValue=" + stringValue.getValue());
+        log.trace("[EvaluateExpressionVisitor] StringValue={}", stringValue.getValue());
         result = stringValue.getValue();
     }
 
@@ -335,7 +333,7 @@ public class EvaluateExpressionVisitor implements ExpressionVisitor {
 
     @Override
     public void visit(Addition addition) {
-        logger.finest("[EvaluateExpressionVisitor] Addition");
+        log.trace("[EvaluateExpressionVisitor] Addition");
         EvaluateExpressionVisitor subEvaluatorLeft = subVisitor();
         addition.getLeftExpression().accept(subEvaluatorLeft);
         EvaluateExpressionVisitor subEvaluatorRight = subVisitor();
@@ -379,13 +377,13 @@ public class EvaluateExpressionVisitor implements ExpressionVisitor {
         String message = String.format("Addition not implemented for types %s and %s",
             subEvaluatorLeft.result.getClass().getName(),
             subEvaluatorRight.result.getClass().getName());
-        logger.log(Level.SEVERE, message);
+        log.error(message);
         throw new UnsupportedArgumentTypeException(message);
     }
 
     @Override
     public void visit(Division division) {
-        logger.finest("[EvaluateExpressionVisitor] Division");
+        log.trace("[EvaluateExpressionVisitor] Division");
         EvaluateExpressionVisitor subEvaluatorLeft = subVisitor();
         division.getLeftExpression().accept(subEvaluatorLeft);
         EvaluateExpressionVisitor subEvaluatorRight = subVisitor();
@@ -402,7 +400,7 @@ public class EvaluateExpressionVisitor implements ExpressionVisitor {
             String message = String.format("Division not implemented for types %s and %s",
                 subEvaluatorLeft.result.getClass().getName(),
                 subEvaluatorRight.result.getClass().getName());
-            logger.log(Level.SEVERE, message);
+            log.error(message);
             throw new UnsupportedArgumentTypeException(message);
         }
 
@@ -418,13 +416,13 @@ public class EvaluateExpressionVisitor implements ExpressionVisitor {
         String message = String.format("Division not implemented for types %s and %s",
             subEvaluatorLeft.result.getClass().getName(),
             subEvaluatorRight.result.getClass().getName());
-        logger.log(Level.SEVERE, message);
+        log.error(message);
         throw new UnsupportedArgumentTypeException(message);
     }
 
     @Override
     public void visit(IntegerDivision division) {
-        logger.finest("[EvaluateExpressionVisitor] IntegerDivision");
+        log.trace("[EvaluateExpressionVisitor] IntegerDivision");
         EvaluateExpressionVisitor subEvaluatorLeft = subVisitor();
         division.getLeftExpression().accept(subEvaluatorLeft);
         EvaluateExpressionVisitor subEvaluatorRight = subVisitor();
@@ -441,7 +439,7 @@ public class EvaluateExpressionVisitor implements ExpressionVisitor {
             String message = String.format("Division not implemented for types %s and %s",
                 subEvaluatorLeft.result.getClass().getName(),
                 subEvaluatorRight.result.getClass().getName());
-            logger.log(Level.SEVERE, message);
+            log.error(message);
             throw new UnsupportedArgumentTypeException(message);
         }
 
@@ -457,13 +455,13 @@ public class EvaluateExpressionVisitor implements ExpressionVisitor {
         String message = String.format("Division not implemented for types %s and %s",
             subEvaluatorLeft.result.getClass().getName(),
             subEvaluatorRight.result.getClass().getName());
-        logger.log(Level.SEVERE, message);
+        log.error(message);
         throw new UnsupportedArgumentTypeException(message);
     }
 
     @Override
     public void visit(Multiplication multiplication) {
-        logger.finest("[EvaluateExpressionVisitor] Multiplication");
+        log.trace("[EvaluateExpressionVisitor] Multiplication");
         EvaluateExpressionVisitor subEvaluatorLeft = subVisitor();
         multiplication.getLeftExpression().accept(subEvaluatorLeft);
         EvaluateExpressionVisitor subEvaluatorRight = subVisitor();
@@ -480,7 +478,7 @@ public class EvaluateExpressionVisitor implements ExpressionVisitor {
             String message = String.format("Multiplication not implemented for types %s and %s",
                 subEvaluatorLeft.result.getClass().getName(),
                 subEvaluatorRight.result.getClass().getName());
-            logger.log(Level.SEVERE, message);
+            log.error(message);
             throw new UnsupportedArgumentTypeException(message);
         }
 
@@ -496,13 +494,13 @@ public class EvaluateExpressionVisitor implements ExpressionVisitor {
         String message = String.format("Multiplication not implemented for types %s and %s",
             subEvaluatorLeft.result.getClass().getName(),
             subEvaluatorRight.result.getClass().getName());
-        logger.log(Level.SEVERE, message);
+        log.error(message);
         throw new UnsupportedArgumentTypeException(message);
     }
 
     @Override
     public void visit(Subtraction subtraction) {
-        logger.finest("[EvaluateExpressionVisitor] Subtraction");
+        log.trace("[EvaluateExpressionVisitor] Subtraction");
         EvaluateExpressionVisitor subEvaluatorLeft = subVisitor();
         subtraction.getLeftExpression().accept(subEvaluatorLeft);
         EvaluateExpressionVisitor subEvaluatorRight = subVisitor();
@@ -528,7 +526,7 @@ public class EvaluateExpressionVisitor implements ExpressionVisitor {
             String message = String.format("Subtraction not implemented for types %s and %s",
                 subEvaluatorLeft.result.getClass().getName(),
                 subEvaluatorRight.result.getClass().getName());
-            logger.log(Level.SEVERE, message);
+            log.error(message);
             throw new UnsupportedArgumentTypeException(message);
         }
 
@@ -543,122 +541,122 @@ public class EvaluateExpressionVisitor implements ExpressionVisitor {
         String message = String.format("Subtraction not implemented for types %s and %s",
             subEvaluatorLeft.result.getClass().getName(),
             subEvaluatorRight.result.getClass().getName());
-        logger.log(Level.SEVERE, message);
+        log.error(message);
         result = null;
         throw new UnsupportedArgumentTypeException(message);
     }
 
     @Override
     public void visit(AndExpression andExpression) {
-        logger.warning("[EvaluateExpressionVisitor] AndExpression");
+        log.warn("[EvaluateExpressionVisitor] AndExpression");
     }
 
     @Override
     public void visit(OrExpression orExpression) {
-        logger.warning("[EvaluateExpressionVisitor] OrExpression");
+        log.warn("[EvaluateExpressionVisitor] OrExpression");
     }
 
     @Override
     public void visit(Between between) {
-        logger.warning("[EvaluateExpressionVisitor] Between");
+        log.warn("[EvaluateExpressionVisitor] Between");
     }
 
     @Override
     public void visit(EqualsTo equalsTo) {
-        logger.warning("[EvaluateExpressionVisitor] EqualsTo");
+        log.warn("[EvaluateExpressionVisitor] EqualsTo");
     }
 
     @Override
     public void visit(GreaterThan greaterThan) {
-        logger.warning("[EvaluateExpressionVisitor] GreaterThan");
+        log.warn("[EvaluateExpressionVisitor] GreaterThan");
     }
 
     @Override
     public void visit(GreaterThanEquals greaterThanEquals) {
-        logger.warning("[EvaluateExpressionVisitor] GreaterThanEquals");
+        log.warn("[EvaluateExpressionVisitor] GreaterThanEquals");
     }
 
     @Override
     public void visit(InExpression inExpression) {
-        logger.warning("[EvaluateExpressionVisitor] InExpression");
+        log.warn("[EvaluateExpressionVisitor] InExpression");
     }
 
     @Override
     public void visit(FullTextSearch fullTextSearch) {
-        logger.warning("[EvaluateExpressionVisitor] FullTextSearch");
+        log.warn("[EvaluateExpressionVisitor] FullTextSearch");
     }
 
     @Override
     public void visit(IsNullExpression isNullExpression) {
-        logger.warning("[EvaluateExpressionVisitor] IsNullExpression");
+        log.warn("[EvaluateExpressionVisitor] IsNullExpression");
     }
 
     @Override
     public void visit(IsBooleanExpression isBooleanExpression) {
-        logger.warning("[EvaluateExpressionVisitor] IsBooleanExpression");
+        log.warn("[EvaluateExpressionVisitor] IsBooleanExpression");
     }
 
     @Override
     public void visit(LikeExpression likeExpression) {
-        logger.warning("[EvaluateExpressionVisitor] LikeExpression");
+        log.warn("[EvaluateExpressionVisitor] LikeExpression");
     }
 
     @Override
     public void visit(MinorThan minorThan) {
-        logger.warning("[EvaluateExpressionVisitor] MinorThan");
+        log.warn("[EvaluateExpressionVisitor] MinorThan");
     }
 
     @Override
     public void visit(MinorThanEquals minorThanEquals) {
-        logger.warning("[EvaluateExpressionVisitor] MinorThanEquals");
+        log.warn("[EvaluateExpressionVisitor] MinorThanEquals");
     }
 
     @Override
     public void visit(NotEqualsTo notEqualsTo) {
-        logger.warning("[EvaluateExpressionVisitor] NotEqualsTo");
+        log.warn("[EvaluateExpressionVisitor] NotEqualsTo");
     }
 
     @Override
     public void visit(Column tableColumn) {
-        logger.finest("[EvaluateExpressionVisitor] Column column=" + tableColumn.getColumnName());
+        log.trace("[EvaluateExpressionVisitor] Column column={}", tableColumn.getColumnName());
         result = recordFieldsFromDB.get(tableColumn.getColumnName());
     }
 
     @Override
     public void visit(SubSelect subSelect) {
-        logger.warning("[VtoxSVisitor] SubSelect=" + subSelect.toString());
+        log.warn("[VtoxSVisitor] SubSelect={}", subSelect.toString());
     }
 
     @Override
     public void visit(CaseExpression caseExpression) {
-        logger.finest("[EvaluateExpressionVisitor] CaseExpression");
+        log.trace("[EvaluateExpressionVisitor] CaseExpression");
         EvaluateExpressionVisitor caseEvaluatorLeft = subVisitor();
         caseExpression.getSwitchExpression().accept(caseEvaluatorLeft);
     }
 
     @Override
     public void visit(WhenClause whenClause) {
-        logger.warning("[EvaluateExpressionVisitor] WhenClause");
+        log.warn("[EvaluateExpressionVisitor] WhenClause");
     }
 
     @Override
     public void visit(ExistsExpression existsExpression) {
-        logger.warning("[EvaluateExpressionVisitor] ExistsExpression");
+        log.warn("[EvaluateExpressionVisitor] ExistsExpression");
     }
 
     @Override
     public void visit(AllComparisonExpression allComparisonExpression) {
-        logger.warning("[EvaluateExpressionVisitor] AllComparisonExpression");
+        log.warn("[EvaluateExpressionVisitor] AllComparisonExpression");
     }
 
     @Override
     public void visit(AnyComparisonExpression anyComparisonExpression) {
-        logger.warning("[EvaluateExpressionVisitor] AnyComparisonExpression");
+        log.warn("[EvaluateExpressionVisitor] AnyComparisonExpression");
     }
 
     @Override
     public void visit(Concat concat) {
-        logger.finest("[EvaluateExpressionVisitor] Concat");
+        log.trace("[EvaluateExpressionVisitor] Concat");
         EvaluateExpressionVisitor subEvaluatorLeft = subVisitor();
         concat.getLeftExpression().accept(subEvaluatorLeft);
         EvaluateExpressionVisitor subEvaluatorRight = subVisitor();
@@ -669,151 +667,151 @@ public class EvaluateExpressionVisitor implements ExpressionVisitor {
 
     @Override
     public void visit(Matches matches) {
-        logger.warning("[EvaluateExpressionVisitor] Matches");
+        log.warn("[EvaluateExpressionVisitor] Matches");
     }
 
     @Override
     public void visit(BitwiseAnd bitwiseAnd) {
-        logger.warning("[EvaluateExpressionVisitor] BitwiseAnd");
+        log.warn("[EvaluateExpressionVisitor] BitwiseAnd");
     }
 
     @Override
     public void visit(BitwiseOr bitwiseOr) {
-        logger.warning("[EvaluateExpressionVisitor] BitwiseOr");
+        log.warn("[EvaluateExpressionVisitor] BitwiseOr");
     }
 
     @Override
     public void visit(BitwiseXor bitwiseXor) {
-        logger.warning("[EvaluateExpressionVisitor] BitwiseXor");
+        log.warn("[EvaluateExpressionVisitor] BitwiseXor");
     }
 
     @Override
     public void visit(CastExpression cast) {
-        logger.warning("[EvaluateExpressionVisitor] CastExpression");
+        log.warn("[EvaluateExpressionVisitor] CastExpression");
     }
 
     @Override
     public void visit(Modulo modulo) {
-        logger.warning("[EvaluateExpressionVisitor] Modulo");
+        log.warn("[EvaluateExpressionVisitor] Modulo");
     }
 
     @Override
     public void visit(AnalyticExpression aexpr) {
-        logger.warning("[EvaluateExpressionVisitor] AnalyticExpression");
+        log.warn("[EvaluateExpressionVisitor] AnalyticExpression");
     }
 
     @Override
     public void visit(ExtractExpression eexpr) {
-        logger.warning("[EvaluateExpressionVisitor] BitwiseRightShift");
+        log.warn("[EvaluateExpressionVisitor] BitwiseRightShift");
     }
 
     @Override
     public void visit(IntervalExpression iexpr) {
-        logger.warning("[EvaluateExpressionVisitor] IntervalExpression");
+        log.warn("[EvaluateExpressionVisitor] IntervalExpression");
     }
 
     @Override
     public void visit(OracleHierarchicalExpression oexpr) {
-        logger.warning("[EvaluateExpressionVisitor] OracleHierarchicalExpression");
+        log.warn("[EvaluateExpressionVisitor] OracleHierarchicalExpression");
     }
 
     @Override
     public void visit(RegExpMatchOperator rexpr) {
-        logger.warning("[EvaluateExpressionVisitor] RegExpMatchOperator");
+        log.warn("[EvaluateExpressionVisitor] RegExpMatchOperator");
     }
 
     @Override
     public void visit(JsonExpression jsonExpr) {
-        logger.warning("[EvaluateExpressionVisitor] JsonExpression");
+        log.warn("[EvaluateExpressionVisitor] JsonExpression");
     }
 
     @Override
     public void visit(JsonOperator jsonExpr) {
-        logger.warning("[EvaluateExpressionVisitor] JsonOperator");
+        log.warn("[EvaluateExpressionVisitor] JsonOperator");
     }
 
     @Override
     public void visit(RegExpMySQLOperator regExpMySQLOperator) {
-        logger.warning("[EvaluateExpressionVisitor] RegExpMySQLOperator");
+        log.warn("[EvaluateExpressionVisitor] RegExpMySQLOperator");
     }
 
     @Override
     public void visit(UserVariable var) {
-        logger.warning("[EvaluateExpressionVisitor] UserVariable");
+        log.warn("[EvaluateExpressionVisitor] UserVariable");
     }
 
     @Override
     public void visit(NumericBind bind) {
-        logger.warning("[EvaluateExpressionVisitor] NumericBind");
+        log.warn("[EvaluateExpressionVisitor] NumericBind");
     }
 
     @Override
     public void visit(KeepExpression aexpr) {
-        logger.warning("[EvaluateExpressionVisitor] KeepExpression");
+        log.warn("[EvaluateExpressionVisitor] KeepExpression");
     }
 
     @Override
     public void visit(MySQLGroupConcat groupConcat) {
-        logger.warning("[EvaluateExpressionVisitor] MySQLGroupConcat");
+        log.warn("[EvaluateExpressionVisitor] MySQLGroupConcat");
     }
 
     @Override
     public void visit(ValueListExpression valueList) {
-        logger.warning("[EvaluateExpressionVisitor] ValueListExpression");
+        log.warn("[EvaluateExpressionVisitor] ValueListExpression");
     }
 
     @Override
     public void visit(RowConstructor rowConstructor) {
-        logger.warning("[EvaluateExpressionVisitor] RowConstructor");
+        log.warn("[EvaluateExpressionVisitor] RowConstructor");
     }
 
     @Override
     public void visit(OracleHint hint) {
-        logger.warning("[EvaluateExpressionVisitor] OracleHint");
+        log.warn("[EvaluateExpressionVisitor] OracleHint");
     }
 
     @Override
     public void visit(TimeKeyExpression timeKeyExpression) {
-        logger.warning("[EvaluateExpressionVisitor] TimeKeyExpression");
+        log.warn("[EvaluateExpressionVisitor] TimeKeyExpression");
     }
 
     @Override
     public void visit(DateTimeLiteralExpression literal) {
-        logger.warning("[EvaluateExpressionVisitor] DateTimeLiteralExpression");
+        log.warn("[EvaluateExpressionVisitor] DateTimeLiteralExpression");
     }
 
     @Override
     public void visit(NotExpression aThis) {
-        logger.warning("[EvaluateExpressionVisitor] NotExpression");
+        log.warn("[EvaluateExpressionVisitor] NotExpression");
     }
 
     @Override
     public void visit(NextValExpression aThis) {
-        logger.warning("[EvaluateExpressionVisitor] NextValExpression");
+        log.warn("[EvaluateExpressionVisitor] NextValExpression");
     }
 
     @Override
     public void visit(CollateExpression aThis) {
-        logger.warning("[EvaluateExpressionVisitor] CollateExpression");
+        log.warn("[EvaluateExpressionVisitor] CollateExpression");
     }
 
     @Override
     public void visit(SimilarToExpression aThis) {
-        logger.warning("[EvaluateExpressionVisitor] SimilarToExpression");
+        log.warn("[EvaluateExpressionVisitor] SimilarToExpression");
     }
 
     @Override
     public void visit(ArrayExpression aThis) {
-        logger.warning("[EvaluateExpressionVisitor] ArrayExpression");
+        log.warn("[EvaluateExpressionVisitor] ArrayExpression");
     }
 
     @Override
     public void visit(VariableAssignment aThis) {
-        logger.warning("[EvaluateExpressionVisitor] VariableAssignment");
+        log.warn("[EvaluateExpressionVisitor] VariableAssignment");
     }
 
     @Override
     public void visit(XMLSerializeExpr aThis) {
-        logger.warning("[EvaluateExpressionVisitor] XMLSerializeExpr");
+        log.warn("[EvaluateExpressionVisitor] XMLSerializeExpr");
     }
 }

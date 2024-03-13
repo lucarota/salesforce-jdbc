@@ -1,12 +1,10 @@
 package com.ascendix.jdbc.salesforce.statement.processor;
 
-import com.ascendix.jdbc.salesforce.ForceDriver;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import lombok.extern.slf4j.Slf4j;
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.expression.StringValue;
 import net.sf.jsqlparser.expression.operators.relational.EqualsTo;
@@ -18,9 +16,8 @@ import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.Select;
 import net.sf.jsqlparser.util.SelectUtils;
 
+@Slf4j
 public class DeleteQueryAnalyzer {
-
-    private static final Logger logger = Logger.getLogger(ForceDriver.SF_JDBC_DRIVER_NAME);
 
     private String soql;
     private final Function<String, List<Map<String, Object>>> subSelectResolver;
@@ -58,7 +55,7 @@ public class DeleteQueryAnalyzer {
                 }
             } catch (JSQLParserException e) {
                 if (!silentMode) {
-                    logger.log(Level.SEVERE, "Failed request to create entities with error: " + e.getMessage(), e);
+                    log.error("Failed request to create entities with error: {}", e.getMessage(), e);
                 }
             }
         }
@@ -89,12 +86,12 @@ public class DeleteQueryAnalyzer {
                         records.add((String) subRecord.get("Id"));
                     }
                 } catch (JSQLParserException e) {
-                    logger.log(Level.SEVERE,
+                    log.error(
                         "Failed request to fetch the applicable entities: error in columns to fetch",
                         e);
                 }
             } else {
-                logger.log(Level.SEVERE,
+                log.error(
                     "Failed request to fetch the applicable entities: subSelectResolver not defined");
             }
         }

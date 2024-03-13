@@ -1,6 +1,5 @@
 package com.ascendix.jdbc.salesforce.statement.processor;
 
-import com.ascendix.jdbc.salesforce.ForceDriver;
 import com.ascendix.jdbc.salesforce.delegates.PartnerService;
 import com.ascendix.jdbc.salesforce.statement.processor.utils.ColumnsFinderVisitor;
 import com.ascendix.jdbc.salesforce.statement.processor.utils.UpdateRecordVisitor;
@@ -15,8 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import lombok.extern.slf4j.Slf4j;
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.StringValue;
@@ -34,9 +32,8 @@ import net.sf.jsqlparser.statement.select.SubSelect;
 import net.sf.jsqlparser.statement.update.Update;
 import net.sf.jsqlparser.util.SelectUtils;
 
+@Slf4j
 public class UpdateQueryAnalyzer {
-
-    private static final Logger logger = Logger.getLogger(ForceDriver.SF_JDBC_DRIVER_NAME);
 
     private String soql;
     private final Function<String, List<Map<String, Object>>> subSelectResolver;
@@ -69,12 +66,12 @@ public class UpdateQueryAnalyzer {
 
         @Override
         public void visit(SubSelect subSelect) {
-            logger.warning("SubSelect Visitor");
+            log.warn("SubSelect Visitor");
         }
 
         @Override
         public void visit(ExpressionList expressionList) {
-            logger.finest("Expression Visitor");
+            log.trace("Expression Visitor");
             HashMap<String, Object> fieldValues = new HashMap<>();
             records.add(fieldValues);
 
@@ -90,12 +87,12 @@ public class UpdateQueryAnalyzer {
 
         @Override
         public void visit(NamedExpressionList namedExpressionList) {
-            logger.warning("NamedExpression Visitor");
+            log.warn("NamedExpression Visitor");
         }
 
         @Override
         public void visit(MultiExpressionList multiExprList) {
-            logger.finest("MultiExpression Visitor");
+            log.trace("MultiExpression Visitor");
             multiExprList.getExpressionLists().forEach(expressions -> {
                 expressions.accept(new UpdateItemsListVisitor(columns, records));
             });
@@ -127,7 +124,7 @@ public class UpdateQueryAnalyzer {
                 }
             } catch (JSQLParserException e) {
                 if (!silentMode) {
-                    logger.log(Level.SEVERE, "Failed request to create entities with error: " + e.getMessage(), e);
+                    log.error("Failed request to create entities with error: {}", e.getMessage(), e);
                 }
             }
         }
@@ -193,12 +190,12 @@ public class UpdateQueryAnalyzer {
                         }
                     }
                 } catch (JSQLParserException e) {
-                    logger.log(Level.SEVERE,
+                    log.error(
                         "Failed request to fetch the applicable entities: error in columns to fetch",
                         e);
                 }
             } else {
-                logger.log(Level.SEVERE,
+                log.error(
                     "Failed request to fetch the applicable entities: subSelectResolver not defined");
             }
         }
