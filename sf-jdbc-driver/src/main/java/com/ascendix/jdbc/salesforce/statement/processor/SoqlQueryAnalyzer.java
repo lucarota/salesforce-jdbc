@@ -1,6 +1,5 @@
 package com.ascendix.jdbc.salesforce.statement.processor;
 
-import com.ascendix.jdbc.salesforce.ForceDriver;
 import com.ascendix.jdbc.salesforce.delegates.PartnerService;
 import com.ascendix.jdbc.salesforce.statement.FieldDef;
 import com.sforce.soap.partner.ChildRelationship;
@@ -10,10 +9,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.mule.tools.soql.SOQLDataBaseVisitor;
 import org.mule.tools.soql.SOQLParserHelper;
 import org.mule.tools.soql.exception.SOQLParsingException;
@@ -24,9 +22,9 @@ import org.mule.tools.soql.query.from.ObjectSpec;
 import org.mule.tools.soql.query.select.FieldSpec;
 import org.mule.tools.soql.query.select.FunctionCallSpec;
 
+@Slf4j
 public class SoqlQueryAnalyzer {
 
-    private static final Logger logger = Logger.getLogger(ForceDriver.SF_JDBC_DRIVER_NAME);
     private String soql;
     private final PartnerService partnerService;
 
@@ -185,16 +183,14 @@ public class SoqlQueryAnalyzer {
                         String fields = Arrays.stream(describeSObjectResult.getFields())
                             .limit(100) // Limit to first 100 fields
                             .map(Field::getName).collect(Collectors.joining(", "));
-                        logger.log(Level.INFO,
-                            "Warning in SOQL query parsing. Expansion of * fields to first 100 of "
+                        log.warn("Warning in SOQL query parsing. Expansion of * fields to first 100 of "
                                 + describeSObjectResult.getFields().length
                                 + ". Please fix the query as SOQL does not support * to fetch all the fields");
                         String soqlExpanded = soql.replace("*", fields);
                         queryData = SOQLParserHelper.createSOQLData(soqlExpanded);
                         this.soql = soqlExpanded;
                     } catch (SOQLParsingException e2) {
-                        logger.log(Level.WARNING,
-                            "Error in SOQL query parsing. Expansion of * failed. Please fix the query as SOQL does not support * to fetch all the fields",
+                        log.warn("Error in SOQL query parsing. Expansion of * failed. Please fix the query as SOQL does not support * to fetch all the fields",
                             e2);
                         throw new SOQLParsingException(
                             "Error in SOQL query parsing. Expansion of * failed. Please fix the query as SOQL does not support * to fetch all the fields",

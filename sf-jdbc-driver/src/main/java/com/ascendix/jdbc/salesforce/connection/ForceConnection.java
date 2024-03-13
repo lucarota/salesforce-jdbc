@@ -7,7 +7,7 @@ import com.ascendix.jdbc.salesforce.statement.ForcePreparedStatement;
 import com.sforce.soap.partner.DescribeSObjectResult;
 import com.sforce.soap.partner.PartnerConnection;
 import com.sforce.ws.ConnectionException;
-
+import com.sforce.ws.ConnectorConfig;
 import java.io.IOException;
 import java.sql.Array;
 import java.sql.Blob;
@@ -29,12 +29,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.Executor;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import com.sforce.ws.ConnectorConfig;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class ForceConnection implements Connection {
 
     private final PartnerConnection partnerConnection;
@@ -48,7 +46,7 @@ public class ForceConnection implements Connection {
     @Getter
     private final PartnerService partnerService;
 
-    private static final Logger logger = Logger.getLogger(ForceDriver.SF_JDBC_DRIVER_NAME);
+
 
     private final Map<String, DescribeSObjectResult> connectionCache = new HashMap<>();
     private final Properties clientInfo = new Properties();
@@ -71,7 +69,7 @@ public class ForceConnection implements Connection {
         String currentUserName = null;
         try {
             currentUserName = partnerConnection.getUserInfo().getUserName();
-            logger.finest(
+            log.trace(
             "[Conn] updatePartnerConnection IMPLEMENTED newUserName=" + userName + " oldUserName=" + currentUserName
                 + " newUrl=" + url);
             ConnectorConfig partnerConfig = partnerConnection.getConfig();
@@ -79,16 +77,16 @@ public class ForceConnection implements Connection {
             forceConnectionInfo.setUserName(userName);
             forceConnectionInfo.setPassword(userPass);
             partnerConnectionUpdated = ForceService.createPartnerConnection(forceConnectionInfo);
-            logger.info("[Conn] updatePartnerConnection UPDATED to newUserName=" + userName);
+            log.info("[Conn] updatePartnerConnection UPDATED to newUserName={}", userName);
             result = true;
         } catch (IOException e) {
-            logger.log(Level.SEVERE,
+            log.error(
                     "[Conn] updatePartnerConnection UPDATE FAILED to newUserName=" + userName + " currentUserName="
                             + currentUserName,
                     e);
             throw new ConnectionException(e.getMessage());
         } catch (ConnectionException e) {
-            logger.log(Level.SEVERE,
+            log.error(
                 "[Conn] updatePartnerConnection UPDATE FAILED to newUserName=" + userName + " currentUserName="
                     + currentUserName,
                 e);
@@ -104,7 +102,7 @@ public class ForceConnection implements Connection {
 
     @Override
     public PreparedStatement prepareStatement(String soql) {
-        logger.finest("[Conn] prepareStatement IMPLEMENTED " + soql);
+        log.trace("[Conn] prepareStatement IMPLEMENTED {}", soql);
         return new ForcePreparedStatement(this, soql);
     }
 
@@ -129,19 +127,19 @@ public class ForceConnection implements Connection {
 
     @Override
     public Statement createStatement() {
-        logger.finest("[Conn] createStatement 1 IMPLEMENTED");
+        log.trace("[Conn] createStatement 1 IMPLEMENTED");
         return new ForcePreparedStatement(this);
     }
 
     @Override
     public CallableStatement prepareCall(String sql) {
-        logger.finer("[Conn] prepareCall NOT_IMPLEMENTED");
+        log.trace("[Conn] prepareCall NOT_IMPLEMENTED");
         return null;
     }
 
     @Override
     public String nativeSQL(String sql) {
-        logger.finer("[Conn] nativeSQL NOT_IMPLEMENTED");
+        log.trace("[Conn] nativeSQL NOT_IMPLEMENTED");
         return null;
     }
 
@@ -158,17 +156,17 @@ public class ForceConnection implements Connection {
 
     @Override
     public void commit() throws SQLException {
-        logger.finer("[Conn] commit NOT_IMPLEMENTED");
+        log.trace("[Conn] commit NOT_IMPLEMENTED");
     }
 
     @Override
     public void rollback() throws SQLException {
-        logger.finer("[Conn] rollback NOT_IMPLEMENTED");
+        log.trace("[Conn] rollback NOT_IMPLEMENTED");
     }
 
     @Override
     public void close() throws SQLException {
-        logger.finer("[Conn] close NOT_IMPLEMENTED");
+        log.trace("[Conn] close NOT_IMPLEMENTED");
     }
 
     @Override
@@ -189,12 +187,12 @@ public class ForceConnection implements Connection {
     @Override
     public void setCatalog(String catalog) throws SQLException {
         // TODO Auto-generated method stub
-        logger.finer("[Conn] setCatalog NOT_IMPLEMENTED set to '" + catalog + "'");
+        log.trace("[Conn] setCatalog NOT_IMPLEMENTED set to '{}'", catalog);
     }
 
     @Override
     public String getCatalog() throws SQLException {
-        logger.finest("[Conn] getCatalog IMPLEMENTED returning " + ForceDatabaseMetaData.DEFAULT_CATALOG);
+        log.trace("[Conn] getCatalog IMPLEMENTED returning {}", ForceDatabaseMetaData.DEFAULT_CATALOG);
         return ForceDatabaseMetaData.DEFAULT_CATALOG;
     }
 
@@ -231,7 +229,7 @@ public class ForceConnection implements Connection {
 
     @Override
     public CallableStatement prepareCall(String sql, int resultSetType, int resultSetConcurrency) throws SQLException {
-        logger.finer("[Conn] prepareCall NOT_IMPLEMENTED " + sql);
+        log.trace("[Conn] prepareCall NOT_IMPLEMENTED {}", sql);
         return null;
     }
 
@@ -270,7 +268,7 @@ public class ForceConnection implements Connection {
 
     @Override
     public void releaseSavepoint(Savepoint savepoint) throws SQLException {
-        logger.finer("[Conn] releaseSavepoint NOT_IMPLEMENTED");
+        log.trace("[Conn] releaseSavepoint NOT_IMPLEMENTED");
     }
 
     @Override
@@ -302,7 +300,7 @@ public class ForceConnection implements Connection {
     @Override
     public CallableStatement prepareCall(String sql, int resultSetType, int resultSetConcurrency,
         int resultSetHoldability) throws SQLException {
-        logger.finer("[Conn] prepareCall 2 NOT_IMPLEMENTED " + sql);
+        log.trace("[Conn] prepareCall 2 NOT_IMPLEMENTED {}", sql);
         return null;
     }
 
@@ -333,33 +331,33 @@ public class ForceConnection implements Connection {
     @Override
     public boolean isValid(int timeout) throws SQLException {
         // TODO Auto-generated method stub
-        logger.finer("[Conn] isValid NOT_IMPLEMENTED");
+        log.trace("[Conn] isValid NOT_IMPLEMENTED");
         return true;
     }
 
     @Override
     public void setClientInfo(String name, String value) throws SQLClientInfoException {
         // TODO Auto-generated method stub
-        logger.finest("[Conn] setClientInfo 1 IMPLEMENTED " + name + "=" + value);
+        log.trace("[Conn] setClientInfo 1 IMPLEMENTED {}={}", name, value);
         clientInfo.setProperty(name, value);
     }
 
     @Override
     public void setClientInfo(Properties properties) throws SQLClientInfoException {
-        logger.finest("[Conn] setClientInfo 2 IMPLEMENTED properties<>");
+        log.trace("[Conn] setClientInfo 2 IMPLEMENTED properties<>");
         properties.stringPropertyNames()
             .forEach(propName -> clientInfo.setProperty(propName, properties.getProperty(propName)));
     }
 
     @Override
     public String getClientInfo(String name) throws SQLException {
-        logger.finest("[Conn] getClientInfo 1 IMPLEMENTED for '" + name + "'");
+        log.trace("[Conn] getClientInfo 1 IMPLEMENTED for '{}'", name);
         return clientInfo.getProperty(name);
     }
 
     @Override
     public Properties getClientInfo() throws SQLException {
-        logger.finest("[Conn] getClientInfo 2 IMPLEMENTED ");
+        log.trace("[Conn] getClientInfo 2 IMPLEMENTED ");
         return clientInfo;
     }
 
@@ -378,7 +376,7 @@ public class ForceConnection implements Connection {
     @Override
     public void setSchema(String schema) throws SQLException {
         // TODO Auto-generated method stub
-        logger.finer("[Conn] setSchema NOT_IMPLEMENTED");
+        log.trace("[Conn] setSchema NOT_IMPLEMENTED");
     }
 
     @Override

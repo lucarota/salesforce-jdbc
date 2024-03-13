@@ -1,6 +1,5 @@
 package com.ascendix.jdbc.salesforce.resultset;
 
-import com.ascendix.jdbc.salesforce.ForceDriver;
 import com.ascendix.jdbc.salesforce.metadata.ColumnMap;
 import java.io.InputStream;
 import java.io.Reader;
@@ -36,12 +35,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
-import java.util.logging.Logger;
 import javax.sql.rowset.serial.SerialBlob;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class CachedResultSet implements ResultSet, Serializable {
-
-    private static final Logger logger = Logger.getLogger(ForceDriver.SF_JDBC_DRIVER_NAME);
 
     @Serial
     private static final long serialVersionUID = 1L;
@@ -473,7 +471,7 @@ public class CachedResultSet implements ResultSet, Serializable {
     }
 
     public void afterLast() throws SQLException {
-        logger.warning("after last check");
+        log.warn("after last check");
     }
 
     public void beforeFirst() throws SQLException {
@@ -483,7 +481,7 @@ public class CachedResultSet implements ResultSet, Serializable {
     }
 
     public void clearWarnings() throws SQLException {
-        logger.info("clearWarnings");
+        log.info("clearWarnings");
         this.warningsChain = null;
     }
 
@@ -608,7 +606,7 @@ public class CachedResultSet implements ResultSet, Serializable {
     }
 
     public void addWarning(SQLWarning warn) {
-        logger.info("Adding Warning: " + warn.getMessage());
+        log.info("Adding Warning: {}", warn.getMessage());
         if (warningsChain != null) {
             SQLWarning last = warningsChain;
             while (last != null && last.getNextWarning() != null) {
@@ -622,7 +620,7 @@ public class CachedResultSet implements ResultSet, Serializable {
     }
 
     public void addWarning(String reason) {
-        logger.info("Adding Warning: " + reason);
+        log.info("Adding Warning: {}", reason);
         if (warningsChain != null) {
             SQLWarning last = warningsChain;
             while (last != null && last.getNextWarning() != null) {

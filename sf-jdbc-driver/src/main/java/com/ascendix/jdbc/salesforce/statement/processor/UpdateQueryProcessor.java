@@ -1,6 +1,5 @@
 package com.ascendix.jdbc.salesforce.statement.processor;
 
-import com.ascendix.jdbc.salesforce.ForceDriver;
 import com.ascendix.jdbc.salesforce.delegates.PartnerService;
 import com.ascendix.jdbc.salesforce.resultset.CommandLogCachedResultSet;
 import com.ascendix.jdbc.salesforce.statement.ForcePreparedStatement;
@@ -11,13 +10,11 @@ import java.sql.ResultSet;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class UpdateQueryProcessor {
-
-    private static final Logger logger = Logger.getLogger(ForceDriver.SF_JDBC_DRIVER_NAME);
 
     public static boolean isUpdateQuery(String soqlQuery, UpdateQueryAnalyzer queryAnalyzer) {
         if (soqlQuery == null || soqlQuery.trim().isEmpty()) {
@@ -54,7 +51,7 @@ public class UpdateQueryProcessor {
             statement.setResultSet(resultSet);
         } catch (ConnectionException e) {
             resultSet.addWarning("Failed request to update entities with error: " + e.getMessage());
-            logger.log(Level.SEVERE, "Failed request to update entities with error: " + e.getMessage(), e);
+            log.error("Failed request to update entities with error: {}", e.getMessage(), e);
         }
         return resultSet;
     }

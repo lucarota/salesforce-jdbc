@@ -1,6 +1,5 @@
 package com.ascendix.jdbc.salesforce.connection;
 
-import com.ascendix.jdbc.salesforce.ForceDriver;
 import com.ascendix.salesforce.oauth.ForceOAuthClient;
 import com.sforce.soap.partner.Connector;
 import com.sforce.soap.partner.PartnerConnection;
@@ -16,8 +15,8 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import lombok.experimental.UtilityClass;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.mapdb.DB;
@@ -26,9 +25,8 @@ import org.mapdb.HTreeMap;
 import org.mapdb.Serializer;
 
 @UtilityClass
+@Slf4j
 public class ForceService {
-
-    private static final Logger logger = Logger.getLogger(ForceDriver.SF_JDBC_DRIVER_NAME);
 
     public static final String DEFAULT_LOGIN_DOMAIN = "login.salesforce.com";
     private static final String SANDBOX_LOGIN_DOMAIN = "test.salesforce.com";
@@ -121,7 +119,7 @@ public class ForceService {
                 partnerConfig.setTraceFile(info.getLogfile());
                 partnerConfig.setTraceMessage(true);
             } catch (FileNotFoundException e) {
-                logger.log(Level.WARNING, "Error creating log file", e);
+                log.warn("Error creating log file", e);
             }
         }
 
@@ -132,7 +130,7 @@ public class ForceService {
         try {
             QueryResult select_name_from_organization = connection.query("Select Name from Organization");
             if (select_name_from_organization.getSize() != 1) {
-                logger.log(Level.SEVERE, "Unable to verify connectivity for URL provided");
+                log.error("Unable to verify connectivity for URL provided");
             }
         } catch (UnexpectedErrorFault e) {
             if (e.getExceptionCode() != null && "INVALID_SESSION_ID".equals(e.getExceptionCode().name())) {
@@ -143,18 +141,18 @@ public class ForceService {
                     URLConnection urlConnection = serviceUrl.openConnection();
                     urlConnection.connect();
                 } catch (MalformedURLException ex) {
-                    logger.log(Level.SEVERE, "The format of the URL is wrong", ex);
+                    log.error("The format of the URL is wrong", ex);
                     throw new ConnectionException("Failed to connect to the host", ex);
                 } catch (IOException ioException) {
-                    logger.log(Level.SEVERE, "Failed to connect to the host", ioException);
+                    log.error("Failed to connect to the host", ioException);
                     throw new ConnectionException("Failed to connect to the host", ioException);
                 }
             }
         } catch (ConnectionException e) {
-            logger.log(Level.SEVERE, "Failed to establish connection", e);
+            log.error("Failed to establish connection", e);
             throw new ConnectionException("Failed to connect, unexpected error:", e);
         } catch (Exception e) {
-            logger.log(Level.SEVERE, "Failed to connect, unexpected error:", e);
+            log.error("Failed to connect, unexpected error:", e);
             throw new ConnectionException("Failed to connect, unexpected error:", e);
         }
     }

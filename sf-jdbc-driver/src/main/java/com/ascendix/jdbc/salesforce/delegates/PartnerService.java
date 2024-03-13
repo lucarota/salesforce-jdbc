@@ -1,6 +1,5 @@
 package com.ascendix.jdbc.salesforce.delegates;
 
-import com.ascendix.jdbc.salesforce.ForceDriver;
 import com.ascendix.jdbc.salesforce.metadata.Column;
 import com.ascendix.jdbc.salesforce.metadata.Table;
 import com.ascendix.jdbc.salesforce.statement.FieldDef;
@@ -25,14 +24,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.function.Function;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.IteratorUtils;
 
+@Slf4j
 public class PartnerService {
-
-    private static final Logger logger = Logger.getLogger(ForceDriver.SF_JDBC_DRIVER_NAME);
 
     private final PartnerConnection partnerConnection;
 
@@ -45,12 +43,12 @@ public class PartnerService {
     }
 
     public List<Table> getTables() throws ConnectionException {
-        logger.finest("[PartnerService] getTables IMPLEMENTED");
+        log.trace("[PartnerService] getTables IMPLEMENTED");
         Map<String, DescribeSObjectResult> sObjects = getSObjectsDescription();
         List<Table> tables = sObjects.values().stream()
             .map(this::convertToTable)
             .collect(Collectors.toList());
-        logger.info("[PartnerService] getTables tables count=" + tables.size());
+        log.info("[PartnerService] getTables tables count={}", tables.size());
         return tables;
     }
 
@@ -74,7 +72,7 @@ public class PartnerService {
     }
 
     private Table convertToTable(DescribeSObjectResult so) {
-        logger.finest("[PartnerService] convertToTable " + so.getName());
+        log.trace("[PartnerService] convertToTable {}", so.getName());
         List<Field> fields = Arrays.asList(so.getFields());
         List<Column> columns = fields.stream()
             .map(this::convertToColumn)
@@ -129,7 +127,7 @@ public class PartnerService {
 
     private Map<String, DescribeSObjectResult> getSObjectsDescription() throws ConnectionException {
         if (sObjectsCache.isEmpty()) {
-            logger.finest("Load all SObjects");
+            log.trace("Load all SObjects");
             Map<String, DescribeSObjectResult> cache;
             DescribeGlobalResult describeGlobals = getDescribeGlobal();
             List<String> tableNames = Arrays.stream(describeGlobals.getSobjects())
@@ -176,7 +174,7 @@ public class PartnerService {
     }
 
     public List<List> query(String soql, List<FieldDef> expectedSchema) throws ConnectionException {
-        logger.finest("[PartnerService] query " + soql);
+        log.trace("[PartnerService] query {}", soql);
         List<List> resultRows = Collections.synchronizedList(new LinkedList<>());
         QueryResult queryResult = null;
         do {
@@ -191,7 +189,7 @@ public class PartnerService {
 
     public Map.Entry<List<List>, String> queryStart(String soql, List<FieldDef> expectedSchema)
         throws ConnectionException {
-        logger.finest("[PartnerService] queryStart " + soql);
+        log.trace("[PartnerService] queryStart {}", soql);
         QueryResult queryResult = partnerConnection.query(soql);
         String queryLocator = queryResult.isDone() ? null : queryResult.getQueryLocator();
         return new AbstractMap.SimpleEntry<>(Collections.unmodifiableList(extractQueryResultData(queryResult)),
@@ -201,7 +199,7 @@ public class PartnerService {
 
     public Map.Entry<List<List>, String> queryMore(String queryLocator, List<FieldDef> expectedSchema)
         throws ConnectionException {
-        logger.finest("[PartnerService] queryMore " + queryLocator);
+        log.trace("[PartnerService] queryMore {}", queryLocator);
         QueryResult queryResult = partnerConnection.queryMore(queryLocator);
         queryLocator = queryResult.isDone() ? null : queryResult.getQueryLocator();
         return new AbstractMap.SimpleEntry<>(Collections.unmodifiableList(extractQueryResultData(queryResult)),
