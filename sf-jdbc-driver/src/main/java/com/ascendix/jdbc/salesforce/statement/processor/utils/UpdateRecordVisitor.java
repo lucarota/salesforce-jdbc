@@ -3,7 +3,6 @@ package com.ascendix.jdbc.salesforce.statement.processor.utils;
 import java.util.List;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
-import net.sf.jsqlparser.expression.AllComparisonExpression;
 import net.sf.jsqlparser.expression.AnalyticExpression;
 import net.sf.jsqlparser.expression.AnyComparisonExpression;
 import net.sf.jsqlparser.expression.ArrayExpression;
@@ -11,16 +10,12 @@ import net.sf.jsqlparser.expression.CaseExpression;
 import net.sf.jsqlparser.expression.CastExpression;
 import net.sf.jsqlparser.expression.CollateExpression;
 import net.sf.jsqlparser.expression.DateTimeLiteralExpression;
-import net.sf.jsqlparser.expression.DateValue;
 import net.sf.jsqlparser.expression.DoubleValue;
 import net.sf.jsqlparser.expression.Expression;
-import net.sf.jsqlparser.expression.ExpressionVisitor;
+import net.sf.jsqlparser.expression.ExpressionVisitorAdapter;
 import net.sf.jsqlparser.expression.ExtractExpression;
-import net.sf.jsqlparser.expression.Function;
 import net.sf.jsqlparser.expression.HexValue;
 import net.sf.jsqlparser.expression.IntervalExpression;
-import net.sf.jsqlparser.expression.JdbcNamedParameter;
-import net.sf.jsqlparser.expression.JdbcParameter;
 import net.sf.jsqlparser.expression.JsonExpression;
 import net.sf.jsqlparser.expression.KeepExpression;
 import net.sf.jsqlparser.expression.LongValue;
@@ -33,7 +28,6 @@ import net.sf.jsqlparser.expression.OracleHierarchicalExpression;
 import net.sf.jsqlparser.expression.OracleHint;
 import net.sf.jsqlparser.expression.Parenthesis;
 import net.sf.jsqlparser.expression.RowConstructor;
-import net.sf.jsqlparser.expression.SignedExpression;
 import net.sf.jsqlparser.expression.StringValue;
 import net.sf.jsqlparser.expression.TimeKeyExpression;
 import net.sf.jsqlparser.expression.TimeValue;
@@ -45,9 +39,7 @@ import net.sf.jsqlparser.expression.WhenClause;
 import net.sf.jsqlparser.expression.XMLSerializeExpr;
 import net.sf.jsqlparser.expression.operators.arithmetic.Addition;
 import net.sf.jsqlparser.expression.operators.arithmetic.BitwiseAnd;
-import net.sf.jsqlparser.expression.operators.arithmetic.BitwiseLeftShift;
 import net.sf.jsqlparser.expression.operators.arithmetic.BitwiseOr;
-import net.sf.jsqlparser.expression.operators.arithmetic.BitwiseRightShift;
 import net.sf.jsqlparser.expression.operators.arithmetic.BitwiseXor;
 import net.sf.jsqlparser.expression.operators.arithmetic.Concat;
 import net.sf.jsqlparser.expression.operators.arithmetic.Division;
@@ -80,7 +72,7 @@ import net.sf.jsqlparser.statement.select.SubSelect;
 import net.sf.jsqlparser.statement.update.Update;
 
 @Slf4j
-public class UpdateRecordVisitor implements ExpressionVisitor {
+public class UpdateRecordVisitor extends ExpressionVisitorAdapter {
 
     private final Update updateStatement;
     private final Map<String, Object> recordFieldsToUpdate;
@@ -99,39 +91,9 @@ public class UpdateRecordVisitor implements ExpressionVisitor {
     }
 
     @Override
-    public void visit(BitwiseRightShift aThis) {
-        log.warn("[UpdateVisitor] BitwiseRightShift");
-    }
-
-    @Override
-    public void visit(BitwiseLeftShift aThis) {
-        log.warn("[UpdateVisitor] BitwiseLeftShift");
-    }
-
-    @Override
     public void visit(NullValue nullValue) {
         log.trace("[UpdateVisitor] NullValue column={}", columnName);
         recordFieldsToUpdate.put(columnName, null);
-    }
-
-    @Override
-    public void visit(Function function) {
-        log.warn("[UpdateVisitor] Function function={}", function.getName());
-    }
-
-    @Override
-    public void visit(SignedExpression signedExpression) {
-        log.warn("[UpdateVisitor] SignedExpression");
-    }
-
-    @Override
-    public void visit(JdbcParameter jdbcParameter) {
-        log.warn("[UpdateVisitor] BitwiseRightShift");
-    }
-
-    @Override
-    public void visit(JdbcNamedParameter jdbcNamedParameter) {
-        log.warn("[UpdateVisitor] JdbcNamedParameter");
     }
 
     @Override
@@ -150,11 +112,6 @@ public class UpdateRecordVisitor implements ExpressionVisitor {
     public void visit(HexValue hexValue) {
         log.trace("[UpdateVisitor] HexValue={} column={}", hexValue.getValue() , columnName);
         recordFieldsToUpdate.put(columnName, hexValue.getValue());
-    }
-
-    @Override
-    public void visit(DateValue dateValue) {
-        log.warn("[UpdateVisitor] DateValue column={}", columnName);
     }
 
     @Override
@@ -345,12 +302,6 @@ public class UpdateRecordVisitor implements ExpressionVisitor {
     public void visit(ExistsExpression existsExpression) {
         log.trace("[UpdateVisitor] ExistsExpression");
         evaluate(existsExpression);
-    }
-
-    @Override
-    public void visit(AllComparisonExpression allComparisonExpression) {
-        log.trace("[UpdateVisitor] AllComparisonExpression");
-        evaluate(allComparisonExpression);
     }
 
     @Override

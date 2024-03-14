@@ -9,14 +9,12 @@ import java.util.function.Function;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.expression.operators.relational.ExpressionList;
-import net.sf.jsqlparser.expression.operators.relational.ItemsListVisitor;
+import net.sf.jsqlparser.expression.operators.relational.ItemsListVisitorAdapter;
 import net.sf.jsqlparser.expression.operators.relational.MultiExpressionList;
-import net.sf.jsqlparser.expression.operators.relational.NamedExpressionList;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.insert.Insert;
-import net.sf.jsqlparser.statement.select.SubSelect;
 
 @Slf4j
 public class InsertQueryAnalyzer {
@@ -39,7 +37,7 @@ public class InsertQueryAnalyzer {
         return getQueryData(true) != null;
     }
 
-    public class InsertItemsListVisitor implements ItemsListVisitor {
+    public class InsertItemsListVisitor extends ItemsListVisitorAdapter {
 
         List<Column> columns;
         List<Map<String, Object>> records;
@@ -47,11 +45,6 @@ public class InsertQueryAnalyzer {
         public InsertItemsListVisitor(List<Column> columns, List<Map<String, Object>> records) {
             this.columns = columns;
             this.records = records;
-        }
-
-        @Override
-        public void visit(SubSelect subSelect) {
-            log.warn("SubSelect Visitor");
         }
 
         @Override
@@ -68,11 +61,6 @@ public class InsertQueryAnalyzer {
                         subSelectResolver)
                 );
             }
-        }
-
-        @Override
-        public void visit(NamedExpressionList namedExpressionList) {
-            log.warn("NamedExpression Visitor");
         }
 
         @Override
