@@ -7,7 +7,6 @@ import com.ascendix.jdbc.salesforce.statement.ForcePreparedStatement;
 import com.sforce.soap.partner.DescribeSObjectResult;
 import com.sforce.soap.partner.PartnerConnection;
 import com.sforce.ws.ConnectionException;
-import com.sforce.ws.ConnectorConfig;
 import java.io.IOException;
 import java.sql.Array;
 import java.sql.Blob;
@@ -18,8 +17,6 @@ import java.sql.DatabaseMetaData;
 import java.sql.NClob;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLClientInfoException;
-import java.sql.SQLException;
 import java.sql.SQLWarning;
 import java.sql.SQLXML;
 import java.sql.Savepoint;
@@ -46,9 +43,6 @@ public class ForceConnection implements Connection {
     @Getter
     private final PartnerService partnerService;
 
-
-
-    private final Map<String, DescribeSObjectResult> connectionCache = new HashMap<>();
     private final Properties clientInfo = new Properties();
 
     public ForceConnection(PartnerConnection partnerConnection, PartnerService partnerService) {
@@ -65,20 +59,17 @@ public class ForceConnection implements Connection {
     }
 
     public boolean updatePartnerConnection(String url, String userName, String userPass) throws ConnectionException {
-        boolean result = false;
         String currentUserName = null;
         try {
             currentUserName = partnerConnection.getUserInfo().getUserName();
             log.trace(
             "[Conn] updatePartnerConnection IMPLEMENTED newUserName=" + userName + " oldUserName=" + currentUserName
                 + " newUrl=" + url);
-            ConnectorConfig partnerConfig = partnerConnection.getConfig();
             ForceConnectionInfo forceConnectionInfo = ForceDriver.parseConnectionUrl(url);
             forceConnectionInfo.setUserName(userName);
             forceConnectionInfo.setPassword(userPass);
             partnerConnectionUpdated = ForceService.createPartnerConnection(forceConnectionInfo);
             log.info("[Conn] updatePartnerConnection UPDATED to newUserName={}", userName);
-            result = true;
         } catch (IOException e) {
             log.error(
                     "[Conn] updatePartnerConnection UPDATE FAILED to newUserName=" + userName + " currentUserName="
@@ -93,7 +84,7 @@ public class ForceConnection implements Connection {
             throw e;
         }
 
-        return result;
+        return true;
     }
 
     public DatabaseMetaData getMetaData() {
@@ -109,10 +100,6 @@ public class ForceConnection implements Connection {
     @Override
     public String getSchema() {
         return "Salesforce";
-    }
-
-    public Map<String, DescribeSObjectResult> getCache() {
-        return connectionCache;
     }
 
     @Override
@@ -145,255 +132,233 @@ public class ForceConnection implements Connection {
 
     @Override
     public void setAutoCommit(boolean autoCommit) {
-        // TODO Auto-generated method stub
-
     }
 
     @Override
-    public boolean getAutoCommit() throws SQLException {
+    public boolean getAutoCommit() {
         return true;
     }
 
     @Override
-    public void commit() throws SQLException {
+    public void commit() {
         log.trace("[Conn] commit NOT_IMPLEMENTED");
     }
 
     @Override
-    public void rollback() throws SQLException {
+    public void rollback() {
         log.trace("[Conn] rollback NOT_IMPLEMENTED");
     }
 
     @Override
-    public void close() throws SQLException {
+    public void close() {
         log.trace("[Conn] close NOT_IMPLEMENTED");
     }
 
     @Override
-    public boolean isClosed() throws SQLException {
-        // TODO Auto-generated method stub
+    public boolean isClosed() {
         return false;
     }
 
     @Override
-    public void setReadOnly(boolean readOnly) throws SQLException {
+    public void setReadOnly(boolean readOnly) {
     }
 
     @Override
-    public boolean isReadOnly() throws SQLException {
+    public boolean isReadOnly() {
         return false;
     }
 
     @Override
-    public void setCatalog(String catalog) throws SQLException {
-        // TODO Auto-generated method stub
+    public void setCatalog(String catalog) {
         log.trace("[Conn] setCatalog NOT_IMPLEMENTED set to '{}'", catalog);
     }
 
     @Override
-    public String getCatalog() throws SQLException {
+    public String getCatalog() {
         log.trace("[Conn] getCatalog IMPLEMENTED returning {}", ForceDatabaseMetaData.DEFAULT_CATALOG);
         return ForceDatabaseMetaData.DEFAULT_CATALOG;
     }
 
     @Override
-    public void setTransactionIsolation(int level) throws SQLException {
-        // TODO Auto-generated method stub
-
+    public void setTransactionIsolation(int level) {
     }
 
     @Override
-    public int getTransactionIsolation() throws SQLException {
+    public int getTransactionIsolation() {
         return Connection.TRANSACTION_NONE;
     }
 
     @Override
-    public SQLWarning getWarnings() throws SQLException {
+    public SQLWarning getWarnings() {
         return null;
     }
 
     @Override
-    public void clearWarnings() throws SQLException {
+    public void clearWarnings() {
     }
 
     @Override
-    public Statement createStatement(int resultSetType, int resultSetConcurrency) throws SQLException {
+    public Statement createStatement(int resultSetType, int resultSetConcurrency) {
         return new ForcePreparedStatement(this);
     }
 
     @Override
-    public PreparedStatement prepareStatement(String sql, int resultSetType, int resultSetConcurrency)
-        throws SQLException {
+    public PreparedStatement prepareStatement(String sql, int resultSetType, int resultSetConcurrency) {
         return new ForcePreparedStatement(this, sql);
     }
 
     @Override
-    public CallableStatement prepareCall(String sql, int resultSetType, int resultSetConcurrency) throws SQLException {
+    public CallableStatement prepareCall(String sql, int resultSetType, int resultSetConcurrency) {
         log.trace("[Conn] prepareCall NOT_IMPLEMENTED {}", sql);
         return null;
     }
 
     @Override
-    public Map<String, Class<?>> getTypeMap() throws SQLException {
+    public Map<String, Class<?>> getTypeMap() {
         throw new UnsupportedOperationException("Feature is not supported.");
     }
 
     @Override
-    public void setTypeMap(Map<String, Class<?>> map) throws SQLException {
+    public void setTypeMap(Map<String, Class<?>> map) {
     }
 
     @Override
-    public void setHoldability(int holdability) throws SQLException {
+    public void setHoldability(int holdability) {
     }
 
     @Override
-    public int getHoldability() throws SQLException {
+    public int getHoldability() {
         return ResultSet.CLOSE_CURSORS_AT_COMMIT;
     }
 
     @Override
-    public Savepoint setSavepoint() throws SQLException {
+    public Savepoint setSavepoint() {
         throw new UnsupportedOperationException("Feature is not supported.");
     }
 
     @Override
-    public Savepoint setSavepoint(String name) throws SQLException {
+    public Savepoint setSavepoint(String name) {
         throw new UnsupportedOperationException("Feature is not supported.");
     }
 
     @Override
-    public void rollback(Savepoint savepoint) throws SQLException {
+    public void rollback(Savepoint savepoint) {
         rollback();
     }
 
     @Override
-    public void releaseSavepoint(Savepoint savepoint) throws SQLException {
+    public void releaseSavepoint(Savepoint savepoint) {
         log.trace("[Conn] releaseSavepoint NOT_IMPLEMENTED");
     }
 
     @Override
-    public Statement createStatement(int resultSetType, int resultSetConcurrency, int resultSetHoldability)
-        throws SQLException {
+    public Statement createStatement(int resultSetType, int resultSetConcurrency, int resultSetHoldability) {
         return new ForcePreparedStatement(this);
     }
 
     @Override
     public PreparedStatement prepareStatement(String sql, int resultSetType, int resultSetConcurrency,
-        int resultSetHoldability) throws SQLException {
+        int resultSetHoldability) {
         return new ForcePreparedStatement(this, sql);
     }
     @Override
-    public PreparedStatement prepareStatement(String sql, int autoGeneratedKeys) throws SQLException {
+    public PreparedStatement prepareStatement(String sql, int autoGeneratedKeys) {
         return new ForcePreparedStatement(this, sql, autoGeneratedKeys);
     }
 
     @Override
-    public PreparedStatement prepareStatement(String sql, int[] columnIndexes) throws SQLException {
+    public PreparedStatement prepareStatement(String sql, int[] columnIndexes) {
         return new ForcePreparedStatement(this, sql);
     }
 
     @Override
-    public PreparedStatement prepareStatement(String sql, String[] columnNames) throws SQLException {
+    public PreparedStatement prepareStatement(String sql, String[] columnNames) {
         return new ForcePreparedStatement(this, sql, columnNames.length > 0 ? Statement.RETURN_GENERATED_KEYS : Statement.NO_GENERATED_KEYS);
     }
 
     @Override
     public CallableStatement prepareCall(String sql, int resultSetType, int resultSetConcurrency,
-        int resultSetHoldability) throws SQLException {
+        int resultSetHoldability) {
         log.trace("[Conn] prepareCall 2 NOT_IMPLEMENTED {}", sql);
         return null;
     }
 
     @Override
-    public Clob createClob() throws SQLException {
-        // TODO Auto-generated method stub
+    public Clob createClob() {
         return null;
     }
 
     @Override
-    public Blob createBlob() throws SQLException {
-        // TODO Auto-generated method stub
+    public Blob createBlob() {
         return null;
     }
 
     @Override
-    public NClob createNClob() throws SQLException {
-        // TODO Auto-generated method stub
+    public NClob createNClob() {
         return null;
     }
 
     @Override
-    public SQLXML createSQLXML() throws SQLException {
-        // TODO Auto-generated method stub
+    public SQLXML createSQLXML() {
         return null;
     }
 
     @Override
-    public boolean isValid(int timeout) throws SQLException {
-        // TODO Auto-generated method stub
+    public boolean isValid(int timeout) {
         log.trace("[Conn] isValid NOT_IMPLEMENTED");
         return true;
     }
 
     @Override
-    public void setClientInfo(String name, String value) throws SQLClientInfoException {
-        // TODO Auto-generated method stub
+    public void setClientInfo(String name, String value) {
         log.trace("[Conn] setClientInfo 1 IMPLEMENTED {}={}", name, value);
         clientInfo.setProperty(name, value);
     }
 
     @Override
-    public void setClientInfo(Properties properties) throws SQLClientInfoException {
+    public void setClientInfo(Properties properties) {
         log.trace("[Conn] setClientInfo 2 IMPLEMENTED properties<>");
         properties.stringPropertyNames()
             .forEach(propName -> clientInfo.setProperty(propName, properties.getProperty(propName)));
     }
 
     @Override
-    public String getClientInfo(String name) throws SQLException {
+    public String getClientInfo(String name) {
         log.trace("[Conn] getClientInfo 1 IMPLEMENTED for '{}'", name);
         return clientInfo.getProperty(name);
     }
 
     @Override
-    public Properties getClientInfo() throws SQLException {
+    public Properties getClientInfo() {
         log.trace("[Conn] getClientInfo 2 IMPLEMENTED ");
         return clientInfo;
     }
 
     @Override
-    public Array createArrayOf(String typeName, Object[] elements) throws SQLException {
-        // TODO Auto-generated method stub
+    public Array createArrayOf(String typeName, Object[] elements) {
         return null;
     }
 
     @Override
-    public Struct createStruct(String typeName, Object[] attributes) throws SQLException {
-        // TODO Auto-generated method stub
+    public Struct createStruct(String typeName, Object[] attributes) {
         return null;
     }
 
     @Override
-    public void setSchema(String schema) throws SQLException {
-        // TODO Auto-generated method stub
+    public void setSchema(String schema) {
         log.trace("[Conn] setSchema NOT_IMPLEMENTED");
     }
 
     @Override
-    public void abort(Executor executor) throws SQLException {
-        // TODO Auto-generated method stub
-
+    public void abort(Executor executor) {
     }
 
     @Override
-    public void setNetworkTimeout(Executor executor, int milliseconds) throws SQLException {
-        // TODO Auto-generated method stub
-
+    public void setNetworkTimeout(Executor executor, int milliseconds) {
     }
 
     @Override
-    public int getNetworkTimeout() throws SQLException {
-        // TODO Auto-generated method stub
+    public int getNetworkTimeout() {
         return 0;
     }
 }
