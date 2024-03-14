@@ -76,7 +76,7 @@ public class InsertQueryAnalyzerTest {
     @Test
     public void testProcessInsert_ValuesTwo() {
         String soql = "insert into Account(Name, OwnerId) values ('FirstAccount', '005xx1111111111111'),  ('SecondAccount', '005xx2222222222222')";
-        Map<String, DescribeSObjectResult> cache = new HashMap<>();
+
         InsertQueryAnalyzer analyzer = new InsertQueryAnalyzer(soql, null);
 
         assertTrue(analyzer.analyse(soql));

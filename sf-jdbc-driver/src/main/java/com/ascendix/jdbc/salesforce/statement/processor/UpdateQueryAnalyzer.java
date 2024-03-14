@@ -54,51 +54,6 @@ public class UpdateQueryAnalyzer {
         return getQueryData(true) != null;
     }
 
-    public class UpdateItemsListVisitor implements ItemsListVisitor {
-
-        List<Column> columns;
-        List<Map<String, Object>> records;
-
-        public UpdateItemsListVisitor(List<Column> columns, List<Map<String, Object>> records) {
-            this.columns = columns;
-            this.records = records;
-        }
-
-        @Override
-        public void visit(SubSelect subSelect) {
-            log.warn("SubSelect Visitor");
-        }
-
-        @Override
-        public void visit(ExpressionList expressionList) {
-            log.trace("Expression Visitor");
-            HashMap<String, Object> fieldValues = new HashMap<>();
-            records.add(fieldValues);
-
-            for (int i = 0; i < columns.size(); i++) {
-                expressionList.getExpressions().get(i).accept(
-                    new ValueToStringVisitor(
-                        fieldValues,
-                        columns.get(i).getColumnName(),
-                        subSelectResolver)
-                );
-            }
-        }
-
-        @Override
-        public void visit(NamedExpressionList namedExpressionList) {
-            log.warn("NamedExpression Visitor");
-        }
-
-        @Override
-        public void visit(MultiExpressionList multiExprList) {
-            log.trace("MultiExpression Visitor");
-            multiExprList.getExpressionLists().forEach(expressions -> {
-                expressions.accept(new UpdateItemsListVisitor(columns, records));
-            });
-        }
-    }
-
     private Field findField(String name, DescribeSObjectResult objectDesc, Function<Field, String> nameFetcher) {
         return Arrays.stream(objectDesc.getFields())
             .filter(field -> name.equalsIgnoreCase(nameFetcher.apply(field)))
