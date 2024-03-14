@@ -335,55 +335,46 @@ public class ForceDatabaseMetaData implements DatabaseMetaData, Serializable {
 
     @Override
     public boolean allProceduresAreCallable() {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public boolean allTablesAreSelectable() {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public String getURL() {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public String getUserName() {
-        // TODO Auto-generated method stub
         return "";
     }
 
     @Override
     public boolean isReadOnly() {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public boolean nullsAreSortedHigh() {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public boolean nullsAreSortedLow() {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public boolean nullsAreSortedAtStart() {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public boolean nullsAreSortedAtEnd() {
-        // TODO Auto-generated method stub
         return false;
     }
 
@@ -419,13 +410,11 @@ public class ForceDatabaseMetaData implements DatabaseMetaData, Serializable {
 
     @Override
     public boolean usesLocalFiles() {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public boolean usesLocalFilePerTable() {
-        // TODO Auto-generated method stub
         return false;
     }
 
@@ -437,13 +426,11 @@ public class ForceDatabaseMetaData implements DatabaseMetaData, Serializable {
 
     @Override
     public boolean storesUpperCaseIdentifiers() {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public boolean storesLowerCaseIdentifiers() {
-        // TODO Auto-generated method stub
         return false;
     }
 
@@ -455,97 +442,81 @@ public class ForceDatabaseMetaData implements DatabaseMetaData, Serializable {
 
     @Override
     public boolean supportsMixedCaseQuotedIdentifiers() {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public boolean storesUpperCaseQuotedIdentifiers() {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public boolean storesLowerCaseQuotedIdentifiers() {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public boolean storesMixedCaseQuotedIdentifiers() {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public String getIdentifierQuoteString() {
-        // TODO Auto-generated method stub
         return "";
     }
 
     @Override
     public String getSQLKeywords() {
-        // TODO Auto-generated method stub
         return "";
     }
 
     @Override
     public String getNumericFunctions() {
-        // TODO Auto-generated method stub
         return "";
     }
 
     @Override
     public String getStringFunctions() {
-        // TODO Auto-generated method stub
         return "";
     }
 
     @Override
     public String getSystemFunctions() {
-        // TODO Auto-generated method stub
         return "";
     }
 
     @Override
     public String getTimeDateFunctions() {
-        // TODO Auto-generated method stub
         return "";
     }
 
     @Override
     public String getSearchStringEscape() {
-        // TODO Auto-generated method stub
         return "";
     }
 
     @Override
     public String getExtraNameCharacters() {
-        // TODO Auto-generated method stub
         return "";
     }
 
     @Override
     public boolean supportsAlterTableWithAddColumn() {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public boolean supportsAlterTableWithDropColumn() {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public boolean supportsColumnAliasing() {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public boolean nullPlusNonNullIsNull() {
-        // TODO Auto-generated method stub
         return false;
     }
 
@@ -561,475 +532,396 @@ public class ForceDatabaseMetaData implements DatabaseMetaData, Serializable {
 
     @Override
     public boolean supportsTableCorrelationNames() {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public boolean supportsDifferentTableCorrelationNames() {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public boolean supportsExpressionsInOrderBy() {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public boolean supportsOrderByUnrelated() {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public boolean supportsGroupBy() {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public boolean supportsGroupByUnrelated() {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public boolean supportsGroupByBeyondSelect() {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public boolean supportsLikeEscapeClause() {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public boolean supportsMultipleResultSets() {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public boolean supportsMultipleTransactions() {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public boolean supportsNonNullableColumns() {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public boolean supportsMinimumSQLGrammar() {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public boolean supportsCoreSQLGrammar() {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public boolean supportsExtendedSQLGrammar() {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public boolean supportsANSI92EntryLevelSQL() {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public boolean supportsANSI92IntermediateSQL() {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public boolean supportsANSI92FullSQL() {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public boolean supportsIntegrityEnhancementFacility() {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public boolean supportsOuterJoins() {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public boolean supportsFullOuterJoins() {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public boolean supportsLimitedOuterJoins() {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public String getSchemaTerm() {
-        // TODO Auto-generated method stub
         return DEFAULT_SCHEMA;
     }
 
     @Override
     public String getProcedureTerm() {
-        // TODO Auto-generated method stub
         return "";
     }
 
     @Override
     public String getCatalogTerm() {
-        // TODO Auto-generated method stub
         return DEFAULT_CATALOG;
     }
 
     @Override
     public boolean isCatalogAtStart() {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public String getCatalogSeparator() {
-        // TODO Auto-generated method stub
         return ".";
     }
 
     @Override
     public boolean supportsSchemasInDataManipulation() {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public boolean supportsSchemasInProcedureCalls() {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public boolean supportsSchemasInTableDefinitions() {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public boolean supportsSchemasInIndexDefinitions() {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public boolean supportsSchemasInPrivilegeDefinitions() {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public boolean supportsCatalogsInDataManipulation() {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public boolean supportsCatalogsInProcedureCalls() {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public boolean supportsCatalogsInTableDefinitions() {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public boolean supportsCatalogsInIndexDefinitions() {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public boolean supportsCatalogsInPrivilegeDefinitions() {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public boolean supportsPositionedDelete() {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public boolean supportsPositionedUpdate() {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public boolean supportsSelectForUpdate() {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public boolean supportsStoredProcedures() {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public boolean supportsSubqueriesInComparisons() {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public boolean supportsSubqueriesInExists() {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public boolean supportsSubqueriesInIns() {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public boolean supportsSubqueriesInQuantifieds() {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public boolean supportsCorrelatedSubqueries() {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public boolean supportsUnion() {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public boolean supportsUnionAll() {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public boolean supportsOpenCursorsAcrossCommit() {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public boolean supportsOpenCursorsAcrossRollback() {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public boolean supportsOpenStatementsAcrossCommit() {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public boolean supportsOpenStatementsAcrossRollback() {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public int getMaxBinaryLiteralLength() {
-        // TODO Auto-generated method stub
         return 0;
     }
 
     @Override
     public int getMaxCharLiteralLength() {
-        // TODO Auto-generated method stub
         return 0;
     }
 
     @Override
     public int getMaxColumnNameLength() {
-        // TODO Auto-generated method stub
         return 0;
     }
 
     @Override
     public int getMaxColumnsInGroupBy() {
-        // TODO Auto-generated method stub
         return 0;
     }
 
     @Override
     public int getMaxColumnsInIndex() {
-        // TODO Auto-generated method stub
         return 0;
     }
 
     @Override
     public int getMaxColumnsInOrderBy() {
-        // TODO Auto-generated method stub
         return 0;
     }
 
     @Override
     public int getMaxColumnsInSelect() {
-        // TODO Auto-generated method stub
         return 0;
     }
 
     @Override
     public int getMaxColumnsInTable() {
-        // TODO Auto-generated method stub
         return 0;
     }
 
     @Override
     public int getMaxConnections() {
-        // TODO Auto-generated method stub
         return 0;
     }
 
     @Override
     public int getMaxCursorNameLength() {
-        // TODO Auto-generated method stub
         return 0;
     }
 
     @Override
     public int getMaxIndexLength() {
-        // TODO Auto-generated method stub
         return 0;
     }
 
     @Override
     public int getMaxSchemaNameLength() {
-        // TODO Auto-generated method stub
         return 0;
     }
 
     @Override
     public int getMaxProcedureNameLength() {
-        // TODO Auto-generated method stub
         return 0;
     }
 
     @Override
     public int getMaxCatalogNameLength() {
-        // TODO Auto-generated method stub
         return 0;
     }
 
     @Override
     public int getMaxRowSize() {
-        // TODO Auto-generated method stub
         return 0;
     }
 
     @Override
     public boolean doesMaxRowSizeIncludeBlobs() {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public int getMaxStatementLength() {
-        // TODO Auto-generated method stub
         return 0;
     }
 
     @Override
     public int getMaxStatements() {
-        // TODO Auto-generated method stub
         return 0;
     }
 
     @Override
     public int getMaxTableNameLength() {
-        // TODO Auto-generated method stub
         return 0;
     }
 
     @Override
     public int getMaxTablesInSelect() {
-        // TODO Auto-generated method stub
         return 0;
     }
 
     @Override
     public int getMaxUserNameLength() {
-        // TODO Auto-generated method stub
         return 0;
     }
 
     @Override
     public int getDefaultTransactionIsolation() {
-        // TODO Auto-generated method stub
         return 0;
     }
 
     @Override
     public boolean supportsTransactions() {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public boolean supportsTransactionIsolationLevel(int level) {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public boolean supportsDataDefinitionAndDataManipulationTransactions() {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public boolean supportsDataManipulationTransactionsOnly() {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public boolean dataDefinitionCausesTransactionCommit() {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public boolean dataDefinitionIgnoredInTransactions() {
-        // TODO Auto-generated method stub
         return false;
     }
 
@@ -1123,37 +1015,31 @@ public class ForceDatabaseMetaData implements DatabaseMetaData, Serializable {
 
     @Override
     public boolean ownUpdatesAreVisible(int type) {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public boolean ownDeletesAreVisible(int type) {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public boolean ownInsertsAreVisible(int type) {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public boolean othersUpdatesAreVisible(int type) {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public boolean othersDeletesAreVisible(int type) {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public boolean othersInsertsAreVisible(int type) {
-        // TODO Auto-generated method stub
         return false;
     }
 
@@ -1164,19 +1050,16 @@ public class ForceDatabaseMetaData implements DatabaseMetaData, Serializable {
 
     @Override
     public boolean deletesAreDetected(int type) {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public boolean insertsAreDetected(int type) {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public boolean supportsBatchUpdates() {
-        // TODO Auto-generated method stub
         return false;
     }
 
@@ -1199,7 +1082,6 @@ public class ForceDatabaseMetaData implements DatabaseMetaData, Serializable {
 
     @Override
     public boolean supportsNamedParameters() {
-        // FIXME: ci servono
         return false;
     }
 
@@ -1239,13 +1121,11 @@ public class ForceDatabaseMetaData implements DatabaseMetaData, Serializable {
 
     @Override
     public boolean supportsResultSetHoldability(int holdability) {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public int getResultSetHoldability() {
-        // TODO Auto-generated method stub
         return 0;
     }
 
@@ -1276,13 +1156,11 @@ public class ForceDatabaseMetaData implements DatabaseMetaData, Serializable {
 
     @Override
     public boolean locatorsUpdateCopy() {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public boolean supportsStatementPooling() {
-        // TODO Auto-generated method stub
         return false;
     }
 
@@ -1298,7 +1176,6 @@ public class ForceDatabaseMetaData implements DatabaseMetaData, Serializable {
 
     @Override
     public boolean supportsStoredFunctionsUsingCallSyntax() {
-        // TODO Auto-generated method stub
         return false;
     }
 
@@ -1373,7 +1250,6 @@ public class ForceDatabaseMetaData implements DatabaseMetaData, Serializable {
 
     @Override
     public boolean generatedKeyAlwaysReturned() {
-        // TODO Auto-generated method stub
         return false;
     }
 
