@@ -192,7 +192,8 @@ public class PartnerService {
         log.trace("[PartnerService] queryStart {}", soql);
         QueryResult queryResult = partnerConnection.query(soql);
         String queryLocator = queryResult.isDone() ? null : queryResult.getQueryLocator();
-        return new AbstractMap.SimpleEntry<>(Collections.unmodifiableList(extractQueryResultData(queryResult)),
+        List<List> resultRows = extractQueryResultData(queryResult);
+        return new AbstractMap.SimpleEntry<>(PartnerResultToCartesianTable.expand(resultRows, expectedSchema),
             queryLocator
         );
     }
@@ -202,7 +203,8 @@ public class PartnerService {
         log.trace("[PartnerService] queryMore {}", queryLocator);
         QueryResult queryResult = partnerConnection.queryMore(queryLocator);
         queryLocator = queryResult.isDone() ? null : queryResult.getQueryLocator();
-        return new AbstractMap.SimpleEntry<>(Collections.unmodifiableList(extractQueryResultData(queryResult)),
+        List<List> resultRows = extractQueryResultData(queryResult);
+        return new AbstractMap.SimpleEntry<>(PartnerResultToCartesianTable.expand(resultRows, expectedSchema),
             queryLocator
         );
     }

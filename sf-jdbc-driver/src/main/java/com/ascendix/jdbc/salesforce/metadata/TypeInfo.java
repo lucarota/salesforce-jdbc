@@ -108,7 +108,10 @@ public enum TypeInfo {
     }
 
     public static TypeInfo lookupTypeInfo(String forceTypeName) {
-        String typeName = forceTypeName.replaceFirst("\\A_+", "");
+        if (forceTypeName == null) {
+            return OTHER_TYPE_INFO;
+        }
+        String typeName = forceTypeName.replaceFirst("\\A_+", "").toLowerCase();
         return Arrays.stream(TypeInfo.values())
             .filter(entry -> typeName.equals(entry.getTypeName()))
             .findAny()
