@@ -1,6 +1,7 @@
 package com.ascendix.jdbc.salesforce.resultset;
 
 import com.ascendix.jdbc.salesforce.metadata.ColumnMap;
+import com.ascendix.jdbc.salesforce.metadata.TypeInfo;
 import java.io.InputStream;
 import java.io.Reader;
 import java.io.Serial;
@@ -78,11 +79,11 @@ public class CachedResultSet implements ResultSet, Serializable {
         this.rowSupplier = rowSupplier;
     }
 
-    public Object getObject(String columnName) throws SQLException {
+    public Object getObject(String columnName) {
         return rows.get(getIndex()).get(columnName);
     }
 
-    public Object getObject(int columnIndex) throws SQLException {
+    public Object getObject(int columnIndex) {
         return rows.get(getIndex()).getByIndex(columnIndex);
     }
 
@@ -105,7 +106,7 @@ public class CachedResultSet implements ResultSet, Serializable {
         index = getIndex() + 1;
     }
 
-    public boolean first() throws SQLException {
+    public boolean first() {
         if (this.rowSupplier != null) throw new UnsupportedOperationException("Not implemented yet.");
         if (!rows.isEmpty()) {
             setIndex(0);
@@ -115,7 +116,7 @@ public class CachedResultSet implements ResultSet, Serializable {
         }
     }
 
-    public boolean last() throws SQLException {
+    public boolean last() {
         if (this.rowSupplier != null) throw new UnsupportedOperationException("Not implemented yet.");
         if (!rows.isEmpty()) {
             setIndex(rows.size() - 1);
@@ -125,7 +126,7 @@ public class CachedResultSet implements ResultSet, Serializable {
         }
     }
 
-    private boolean nextSupplied() throws SQLException {
+    private boolean nextSupplied() {
         if (this.rowSupplier == null || !this.rowSupplier.hasNext()) {
             this.rows = Collections.emptyList();
             return false;
@@ -135,7 +136,7 @@ public class CachedResultSet implements ResultSet, Serializable {
         return !rows.isEmpty();
     }
 
-    public boolean next() throws SQLException {
+    public boolean next() {
         if (!rows.isEmpty()) {
             increaseIndex();
             if (getIndex() < rows.size()) return true;
@@ -143,38 +144,38 @@ public class CachedResultSet implements ResultSet, Serializable {
         return nextSupplied() && next();
     }
 
-    public boolean isAfterLast() throws SQLException {
+    public boolean isAfterLast() {
         if (this.rowSupplier != null) throw new UnsupportedOperationException("Not implemented yet.");
         return !rows.isEmpty() && getIndex() == rows.size();
     }
 
-    public boolean isBeforeFirst() throws SQLException {
+    public boolean isBeforeFirst() {
         if (this.rowSupplier != null) throw new UnsupportedOperationException("Not implemented yet.");
         return !rows.isEmpty() && getIndex() == -1;
     }
 
-    public boolean isFirst() throws SQLException {
+    public boolean isFirst() {
         if (this.rowSupplier != null) throw new UnsupportedOperationException("Not implemented yet.");
         return !rows.isEmpty() && getIndex() == 0;
     }
 
-    public boolean isLast() throws SQLException {
+    public boolean isLast() {
         if (this.rowSupplier != null) throw new UnsupportedOperationException("Not implemented yet.");
         return !rows.isEmpty() && getIndex() == rows.size() - 1;
     }
 
-    public ResultSetMetaData getMetaData() throws SQLException {
+    public ResultSetMetaData getMetaData() {
         return metadata != null ? metadata : CachedResultSetMetaData.EMPTY;
     }
 
-    public void setFetchSize(int rows) throws SQLException {
+    public void setFetchSize(int rows) {
     }
 
-    public Date getDate(int columnIndex, Calendar cal) throws SQLException {
+    public Date getDate(int columnIndex, Calendar cal) {
         throw new UnsupportedOperationException("Not implemented yet.");
     }
 
-    public Date getDate(String columnName, Calendar cal) throws SQLException {
+    public Date getDate(String columnName, Calendar cal) {
         throw new UnsupportedOperationException("Not implemented yet.");
     }
 
@@ -188,12 +189,12 @@ public class CachedResultSet implements ResultSet, Serializable {
             this.clazz = clazz;
         }
 
-        public Optional<T> parse(int columnIndex) throws SQLException {
+        public Optional<T> parse(int columnIndex) {
             Object value = getObject(columnIndex);
             return parse(value);
         }
 
-        public Optional<T> parse(String columnName) throws SQLException {
+        public Optional<T> parse(String columnName) {
             Object value = getObject(columnName);
             return parse(value);
         }
@@ -221,21 +222,21 @@ public class CachedResultSet implements ResultSet, Serializable {
         }
     }
 
-    public String getString(String columnName) throws SQLException {
+    public String getString(String columnName) {
         return convertToString(getObject(columnName));
     }
 
-    public String getString(int columnIndex) throws SQLException {
+    public String getString(int columnIndex) {
         return convertToString(getObject(columnIndex));
     }
 
-    public BigDecimal getBigDecimal(int columnIndex) throws SQLException {
+    public BigDecimal getBigDecimal(int columnIndex) {
         return new ColumnValueParser<>(BigDecimal::new, BigDecimal.class)
             .parse(columnIndex)
             .orElse(null);
     }
 
-    public BigDecimal getBigDecimal(String columnName) throws SQLException {
+    public BigDecimal getBigDecimal(String columnName) {
         return new ColumnValueParser<>(BigDecimal::new, BigDecimal.class)
             .parse(columnName)
             .orElse(null);
@@ -249,14 +250,14 @@ public class CachedResultSet implements ResultSet, Serializable {
         }
     }
 
-    public Date getDate(int columnIndex) throws SQLException {
+    public Date getDate(int columnIndex) {
         return new ColumnValueParser<>(this::parseDate, java.util.Date.class)
             .parse(columnIndex)
             .map(d -> new java.sql.Date(d.getTime()))
             .orElse(null);
     }
 
-    public Date getDate(String columnName) throws SQLException {
+    public Date getDate(String columnName) {
         return new ColumnValueParser<>(this::parseDate, java.util.Date.class)
             .parse(columnName)
             .map(d -> new java.sql.Date(d.getTime()))
@@ -271,10 +272,15 @@ public class CachedResultSet implements ResultSet, Serializable {
         }
     }
 
-    public Timestamp getTimestamp(int columnIndex) throws SQLException {
+    public Timestamp getTimestamp(int columnIndex) {
         Object value = rows.get(getIndex()).getByIndex(columnIndex);
         if (value instanceof GregorianCalendar) {
             return new java.sql.Timestamp(((GregorianCalendar) value).getTime().getTime());
+        } else if (rows.get(getIndex()).getTypeInfoByIndex(columnIndex) == TypeInfo.DATE_TYPE_INFO) {
+            return new ColumnValueParser<>(this::parseDate, java.util.Date.class)
+                .parse(columnIndex)
+                .map(d -> new java.sql.Timestamp(d.getTime()))
+                .orElse(null);
         } else {
             return new ColumnValueParser<>(this::parseDateTime, java.util.Date.class)
                 .parse(columnIndex)
@@ -283,10 +289,16 @@ public class CachedResultSet implements ResultSet, Serializable {
         }
     }
 
-    public Timestamp getTimestamp(String columnName) throws SQLException {
+    public Timestamp getTimestamp(String columnName) {
         Object value = rows.get(getIndex()).get(columnName);
         if (value instanceof GregorianCalendar) {
             return new java.sql.Timestamp(((GregorianCalendar) value).getTime().getTime());
+        } else if (rows.get(getIndex()).getTypeInfo(columnName) == TypeInfo.DATE_TYPE_INFO) {
+            return new ColumnValueParser<>(this::parseDate, java.util.Date.class)
+                .parse(columnName)
+                .map(d -> new java.sql.Timestamp(d.getTime()))
+                .orElse(null);
+
         } else {
             return new ColumnValueParser<>(this::parseDateTime, java.util.Date.class)
                 .parse(columnName)
@@ -295,11 +307,11 @@ public class CachedResultSet implements ResultSet, Serializable {
         }
     }
 
-    public Timestamp getTimestamp(int columnIndex, Calendar cal) throws SQLException {
+    public Timestamp getTimestamp(int columnIndex, Calendar cal) {
         throw new UnsupportedOperationException("Not implemented yet.");
     }
 
-    public Timestamp getTimestamp(String columnName, Calendar cal) throws SQLException {
+    public Timestamp getTimestamp(String columnName, Calendar cal) {
         throw new UnsupportedOperationException("Not implemented yet.");
     }
 
@@ -311,14 +323,14 @@ public class CachedResultSet implements ResultSet, Serializable {
         }
     }
 
-    public Time getTime(String columnName) throws SQLException {
+    public Time getTime(String columnName) {
         return new ColumnValueParser<>(this::parseTime, java.util.Date.class)
             .parse(columnName)
             .map(d -> new Time(d.getTime()))
             .orElse(null);
     }
 
-    public Time getTime(int columnIndex) throws SQLException {
+    public Time getTime(int columnIndex) {
         return new ColumnValueParser<>(this::parseTime, java.util.Date.class)
             .parse(columnIndex)
             .map(d -> new Time(d.getTime()))
@@ -326,7 +338,7 @@ public class CachedResultSet implements ResultSet, Serializable {
     }
 
     @Deprecated
-    public BigDecimal getBigDecimal(int columnIndex, int scale) throws SQLException {
+    public BigDecimal getBigDecimal(int columnIndex, int scale) {
         Optional<BigDecimal> result = new ColumnValueParser<>(BigDecimal::new, BigDecimal.class)
             .parse(columnIndex);
 
@@ -334,77 +346,77 @@ public class CachedResultSet implements ResultSet, Serializable {
     }
 
     @Deprecated
-    public BigDecimal getBigDecimal(String columnName, int scale) throws SQLException {
+    public BigDecimal getBigDecimal(String columnName, int scale) {
         Optional<BigDecimal> result = new ColumnValueParser<>(BigDecimal::new, BigDecimal.class)
             .parse(columnName);
         return result.map(bigDecimal -> bigDecimal.setScale(scale, RoundingMode.HALF_EVEN)).orElse(null);
     }
 
-    public float getFloat(int columnIndex) throws SQLException {
+    public float getFloat(int columnIndex) {
         return new ColumnValueParser<>(Float::parseFloat, Float.class)
             .parse(columnIndex)
             .orElse(0f);
     }
 
-    public float getFloat(String columnName) throws SQLException {
+    public float getFloat(String columnName) {
         return new ColumnValueParser<>(Float::parseFloat, Float.class)
             .parse(columnName)
             .orElse(0f);
     }
 
-    public double getDouble(int columnIndex) throws SQLException {
+    public double getDouble(int columnIndex) {
         return new ColumnValueParser<>(Double::parseDouble, Double.class)
             .parse(columnIndex)
             .orElse(0d);
     }
 
-    public double getDouble(String columnName) throws SQLException {
+    public double getDouble(String columnName) {
         return new ColumnValueParser<>(Double::parseDouble, Double.class)
             .parse(columnName)
             .orElse(0d);
     }
 
-    public long getLong(String columnName) throws SQLException {
+    public long getLong(String columnName) {
         return new ColumnValueParser<>(Long::parseLong, Long.class)
             .parse(columnName)
             .orElse(0L);
     }
 
-    public long getLong(int columnIndex) throws SQLException {
+    public long getLong(int columnIndex) {
         return new ColumnValueParser<Long>(Long::parseLong, Long.class)
             .parse(columnIndex)
             .orElse(0L);
     }
 
-    public int getInt(String columnName) throws SQLException {
+    public int getInt(String columnName) {
         return new ColumnValueParser<>(Integer::parseInt, Integer.class)
             .parse(columnName)
             .orElse(0);
     }
 
-    public int getInt(int columnIndex) throws SQLException {
+    public int getInt(int columnIndex) {
         return new ColumnValueParser<>(Integer::parseInt, Integer.class)
             .parse(columnIndex)
             .orElse(0);
     }
 
-    public short getShort(String columnName) throws SQLException {
+    public short getShort(String columnName) {
         return new ColumnValueParser<>(Short::parseShort, Short.class)
             .parse(columnName)
             .orElse((short) 0);
     }
 
-    public short getShort(int columnIndex) throws SQLException {
+    public short getShort(int columnIndex) {
         return new ColumnValueParser<>(Short::parseShort, Short.class)
             .parse(columnIndex)
             .orElse((short) 0);
     }
 
-    public InputStream getBinaryStream(int columnIndex) throws SQLException {
+    public InputStream getBinaryStream(int columnIndex) {
         throw new UnsupportedOperationException("Not implemented yet.");
     }
 
-    public InputStream getBinaryStream(String columnName) throws SQLException {
+    public InputStream getBinaryStream(String columnName) {
         throw new UnsupportedOperationException("Not implemented yet.");
     }
 
@@ -416,49 +428,49 @@ public class CachedResultSet implements ResultSet, Serializable {
         }
     }
 
-    public Blob getBlob(int columnIndex) throws SQLException {
+    public Blob getBlob(int columnIndex) {
         return new ColumnValueParser<>((v) -> Base64.getDecoder().decode(v), byte[].class)
             .parse(columnIndex)
             .map(this::createBlob)
             .orElse(null);
     }
 
-    public Blob getBlob(String columnName) throws SQLException {
+    public Blob getBlob(String columnName) {
         return new ColumnValueParser<>((v) -> Base64.getDecoder().decode(v), byte[].class)
             .parse(columnName)
             .map(this::createBlob)
             .orElse(null);
     }
 
-    public boolean getBoolean(int columnIndex) throws SQLException {
+    public boolean getBoolean(int columnIndex) {
         return new ColumnValueParser<>(Boolean::parseBoolean, Boolean.class)
             .parse(columnIndex)
             .orElse(false);
     }
 
-    public boolean getBoolean(String columnName) throws SQLException {
+    public boolean getBoolean(String columnName) {
         return new ColumnValueParser<>(Boolean::parseBoolean, Boolean.class)
             .parse(columnName)
             .orElse(false);
     }
 
-    public byte getByte(int columnIndex) throws SQLException {
+    public byte getByte(int columnIndex) {
         return new ColumnValueParser<>(Byte::parseByte, Byte.class)
             .parse(columnIndex)
             .orElse((byte) 0);
     }
 
-    public byte getByte(String columnName) throws SQLException {
+    public byte getByte(String columnName) {
         return new ColumnValueParser<>(Byte::parseByte, Byte.class)
             .parse(columnName)
             .orElse((byte) 0);
     }
 
-    public byte[] getBytes(int columnIndex) throws SQLException {
+    public byte[] getBytes(int columnIndex) {
         throw new UnsupportedOperationException("Not implemented yet.");
     }
 
-    public byte[] getBytes(String columnName) throws SQLException {
+    public byte[] getBytes(String columnName) {
         throw new UnsupportedOperationException("Not implemented yet.");
     }
 
@@ -466,142 +478,142 @@ public class CachedResultSet implements ResultSet, Serializable {
     // Not implemented below here
     //
 
-    public boolean absolute(int row) throws SQLException {
+    public boolean absolute(int row) {
         return false;
     }
 
-    public void afterLast() throws SQLException {
+    public void afterLast() {
         log.warn("after last check");
     }
 
-    public void beforeFirst() throws SQLException {
+    public void beforeFirst() {
     }
 
-    public void cancelRowUpdates() throws SQLException {
+    public void cancelRowUpdates() {
     }
 
-    public void clearWarnings() throws SQLException {
+    public void clearWarnings() {
         log.info("clearWarnings");
         this.warningsChain = null;
     }
 
-    public void close() throws SQLException {
+    public void close() {
 
     }
 
-    public void deleteRow() throws SQLException {
+    public void deleteRow() {
 
     }
 
-    public int findColumn(String columnName) throws SQLException {
+    public int findColumn(String columnName) {
         return 0;
     }
 
-    public Array getArray(int i) throws SQLException {
+    public Array getArray(int i) {
         return null;
     }
 
-    public Array getArray(String colName) throws SQLException {
+    public Array getArray(String colName) {
         return null;
     }
 
-    public InputStream getAsciiStream(int columnIndex) throws SQLException {
+    public InputStream getAsciiStream(int columnIndex) {
         return null;
     }
 
-    public InputStream getAsciiStream(String columnName) throws SQLException {
+    public InputStream getAsciiStream(String columnName) {
         return null;
     }
 
-    public Reader getCharacterStream(int columnIndex) throws SQLException {
+    public Reader getCharacterStream(int columnIndex) {
         return null;
     }
 
-    public Reader getCharacterStream(String columnName) throws SQLException {
+    public Reader getCharacterStream(String columnName) {
         return null;
     }
 
-    public Clob getClob(int i) throws SQLException {
+    public Clob getClob(int i) {
         return null;
     }
 
-    public Clob getClob(String colName) throws SQLException {
+    public Clob getClob(String colName) {
         return null;
     }
 
-    public int getConcurrency() throws SQLException {
+    public int getConcurrency() {
         return ResultSet.CONCUR_READ_ONLY;
     }
 
-    public String getCursorName() throws SQLException {
+    public String getCursorName() {
         return null;
     }
 
-    public int getFetchDirection() throws SQLException {
+    public int getFetchDirection() {
         return ResultSet.FETCH_UNKNOWN;
     }
 
-    public int getFetchSize() throws SQLException {
+    public int getFetchSize() {
         return 0;
     }
 
     public Object getObject(int i, Map<String, Class<?>> map)
-        throws SQLException {
+        {
         return null;
     }
 
     public Object getObject(String colName, Map<String, Class<?>> map)
-        throws SQLException {
+        {
         return null;
     }
 
-    public Ref getRef(int i) throws SQLException {
+    public Ref getRef(int i) {
         return null;
     }
 
-    public Ref getRef(String colName) throws SQLException {
+    public Ref getRef(String colName) {
         return null;
     }
 
-    public int getRow() throws SQLException {
+    public int getRow() {
         return 0;
     }
 
-    public Statement getStatement() throws SQLException {
+    public Statement getStatement() {
         return null;
     }
 
-    public Time getTime(int columnIndex, Calendar cal) throws SQLException {
+    public Time getTime(int columnIndex, Calendar cal) {
         return null;
     }
 
-    public Time getTime(String columnName, Calendar cal) throws SQLException {
+    public Time getTime(String columnName, Calendar cal) {
         return null;
     }
 
-    public int getType() throws SQLException {
+    public int getType() {
         return ResultSet.TYPE_FORWARD_ONLY;
     }
 
-    public URL getURL(int columnIndex) throws SQLException {
+    public URL getURL(int columnIndex) {
         return null;
     }
 
-    public URL getURL(String columnName) throws SQLException {
-        return null;
-    }
-
-    @Deprecated
-    public InputStream getUnicodeStream(int columnIndex) throws SQLException {
+    public URL getURL(String columnName) {
         return null;
     }
 
     @Deprecated
-    public InputStream getUnicodeStream(String columnName) throws SQLException {
+    public InputStream getUnicodeStream(int columnIndex) {
         return null;
     }
 
-    public SQLWarning getWarnings() throws SQLException {
+    @Deprecated
+    public InputStream getUnicodeStream(String columnName) {
+        return null;
+    }
+
+    public SQLWarning getWarnings() {
         return warningsChain;
     }
 
@@ -637,385 +649,385 @@ public class CachedResultSet implements ResultSet, Serializable {
         throw new SQLException("Feature is not supported.", "HY000", 1);
     }
 
-    public void moveToCurrentRow() throws SQLException {
+    public void moveToCurrentRow() {
     }
 
-    public void moveToInsertRow() throws SQLException {
+    public void moveToInsertRow() {
     }
 
-    public boolean previous() throws SQLException {
+    public boolean previous() {
 
         return false;
     }
 
-    public void refreshRow() throws SQLException {
+    public void refreshRow() {
     }
 
-    public boolean relative(int rows) throws SQLException {
+    public boolean relative(int rows) {
 
         return false;
     }
 
-    public boolean rowDeleted() throws SQLException {
+    public boolean rowDeleted() {
 
         return false;
     }
 
-    public boolean rowInserted() throws SQLException {
+    public boolean rowInserted() {
 
         return false;
     }
 
-    public boolean rowUpdated() throws SQLException {
+    public boolean rowUpdated() {
 
         return false;
     }
 
-    public void setFetchDirection(int direction) throws SQLException {
+    public void setFetchDirection(int direction) {
     }
 
-    public void updateArray(int columnIndex, Array x) throws SQLException {
+    public void updateArray(int columnIndex, Array x) {
     }
 
-    public void updateArray(String columnName, Array x) throws SQLException {
+    public void updateArray(String columnName, Array x) {
     }
 
     public void updateAsciiStream(int columnIndex, InputStream x, int length)
-        throws SQLException {
+        {
     }
 
     public void updateAsciiStream(String columnName, InputStream x, int length)
-        throws SQLException {
+        {
     }
 
     public void updateBigDecimal(int columnIndex, BigDecimal x)
-        throws SQLException {
+        {
     }
 
     public void updateBigDecimal(String columnName, BigDecimal x)
-        throws SQLException {
+        {
     }
 
     public void updateBinaryStream(int columnIndex, InputStream x, int length)
-        throws SQLException {
+        {
     }
 
     public void updateBinaryStream(String columnName, InputStream x, int length)
-        throws SQLException {
+        {
     }
 
-    public void updateBlob(int columnIndex, Blob x) throws SQLException {
+    public void updateBlob(int columnIndex, Blob x) {
     }
 
-    public void updateBlob(String columnName, Blob x) throws SQLException {
+    public void updateBlob(String columnName, Blob x) {
     }
 
-    public void updateBoolean(int columnIndex, boolean x) throws SQLException {
+    public void updateBoolean(int columnIndex, boolean x) {
     }
 
-    public void updateBoolean(String columnName, boolean x) throws SQLException {
+    public void updateBoolean(String columnName, boolean x) {
     }
 
-    public void updateByte(int columnIndex, byte x) throws SQLException {
+    public void updateByte(int columnIndex, byte x) {
     }
 
-    public void updateByte(String columnName, byte x) throws SQLException {
+    public void updateByte(String columnName, byte x) {
     }
 
-    public void updateBytes(int columnIndex, byte[] x) throws SQLException {
+    public void updateBytes(int columnIndex, byte[] x) {
     }
 
-    public void updateBytes(String columnName, byte[] x) throws SQLException {
+    public void updateBytes(String columnName, byte[] x) {
     }
 
     public void updateCharacterStream(int columnIndex, Reader x, int length)
-        throws SQLException {
+        {
     }
 
     public void updateCharacterStream(String columnName, Reader reader,
-        int length) throws SQLException {
+        int length) {
     }
 
-    public void updateClob(int columnIndex, Clob x) throws SQLException {
+    public void updateClob(int columnIndex, Clob x) {
     }
 
-    public void updateClob(String columnName, Clob x) throws SQLException {
+    public void updateClob(String columnName, Clob x) {
     }
 
-    public void updateDate(int columnIndex, Date x) throws SQLException {
+    public void updateDate(int columnIndex, Date x) {
     }
 
-    public void updateDate(String columnName, Date x) throws SQLException {
+    public void updateDate(String columnName, Date x) {
     }
 
-    public void updateDouble(int columnIndex, double x) throws SQLException {
+    public void updateDouble(int columnIndex, double x) {
     }
 
-    public void updateDouble(String columnName, double x) throws SQLException {
+    public void updateDouble(String columnName, double x) {
     }
 
-    public void updateFloat(int columnIndex, float x) throws SQLException {
+    public void updateFloat(int columnIndex, float x) {
     }
 
-    public void updateFloat(String columnName, float x) throws SQLException {
+    public void updateFloat(String columnName, float x) {
     }
 
-    public void updateInt(int columnIndex, int x) throws SQLException {
+    public void updateInt(int columnIndex, int x) {
     }
 
-    public void updateInt(String columnName, int x) throws SQLException {
+    public void updateInt(String columnName, int x) {
     }
 
-    public void updateLong(int columnIndex, long x) throws SQLException {
+    public void updateLong(int columnIndex, long x) {
     }
 
-    public void updateLong(String columnName, long x) throws SQLException {
+    public void updateLong(String columnName, long x) {
     }
 
-    public void updateNull(int columnIndex) throws SQLException {
+    public void updateNull(int columnIndex) {
     }
 
-    public void updateNull(String columnName) throws SQLException {
+    public void updateNull(String columnName) {
     }
 
-    public void updateObject(int columnIndex, Object x) throws SQLException {
+    public void updateObject(int columnIndex, Object x) {
     }
 
-    public void updateObject(String columnName, Object x) throws SQLException {
+    public void updateObject(String columnName, Object x) {
     }
 
     public void updateObject(int columnIndex, Object x, int scale)
-        throws SQLException {
+        {
     }
 
     public void updateObject(String columnName, Object x, int scale)
-        throws SQLException {
+        {
     }
 
-    public void updateRef(int columnIndex, Ref x) throws SQLException {
+    public void updateRef(int columnIndex, Ref x) {
     }
 
-    public void updateRef(String columnName, Ref x) throws SQLException {
+    public void updateRef(String columnName, Ref x) {
     }
 
-    public void updateRow() throws SQLException {
+    public void updateRow() {
     }
 
-    public void updateShort(int columnIndex, short x) throws SQLException {
+    public void updateShort(int columnIndex, short x) {
     }
 
-    public void updateShort(String columnName, short x) throws SQLException {
+    public void updateShort(String columnName, short x) {
     }
 
-    public void updateString(int columnIndex, String x) throws SQLException {
+    public void updateString(int columnIndex, String x) {
     }
 
-    public void updateString(String columnName, String x) throws SQLException {
+    public void updateString(String columnName, String x) {
     }
 
-    public void updateTime(int columnIndex, Time x) throws SQLException {
+    public void updateTime(int columnIndex, Time x) {
     }
 
-    public void updateTime(String columnName, Time x) throws SQLException {
+    public void updateTime(String columnName, Time x) {
     }
 
     public void updateTimestamp(int columnIndex, Timestamp x)
-        throws SQLException {
+        {
     }
 
     public void updateTimestamp(String columnName, Timestamp x)
-        throws SQLException {
+        {
     }
 
-    public boolean wasNull() throws SQLException {
+    public boolean wasNull() {
 
         return false;
     }
 
-    public <T> T unwrap(Class<T> iface) throws SQLException {
+    public <T> T unwrap(Class<T> iface) {
 
         return null;
     }
 
-    public boolean isWrapperFor(Class<?> iface) throws SQLException {
+    public boolean isWrapperFor(Class<?> iface) {
 
         return false;
     }
 
-    public RowId getRowId(int columnIndex) throws SQLException {
+    public RowId getRowId(int columnIndex) {
 
         return null;
     }
 
-    public RowId getRowId(String columnLabel) throws SQLException {
+    public RowId getRowId(String columnLabel) {
 
         return null;
     }
 
-    public void updateRowId(int columnIndex, RowId x) throws SQLException {
+    public void updateRowId(int columnIndex, RowId x) {
     }
 
-    public void updateRowId(String columnLabel, RowId x) throws SQLException {
+    public void updateRowId(String columnLabel, RowId x) {
     }
 
-    public int getHoldability() throws SQLException {
+    public int getHoldability() {
         return ResultSet.CLOSE_CURSORS_AT_COMMIT;
     }
 
-    public boolean isClosed() throws SQLException {
+    public boolean isClosed() {
 
         return false;
     }
 
-    public void updateNString(int columnIndex, String nString) throws SQLException {
+    public void updateNString(int columnIndex, String nString) {
     }
 
-    public void updateNString(String columnLabel, String nString) throws SQLException {
+    public void updateNString(String columnLabel, String nString) {
     }
 
-    public void updateNClob(int columnIndex, NClob nClob) throws SQLException {
+    public void updateNClob(int columnIndex, NClob nClob) {
     }
 
-    public void updateNClob(String columnLabel, NClob nClob) throws SQLException {
+    public void updateNClob(String columnLabel, NClob nClob) {
     }
 
-    public NClob getNClob(int columnIndex) throws SQLException {
+    public NClob getNClob(int columnIndex) {
 
         return null;
     }
 
-    public NClob getNClob(String columnLabel) throws SQLException {
+    public NClob getNClob(String columnLabel) {
 
         return null;
     }
 
-    public SQLXML getSQLXML(int columnIndex) throws SQLException {
+    public SQLXML getSQLXML(int columnIndex) {
 
         return null;
     }
 
-    public SQLXML getSQLXML(String columnLabel) throws SQLException {
+    public SQLXML getSQLXML(String columnLabel) {
 
         return null;
     }
 
-    public void updateSQLXML(int columnIndex, SQLXML xmlObject) throws SQLException {
+    public void updateSQLXML(int columnIndex, SQLXML xmlObject) {
     }
 
-    public void updateSQLXML(String columnLabel, SQLXML xmlObject) throws SQLException {
+    public void updateSQLXML(String columnLabel, SQLXML xmlObject) {
     }
 
-    public String getNString(int columnIndex) throws SQLException {
+    public String getNString(int columnIndex) {
 
         return null;
     }
 
-    public String getNString(String columnLabel) throws SQLException {
+    public String getNString(String columnLabel) {
 
         return null;
     }
 
-    public Reader getNCharacterStream(int columnIndex) throws SQLException {
+    public Reader getNCharacterStream(int columnIndex) {
 
         return null;
     }
 
-    public Reader getNCharacterStream(String columnLabel) throws SQLException {
+    public Reader getNCharacterStream(String columnLabel) {
 
         return null;
     }
 
-    public void updateNCharacterStream(int columnIndex, Reader x, long length) throws SQLException {
+    public void updateNCharacterStream(int columnIndex, Reader x, long length) {
     }
 
-    public void updateNCharacterStream(String columnLabel, Reader reader, long length) throws SQLException {
+    public void updateNCharacterStream(String columnLabel, Reader reader, long length) {
     }
 
-    public void updateAsciiStream(int columnIndex, InputStream x, long length) throws SQLException {
+    public void updateAsciiStream(int columnIndex, InputStream x, long length) {
     }
 
-    public void updateBinaryStream(int columnIndex, InputStream x, long length) throws SQLException {
+    public void updateBinaryStream(int columnIndex, InputStream x, long length) {
     }
 
-    public void updateCharacterStream(int columnIndex, Reader x, long length) throws SQLException {
+    public void updateCharacterStream(int columnIndex, Reader x, long length) {
     }
 
-    public void updateAsciiStream(String columnLabel, InputStream x, long length) throws SQLException {
+    public void updateAsciiStream(String columnLabel, InputStream x, long length) {
     }
 
-    public void updateBinaryStream(String columnLabel, InputStream x, long length) throws SQLException {
+    public void updateBinaryStream(String columnLabel, InputStream x, long length) {
     }
 
-    public void updateCharacterStream(String columnLabel, Reader reader, long length) throws SQLException {
+    public void updateCharacterStream(String columnLabel, Reader reader, long length) {
     }
 
-    public void updateBlob(int columnIndex, InputStream inputStream, long length) throws SQLException {
+    public void updateBlob(int columnIndex, InputStream inputStream, long length) {
     }
 
-    public void updateBlob(String columnLabel, InputStream inputStream, long length) throws SQLException {
+    public void updateBlob(String columnLabel, InputStream inputStream, long length) {
     }
 
-    public void updateClob(int columnIndex, Reader reader, long length) throws SQLException {
+    public void updateClob(int columnIndex, Reader reader, long length) {
     }
 
-    public void updateClob(String columnLabel, Reader reader, long length) throws SQLException {
+    public void updateClob(String columnLabel, Reader reader, long length) {
     }
 
-    public void updateNClob(int columnIndex, Reader reader, long length) throws SQLException {
+    public void updateNClob(int columnIndex, Reader reader, long length) {
     }
 
-    public void updateNClob(String columnLabel, Reader reader, long length) throws SQLException {
+    public void updateNClob(String columnLabel, Reader reader, long length) {
     }
 
-    public void updateNCharacterStream(int columnIndex, Reader x) throws SQLException {
+    public void updateNCharacterStream(int columnIndex, Reader x) {
     }
 
-    public void updateNCharacterStream(String columnLabel, Reader reader) throws SQLException {
+    public void updateNCharacterStream(String columnLabel, Reader reader) {
     }
 
-    public void updateAsciiStream(int columnIndex, InputStream x) throws SQLException {
+    public void updateAsciiStream(int columnIndex, InputStream x) {
     }
 
-    public void updateBinaryStream(int columnIndex, InputStream x) throws SQLException {
+    public void updateBinaryStream(int columnIndex, InputStream x) {
     }
 
-    public void updateCharacterStream(int columnIndex, Reader x) throws SQLException {
+    public void updateCharacterStream(int columnIndex, Reader x) {
     }
 
-    public void updateAsciiStream(String columnLabel, InputStream x) throws SQLException {
+    public void updateAsciiStream(String columnLabel, InputStream x) {
     }
 
-    public void updateBinaryStream(String columnLabel, InputStream x) throws SQLException {
+    public void updateBinaryStream(String columnLabel, InputStream x) {
     }
 
-    public void updateCharacterStream(String columnLabel, Reader reader) throws SQLException {
+    public void updateCharacterStream(String columnLabel, Reader reader) {
     }
 
-    public void updateBlob(int columnIndex, InputStream inputStream) throws SQLException {
+    public void updateBlob(int columnIndex, InputStream inputStream) {
     }
 
-    public void updateBlob(String columnLabel, InputStream inputStream) throws SQLException {
+    public void updateBlob(String columnLabel, InputStream inputStream) {
     }
 
-    public void updateClob(int columnIndex, Reader reader) throws SQLException {
+    public void updateClob(int columnIndex, Reader reader) {
     }
 
-    public void updateClob(String columnLabel, Reader reader) throws SQLException {
+    public void updateClob(String columnLabel, Reader reader) {
     }
 
-    public void updateNClob(int columnIndex, Reader reader) throws SQLException {
+    public void updateNClob(int columnIndex, Reader reader) {
     }
 
-    public void updateNClob(String columnLabel, Reader reader) throws SQLException {
+    public void updateNClob(String columnLabel, Reader reader) {
     }
 
     @Override
-    public <T> T getObject(int columnIndex, Class<T> type) throws SQLException {
+    public <T> T getObject(int columnIndex, Class<T> type) {
         return null;
     }
 
     @Override
-    public <T> T getObject(String columnLabel, Class<T> type) throws SQLException {
+    public <T> T getObject(String columnLabel, Class<T> type) {
         return null;
     }
 
