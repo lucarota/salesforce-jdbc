@@ -11,22 +11,21 @@ import com.ascendix.jdbc.salesforce.statement.processor.utils.RecordFieldsBuilde
 import com.google.common.collect.Sets;
 import com.sforce.soap.partner.DescribeSObjectResult;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import org.junit.Test;
 
 public class UpdateQueryAnalyzerTest {
 
-    private final PartnerService partnerService;
-
     public UpdateQueryAnalyzerTest() {
-        partnerService = mock(PartnerService.class);
+        PartnerService partnerService = mock(PartnerService.class);
         when(partnerService.describeSObject(eq("Account"))).thenReturn(describeSObject("Account"));
     }
 
     @Test
     public void testIsUpdateQuery_ById() {
         String soql = "Update Account set Name ='FirstAccount_new' where Id='001xx000003GeY0AAK'";
-        UpdateQueryAnalyzer analyzer = new UpdateQueryAnalyzer(soql, partnerService, null);
+        UpdateQueryAnalyzer analyzer = new UpdateQueryAnalyzer(soql, null);
 
         assertTrue(analyzer.analyse(soql));
     }
@@ -40,7 +39,7 @@ public class UpdateQueryAnalyzerTest {
     @Test
     public void testProcessUpdate_One_ById() {
         String soql = "Update Account set Name ='FirstAccount_new' where Id='001xx000003GeY0AAK'";
-        UpdateQueryAnalyzer analyzer = new UpdateQueryAnalyzer(soql, partnerService, null);
+        UpdateQueryAnalyzer analyzer = new UpdateQueryAnalyzer(soql,  null);
 
         assertTrue(analyzer.analyse(soql));
         assertEquals("Account", analyzer.getFromObjectName());
@@ -59,7 +58,7 @@ public class UpdateQueryAnalyzerTest {
     @Test
     public void testProcessUpdate_One_ByName() {
         String soql = "Update Account set Name ='NEW_AccountName' where Name='FirstAccount_new'";
-        UpdateQueryAnalyzer analyzer = new UpdateQueryAnalyzer(soql, partnerService, subSoql -> {
+        UpdateQueryAnalyzer analyzer = new UpdateQueryAnalyzer(soql, subSoql -> {
             if ("SELECT Id FROM Account WHERE Name = 'FirstAccount_new'".equals(subSoql)) {
                 return Arrays.asList(
                         RecordFieldsBuilder.id("005xx1111111111111"),
@@ -67,7 +66,7 @@ public class UpdateQueryAnalyzerTest {
                         RecordFieldsBuilder.id("005xx3333333333333")
                        );
             }
-            return Arrays.asList();
+            return List.of();
         });
 
         assertTrue(analyzer.analyse(soql));
@@ -104,7 +103,7 @@ public class UpdateQueryAnalyzerTest {
     @Test
     public void testProcessUpdate_One_ByName_CALC() {
         String soql = "Update Account set Name=Name+'-' where Name='FirstAccount_new'";
-        UpdateQueryAnalyzer analyzer = new UpdateQueryAnalyzer(soql, partnerService, subSoql -> {
+        UpdateQueryAnalyzer analyzer = new UpdateQueryAnalyzer(soql, subSoql -> {
             if ("SELECT Id, Name FROM Account WHERE Name = 'FirstAccount_new'".equals(subSoql)) {
                 return Arrays.asList(
                         RecordFieldsBuilder.setId("005xx1111111111111").set("Name", "Acc_01").build(),
@@ -112,7 +111,7 @@ public class UpdateQueryAnalyzerTest {
                         RecordFieldsBuilder.setId("005xx3333333333333").set("Name", "Acc_03").build()
                        );
             }
-            return Arrays.asList();
+            return List.of();
         });
 
         assertTrue(analyzer.analyse(soql));

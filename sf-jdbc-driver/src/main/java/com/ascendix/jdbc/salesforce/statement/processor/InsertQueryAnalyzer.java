@@ -1,20 +1,26 @@
 package com.ascendix.jdbc.salesforce.statement.processor;
 
 import com.ascendix.jdbc.salesforce.statement.processor.utils.ValueToStringVisitor;
+import lombok.extern.slf4j.Slf4j;
+import net.sf.jsqlparser.JSQLParserException;
+import net.sf.jsqlparser.expression.Expression;
+import net.sf.jsqlparser.expression.operators.relational.ExpressionList;
+import net.sf.jsqlparser.expression.operators.relational.ParenthesedExpressionList;
+import net.sf.jsqlparser.parser.CCJSqlParserUtil;
+import net.sf.jsqlparser.schema.Column;
+import net.sf.jsqlparser.statement.Statement;
+import net.sf.jsqlparser.statement.insert.Insert;
+import net.sf.jsqlparser.statement.select.Select;
+import net.sf.jsqlparser.statement.select.SelectVisitorAdapter;
+import net.sf.jsqlparser.statement.select.Values;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
-import lombok.extern.slf4j.Slf4j;
-import net.sf.jsqlparser.JSQLParserException;
-import net.sf.jsqlparser.expression.operators.relational.ExpressionList;
-import net.sf.jsqlparser.expression.operators.relational.ItemsListVisitorAdapter;
-import net.sf.jsqlparser.expression.operators.relational.MultiExpressionList;
-import net.sf.jsqlparser.parser.CCJSqlParserUtil;
-import net.sf.jsqlparser.schema.Column;
-import net.sf.jsqlparser.statement.Statement;
-import net.sf.jsqlparser.statement.insert.Insert;
+
+import static net.sf.jsqlparser.util.validation.metadata.NamedObject.column;
 
 @Slf4j
 public class InsertQueryAnalyzer {
@@ -37,39 +43,36 @@ public class InsertQueryAnalyzer {
         return getQueryData(true) != null;
     }
 
-    public class InsertItemsListVisitor extends ItemsListVisitorAdapter {
+    public class InsertValuesVisitor extends SelectVisitorAdapter {
 
         List<Column> columns;
         List<Map<String, Object>> records;
 
-        public InsertItemsListVisitor(List<Column> columns, List<Map<String, Object>> records) {
+        public InsertValuesVisitor(List<Column> columns, List<Map<String, Object>> records) {
             this.columns = columns;
             this.records = records;
         }
 
         @Override
-        public void visit(ExpressionList expressionList) {
+        public void visit(Values values) {
             log.trace("Expression Visitor");
-            HashMap<String, Object> fieldValues = new HashMap<>();
-            records.add(fieldValues);
 
-            for (int i = 0; i < columns.size(); i++) {
-                expressionList.getExpressions().get(i).accept(
-                    new ValueToStringVisitor(
-                        fieldValues,
-                        columns.get(i).getColumnName(),
-                        subSelectResolver)
-                );
+            for (Expression e: values.getExpressions()) {
+                if (e instanceof ExpressionList expressionList) {
+                    new Values(expressionList).accept(new InsertValuesVisitor(columns, records));
+                } else {
+                    HashMap<String, Object> fieldValues = new HashMap<>();
+                    records.add(fieldValues);
+                    for (int i = 0; i < columns.size(); i++) {
+                        Expression expression = values.getExpressions().get(i);
+                        expression.accept(
+                                    new ValueToStringVisitor(fieldValues, columns.get(i).getColumnName(), subSelectResolver));
+                    }
+                    break;
+                }
             }
         }
 
-        @Override
-        public void visit(MultiExpressionList multiExprList) {
-            log.trace("MultiExpression Visitor");
-            multiExprList.getExpressionLists().forEach(expressions -> {
-                expressions.accept(new InsertItemsListVisitor(columns, records));
-            });
-        }
     }
 
     protected String getFromObjectName() {
@@ -100,15 +103,15 @@ public class InsertQueryAnalyzer {
         if (queryData != null && records == null) {
             records = new ArrayList<>();
             if (getQueryData().isUseValues()) {
-                getQueryData().getItemsList().accept(new InsertItemsListVisitor(getQueryData().getColumns(), records));
+                getQueryData().getValues().accept(new InsertValuesVisitor(getQueryData().getColumns(), records));
             } else {
-                if (getQueryData().getSelect() != null) {
+                Select select = getQueryData().getSelect();
+                if (select != null) {
                     if (subSelectResolver != null) {
-                        log.info("Insert/Update has a sub-select: {}", getQueryData().getSelect().toString());
-                        List<Map<String, Object>> subRecords = subSelectResolver.apply(getQueryData().getSelect()
-                            .toString());
-                        log.info("Insert/Update fetched {} records from a sub-select: {}", subRecords.size(),
-                            getQueryData().getSelect().toString());
+                        log.info("Insert/Update has a sub-select: {}", select);
+                        List<Map<String, Object>> subRecords = subSelectResolver.apply(
+                                select.getPlainSelect().toString());
+                        log.info("Insert/Update fetched {} records from a sub-select: {}", subRecords.size(), select);
                         for (Map<String, Object> subRecord : subRecords) {
                             // this subRecord is LinkedHashMap - so the order of fields is determined by soql
                             Map<String, Object> record = new HashMap<>();

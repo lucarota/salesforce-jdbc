@@ -1,93 +1,27 @@
 package com.ascendix.jdbc.salesforce.statement.processor.utils;
 
-import java.util.List;
-import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
-import net.sf.jsqlparser.expression.AnalyticExpression;
-import net.sf.jsqlparser.expression.AnyComparisonExpression;
-import net.sf.jsqlparser.expression.ArrayExpression;
-import net.sf.jsqlparser.expression.CaseExpression;
-import net.sf.jsqlparser.expression.CastExpression;
-import net.sf.jsqlparser.expression.CollateExpression;
-import net.sf.jsqlparser.expression.DateTimeLiteralExpression;
-import net.sf.jsqlparser.expression.DoubleValue;
-import net.sf.jsqlparser.expression.Expression;
-import net.sf.jsqlparser.expression.ExpressionVisitorAdapter;
-import net.sf.jsqlparser.expression.ExtractExpression;
-import net.sf.jsqlparser.expression.HexValue;
-import net.sf.jsqlparser.expression.IntervalExpression;
-import net.sf.jsqlparser.expression.JsonExpression;
-import net.sf.jsqlparser.expression.KeepExpression;
-import net.sf.jsqlparser.expression.LongValue;
-import net.sf.jsqlparser.expression.MySQLGroupConcat;
-import net.sf.jsqlparser.expression.NextValExpression;
-import net.sf.jsqlparser.expression.NotExpression;
-import net.sf.jsqlparser.expression.NullValue;
-import net.sf.jsqlparser.expression.NumericBind;
-import net.sf.jsqlparser.expression.OracleHierarchicalExpression;
-import net.sf.jsqlparser.expression.OracleHint;
-import net.sf.jsqlparser.expression.Parenthesis;
-import net.sf.jsqlparser.expression.RowConstructor;
-import net.sf.jsqlparser.expression.StringValue;
-import net.sf.jsqlparser.expression.TimeKeyExpression;
-import net.sf.jsqlparser.expression.TimeValue;
-import net.sf.jsqlparser.expression.TimestampValue;
-import net.sf.jsqlparser.expression.UserVariable;
-import net.sf.jsqlparser.expression.ValueListExpression;
-import net.sf.jsqlparser.expression.VariableAssignment;
-import net.sf.jsqlparser.expression.WhenClause;
-import net.sf.jsqlparser.expression.XMLSerializeExpr;
-import net.sf.jsqlparser.expression.operators.arithmetic.Addition;
-import net.sf.jsqlparser.expression.operators.arithmetic.BitwiseAnd;
-import net.sf.jsqlparser.expression.operators.arithmetic.BitwiseOr;
-import net.sf.jsqlparser.expression.operators.arithmetic.BitwiseXor;
-import net.sf.jsqlparser.expression.operators.arithmetic.Concat;
-import net.sf.jsqlparser.expression.operators.arithmetic.Division;
-import net.sf.jsqlparser.expression.operators.arithmetic.IntegerDivision;
-import net.sf.jsqlparser.expression.operators.arithmetic.Modulo;
-import net.sf.jsqlparser.expression.operators.arithmetic.Multiplication;
-import net.sf.jsqlparser.expression.operators.arithmetic.Subtraction;
+import net.sf.jsqlparser.expression.*;
+import net.sf.jsqlparser.expression.operators.arithmetic.*;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.expression.operators.conditional.OrExpression;
-import net.sf.jsqlparser.expression.operators.relational.Between;
-import net.sf.jsqlparser.expression.operators.relational.EqualsTo;
-import net.sf.jsqlparser.expression.operators.relational.ExistsExpression;
-import net.sf.jsqlparser.expression.operators.relational.FullTextSearch;
-import net.sf.jsqlparser.expression.operators.relational.GreaterThan;
-import net.sf.jsqlparser.expression.operators.relational.GreaterThanEquals;
-import net.sf.jsqlparser.expression.operators.relational.InExpression;
-import net.sf.jsqlparser.expression.operators.relational.IsBooleanExpression;
-import net.sf.jsqlparser.expression.operators.relational.IsNullExpression;
-import net.sf.jsqlparser.expression.operators.relational.JsonOperator;
-import net.sf.jsqlparser.expression.operators.relational.LikeExpression;
-import net.sf.jsqlparser.expression.operators.relational.Matches;
-import net.sf.jsqlparser.expression.operators.relational.MinorThan;
-import net.sf.jsqlparser.expression.operators.relational.MinorThanEquals;
-import net.sf.jsqlparser.expression.operators.relational.NotEqualsTo;
-import net.sf.jsqlparser.expression.operators.relational.RegExpMatchOperator;
-import net.sf.jsqlparser.expression.operators.relational.RegExpMySQLOperator;
-import net.sf.jsqlparser.expression.operators.relational.SimilarToExpression;
+import net.sf.jsqlparser.expression.operators.relational.*;
 import net.sf.jsqlparser.schema.Column;
-import net.sf.jsqlparser.statement.select.SubSelect;
-import net.sf.jsqlparser.statement.update.Update;
+
+import java.util.Map;
 
 @Slf4j
 public class UpdateRecordVisitor extends ExpressionVisitorAdapter {
 
-    private final Update updateStatement;
     private final Map<String, Object> recordFieldsToUpdate;
     private final Map<String, Object> recordFieldsFromDB;
     private final String columnName;
-    private final java.util.function.Function<String, List<Map<String, Object>>> subSelectResolver;
 
-    public UpdateRecordVisitor(Update updateStatement, Map<String, Object> recordFieldsToUpdate,
-        Map<String, Object> recordFieldsFromDB, String columnName,
-        java.util.function.Function<String, List<Map<String, Object>>> subSelectResolver) {
-        this.updateStatement = updateStatement;
+    public UpdateRecordVisitor(Map<String, Object> recordFieldsToUpdate,
+        Map<String, Object> recordFieldsFromDB, String columnName) {
         this.recordFieldsToUpdate = recordFieldsToUpdate;
         this.recordFieldsFromDB = recordFieldsFromDB;
         this.columnName = columnName;
-        this.subSelectResolver = subSelectResolver;
     }
 
     @Override
@@ -269,24 +203,6 @@ public class UpdateRecordVisitor extends ExpressionVisitorAdapter {
     }
 
     @Override
-    public void visit(SubSelect subSelect) {
-        log.trace("[VtoxSVisitor] SubSelect={} column={}", subSelect.toString(), columnName);
-//        Object value = null;
-//        if (subSelectResolver != null) {
-//            subSelect.setUseBrackets(false);
-//            List<Map<String, Object>> records = subSelectResolver.apply(subSelect.toString());
-//            if (records.size() == 1 && records.get(0).size() == 1) {
-//                 return the value as plain value
-//                value = records.get(0).entrySet().iterator().next().getValue();
-//                log.trace("[UpdateVisitor] resolved to {}", value);
-//            }
-//        } else {
-//            log.trace("[UpdateVisitor] subSelectResolver is undefined");
-//        }
-//        recordFieldsToUpdate.put(columnName, value);
-    }
-
-    @Override
     public void visit(CaseExpression caseExpression) {
         log.trace("[UpdateVisitor] CaseExpression");
         evaluate(caseExpression);
@@ -395,12 +311,6 @@ public class UpdateRecordVisitor extends ExpressionVisitorAdapter {
     }
 
     @Override
-    public void visit(RegExpMySQLOperator aThis) {
-        log.trace("[UpdateVisitor] RegExpMySQLOperator");
-        evaluate(aThis);
-    }
-
-    @Override
     public void visit(UserVariable aThis) {
         log.trace("[UpdateVisitor] UserVariable");
         evaluate(aThis);
@@ -421,12 +331,6 @@ public class UpdateRecordVisitor extends ExpressionVisitorAdapter {
     @Override
     public void visit(MySQLGroupConcat aThis) {
         log.trace("[UpdateVisitor] MySQLGroupConcat");
-        evaluate(aThis);
-    }
-
-    @Override
-    public void visit(ValueListExpression aThis) {
-        log.trace("[UpdateVisitor] ValueListExpression");
         evaluate(aThis);
     }
 

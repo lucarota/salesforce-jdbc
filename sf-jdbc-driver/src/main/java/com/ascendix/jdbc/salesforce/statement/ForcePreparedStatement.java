@@ -539,7 +539,7 @@ public class ForcePreparedStatement implements PreparedStatement, Iterator<List<
     private UpdateQueryAnalyzer getUpdateQueryAnalyzer() {
         log.trace("[PrepStat] getUpdateQueryAnalyzer IMPLEMENTED ");
         if (updateQueryAnalyzer == null) {
-            updateQueryAnalyzer = new UpdateQueryAnalyzer(soqlQuery, getPartnerService(), this::runResolveSubselect);
+            updateQueryAnalyzer = new UpdateQueryAnalyzer(soqlQuery, this::runResolveSubselect);
         }
         return updateQueryAnalyzer;
     }
