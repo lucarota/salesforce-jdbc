@@ -1,19 +1,12 @@
 package com.ascendix.jdbc.salesforce.statement.processor.utils;
 
+import lombok.extern.slf4j.Slf4j;
+import net.sf.jsqlparser.expression.*;
+import net.sf.jsqlparser.statement.select.PlainSelect;
+import net.sf.jsqlparser.statement.select.Select;
+
 import java.util.List;
 import java.util.Map;
-import lombok.extern.slf4j.Slf4j;
-import net.sf.jsqlparser.expression.DoubleValue;
-import net.sf.jsqlparser.expression.Expression;
-import net.sf.jsqlparser.expression.ExpressionVisitorAdapter;
-import net.sf.jsqlparser.expression.HexValue;
-import net.sf.jsqlparser.expression.LongValue;
-import net.sf.jsqlparser.expression.NullValue;
-import net.sf.jsqlparser.expression.RowConstructor;
-import net.sf.jsqlparser.expression.StringValue;
-import net.sf.jsqlparser.schema.Column;
-import net.sf.jsqlparser.statement.create.table.ColumnDefinition;
-import net.sf.jsqlparser.statement.select.SubSelect;
 
 @Slf4j
 public class ValueToStringVisitor extends ExpressionVisitorAdapter {
@@ -60,19 +53,21 @@ public class ValueToStringVisitor extends ExpressionVisitorAdapter {
     }
 
     @Override
-    public void visit(SubSelect subSelect) {
-        log.trace("[VtoxSVisitor] SubSelect {}={}", columnName, subSelect.toString());
+    public void visit(Select subSelect) {
         Object value = null;
-        if (subSelectResolver != null) {
-            subSelect.setUseBrackets(false);
-            List<Map<String, Object>> records = subSelectResolver.apply(subSelect.toString());
-            if (records.size() == 1 && records.get(0).size() == 1) {
-                // return the value as plain value
-                value = records.get(0).entrySet().iterator().next().getValue();
-                log.trace("[VtoSVisitor] resolved to {}", value);
+        PlainSelect plainSelect = subSelect.getPlainSelect();
+        if (plainSelect != null) {
+            log.trace("[VtoxSVisitor] SubSelect {}={}", columnName, plainSelect);
+            if (subSelectResolver != null) {
+                List<Map<String, Object>> records = subSelectResolver.apply(plainSelect.toString());
+                if (records.size() == 1 && records.get(0).size() == 1) {
+                    // return the value as plain value
+                    value = records.get(0).entrySet().iterator().next().getValue();
+                    log.trace("[VtoSVisitor] resolved to {}", value);
+                }
+            } else {
+                log.trace("[VtoSVisitor] subSelectResolver is undefined");
             }
-        } else {
-            log.trace("[VtoSVisitor] subSelectResolver is undefined");
         }
         fieldValues.put(columnName, value);
     }

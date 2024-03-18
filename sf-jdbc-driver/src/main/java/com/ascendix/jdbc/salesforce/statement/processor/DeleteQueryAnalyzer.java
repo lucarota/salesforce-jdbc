@@ -77,7 +77,7 @@ public class DeleteQueryAnalyzer {
                 try {
                     Select select = SelectUtils.buildSelectFromTableAndExpressions(getQueryData().getTable(),
                         "Id");
-                    ((PlainSelect) select.getSelectBody()).setWhere(getQueryData().getWhere());
+                    select.getPlainSelect().setWhere(getQueryData().getWhere());
 
                     List<Map<String, Object>> subRecords = subSelectResolver.apply(select.toString());
 

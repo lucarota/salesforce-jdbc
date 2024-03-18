@@ -1,36 +1,23 @@
 package com.ascendix.jdbc.salesforce.statement.processor;
 
-import com.ascendix.jdbc.salesforce.delegates.PartnerService;
 import com.ascendix.jdbc.salesforce.statement.processor.utils.ColumnsFinderVisitor;
 import com.ascendix.jdbc.salesforce.statement.processor.utils.UpdateRecordVisitor;
 import com.ascendix.jdbc.salesforce.statement.processor.utils.ValueToStringVisitor;
-import com.sforce.soap.partner.DescribeSObjectResult;
-import com.sforce.soap.partner.Field;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.Function;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.StringValue;
 import net.sf.jsqlparser.expression.operators.relational.EqualsTo;
-import net.sf.jsqlparser.expression.operators.relational.ExpressionList;
-import net.sf.jsqlparser.expression.operators.relational.ItemsListVisitor;
-import net.sf.jsqlparser.expression.operators.relational.MultiExpressionList;
-import net.sf.jsqlparser.expression.operators.relational.NamedExpressionList;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.statement.Statement;
-import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.Select;
-import net.sf.jsqlparser.statement.select.SubSelect;
 import net.sf.jsqlparser.statement.update.Update;
+import net.sf.jsqlparser.statement.update.UpdateSet;
 import net.sf.jsqlparser.util.SelectUtils;
+
+import java.util.*;
+import java.util.function.Function;
 
 @Slf4j
 public class UpdateQueryAnalyzer {
@@ -40,8 +27,7 @@ public class UpdateQueryAnalyzer {
     private Update queryData;
     private List<Map<String, Object>> records;
 
-    public UpdateQueryAnalyzer(String soql, PartnerService partnerService,
-        Function<String, List<Map<String, Object>>> subSelectResolver) {
+    public UpdateQueryAnalyzer(String soql, Function<String, List<Map<String, Object>>> subSelectResolver) {
         this.soql = soql;
         this.subSelectResolver = subSelectResolver;
     }
@@ -52,14 +38,6 @@ public class UpdateQueryAnalyzer {
         }
         this.soql = soql;
         return getQueryData(true) != null;
-    }
-
-    private Field findField(String name, DescribeSObjectResult objectDesc, Function<Field, String> nameFetcher) {
-        return Arrays.stream(objectDesc.getFields())
-            .filter(field -> name.equalsIgnoreCase(nameFetcher.apply(field)))
-            .findFirst()
-            .orElseThrow(() -> new IllegalArgumentException(
-                "Unknown field name \"" + name + "\" in object \"" + objectDesc.getName() + "\""));
     }
 
     protected String getFromObjectName() {
@@ -91,23 +69,23 @@ public class UpdateQueryAnalyzer {
             records = new ArrayList<>();
 
             String id = checkIsDirectIdWhere();
+            List<UpdateSet> updateSets = getQueryData().getUpdateSets();
             if (id != null) {
                 Set<String> columnsToFetch = new HashSet<>();
-                boolean isFunctionFound = findSubFields(columnsToFetch, getQueryData().getExpressions());
+                boolean isFunctionFound = findSubFields(columnsToFetch, updateSets);
                 if (columnsToFetch.isEmpty() && !isFunctionFound) {
                     // means there is no calculations in the new field values
                     Map<String, Object> record = new HashMap<>();
                     records.add(record);
                     record.put("Id", id);
 
-                    List<Column> columns = getQueryData().getColumns();
-                    for (int i = 0; i < columns.size(); i++) {
-                        getQueryData().getExpressions().get(i).accept(
-                            new ValueToStringVisitor(
-                                record,
-                                columns.get(i).getColumnName(),
-                                subSelectResolver)
-                        );
+                    for (UpdateSet updateSet : updateSets) {
+                        List<Column> columns = updateSet.getColumns();
+                        for (Column column : columns) {
+                            updateSet.getValues().accept(new ValueToStringVisitor(record, column.getColumnName(),
+                                    subSelectResolver));
+                        }
+
                     }
                     return records;
                 }
@@ -116,11 +94,11 @@ public class UpdateQueryAnalyzer {
             if (subSelectResolver != null) {
                 try {
                     Set<String> columnsToFetch = new HashSet<>();
-                    findSubFields(columnsToFetch, getQueryData().getExpressions());
+                    findSubFields(columnsToFetch, updateSets);
                     columnsToFetch.add("Id");
                     Select select = SelectUtils.buildSelectFromTableAndExpressions(getQueryData().getTable(),
                         columnsToFetch.toArray(new String[]{}));
-                    ((PlainSelect) select.getSelectBody()).setWhere(getQueryData().getWhere());
+                    select.getPlainSelect().setWhere(getQueryData().getWhere());
 
                     List<Map<String, Object>> subRecords = subSelectResolver.apply(select.toString());
 
@@ -130,19 +108,20 @@ public class UpdateQueryAnalyzer {
                         records.add(record);
                         record.put("Id", subRecord.get("Id"));
 
-                        List<Column> columns = getQueryData().getColumns();
                         // Iterating over the received entities and adding fields to update
-                        for (int i = 0; i < columns.size(); i++) {
-                            Expression expr = getQueryData().getExpressions().get(i);
-                            expr.accept(
-                                new UpdateRecordVisitor(
-                                    getQueryData(),
-                                    record,
-                                    subRecord,
-                                    columns.get(i).getColumnName(),
-                                    subSelectResolver)
-                            );
+                        for (UpdateSet updateSet : updateSets) {
+                            List<Column> columns = updateSet.getColumns();
+                            for (int i = 0; i < columns.size(); i++) {
+                                Expression expr = updateSet.getValue(i);
+                                expr.accept(
+                                    new UpdateRecordVisitor(
+                                        record,
+                                        subRecord,
+                                        columns.get(i).getColumnName())
+                                );
+                            }
                         }
+
                     }
                 } catch (JSQLParserException e) {
                     log.error(
@@ -157,15 +136,12 @@ public class UpdateQueryAnalyzer {
         return records;
     }
 
-    private Set<String> findFields(List<Expression> expressions) {
-        Set<String> columns = new HashSet<>();
-        findSubFields(columns, expressions);
-        return columns;
-    }
-
-    private boolean findSubFields(Set<String> columns, List<Expression> expressions) {
+    private boolean findSubFields(Set<String> columns, List<UpdateSet> updateSets) {
         ColumnsFinderVisitor visitor = new ColumnsFinderVisitor(columns);
-        expressions.forEach(expr -> expr.accept(visitor));
+        for (UpdateSet updateSet : updateSets) {
+            updateSet.getValues().forEach(expr -> expr.accept(visitor));
+        }
+
         return visitor.isFunctionFound();
     }
 

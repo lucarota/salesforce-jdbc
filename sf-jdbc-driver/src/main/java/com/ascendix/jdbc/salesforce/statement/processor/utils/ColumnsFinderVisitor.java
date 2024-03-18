@@ -1,61 +1,15 @@
 package com.ascendix.jdbc.salesforce.statement.processor.utils;
 
-import java.util.Set;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import net.sf.jsqlparser.expression.AnalyticExpression;
-import net.sf.jsqlparser.expression.ArrayExpression;
-import net.sf.jsqlparser.expression.BinaryExpression;
-import net.sf.jsqlparser.expression.CastExpression;
-import net.sf.jsqlparser.expression.CollateExpression;
-import net.sf.jsqlparser.expression.Expression;
-import net.sf.jsqlparser.expression.ExpressionVisitorAdapter;
-import net.sf.jsqlparser.expression.ExtractExpression;
-import net.sf.jsqlparser.expression.Function;
-import net.sf.jsqlparser.expression.IntervalExpression;
-import net.sf.jsqlparser.expression.JsonExpression;
-import net.sf.jsqlparser.expression.MySQLGroupConcat;
-import net.sf.jsqlparser.expression.NotExpression;
-import net.sf.jsqlparser.expression.OracleHierarchicalExpression;
-import net.sf.jsqlparser.expression.Parenthesis;
-import net.sf.jsqlparser.expression.RowConstructor;
-import net.sf.jsqlparser.expression.SignedExpression;
-import net.sf.jsqlparser.expression.ValueListExpression;
-import net.sf.jsqlparser.expression.VariableAssignment;
-import net.sf.jsqlparser.expression.XMLSerializeExpr;
-import net.sf.jsqlparser.expression.operators.arithmetic.Addition;
-import net.sf.jsqlparser.expression.operators.arithmetic.BitwiseAnd;
-import net.sf.jsqlparser.expression.operators.arithmetic.BitwiseLeftShift;
-import net.sf.jsqlparser.expression.operators.arithmetic.BitwiseOr;
-import net.sf.jsqlparser.expression.operators.arithmetic.BitwiseRightShift;
-import net.sf.jsqlparser.expression.operators.arithmetic.BitwiseXor;
-import net.sf.jsqlparser.expression.operators.arithmetic.Concat;
-import net.sf.jsqlparser.expression.operators.arithmetic.Division;
-import net.sf.jsqlparser.expression.operators.arithmetic.IntegerDivision;
-import net.sf.jsqlparser.expression.operators.arithmetic.Modulo;
-import net.sf.jsqlparser.expression.operators.arithmetic.Multiplication;
-import net.sf.jsqlparser.expression.operators.arithmetic.Subtraction;
+import net.sf.jsqlparser.expression.*;
+import net.sf.jsqlparser.expression.operators.arithmetic.*;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.expression.operators.conditional.OrExpression;
-import net.sf.jsqlparser.expression.operators.relational.Between;
-import net.sf.jsqlparser.expression.operators.relational.EqualsTo;
-import net.sf.jsqlparser.expression.operators.relational.ExistsExpression;
-import net.sf.jsqlparser.expression.operators.relational.FullTextSearch;
-import net.sf.jsqlparser.expression.operators.relational.GreaterThan;
-import net.sf.jsqlparser.expression.operators.relational.GreaterThanEquals;
-import net.sf.jsqlparser.expression.operators.relational.InExpression;
-import net.sf.jsqlparser.expression.operators.relational.IsBooleanExpression;
-import net.sf.jsqlparser.expression.operators.relational.IsNullExpression;
-import net.sf.jsqlparser.expression.operators.relational.JsonOperator;
-import net.sf.jsqlparser.expression.operators.relational.LikeExpression;
-import net.sf.jsqlparser.expression.operators.relational.Matches;
-import net.sf.jsqlparser.expression.operators.relational.MinorThan;
-import net.sf.jsqlparser.expression.operators.relational.MinorThanEquals;
-import net.sf.jsqlparser.expression.operators.relational.NotEqualsTo;
-import net.sf.jsqlparser.expression.operators.relational.RegExpMatchOperator;
-import net.sf.jsqlparser.expression.operators.relational.RegExpMySQLOperator;
-import net.sf.jsqlparser.expression.operators.relational.SimilarToExpression;
+import net.sf.jsqlparser.expression.operators.relational.*;
 import net.sf.jsqlparser.schema.Column;
+
+import java.util.Set;
 
 @Slf4j
 public class ColumnsFinderVisitor extends ExpressionVisitorAdapter {
@@ -329,27 +283,15 @@ public class ColumnsFinderVisitor extends ExpressionVisitorAdapter {
     }
 
     @Override
-    public void visit(RegExpMySQLOperator regExpMySQLOperator) {
-        log.trace("[ColumnsFinder] RegExpMySQLOperator");
-        processBinaryExpression(regExpMySQLOperator);
-    }
-
-    @Override
     public void visit(MySQLGroupConcat groupConcat) {
         log.trace("[ColumnsFinder] MySQLGroupConcat");
-        groupConcat.getExpressionList().getExpressions().forEach(expression -> expression.accept(this));
-    }
-
-    @Override
-    public void visit(ValueListExpression valueList) {
-        log.trace("[ColumnsFinder] ValueListExpression");
-        valueList.getExpressionList().getExpressions().forEach(expression -> expression.accept(this));
+        groupConcat.getExpressionList().forEach(expression -> expression.accept(this));
     }
 
     @Override
     public void visit(RowConstructor rowConstructor) {
         log.trace("[ColumnsFinder] RowConstructor");
-        rowConstructor.getExprList().getExpressions().forEach(expression -> expression.accept(this));
+        rowConstructor.accept(this);
     }
 
     @Override
