@@ -195,13 +195,9 @@ Steps to update the partners.wsdl
    `java -jar target/force-wsc-50.0.0-uber.jar blt/app/main/core/shared/submodules/wsdl/src/main/wsdl/partner.wsdl sforce-partner.jar`
 3. Copy the com.sforce.soap to the driver
 
-## SOQL Parser
-
-This project uses a bit modified version of MuleSoft SOQL Parser which also supports quotes around field names.
-It could be obtained from here:  https://github.com/spuliaiev-sfdc/salesforce-soql-parser
-
-
 ## Version History
+
+### 1.5.0
 
 ### 1.4.4
 SOQL queries will try to expand the `SELECT * from Account` syntax for root query entity into up to 100 fields.

@@ -7,60 +7,8 @@ import com.ascendix.jdbc.salesforce.metadata.ColumnMap;
 import com.ascendix.jdbc.salesforce.metadata.ForceDatabaseMetaData;
 import com.ascendix.jdbc.salesforce.metadata.TypeInfo;
 import com.ascendix.jdbc.salesforce.resultset.CachedResultSet;
-import com.ascendix.jdbc.salesforce.statement.processor.AdminQueryProcessor;
-import com.ascendix.jdbc.salesforce.statement.processor.DeleteQueryAnalyzer;
-import com.ascendix.jdbc.salesforce.statement.processor.DeleteQueryProcessor;
-import com.ascendix.jdbc.salesforce.statement.processor.InsertQueryAnalyzer;
-import com.ascendix.jdbc.salesforce.statement.processor.InsertQueryProcessor;
-import com.ascendix.jdbc.salesforce.statement.processor.SoqlQueryAnalyzer;
-import com.ascendix.jdbc.salesforce.statement.processor.SoslQueryAnalyzer;
-import com.ascendix.jdbc.salesforce.statement.processor.SoslQueryProcessor;
-import com.ascendix.jdbc.salesforce.statement.processor.UpdateQueryAnalyzer;
-import com.ascendix.jdbc.salesforce.statement.processor.UpdateQueryProcessor;
+import com.ascendix.jdbc.salesforce.statement.processor.*;
 import com.sforce.ws.ConnectionException;
-import java.io.InputStream;
-import java.io.Reader;
-import java.math.BigDecimal;
-import java.net.URL;
-import java.sql.Array;
-import java.sql.Blob;
-import java.sql.Clob;
-import java.sql.Connection;
-import java.sql.Date;
-import java.sql.NClob;
-import java.sql.ParameterMetaData;
-import java.sql.PreparedStatement;
-import java.sql.Ref;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.RowId;
-import java.sql.SQLException;
-import java.sql.SQLWarning;
-import java.sql.SQLXML;
-import java.sql.Statement;
-import java.sql.Time;
-import java.sql.Timestamp;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import javax.sql.rowset.RowSetMetaDataImpl;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
@@ -69,7 +17,24 @@ import org.mapdb.DB;
 import org.mapdb.DBMaker;
 import org.mapdb.HTreeMap;
 import org.mapdb.Serializer;
-import org.mule.tools.soql.exception.SOQLParsingException;
+
+import javax.sql.rowset.RowSetMetaDataImpl;
+import java.io.InputStream;
+import java.io.Reader;
+import java.math.BigDecimal;
+import java.net.URL;
+import java.sql.Date;
+import java.sql.*;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Slf4j
 public class ForcePreparedStatement implements PreparedStatement, Iterator<List<ColumnMap<String, Object>>> {
@@ -170,11 +135,7 @@ public class ForcePreparedStatement implements PreparedStatement, Iterator<List<
         soqlQuery = prepareQuery();
 
         if (AdminQueryProcessor.isAdminQuery(soqlQuery)) {
-            try {
-                return AdminQueryProcessor.processQuery(this, soqlQuery);
-            } catch (SOQLParsingException e) {
-                throw new SQLException(e);
-            }
+            return AdminQueryProcessor.processQuery(this, soqlQuery);
         }
         InsertQueryAnalyzer insertQueryAnalyzer = getInsertQueryAnalyzer();
         if (InsertQueryProcessor.isInsertQuery(soqlQuery, insertQueryAnalyzer)) {
@@ -207,7 +168,7 @@ public class ForcePreparedStatement implements PreparedStatement, Iterator<List<
             } else {
                 return new CachedResultSet(Collections.emptyList(), getMetaData());
             }
-        } catch (ConnectionException | SOQLParsingException e) {
+        } catch (ConnectionException e) {
             throw new SQLException(e);
         }
     }
@@ -241,7 +202,7 @@ public class ForcePreparedStatement implements PreparedStatement, Iterator<List<
                 .orElseGet(Collections::emptyList)
                 .forEach(record -> result.add(convertToColumnMap(record)));
             return result;
-        } catch (ConnectionException | SOQLParsingException e) {
+        } catch (ConnectionException e) {
             throw new RuntimeException(new SQLException(e));
         }
     }
