@@ -17,10 +17,6 @@
       <artifactId>sf-auth-client</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.mule.tools</groupId>
-      <artifactId>salesforce-soql-parser</artifactId>
-    </dependency>
-    <dependency>
       <groupId>com.force.api</groupId>
       <artifactId>force-partner-api</artifactId>
     </dependency>

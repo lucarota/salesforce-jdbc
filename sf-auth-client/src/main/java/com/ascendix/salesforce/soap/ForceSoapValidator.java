@@ -13,6 +13,8 @@ import com.google.api.client.http.HttpTransport;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -34,8 +36,7 @@ public class ForceSoapValidator {
         HttpRequestFactory requestFactory = buildHttpRequestFactory();
         ClassLoader classLoader = getClass().getClassLoader();
         try (InputStream is = classLoader.getResourceAsStream("forceSoapBody")) {
-
-            String requestBody = IOUtils.toString(is);
+            String requestBody = IOUtils.toString(is, Charset.defaultCharset());
 
             HttpRequest request = requestFactory.buildPostRequest(
                 new GenericUrl(partnerUrl),

@@ -5,22 +5,25 @@ import com.ascendix.jdbc.salesforce.statement.FieldDef;
 import com.sforce.soap.partner.ChildRelationship;
 import com.sforce.soap.partner.DescribeSObjectResult;
 import com.sforce.soap.partner.Field;
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
+import net.sf.jsqlparser.JSQLParserException;
+import net.sf.jsqlparser.expression.Expression;
+import net.sf.jsqlparser.parser.CCJSqlParserUtil;
+import net.sf.jsqlparser.schema.Column;
+import net.sf.jsqlparser.schema.Table;
+import net.sf.jsqlparser.statement.Statement;
+import net.sf.jsqlparser.statement.select.ParenthesedSelect;
+import net.sf.jsqlparser.statement.select.PlainSelect;
+import net.sf.jsqlparser.statement.select.SelectItem;
+import net.sf.jsqlparser.statement.select.SelectItemVisitor;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
-import java.util.stream.Collectors;
-import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
-import org.mule.tools.soql.SOQLDataBaseVisitor;
-import org.mule.tools.soql.SOQLParserHelper;
-import org.mule.tools.soql.exception.SOQLParsingException;
-import org.mule.tools.soql.query.SOQLQuery;
-import org.mule.tools.soql.query.SOQLSubQuery;
-import org.mule.tools.soql.query.clause.FromClause;
-import org.mule.tools.soql.query.from.ObjectSpec;
-import org.mule.tools.soql.query.select.FieldSpec;
-import org.mule.tools.soql.query.select.FunctionCallSpec;
 
 @Slf4j
 public class SoqlQueryAnalyzer {
@@ -28,7 +31,7 @@ public class SoqlQueryAnalyzer {
     private String soql;
     private final PartnerService partnerService;
 
-    private SOQLQuery queryData;
+    private PlainSelect queryData;
     @Getter
     private boolean expandedStarSyntaxForFields = false;
     private List<FieldDef> fieldDefinitions;
@@ -45,10 +48,10 @@ public class SoqlQueryAnalyzer {
     }
 
     public String getSoqlQuery() {
-        return this.queryData.toSOQLText();
+        return this.queryData.toString();
     }
 
-    private class SelectSpecVisitor extends SOQLDataBaseVisitor<Void> {
+    private class SelectSpecVisitor implements SelectItemVisitor {
 
         private final String rootEntityName;
 
@@ -57,22 +60,28 @@ public class SoqlQueryAnalyzer {
         }
 
         @Override
-        public Void visitFieldSpec(FieldSpec fieldSpec) {
-            String name = fieldSpec.getFieldName();
+        public void visit(SelectItem fieldSpec) {
+            if (fieldSpec.getExpression() instanceof Column column) {
+                String name = column.getColumnName();
+                String alias = fieldSpec.getAlias() != null ? fieldSpec.getAlias().getName() : name;
 
-            String alias = fieldSpec.getAlias() != null ? fieldSpec.getAlias() : name;
-            // If Object Name specified - verify it is not the same as SOQL root entity
-            String objectPrefix =
-                !fieldSpec.getObjectPrefixNames().isEmpty() ? fieldSpec.getObjectPrefixNames().get(0) : null;
-            if (fieldSpec.getAlias() == null && objectPrefix != null && !objectPrefix.equals(rootEntityName)) {
-                alias = objectPrefix + "." + name;
+                // If Object Name specified - verify it is not the same as SOQL root entity
+                String objectPrefix = column.getTable() != null ? column.getTable().getName() : null;
+                if (fieldSpec.getAlias() == null && objectPrefix != null && !objectPrefix.equals(rootEntityName)) {
+                    alias = objectPrefix + "." + name;
+                }
+                String[] prefix = StringUtils.split(name, '.');
+                List<String> prefixNames = List.of(ArrayUtils.remove(prefix, prefix.length - 1));
+                FieldDef result = createFieldDef(name, alias, prefixNames);
+                fieldDefinitions.add(result);
+                /* Remove alias from query */
+                fieldSpec.setAlias(null);
+            } else if (fieldSpec.getExpression() instanceof net.sf.jsqlparser.expression.Function func) {
+                String alias = fieldSpec.getAlias() != null ? fieldSpec.getAlias().getName() : func.getName();
+                visitFunctionCallSpec(func, alias);
+            } else if (fieldSpec.getExpression() instanceof ParenthesedSelect subQuery) {
+                visitSubQuery(subQuery);
             }
-            List<String> prefixNames = new ArrayList<>(fieldSpec.getObjectPrefixNames());
-            FieldDef result = createFieldDef(name, alias, prefixNames);
-            fieldDefinitions.add(result);
-            /* Remove alias from query */
-            fieldSpec.setAlias(null);
-            return null;
         }
 
         private FieldDef createFieldDef(String name, String alias, List<String> prefixNames) {
@@ -107,47 +116,48 @@ public class SoqlQueryAnalyzer {
             "WEEK_IN_MONTH",
             "WEEK_IN_YEAR");
 
-        @Override
-        public Void visitFunctionCallSpec(FunctionCallSpec functionCallSpec) {
-            String alias =
-                functionCallSpec.getAlias() != null ? functionCallSpec.getAlias() : functionCallSpec.getFunctionName();
-            if (FUNCTIONS_HAS_INT_RESULT.contains(functionCallSpec.getFunctionName().toUpperCase())) {
+        private void visitFunctionCallSpec(net.sf.jsqlparser.expression.Function functionCallSpec, String alias) {
+            if (FUNCTIONS_HAS_INT_RESULT.contains(functionCallSpec.getName().toUpperCase())) {
                 fieldDefinitions.add(new FieldDef(alias, alias, "int"));
             } else {
-                org.mule.tools.soql.query.data.Field param = (org.mule.tools.soql.query.data.Field) functionCallSpec.getFunctionParameters()
-                    .get(0);
-                FieldDef result = createFieldDef(param.getFieldName(), alias, param.getObjectPrefixNames());
+                Expression param = functionCallSpec.getParameters().get(0);
+                String[] prefix = StringUtils.split(param.toString(), '.');
+                List<String> prefixNames = List.of(ArrayUtils.remove(prefix, prefix.length - 1));
+                FieldDef result = createFieldDef(param.toString(), alias, prefixNames);
                 fieldDefinitions.add(result);
             }
-            return null;
         }
 
-        @Override
-        public Void visitSOQLSubQuery(SOQLSubQuery soqlSubQuery) {
-            String subquerySoql = soqlSubQuery.toSOQLText().replaceAll("\\A\\s*\\(|\\)\\s*$", "");
-            SOQLQuery subquery = SOQLParserHelper.createSOQLData(subquerySoql);
-            String relationshipName = subquery.getFromClause().getMainObjectSpec().getObjectName();
-            ChildRelationship relatedFrom = Arrays.stream(describeObject(getFromObjectName()).getChildRelationships())
-                .filter(rel -> relationshipName.equalsIgnoreCase(rel.getRelationshipName()))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException(
-                    "Unresolved relationship in subquery \"" + subquerySoql + "\""));
-            String fromObject = relatedFrom.getChildSObject();
-            subquery.setFromClause(new FromClause(new ObjectSpec(fromObject, null)));
+        private void visitSubQuery(ParenthesedSelect subQuery) {
+            try {
+                String subQuerySoql = subQuery.getPlainSelect().toString();
+                Statement statement = CCJSqlParserUtil.parse(subQuerySoql);
+                if (statement instanceof PlainSelect select) {
+                    String relationshipName = select.getFromItem().toString();
+                    ChildRelationship relatedFrom = Arrays.stream(
+                                    describeObject(getFromObjectName()).getChildRelationships())
+                            .filter(rel -> relationshipName.equalsIgnoreCase(rel.getRelationshipName())).findFirst()
+                            .orElseThrow(() -> new IllegalArgumentException(
+                                    "Unresolved relationship in subquery \"" + subQuerySoql + "\""));
 
-            SoqlQueryAnalyzer subqueryAnalyzer = new SoqlQueryAnalyzer(subquery.toSOQLText(), partnerService);
-            fieldDefinitions.addAll(subqueryAnalyzer.getFieldDefinitions());
-            return null;
+                    String fromObject = relatedFrom.getChildSObject();
+                    select.setFromItem(new Table(fromObject));
+
+                    SoqlQueryAnalyzer subQueryAnalyzer = new SoqlQueryAnalyzer(select.toString(), partnerService);
+                    fieldDefinitions.addAll(subQueryAnalyzer.getFieldDefinitions());
+                }
+            } catch (JSQLParserException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
     public List<FieldDef> getFieldDefinitions() {
         if (fieldDefinitions == null) {
             fieldDefinitions = new ArrayList<>();
-            String rootEntityName = getQueryData().getFromClause().getMainObjectSpec().getObjectName();
+            String rootEntityName = getFromObjectName();
             SelectSpecVisitor visitor = new SelectSpecVisitor(rootEntityName);
-            getQueryData().getSelectSpecs()
-                .forEach(spec -> spec.accept(visitor));
+            getQueryData().getSelectItems().forEach(spec -> spec.accept(visitor));
         }
         return fieldDefinitions;
     }
@@ -165,40 +175,30 @@ public class SoqlQueryAnalyzer {
     }
 
     public String getFromObjectName() {
-        return getQueryData().getFromClause().getMainObjectSpec().getObjectName();
+        return getQueryData().getFromItem().toString();
     }
 
-    private SOQLQuery getQueryData() {
+    private PlainSelect getQueryData() {
         if (queryData == null) {
             try {
-                queryData = SOQLParserHelper.createSOQLData(soql);
-            } catch (SOQLParsingException e) {
-                if (e.getMessage().startsWith("There was a SOQL parsing error close to '*'")) {
-                    String soqlExpandedToId = soql.replace("*", " Id ");
-                    try {
-                        queryData = SOQLParserHelper.createSOQLData(soqlExpandedToId);
+                Statement statement = CCJSqlParserUtil.parse(soql);
+                if (statement instanceof PlainSelect select) {
+                    if ("*".equals(select.getSelectItem(0).toString())) {
+                        select.getSelectItems().clear();
                         this.expandedStarSyntaxForFields = true;
-                        DescribeSObjectResult describeSObjectResult = describeObject(queryData.getMainObjectSpec()
-                            .getObjectName());
-                        String fields = Arrays.stream(describeSObjectResult.getFields())
-                            .limit(100) // Limit to first 100 fields
-                            .map(Field::getName).collect(Collectors.joining(", "));
+                        DescribeSObjectResult describeSObjectResult = describeObject(select.getFromItem().toString());
+                        Arrays.stream(describeSObjectResult.getFields())
+                                .limit(100) // Limit to first 100 fields
+                                .forEach(f -> select.addSelectItem(new Column(null, f.getName())));
                         log.warn("Warning in SOQL query parsing. Expansion of * fields to first 100 of "
                                 + describeSObjectResult.getFields().length
                                 + ". Please fix the query as SOQL does not support * to fetch all the fields");
-                        String soqlExpanded = soql.replace("*", fields);
-                        queryData = SOQLParserHelper.createSOQLData(soqlExpanded);
-                        this.soql = soqlExpanded;
-                    } catch (SOQLParsingException e2) {
-                        log.warn("Error in SOQL query parsing. Expansion of * failed. Please fix the query as SOQL does not support * to fetch all the fields",
-                            e2);
-                        throw new SOQLParsingException(
-                            "Error in SOQL query parsing. Expansion of * failed. Please fix the query as SOQL does not support * to fetch all the fields",
-                            e);
                     }
-                } else {
-                    throw e;
+                    this.soql = select.toString();
+                    this.queryData = select;
                 }
+            } catch (JSQLParserException e) {
+                log.error("Failed request to create query with error: {}", e.getMessage(), e);
             }
         }
         return queryData;
