@@ -40,11 +40,6 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>com.opencsv</groupId>
-      <artifactId>opencsv</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
       <groupId>com.thoughtworks.xstream</groupId>
       <artifactId>xstream</artifactId>
       <scope>test</scope>

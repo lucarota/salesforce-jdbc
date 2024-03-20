@@ -909,13 +909,11 @@ public class ForcePreparedStatement implements PreparedStatement, Iterator<List<
 
     @Override
     public int getResultSetHoldability() throws SQLException {
-        // TODO Auto-generated method stub
         return 0;
     }
 
     @Override
     public boolean isClosed() throws SQLException {
-        // TODO Auto-generated method stub
         return false;
     }
 
@@ -932,13 +930,11 @@ public class ForcePreparedStatement implements PreparedStatement, Iterator<List<
 
     @Override
     public void closeOnCompletion() throws SQLException {
-        // TODO Auto-generated method stub
 
     }
 
     @Override
     public boolean isCloseOnCompletion() throws SQLException {
-        // TODO Auto-generated method stub
         return false;
     }
 
@@ -950,7 +946,6 @@ public class ForcePreparedStatement implements PreparedStatement, Iterator<List<
 
     @Override
     public boolean isWrapperFor(Class<?> iface) throws SQLException {
-        // TODO Auto-generated method stub
         return false;
     }
 
@@ -963,7 +958,6 @@ public class ForcePreparedStatement implements PreparedStatement, Iterator<List<
     @Override
     public void clearParameters() throws SQLException {
         log.trace("[PrepStat] clearParameters 2 NOT_IMPLEMENTED");
-        // TODO Auto-generated method stub
 
     }
 
@@ -976,13 +970,11 @@ public class ForcePreparedStatement implements PreparedStatement, Iterator<List<
     @Override
     public void addBatch() throws SQLException {
         log.trace("[PrepStat] addBatch NOT_IMPLEMENTED");
-        // TODO Auto-generated method stub
 
     }
 
     @Override
     public void setRowId(int parameterIndex, RowId x) throws SQLException {
-        // TODO Auto-generated method stub
         log.trace("[PrepStat] setRowId NOT_IMPLEMENTED");
     }
 
@@ -1019,7 +1011,6 @@ public class ForcePreparedStatement implements PreparedStatement, Iterator<List<
     @Override
     public void setBlob(int parameterIndex, InputStream inputStream, long length) throws SQLException {
         log.trace("[PrepStat] setBlob NOT_IMPLEMENTED");
-        // TODO Auto-generated method stub
 
     }
 
@@ -1038,20 +1029,17 @@ public class ForcePreparedStatement implements PreparedStatement, Iterator<List<
     @Override
     public void setBinaryStream(int parameterIndex, InputStream x, long length) throws SQLException {
         log.trace("[PrepStat] setBinaryStream NOT_IMPLEMENTED");
-        // TODO Auto-generated method stub
 
     }
 
     @Override
     public void setBinaryStream(int parameterIndex, InputStream x) throws SQLException {
         log.trace("[PrepStat] setBinaryStream NOT_IMPLEMENTED");
-        // TODO Auto-generated method stub
 
     }
 
     @Override
     public void setBlob(int parameterIndex, InputStream inputStream) throws SQLException {
-        // TODO Auto-generated method stub
         log.trace("[PrepStat] setBlob NOT_IMPLEMENTED");
     }
 
