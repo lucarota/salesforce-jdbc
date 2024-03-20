@@ -1,29 +1,22 @@
 package com.ascendix.salesforce.soap;
 
-import com.ascendix.salesforce.oauth.ForceClientException;
-import com.google.api.client.http.ByteArrayContent;
-import com.google.api.client.http.GenericUrl;
-import com.google.api.client.http.HttpHeaders;
-import com.google.api.client.http.HttpRequest;
-import com.google.api.client.http.HttpRequestFactory;
-import com.google.api.client.http.HttpResponse;
-import com.google.api.client.http.HttpResponseException;
-import com.google.api.client.http.HttpStatusCodes;
-import com.google.api.client.http.HttpTransport;
-import com.google.api.client.http.javanet.NetHttpTransport;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.InputStream;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 
 public class ForceSoapValidator {
 
-    private static final HttpTransport HTTP_TRANSPORT = new NetHttpTransport();
-    private final long connectTimeout;
-    private final long readTimeout;
-
+    private static final String SOAP_ACTION = "some";
     private static final String SOAP_FAULT = "<soapenv:Fault>";
     private static final String BAD_TOKEN_SF_ERROR_CODE = "INVALID_SESSION_ID";
+
+    private final long connectTimeout;
+    private final long readTimeout;
 
     public ForceSoapValidator(long connectTimeout, long readTimeout) {
         this.connectTimeout = connectTimeout;
@@ -31,39 +24,48 @@ public class ForceSoapValidator {
     }
 
     public boolean validateForceToken(String partnerUrl, String accessToken) {
-        HttpRequestFactory requestFactory = buildHttpRequestFactory();
-        ClassLoader classLoader = getClass().getClassLoader();
-        try (InputStream is = classLoader.getResourceAsStream("forceSoapBody")) {
-
-            String requestBody = IOUtils.toString(is);
-
-            HttpRequest request = requestFactory.buildPostRequest(
-                new GenericUrl(partnerUrl),
-                ByteArrayContent.fromString(
-                    "text/xml",
-                    requestBody.replace("{sessionId}", accessToken)
-                ));
-            HttpHeaders headers = request.getHeaders();
-            headers.set("SOAPAction", "some");
-            HttpResponse result = request.execute();
-            return result.getStatusCode() == HttpStatusCodes.STATUS_CODE_OK;
-        } catch (HttpResponseException e) {
-            if (e.getStatusCode() == HttpStatusCodes.STATUS_CODE_SERVER_ERROR &&
-                StringUtils.containsIgnoreCase(e.getContent(), SOAP_FAULT) &&
-                StringUtils.containsIgnoreCase(e.getContent(), BAD_TOKEN_SF_ERROR_CODE)) {
-                return false;
+        StringBuilder requestBody = new StringBuilder();
+        try (BufferedReader reader = new BufferedReader(
+                new InputStreamReader(getClass().getResourceAsStream("/forceSoapBody"), StandardCharsets.UTF_8))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                requestBody.append(line).append("\n");
             }
-            throw new ForceClientException("Response error: " + e.getStatusCode() + " " + e.getContent());
         } catch (IOException e) {
-            throw new ForceClientException("IO error: " + e.getMessage(), e);
+            throw new RuntimeException("Error reading SOAP body", e);
+        }
+
+        String soapBody = requestBody.toString().replace("{sessionId}", accessToken);
+        byte[] encodedSoapBody = Base64.getEncoder().encode(soapBody.getBytes(StandardCharsets.UTF_8));
+
+        try {
+            URL url = new URL(partnerUrl);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("POST");
+            connection.setRequestProperty("Content-Type", "text/xml;charset=UTF-8");
+            connection.setRequestProperty("SOAPAction", SOAP_ACTION);
+            connection.setDoOutput(true);
+            connection.setConnectTimeout((int) connectTimeout);
+            connection.setReadTimeout((int) readTimeout);
+            connection.getOutputStream().write(encodedSoapBody);
+
+            int responseCode = connection.getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                return true;
+            } else if (responseCode == HttpURLConnection.HTTP_INTERNAL_ERROR) {
+                String errorMessage = new String(connection.getErrorStream().readAllBytes(), StandardCharsets.UTF_8);
+                return (containsIgnoreCase(errorMessage, SOAP_FAULT) &&
+                    containsIgnoreCase(errorMessage, BAD_TOKEN_SF_ERROR_CODE));
+            } else {
+                throw new RuntimeException("Response error: " + responseCode);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("IO error: " + e.getMessage(), e);
         }
     }
 
-    private HttpRequestFactory buildHttpRequestFactory() {
-        return HTTP_TRANSPORT.createRequestFactory(
-            request -> {
-                request.setConnectTimeout(Math.toIntExact(connectTimeout));
-                request.setReadTimeout(Math.toIntExact(readTimeout));
-            });
+    private boolean containsIgnoreCase(String input, String searchString) {
+        return input.toUpperCase().contains(searchString.toUpperCase());
     }
+
 }
