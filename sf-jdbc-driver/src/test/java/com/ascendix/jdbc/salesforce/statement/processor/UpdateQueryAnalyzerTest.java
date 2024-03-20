@@ -8,11 +8,12 @@ import static org.mockito.Mockito.when;
 
 import com.ascendix.jdbc.salesforce.delegates.PartnerService;
 import com.ascendix.jdbc.salesforce.statement.processor.utils.RecordFieldsBuilder;
-import com.google.common.collect.Sets;
 import com.sforce.soap.partner.DescribeSObjectResult;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
 import org.junit.Test;
 
 public class UpdateQueryAnalyzerTest {
@@ -50,7 +51,7 @@ public class UpdateQueryAnalyzerTest {
         // Verify the fields count for the first record
         assertEquals(2, record.size());
         // Verify the fields' names for the first record
-        assertEquals(Sets.newHashSet("Name", "Id"), record.keySet());
+        assertEquals(Set.of("Name", "Id"), record.keySet());
         assertEquals("FirstAccount_new", record.get("Name"));
         assertEquals("001xx000003GeY0AAK", record.get("Id"));
     }
@@ -79,7 +80,7 @@ public class UpdateQueryAnalyzerTest {
         // Verify the fields count for the first record
         assertEquals(2, record.size());
         // Verify the fields' names for the first record
-        assertEquals(Sets.newHashSet("Name", "Id"), record.keySet());
+        assertEquals(Set.of("Name", "Id"), record.keySet());
         assertEquals("NEW_AccountName", record.get("Name"));
         assertEquals("005xx1111111111111", record.get("Id"));
 
@@ -87,7 +88,7 @@ public class UpdateQueryAnalyzerTest {
         // Verify the fields count for the first record
         assertEquals(2, record.size());
         // Verify the fields' names for the first record
-        assertEquals(Sets.newHashSet("Name", "Id"), record.keySet());
+        assertEquals(Set.of("Name", "Id"), record.keySet());
         assertEquals("NEW_AccountName", record.get("Name"));
         assertEquals("005xx2222222222222", record.get("Id"));
 
@@ -95,7 +96,7 @@ public class UpdateQueryAnalyzerTest {
         // Verify the fields count for the first record
         assertEquals(2, record.size());
         // Verify the fields' names for the first record
-        assertEquals(Sets.newHashSet("Name", "Id"), record.keySet());
+        assertEquals(Set.of("Name", "Id"), record.keySet());
         assertEquals("NEW_AccountName", record.get("Name"));
         assertEquals("005xx3333333333333", record.get("Id"));
     }
@@ -124,7 +125,7 @@ public class UpdateQueryAnalyzerTest {
         // Verify the fields count for the first record
         assertEquals(2, record.size());
         // Verify the fields' names for the first record
-        assertEquals(Sets.newHashSet("Name", "Id"), record.keySet());
+        assertEquals(Set.of("Name", "Id"), record.keySet());
         assertEquals("Acc_01-", record.get("Name"));
         assertEquals("005xx1111111111111", record.get("Id"));
 
@@ -132,7 +133,7 @@ public class UpdateQueryAnalyzerTest {
         // Verify the fields count for the first record
         assertEquals(2, record.size());
         // Verify the fields' names for the first record
-        assertEquals(Sets.newHashSet("Name", "Id"), record.keySet());
+        assertEquals(Set.of("Name", "Id"), record.keySet());
         assertEquals("Acc_02-", record.get("Name"));
         assertEquals("005xx2222222222222", record.get("Id"));
 
@@ -140,7 +141,7 @@ public class UpdateQueryAnalyzerTest {
         // Verify the fields count for the first record
         assertEquals(2, record.size());
         // Verify the fields' names for the first record
-        assertEquals(Sets.newHashSet("Name", "Id"), record.keySet());
+        assertEquals(Set.of("Name", "Id"), record.keySet());
         assertEquals("Acc_03-", record.get("Name"));
         assertEquals("005xx3333333333333", record.get("Id"));
     }
