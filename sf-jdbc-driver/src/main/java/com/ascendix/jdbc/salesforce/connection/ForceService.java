@@ -8,21 +8,20 @@ import com.sforce.soap.partner.SessionHeader_element;
 import com.sforce.soap.partner.fault.UnexpectedErrorFault;
 import com.sforce.ws.ConnectionException;
 import com.sforce.ws.ConnectorConfig;
+import lombok.experimental.UtilityClass;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.mapdb.DB;
+import org.mapdb.DBMaker;
+import org.mapdb.HTreeMap;
+import org.mapdb.Serializer;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import lombok.experimental.UtilityClass;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.mapdb.DB;
-import org.mapdb.DBMaker;
-import org.mapdb.HTreeMap;
-import org.mapdb.Serializer;
 
 @UtilityClass
 @Slf4j
@@ -38,10 +37,12 @@ public class ForceService {
 
     private static final DB cacheDb = DBMaker.tempFileDB().closeOnJvmShutdown().make();
 
+    private static final long ONE_MB = 1048576L;
+
     private static final HTreeMap<String, String> partnerUrlCache = cacheDb
         .hashMap("PartnerUrlCache", Serializer.STRING, Serializer.STRING)
         .expireAfterCreate(EXPIRE_AFTER_CREATE, TimeUnit.MINUTES)
-        .expireStoreSize(EXPIRE_STORE_SIZE * FileUtils.ONE_MB)
+        .expireStoreSize(EXPIRE_STORE_SIZE * ONE_MB)
         .create();
 
     private static String getPartnerUrl(String accessToken, boolean sandbox) {
