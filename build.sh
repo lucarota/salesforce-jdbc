@@ -1,3 +1,3 @@
-source ~/java8
+sdk use java 17.0.9-graal
 export MAVEN_BASEDIR=
-mvn clean install -P single-jar
+mvn clean package -P single-jar
