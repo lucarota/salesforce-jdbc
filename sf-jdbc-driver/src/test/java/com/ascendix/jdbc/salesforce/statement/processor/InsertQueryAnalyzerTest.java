@@ -4,11 +4,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-import com.google.common.collect.Sets;
 import com.sforce.soap.partner.DescribeSObjectResult;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+
+import java.util.*;
+
 import org.junit.Test;
 
 public class InsertQueryAnalyzerTest {
@@ -37,7 +36,7 @@ public class InsertQueryAnalyzerTest {
         // Verify the fields count for the first record
         assertEquals(3, record.size());
         // Verify the fields' names for the first record
-        assertEquals(Sets.newHashSet("Name", "OwnerId", "Title"), record.keySet());
+        assertEquals(Set.of("Name", "OwnerId", "Title"), record.keySet());
         assertEquals("FirstAccount", record.get("Name"));
         assertEquals("005xx1231231233123", record.get("OwnerId"));
         assertTrue(record.containsKey("Title"));
@@ -54,9 +53,9 @@ public class InsertQueryAnalyzerTest {
             if ("SELECT Id FROM User WHERE Name = 'CollectionOwner-f CollectionOwner-l' LIMIT 1".equals(subSoql)) {
                 Map<String, Object> record = new HashMap<>();
                 record.put("id", "005xx1231231233123");
-                return Arrays.asList(record);
+                return List.of(record);
             }
-            return Arrays.asList();
+            return List.of();
         });
 
         assertTrue(analyzer.analyse(soql));
@@ -68,7 +67,7 @@ public class InsertQueryAnalyzerTest {
         // Verify the fields count for the first record
         assertEquals(2, record.size());
         // Verify the fields' names for the first record
-        assertEquals(Sets.newHashSet("Name", "OwnerId"), record.keySet());
+        assertEquals(Set.of("Name", "OwnerId"), record.keySet());
         assertEquals("FirstAccount", record.get("Name"));
         assertEquals("005xx1231231233123", record.get("OwnerId"));
     }
@@ -90,7 +89,7 @@ public class InsertQueryAnalyzerTest {
         // Verify the fields count for the first record
         assertEquals(2, record.size());
         // Verify the fields' names for the first record
-        assertEquals(Sets.newHashSet("Name", "OwnerId"), record.keySet());
+        assertEquals(Set.of("Name", "OwnerId"), record.keySet());
         assertEquals("FirstAccount", record.get("Name"));
         assertEquals("005xx1111111111111", record.get("OwnerId"));
 
@@ -99,7 +98,7 @@ public class InsertQueryAnalyzerTest {
         // Verify the fields count for the second record
         assertEquals(2, record.size());
         // Verify the fields' names for the first record
-        assertEquals(Sets.newHashSet("Name", "OwnerId"), record.keySet());
+        assertEquals(Set.of("Name", "OwnerId"), record.keySet());
         assertEquals("SecondAccount", record.get("Name"));
         assertEquals("005xx2222222222222", record.get("OwnerId"));
     }
