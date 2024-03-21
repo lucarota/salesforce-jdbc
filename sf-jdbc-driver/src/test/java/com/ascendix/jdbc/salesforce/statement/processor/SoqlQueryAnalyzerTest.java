@@ -185,7 +185,7 @@ public class SoqlQueryAnalyzerTest {
 
     private DescribeSObjectResult describeSObject(String sObjectType) {
         try {
-            String xml = new String(Files.readAllBytes(Paths.get("src/test/resources/" + sObjectType + "_desription.xml")));
+            String xml = new String(Files.readAllBytes(Paths.get("src/test/resources/" + sObjectType + "_description.xml")));
             XStream xstream = new XStream();
 
             // clear out existing permissions and set own ones
@@ -229,4 +229,15 @@ public class SoqlQueryAnalyzerTest {
         assertEquals("id", fieldDef.getType());
     }
 
+    @Test
+    public void testFetchFieldDefinitions_Star() {
+        SoqlQueryAnalyzer analyzer = new SoqlQueryAnalyzer("SELECT * FROM Account", partnerService);
+
+        List<FieldDef> actual = analyzer.getFieldDefinitions();
+
+        assertEquals(66, actual.size());
+        FieldDef fieldDef = actual.get(0);
+        assertEquals("Id", fieldDef.getName());
+        assertEquals("id", fieldDef.getType());
+    }
 }
