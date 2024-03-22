@@ -71,25 +71,28 @@
         <plugins>
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-assembly-plugin</artifactId>
+            <artifactId>maven-shade-plugin</artifactId>
+            <version>3.5.0</version>
             <executions>
               <execution>
                 <phase>package</phase>
                 <goals>
-                  <goal>single</goal>
+                  <goal>shade</goal>
                 </goals>
+                <configuration>
+                  <relocations>
+                    <relocation>
+                      <pattern>net.sf</pattern>
+                      <shadedPattern>shaded.net.sf</shadedPattern>
+                    </relocation>
+                    <relocation>
+                      <pattern>org.apache</pattern>
+                      <shadedPattern>shaded.org.apache</shadedPattern>
+                    </relocation>
+                  </relocations>
+                </configuration>
               </execution>
             </executions>
-            <configuration>
-              <descriptorRefs>
-                <descriptorRef>jar-with-dependencies</descriptorRef>
-              </descriptorRefs>
-              <archive>
-                <manifest>
-                  <mainClass>com.ascendix.jdbc.salesforce.metadata.ForceDatabaseMetaData</mainClass>
-                </manifest>
-              </archive>
-            </configuration>
           </plugin>
         </plugins>
       </build>

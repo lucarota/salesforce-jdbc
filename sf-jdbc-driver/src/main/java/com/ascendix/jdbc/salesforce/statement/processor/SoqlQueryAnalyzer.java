@@ -65,13 +65,17 @@ public class SoqlQueryAnalyzer {
                 String name = column.getColumnName();
                 String alias = fieldSpec.getAlias() != null ? fieldSpec.getAlias().getName() : name;
 
+                String objectPrefix = null;
+                List<String> prefixNames = List.of();
+                if (column.getTable() != null) {
+                    objectPrefix = column.getTable().getName();
+                    String[] prefix = StringUtils.split(column.getTable().getFullyQualifiedName(), '.');
+                    prefixNames = List.of(prefix);
+                }
                 // If Object Name specified - verify it is not the same as SOQL root entity
-                String objectPrefix = column.getTable() != null ? column.getTable().getName() : null;
                 if (fieldSpec.getAlias() == null && objectPrefix != null && !objectPrefix.equals(rootEntityName)) {
                     alias = objectPrefix + "." + name;
                 }
-                String[] prefix = StringUtils.split(name, '.');
-                List<String> prefixNames = List.of(ArrayUtils.remove(prefix, prefix.length - 1));
                 FieldDef result = createFieldDef(name, alias, prefixNames);
                 fieldDefinitions.add(result);
                 /* Remove alias from query */
@@ -188,11 +192,7 @@ public class SoqlQueryAnalyzer {
                         this.expandedStarSyntaxForFields = true;
                         DescribeSObjectResult describeSObjectResult = describeObject(select.getFromItem().toString());
                         Arrays.stream(describeSObjectResult.getFields())
-                                .limit(100) // Limit to first 100 fields
                                 .forEach(f -> select.addSelectItem(new Column(null, f.getName())));
-                        log.warn("Warning in SOQL query parsing. Expansion of * fields to first 100 of "
-                                + describeSObjectResult.getFields().length
-                                + ". Please fix the query as SOQL does not support * to fetch all the fields");
                     }
                     this.soql = select.toString();
                     this.queryData = select;
