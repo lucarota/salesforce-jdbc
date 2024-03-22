@@ -50,7 +50,7 @@ public class ForcePreparedStatement implements PreparedStatement, Iterator<List<
     private int maxRows;
     private final List<Object> parameters = new ArrayList<>();
     private CacheMode cacheMode;
-    private static final CacheConfig cacheDb = new CacheConfig();
+    private static final CacheConfig cacheDb = CacheConfig.getInstance();
     @Setter
     private int updateCount = -1;
     private boolean updateCountReturned = false;
