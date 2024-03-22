@@ -246,7 +246,7 @@ public class CachedResultSet implements ResultSet, Serializable {
         try {
             return new SimpleDateFormat("yyyy-MM-dd").parse(dateRepr);
         } catch (ParseException e) {
-            throw new RuntimeException(e);
+            return null;
         }
     }
 
@@ -268,14 +268,14 @@ public class CachedResultSet implements ResultSet, Serializable {
         try {
             return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSX").parse(dateRepr);
         } catch (ParseException e) {
-            throw new RuntimeException(e);
+            return null;
         }
     }
 
     public Timestamp getTimestamp(int columnIndex) {
         Object value = rows.get(getIndex()).getByIndex(columnIndex);
-        if (value instanceof GregorianCalendar) {
-            return new java.sql.Timestamp(((GregorianCalendar) value).getTime().getTime());
+        if (value instanceof GregorianCalendar calendar) {
+            return new java.sql.Timestamp(calendar.getTime().getTime());
         } else if (rows.get(getIndex()).getTypeInfoByIndex(columnIndex) == TypeInfo.DATE_TYPE_INFO) {
             return new ColumnValueParser<>(this::parseDate, java.util.Date.class)
                 .parse(columnIndex)

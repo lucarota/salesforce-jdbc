@@ -13,6 +13,7 @@ import javax.xml.namespace.QName;
 public class ForceSessionRenewal implements SessionRenewer {
     @Override
     public SessionRenewalHeader renewSession(ConnectorConfig config) throws ConnectionException {
+        config.setSessionId(null);
         PartnerConnection partnerConnection = Connector.newConnection(config);
         SessionHeader_element sessionHeader = partnerConnection.getSessionHeader();
         SessionRenewalHeader header = new SessionRenewalHeader();

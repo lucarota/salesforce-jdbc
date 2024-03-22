@@ -12,7 +12,16 @@ import java.sql.ResultSetMetaData;
 public class CacheConfig {
     private final CacheManager cacheManager;
 
-    public CacheConfig() {
+    private static final CacheConfig INSTANCE;
+    static {
+        INSTANCE = new CacheConfig();
+    }
+
+    public static CacheConfig getInstance() {
+        return INSTANCE;
+    }
+
+    private CacheConfig() {
         cacheManager = CacheManagerBuilder.newCacheManagerBuilder().build();
         cacheManager.init();
 
