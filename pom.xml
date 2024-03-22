@@ -26,7 +26,7 @@
         <slf4j.version>1.7.32</slf4j.version>
         <commons-lang3.version>3.12.0</commons-lang3.version>
         <force-partner-api.version>58.0.0</force-partner-api.version>
-        <mapdb.version>3.1.0</mapdb.version>
+        <ehcache.version>3.10.8</ehcache.version>
         <junit.version>4.13.1</junit.version>
         <xstream.version>1.4.20</xstream.version>
 
@@ -64,9 +64,16 @@
                 <version>${force-partner-api.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.mapdb</groupId>
-                <artifactId>mapdb</artifactId>
-                <version>${mapdb.version}</version>
+                <groupId>org.ehcache</groupId>
+                <artifactId>ehcache</artifactId>
+                <version>${ehcache.version}</version>
+                <classifier>jakarta</classifier>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.glassfish.jaxb</groupId>
+                        <artifactId>jaxb-runtime</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.apache.commons</groupId>
@@ -99,7 +106,6 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <scope>provided</scope>
         </dependency>
     </dependencies>
 

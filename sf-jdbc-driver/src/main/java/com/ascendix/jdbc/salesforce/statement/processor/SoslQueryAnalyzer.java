@@ -9,6 +9,7 @@ public class SoslQueryAnalyzer extends SoqlQueryAnalyzer {
     public SoslQueryAnalyzer(String soql, PartnerService partnerService) {
         super(soql, partnerService);
     }
+
     public boolean analyse(String soql) {
         if (soql == null || soql.trim().isEmpty()) {
             return false;
