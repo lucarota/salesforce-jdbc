@@ -1,12 +1,12 @@
 package com.ascendix.jdbc.salesforce.statement.processor;
 
 import com.ascendix.jdbc.salesforce.delegates.PartnerService;
+import com.ascendix.jdbc.salesforce.resultset.CachedResultSet;
 import com.ascendix.jdbc.salesforce.resultset.CommandLogCachedResultSet;
 import com.ascendix.jdbc.salesforce.statement.ForcePreparedStatement;
 import com.sforce.soap.partner.IError;
 import com.sforce.soap.partner.ISaveResult;
 import com.sforce.ws.ConnectionException;
-import java.sql.ResultSet;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
@@ -14,16 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class InsertQueryProcessor {
 
-    public static boolean isInsertQuery(String soqlQuery, InsertQueryAnalyzer queryAnalyzer) {
-        if (soqlQuery == null || soqlQuery.trim().isEmpty()) {
-            return false;
-        }
-        soqlQuery = soqlQuery.trim();
-
-        return queryAnalyzer.analyse(soqlQuery);
-    }
-
-    public static ResultSet processQuery(ForcePreparedStatement statement, String soqlQuery,
+    public static CachedResultSet processQuery(ForcePreparedStatement statement, String soqlQuery,
         PartnerService partnerService, InsertQueryAnalyzer insertQueryAnalyzer) {
         CommandLogCachedResultSet resultSet = new CommandLogCachedResultSet();
         if (soqlQuery == null || soqlQuery.trim().isEmpty()) {

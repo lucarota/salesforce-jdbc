@@ -1,7 +1,6 @@
 package com.ascendix.jdbc.salesforce.statement.processor;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -13,7 +12,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import org.junit.Test;
 
 public class UpdateQueryAnalyzerTest {
@@ -21,14 +19,6 @@ public class UpdateQueryAnalyzerTest {
     public UpdateQueryAnalyzerTest() {
         PartnerService partnerService = mock(PartnerService.class);
         when(partnerService.describeSObject(eq("Account"))).thenReturn(describeSObject("Account"));
-    }
-
-    @Test
-    public void testIsUpdateQuery_ById() {
-        String soql = "Update Account set Name ='FirstAccount_new' where Id='001xx000003GeY0AAK'";
-        UpdateQueryAnalyzer analyzer = new UpdateQueryAnalyzer(soql, null);
-
-        assertTrue(analyzer.analyse(soql));
     }
 
     private DescribeSObjectResult describeSObject(String objName) {
@@ -40,9 +30,9 @@ public class UpdateQueryAnalyzerTest {
     @Test
     public void testProcessUpdate_One_ById() {
         String soql = "Update Account set Name ='FirstAccount_new' where Id='001xx000003GeY0AAK'";
-        UpdateQueryAnalyzer analyzer = new UpdateQueryAnalyzer(soql,  null);
+        final QueryAnalyzer queryAnalyzer = new QueryAnalyzer(soql, null, null);
+        UpdateQueryAnalyzer analyzer = new UpdateQueryAnalyzer(queryAnalyzer);
 
-        assertTrue(analyzer.analyse(soql));
         assertEquals("Account", analyzer.getFromObjectName());
 
         // Verify we have exactly one record to save
@@ -59,18 +49,20 @@ public class UpdateQueryAnalyzerTest {
     @Test
     public void testProcessUpdate_One_ByName() {
         String soql = "Update Account set Name ='NEW_AccountName' where Name='FirstAccount_new'";
-        UpdateQueryAnalyzer analyzer = new UpdateQueryAnalyzer(soql, subSoql -> {
+
+        final QueryAnalyzer queryAnalyzer = new QueryAnalyzer(soql, subSoql -> {
             if ("SELECT Id FROM Account WHERE Name = 'FirstAccount_new'".equals(subSoql)) {
                 return Arrays.asList(
-                        RecordFieldsBuilder.id("005xx1111111111111"),
-                        RecordFieldsBuilder.id("005xx2222222222222"),
-                        RecordFieldsBuilder.id("005xx3333333333333")
-                       );
+                    RecordFieldsBuilder.id("005xx1111111111111"),
+                    RecordFieldsBuilder.id("005xx2222222222222"),
+                    RecordFieldsBuilder.id("005xx3333333333333")
+                );
             }
             return List.of();
-        });
+        }, null);
 
-        assertTrue(analyzer.analyse(soql));
+        UpdateQueryAnalyzer analyzer = new UpdateQueryAnalyzer(queryAnalyzer);
+
         assertEquals("Account", analyzer.getFromObjectName());
 
         // Verify we have exactly three record to save
@@ -104,18 +96,20 @@ public class UpdateQueryAnalyzerTest {
     @Test
     public void testProcessUpdate_One_ByName_CALC() {
         String soql = "Update Account set Name=Name+'-' where Name='FirstAccount_new'";
-        UpdateQueryAnalyzer analyzer = new UpdateQueryAnalyzer(soql, subSoql -> {
+
+        final QueryAnalyzer queryAnalyzer = new QueryAnalyzer(soql, subSoql -> {
             if ("SELECT Id, Name FROM Account WHERE Name = 'FirstAccount_new'".equals(subSoql)) {
                 return Arrays.asList(
-                        RecordFieldsBuilder.setId("005xx1111111111111").set("Name", "Acc_01").build(),
-                        RecordFieldsBuilder.setId("005xx2222222222222").set("Name", "Acc_02").build(),
-                        RecordFieldsBuilder.setId("005xx3333333333333").set("Name", "Acc_03").build()
-                       );
+                    RecordFieldsBuilder.setId("005xx1111111111111").set("Name", "Acc_01").build(),
+                    RecordFieldsBuilder.setId("005xx2222222222222").set("Name", "Acc_02").build(),
+                    RecordFieldsBuilder.setId("005xx3333333333333").set("Name", "Acc_03").build()
+                );
             }
             return List.of();
-        });
+        }, null);
 
-        assertTrue(analyzer.analyse(soql));
+        UpdateQueryAnalyzer analyzer = new UpdateQueryAnalyzer(queryAnalyzer);
+
         assertEquals("Account", analyzer.getFromObjectName());
 
         // Verify we have exactly three record to save

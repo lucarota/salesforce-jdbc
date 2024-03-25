@@ -1,10 +1,10 @@
 package com.ascendix.jdbc.salesforce.statement.processor;
 
 import com.ascendix.jdbc.salesforce.ForceDriver;
+import com.ascendix.jdbc.salesforce.resultset.CachedResultSet;
 import com.ascendix.jdbc.salesforce.resultset.CommandLogCachedResultSet;
 import com.ascendix.jdbc.salesforce.statement.ForcePreparedStatement;
 import java.io.IOException;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Properties;
 import java.util.regex.Matcher;
@@ -50,7 +50,7 @@ public class AdminQueryProcessor {
         return matcherLogin.matches();
     }
 
-    public static ResultSet processQuery(ForcePreparedStatement statement, String soqlQuery) throws SQLException {
+    public static CachedResultSet processQuery(ForcePreparedStatement statement, String soqlQuery) throws SQLException {
         CommandLogCachedResultSet resultSet = new CommandLogCachedResultSet();
         if (soqlQuery == null || soqlQuery.trim().isEmpty()) {
             resultSet.log("No SOQL or ADMIN query found");

@@ -33,8 +33,11 @@ public class SoqlQueryAnalyzerTest {
 
     @Test
     public void testGetFieldNames_SimpleQuery() {
-        SoqlQueryAnalyzer analyzer = new SoqlQueryAnalyzer(" select Id ,Name \r\nfrom Account\r\n where something = 'nothing' ",
-            partnerService);
+        String soql = " select Id ,Name \r\nfrom Account\r\n where something = 'nothing' ";
+        final QueryAnalyzer queryAnalyzer = new QueryAnalyzer(soql, null, partnerService);
+
+        SoqlQueryAnalyzer analyzer = new SoqlQueryAnalyzer(queryAnalyzer);
+
         List<String> expected = Arrays.asList("Id", "Name");
         List<String> actual = listFlatFieldNames(analyzer);
 
@@ -43,20 +46,22 @@ public class SoqlQueryAnalyzerTest {
 
     private List<String> listFlatFieldNames(SoqlQueryAnalyzer analyzer) {
         return analyzer.getFieldDefinitions().stream()
-                .map(FieldDef::getName)
-                .collect(Collectors.toList());
+            .map(FieldDef::getName)
+            .collect(Collectors.toList());
     }
 
     private List<String> listFlatFieldAliases(SoqlQueryAnalyzer analyzer) {
         return analyzer.getFieldDefinitions().stream()
-                .map(FieldDef::getAlias)
-                .collect(Collectors.toList());
+            .map(FieldDef::getAlias)
+            .collect(Collectors.toList());
     }
 
     @Test
     public void testGetFieldNames_SelectWithReferences() {
-        SoqlQueryAnalyzer analyzer = new SoqlQueryAnalyzer(" select Id , Account.Name \r\nfrom Contact\r\n where something = 'nothing' ",
-            partnerService);
+        String soql = " select Id , Account.Name \r\nfrom Contact\r\n where something = 'nothing' ";
+        final QueryAnalyzer queryAnalyzer = new QueryAnalyzer(soql, null, partnerService);
+        SoqlQueryAnalyzer analyzer = new SoqlQueryAnalyzer(queryAnalyzer);
+
         List<String> expected = Arrays.asList("Id", "Name");
         List<String> actual = listFlatFieldNames(analyzer);
 
@@ -65,8 +70,9 @@ public class SoqlQueryAnalyzerTest {
 
     @Test
     public void testGetFieldNames_SelectWithAggregateAliased() {
-        SoqlQueryAnalyzer analyzer = new SoqlQueryAnalyzer(" select Id , Account.Name, count(id) aggrAlias1\r\nfrom Contact\r\n where something = 'nothing' ",
-            partnerService);
+        String soql = " select Id , Account.Name, count(id) aggrAlias1\r\nfrom Contact\r\n where something = 'nothing' ";
+        final QueryAnalyzer queryAnalyzer = new QueryAnalyzer(soql, null, partnerService);
+        SoqlQueryAnalyzer analyzer = new SoqlQueryAnalyzer(queryAnalyzer);
         // Just Name is confusing - see the case
         List<String> expected = Arrays.asList("Id", "Name", "aggrAlias1");
         List<String> actual = listFlatFieldNames(analyzer);
@@ -76,8 +82,9 @@ public class SoqlQueryAnalyzerTest {
 
     @Test
     public void testGetFieldNames_SubSelectWithSameFields() {
-        SoqlQueryAnalyzer analyzer = new SoqlQueryAnalyzer(" select Id, Account.Name, Owner.Id, Owner.Name from Account ",
-            partnerService);
+        String soql = " select Id, Account.Name, Owner.Id, Owner.Name from Account ";
+        final QueryAnalyzer queryAnalyzer = new QueryAnalyzer(soql, null, partnerService);
+        SoqlQueryAnalyzer analyzer = new SoqlQueryAnalyzer(queryAnalyzer);
         // Just Name is confusing - see the case
         List<String> expected = Arrays.asList("Id", "Name", "Id", "Name");
         List<String> actual = listFlatFieldNames(analyzer);
@@ -87,8 +94,9 @@ public class SoqlQueryAnalyzerTest {
 
     @Test
     public void testGetFieldNames_SubSelectWithSameFieldAliases() {
-        SoqlQueryAnalyzer analyzer = new SoqlQueryAnalyzer(" select Id, Account.Name, Owner.Id, Owner.Name from Account ",
-            partnerService);
+        String soql = " select Id, Account.Name, Owner.Id, Owner.Name from Account ";
+        final QueryAnalyzer queryAnalyzer = new QueryAnalyzer(soql, null, partnerService);
+        SoqlQueryAnalyzer analyzer = new SoqlQueryAnalyzer(queryAnalyzer);
         // Just Name is confusing - see the case
         List<String> expected = Arrays.asList("Id", "Name", "Owner.Id", "Owner.Name");
         List<String> actual = listFlatFieldAliases(analyzer);
@@ -98,8 +106,9 @@ public class SoqlQueryAnalyzerTest {
 
     @Test
     public void testGetFieldNames_SelectWithAggregate() {
-        SoqlQueryAnalyzer analyzer = new SoqlQueryAnalyzer(" select Id , Account.Name, count(id)\r\nfrom Contact\r\n where something = 'nothing' ",
-            partnerService);
+        String soql = " select Id , Account.Name, count(id)\r\nfrom Contact\r\n where something = 'nothing' ";
+        final QueryAnalyzer queryAnalyzer = new QueryAnalyzer(soql, null, partnerService);
+        SoqlQueryAnalyzer analyzer = new SoqlQueryAnalyzer(queryAnalyzer);
         List<String> expected = Arrays.asList("Id", "Name", "count");
         List<String> actual = listFlatFieldNames(analyzer);
 
@@ -108,8 +117,9 @@ public class SoqlQueryAnalyzerTest {
 
     @Test
     public void testGetFromObjectName() {
-        SoqlQueryAnalyzer analyzer = new SoqlQueryAnalyzer(" select Id , Account.Name \r\nfrom Contact\r\n where something = 'nothing' ",
-            partnerService);
+        String soql = " select Id , Account.Name \r\nfrom Contact\r\n where something = 'nothing' ";
+        final QueryAnalyzer queryAnalyzer = new QueryAnalyzer(soql, null, partnerService);
+        SoqlQueryAnalyzer analyzer = new SoqlQueryAnalyzer(queryAnalyzer);
         String expected = "Contact";
         String actual = analyzer.getFromObjectName();
 
@@ -118,7 +128,9 @@ public class SoqlQueryAnalyzerTest {
 
     @Test
     public void testGetSimpleFieldDefinitions() {
-        SoqlQueryAnalyzer analyzer = new SoqlQueryAnalyzer("SELECT Id, Name FROM Account", partnerService);
+        String soql = "SELECT Id, Name FROM Account";
+        final QueryAnalyzer queryAnalyzer = new QueryAnalyzer(soql, null, partnerService);
+        SoqlQueryAnalyzer analyzer = new SoqlQueryAnalyzer(queryAnalyzer);
 
         List<FieldDef> actual = analyzer.getFieldDefinitions();
         assertEquals(2, actual.size());
@@ -133,7 +145,9 @@ public class SoqlQueryAnalyzerTest {
 
     @Test
     public void testGetReferenceFieldDefinitions() {
-        SoqlQueryAnalyzer analyzer = new SoqlQueryAnalyzer("SELECT Account.Name FROM Contact", partnerService);
+        String soql = "SELECT Account.Name FROM Contact";
+        final QueryAnalyzer queryAnalyzer = new QueryAnalyzer(soql, null, partnerService);
+        SoqlQueryAnalyzer analyzer = new SoqlQueryAnalyzer(queryAnalyzer);
 
         List<FieldDef> actual = analyzer.getFieldDefinitions();
         assertEquals(1, actual.size());
@@ -143,7 +157,9 @@ public class SoqlQueryAnalyzerTest {
 
     @Test
     public void testGetAggregateFieldDefinition() {
-        SoqlQueryAnalyzer analyzer = new SoqlQueryAnalyzer("SELECT MIN(Name) FROM Contact", partnerService);
+        String soql = "SELECT MIN(Name) FROM Contact";
+        final QueryAnalyzer queryAnalyzer = new QueryAnalyzer(soql, null, partnerService);
+        SoqlQueryAnalyzer analyzer = new SoqlQueryAnalyzer(queryAnalyzer);
 
         List<FieldDef> actual = analyzer.getFieldDefinitions();
         assertEquals(1, actual.size());
@@ -153,7 +169,9 @@ public class SoqlQueryAnalyzerTest {
 
     @Test
     public void testGetAggregateFieldDefinitionWithoutParameter() {
-        SoqlQueryAnalyzer analyzer = new SoqlQueryAnalyzer("SELECT Count() FROM Contact", partnerService);
+        String soql = "SELECT Count() FROM Contact";
+        final QueryAnalyzer queryAnalyzer = new QueryAnalyzer(soql, null, partnerService);
+        SoqlQueryAnalyzer analyzer = new SoqlQueryAnalyzer(queryAnalyzer);
 
         List<FieldDef> actual = analyzer.getFieldDefinitions();
         assertEquals(1, actual.size());
@@ -163,7 +181,9 @@ public class SoqlQueryAnalyzerTest {
 
     @Test
     public void testGetSimpleFieldWithQualifier() {
-        SoqlQueryAnalyzer analyzer = new SoqlQueryAnalyzer("SELECT Contact.Id FROM Contact", partnerService);
+        String soql = "SELECT Contact.Id FROM Contact";
+        final QueryAnalyzer queryAnalyzer = new QueryAnalyzer(soql, null, partnerService);
+        SoqlQueryAnalyzer analyzer = new SoqlQueryAnalyzer(queryAnalyzer);
 
         List<FieldDef> actual = analyzer.getFieldDefinitions();
         assertEquals(1, actual.size());
@@ -173,8 +193,9 @@ public class SoqlQueryAnalyzerTest {
 
     @Test
     public void testGetNamedAggregateFieldDefinitions() {
-        SoqlQueryAnalyzer analyzer = new SoqlQueryAnalyzer("SELECT count(Name) nameCount FROM Account",
-            partnerService);
+        String soql = "SELECT count(Name) nameCount FROM Account";
+        final QueryAnalyzer queryAnalyzer = new QueryAnalyzer(soql, null, partnerService);
+        SoqlQueryAnalyzer analyzer = new SoqlQueryAnalyzer(queryAnalyzer);
 
         List<FieldDef> actual = analyzer.getFieldDefinitions();
 
@@ -185,7 +206,8 @@ public class SoqlQueryAnalyzerTest {
 
     private DescribeSObjectResult describeSObject(String sObjectType) {
         try {
-            String xml = new String(Files.readAllBytes(Paths.get("src/test/resources/" + sObjectType + "_description.xml")));
+            String xml = new String(Files.readAllBytes(Paths.get(
+                "src/test/resources/" + sObjectType + "_description.xml")));
             XStream xstream = new XStream();
 
             // clear out existing permissions and set own ones
@@ -197,7 +219,7 @@ public class SoqlQueryAnalyzerTest {
 
             xstream.addImmutableType(com.sforce.soap.partner.SoapType.class, true);
             xstream.addImmutableType(com.sforce.soap.partner.FieldType.class, true);
-            xstream.allowTypesByRegExp(new String[] { ".*" });
+            xstream.allowTypesByRegExp(new String[]{".*"});
             return (DescribeSObjectResult) xstream.fromXML(xml);
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -206,8 +228,9 @@ public class SoqlQueryAnalyzerTest {
 
     @Test
     public void testFetchFieldDefinitions_WithIncludedSelect() {
-        SoqlQueryAnalyzer analyzer = new SoqlQueryAnalyzer("SELECT Name, (SELECT Id, max(LastName) maxLastName FROM Contacts), Id FROM Account",
-            partnerService);
+        String soql = "SELECT Name, (SELECT Id, max(LastName) maxLastName FROM Contacts), Id FROM Account";
+        final QueryAnalyzer queryAnalyzer = new QueryAnalyzer(soql, null, partnerService);
+        SoqlQueryAnalyzer analyzer = new SoqlQueryAnalyzer(queryAnalyzer);
 
         List<FieldDef> actual = analyzer.getFieldDefinitions();
 
@@ -231,7 +254,9 @@ public class SoqlQueryAnalyzerTest {
 
     @Test
     public void testFetchFieldDefinitions_Star() {
-        SoqlQueryAnalyzer analyzer = new SoqlQueryAnalyzer("SELECT * FROM Account", partnerService);
+        String soql = "SELECT * FROM Account";
+        final QueryAnalyzer queryAnalyzer = new QueryAnalyzer(soql, null, partnerService);
+        SoqlQueryAnalyzer analyzer = new SoqlQueryAnalyzer(queryAnalyzer);
 
         List<FieldDef> actual = analyzer.getFieldDefinitions();
 

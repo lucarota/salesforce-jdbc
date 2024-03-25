@@ -1,12 +1,12 @@
 package com.ascendix.jdbc.salesforce.statement.processor;
 
 import com.ascendix.jdbc.salesforce.delegates.PartnerService;
+import com.ascendix.jdbc.salesforce.resultset.CachedResultSet;
 import com.ascendix.jdbc.salesforce.resultset.CommandLogCachedResultSet;
 import com.ascendix.jdbc.salesforce.statement.ForcePreparedStatement;
 import com.sforce.soap.partner.IError;
 import com.sforce.soap.partner.ISaveResult;
 import com.sforce.ws.ConnectionException;
-import java.sql.ResultSet;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -16,16 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class UpdateQueryProcessor {
 
-    public static boolean isUpdateQuery(String soqlQuery, UpdateQueryAnalyzer queryAnalyzer) {
-        if (soqlQuery == null || soqlQuery.trim().isEmpty()) {
-            return false;
-        }
-        soqlQuery = soqlQuery.trim();
-
-        return queryAnalyzer.analyse(soqlQuery);
-    }
-
-    public static ResultSet processQuery(ForcePreparedStatement statement, String soqlQuery,
+    public static CachedResultSet processQuery(ForcePreparedStatement statement, String soqlQuery,
         PartnerService partnerService, UpdateQueryAnalyzer updateQueryAnalyzer) {
         CommandLogCachedResultSet resultSet = new CommandLogCachedResultSet();
         if (soqlQuery == null || soqlQuery.trim().isEmpty()) {

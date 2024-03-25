@@ -3,6 +3,7 @@ package com.ascendix.jdbc.salesforce.delegates;
 import com.ascendix.jdbc.salesforce.metadata.Column;
 import com.ascendix.jdbc.salesforce.metadata.Table;
 import com.ascendix.jdbc.salesforce.statement.FieldDef;
+import com.ascendix.jdbc.salesforce.utils.IteratorUtils;
 import com.sforce.soap.partner.DeleteResult;
 import com.sforce.soap.partner.DescribeGlobalResult;
 import com.sforce.soap.partner.DescribeGlobalSObjectResult;
@@ -27,7 +28,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
-import com.ascendix.jdbc.salesforce.utils.IteratorUtils;
 
 @Slf4j
 public class PartnerService {
@@ -35,8 +35,8 @@ public class PartnerService {
     private final PartnerConnection partnerConnection;
 
     private static DescribeGlobalResult schemaCache;
-    private final static Map<String, DescribeSObjectResult> sObjectsCache = new ConcurrentSkipListMap<>(
-            String.CASE_INSENSITIVE_ORDER);
+    private static final Map<String, DescribeSObjectResult> sObjectsCache = new ConcurrentSkipListMap<>(
+            java.lang.String.CASE_INSENSITIVE_ORDER);
 
     public PartnerService(PartnerConnection partnerConnection) {
         this.partnerConnection = partnerConnection;
@@ -47,7 +47,7 @@ public class PartnerService {
         Map<String, DescribeSObjectResult> sObjects = getSObjectsDescription();
         List<Table> tables = sObjects.values().stream()
             .map(this::convertToTable)
-            .collect(Collectors.toList());
+            .toList();
         log.info("[PartnerService] getTables tables count={}", tables.size());
         return tables;
     }
@@ -76,7 +76,7 @@ public class PartnerService {
         List<Field> fields = Arrays.asList(so.getFields());
         List<Column> columns = fields.stream()
             .map(this::convertToColumn)
-            .collect(Collectors.toList());
+            .toList();
         return new Table(so.getName(), null, columns, so.isQueryable());
     }
 
@@ -122,7 +122,7 @@ public class PartnerService {
         final Map<String, DescribeSObjectResult> sObjects = getSObjectsDescription();
         return sObjects.values().stream()
                 .map(DescribeSObjectResult::getName)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     private Map<String, DescribeSObjectResult> getSObjectsDescription() throws ConnectionException {
@@ -132,7 +132,7 @@ public class PartnerService {
             DescribeGlobalResult describeGlobals = getDescribeGlobal();
             List<String> tableNames = Arrays.stream(describeGlobals.getSobjects())
                 .map(DescribeGlobalSObjectResult::getName)
-                .collect(Collectors.toList());
+                .toList();
             List<List<String>> tableNamesBatched = toBatches(tableNames, 100);
             cache = tableNamesBatched.stream()
                 .flatMap(batch -> describeSObjects(batch).stream())
@@ -169,8 +169,7 @@ public class PartnerService {
             .findFirst()
             .map(XmlObject::getValue)
             .orElse(null);
-        String parentName = null;
-        return removeServiceInfo(rows, parentName, rootEntityName == null ? null : (String) rootEntityName);
+        return removeServiceInfo(rows, null, rootEntityName == null ? null : (String) rootEntityName);
     }
 
     public List<List> query(String soql, List<FieldDef> expectedSchema) throws ConnectionException {
@@ -222,7 +221,7 @@ public class PartnerService {
             .skip(1) // Removes duplicate Id from SF Partner API response
             // (https://developer.salesforce.com/forums/?id=906F00000008kciIAA)
             .flatMap(field -> translateField(field, parentName, rootEntityName))
-            .collect(Collectors.toList());
+            .toList();
     }
 
     private Stream<ForceResultField> translateField(XmlObject field, String parentName, String rootEntityName) {
@@ -265,7 +264,7 @@ public class PartnerService {
         return object.getXmlType() != null && "QueryResult".equals(object.getXmlType().getLocalPart());
     }
 
-    private final static List<String> SOAP_RESPONSE_SERVICE_OBJECT_TYPES = Arrays.asList("type", "done", "queryLocator",
+    private static final List<String> SOAP_RESPONSE_SERVICE_OBJECT_TYPES = Arrays.asList("type", "done", "queryLocator",
         "size");
 
     private boolean isDataObjectType(XmlObject obj) {
@@ -281,10 +280,10 @@ public class PartnerService {
 
         for (int i = 0; i < recordsDefinitions.size(); i++) {
             Map<String, Object> recordDef = recordsDefinitions.get(i);
-            SObject record = records[i] = new SObject();
-            record.setType(entityName);
+            SObject rec = records[i] = new SObject();
+            rec.setType(entityName);
             for (Map.Entry<String, Object> field : recordDef.entrySet()) {
-                record.setField(field.getKey(), field.getValue());
+                rec.setField(field.getKey(), field.getValue());
             }
         }
         // Make a create call and pass it the array of sObjects
@@ -300,10 +299,10 @@ public class PartnerService {
 
         for (int i = 0; i < recordsDefinitions.size(); i++) {
             Map<String, Object> recordDef = recordsDefinitions.get(i);
-            SObject record = records[i] = new SObject();
-            record.setType(entityName);
+            SObject rec = records[i] = new SObject();
+            rec.setType(entityName);
             for (Map.Entry<String, Object> field : recordDef.entrySet()) {
-                record.setField(field.getKey(), field.getValue());
+                rec.setField(field.getKey(), field.getValue());
             }
         }
         // Make a create call and pass it the array of sObjects
