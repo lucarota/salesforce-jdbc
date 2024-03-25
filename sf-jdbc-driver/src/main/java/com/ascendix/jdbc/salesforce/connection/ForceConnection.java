@@ -4,7 +4,6 @@ import com.ascendix.jdbc.salesforce.ForceDriver;
 import com.ascendix.jdbc.salesforce.delegates.PartnerService;
 import com.ascendix.jdbc.salesforce.metadata.ForceDatabaseMetaData;
 import com.ascendix.jdbc.salesforce.statement.ForcePreparedStatement;
-import com.sforce.soap.partner.DescribeSObjectResult;
 import com.sforce.soap.partner.PartnerConnection;
 import com.sforce.ws.ConnectionException;
 import java.io.IOException;
@@ -22,9 +21,9 @@ import java.sql.SQLXML;
 import java.sql.Savepoint;
 import java.sql.Statement;
 import java.sql.Struct;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.UUID;
 import java.util.concurrent.Executor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -32,7 +31,9 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ForceConnection implements Connection {
 
+    public static final String FEATURE_IS_NOT_SUPPORTED = "Feature is not supported.";
     private final PartnerConnection partnerConnection;
+    private final String uuid;
     /**
      * the updated partner connection in case if we want to support re-login command
      */
@@ -49,6 +50,7 @@ public class ForceConnection implements Connection {
         this.partnerConnection = partnerConnection;
         this.partnerService = partnerService;
         this.metadata = new ForceDatabaseMetaData(this, partnerService);
+        this.uuid = UUID.randomUUID().toString();
     }
 
     public PartnerConnection getPartnerConnection() {
@@ -104,12 +106,12 @@ public class ForceConnection implements Connection {
 
     @Override
     public <T> T unwrap(Class<T> iface) {
-        throw new UnsupportedOperationException("Feature is not supported.");
+        throw new UnsupportedOperationException(FEATURE_IS_NOT_SUPPORTED);
     }
 
     @Override
     public boolean isWrapperFor(Class<?> iface) {
-        throw new UnsupportedOperationException("Feature is not supported.");
+        throw new UnsupportedOperationException(FEATURE_IS_NOT_SUPPORTED);
     }
 
     @Override
@@ -132,6 +134,7 @@ public class ForceConnection implements Connection {
 
     @Override
     public void setAutoCommit(boolean autoCommit) {
+        // NOT Implemented
     }
 
     @Override
@@ -161,6 +164,7 @@ public class ForceConnection implements Connection {
 
     @Override
     public void setReadOnly(boolean readOnly) {
+        // NOT Implemented
     }
 
     @Override
@@ -181,6 +185,7 @@ public class ForceConnection implements Connection {
 
     @Override
     public void setTransactionIsolation(int level) {
+        // NOT Implemented
     }
 
     @Override
@@ -195,6 +200,7 @@ public class ForceConnection implements Connection {
 
     @Override
     public void clearWarnings() {
+        // NOT Implemented
     }
 
     @Override
@@ -215,15 +221,17 @@ public class ForceConnection implements Connection {
 
     @Override
     public Map<String, Class<?>> getTypeMap() {
-        throw new UnsupportedOperationException("Feature is not supported.");
+        throw new UnsupportedOperationException(FEATURE_IS_NOT_SUPPORTED);
     }
 
     @Override
     public void setTypeMap(Map<String, Class<?>> map) {
+        // NOT Implemented
     }
 
     @Override
     public void setHoldability(int holdability) {
+        // NOT Implemented
     }
 
     @Override
@@ -233,12 +241,12 @@ public class ForceConnection implements Connection {
 
     @Override
     public Savepoint setSavepoint() {
-        throw new UnsupportedOperationException("Feature is not supported.");
+        throw new UnsupportedOperationException(FEATURE_IS_NOT_SUPPORTED);
     }
 
     @Override
     public Savepoint setSavepoint(String name) {
-        throw new UnsupportedOperationException("Feature is not supported.");
+        throw new UnsupportedOperationException(FEATURE_IS_NOT_SUPPORTED);
     }
 
     @Override
@@ -351,14 +359,20 @@ public class ForceConnection implements Connection {
 
     @Override
     public void abort(Executor executor) {
+        // NOT Implemented
     }
 
     @Override
     public void setNetworkTimeout(Executor executor, int milliseconds) {
+        // NOT Implemented
     }
 
     @Override
     public int getNetworkTimeout() {
         return 0;
+    }
+
+    public String getUUID() {
+        return this.uuid;
     }
 }

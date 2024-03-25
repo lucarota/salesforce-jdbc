@@ -36,11 +36,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
+import javax.sql.rowset.RowSetMetaDataImpl;
 import javax.sql.rowset.serial.SerialBlob;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class CachedResultSet implements ResultSet, Serializable {
+
+    public static final CachedResultSet EMPTY = new CachedResultSet(Collections.emptyList(), new RowSetMetaDataImpl());
 
     @Serial
     private static final long serialVersionUID = 1L;
@@ -54,6 +57,7 @@ public class CachedResultSet implements ResultSet, Serializable {
 
     public CachedResultSet(List<ColumnMap<String, Object>> rows) {
         this.rows = new ArrayList<>(rows);
+        this.index = -1;
     }
 
     public CachedResultSet(List<ColumnMap<String, Object>> rows, ResultSetMetaData metadata) {
@@ -80,36 +84,25 @@ public class CachedResultSet implements ResultSet, Serializable {
     }
 
     public Object getObject(String columnName) {
-        return rows.get(getIndex()).get(columnName);
+        return rows.get(index).get(columnName);
     }
 
     public Object getObject(int columnIndex) {
-        return rows.get(getIndex()).getByIndex(columnIndex);
+        return rows.get(index).getByIndex(columnIndex);
     }
 
     protected void addRow(ColumnMap<String, Object> row) {
         rows.add(row);
     }
 
-    private int getIndex() {
-        if (index == null) {
-            index = -1;
-        }
-        return index;
-    }
-
-    private void setIndex(int i) {
-        index = i;
-    }
-
     private void increaseIndex() {
-        index = getIndex() + 1;
+        index++;
     }
 
     public boolean first() {
         if (this.rowSupplier != null) throw new UnsupportedOperationException("Not implemented yet.");
         if (!rows.isEmpty()) {
-            setIndex(0);
+            this.index = 0;
             return true;
         } else {
             return false;
@@ -119,7 +112,7 @@ public class CachedResultSet implements ResultSet, Serializable {
     public boolean last() {
         if (this.rowSupplier != null) throw new UnsupportedOperationException("Not implemented yet.");
         if (!rows.isEmpty()) {
-            setIndex(rows.size() - 1);
+            this.index = rows.size() - 1;
             return true;
         } else {
             return false;
@@ -127,41 +120,45 @@ public class CachedResultSet implements ResultSet, Serializable {
     }
 
     private boolean nextSupplied() {
-        if (this.rowSupplier == null || !this.rowSupplier.hasNext()) {
-            this.rows = Collections.emptyList();
-            return false;
+        if (this.rowSupplier != null) {
+            if (this.rowSupplier.hasNext()) {
+                this.rows = this.rowSupplier.next();
+                this.index = -1;
+                return !rows.isEmpty();
+            } else {
+                this.rows = Collections.emptyList();
+                return false;
+            }
         }
-        this.rows = this.rowSupplier.next();
-        this.index = null;
-        return !rows.isEmpty();
+        return false;
     }
 
     public boolean next() {
         if (!rows.isEmpty()) {
             increaseIndex();
-            if (getIndex() < rows.size()) return true;
+            if (index < rows.size()) return true;
         }
         return nextSupplied() && next();
     }
 
     public boolean isAfterLast() {
         if (this.rowSupplier != null) throw new UnsupportedOperationException("Not implemented yet.");
-        return !rows.isEmpty() && getIndex() == rows.size();
+        return !rows.isEmpty() && index == rows.size();
     }
 
     public boolean isBeforeFirst() {
         if (this.rowSupplier != null) throw new UnsupportedOperationException("Not implemented yet.");
-        return !rows.isEmpty() && getIndex() == -1;
+        return !rows.isEmpty() && index == -1;
     }
 
     public boolean isFirst() {
         if (this.rowSupplier != null) throw new UnsupportedOperationException("Not implemented yet.");
-        return !rows.isEmpty() && getIndex() == 0;
+        return !rows.isEmpty() && index == 0;
     }
 
     public boolean isLast() {
         if (this.rowSupplier != null) throw new UnsupportedOperationException("Not implemented yet.");
-        return !rows.isEmpty() && getIndex() == rows.size() - 1;
+        return !rows.isEmpty() && index == rows.size() - 1;
     }
 
     public ResultSetMetaData getMetaData() {
@@ -169,6 +166,7 @@ public class CachedResultSet implements ResultSet, Serializable {
     }
 
     public void setFetchSize(int rows) {
+        // NOT Implemented
     }
 
     public Date getDate(int columnIndex, Calendar cal) {
@@ -273,10 +271,10 @@ public class CachedResultSet implements ResultSet, Serializable {
     }
 
     public Timestamp getTimestamp(int columnIndex) {
-        Object value = rows.get(getIndex()).getByIndex(columnIndex);
+        Object value = rows.get(index).getByIndex(columnIndex);
         if (value instanceof GregorianCalendar calendar) {
             return new java.sql.Timestamp(calendar.getTime().getTime());
-        } else if (rows.get(getIndex()).getTypeInfoByIndex(columnIndex) == TypeInfo.DATE_TYPE_INFO) {
+        } else if (rows.get(index).getTypeInfoByIndex(columnIndex) == TypeInfo.DATE_TYPE_INFO) {
             return new ColumnValueParser<>(this::parseDate, java.util.Date.class)
                 .parse(columnIndex)
                 .map(d -> new java.sql.Timestamp(d.getTime()))
@@ -290,10 +288,10 @@ public class CachedResultSet implements ResultSet, Serializable {
     }
 
     public Timestamp getTimestamp(String columnName) {
-        Object value = rows.get(getIndex()).get(columnName);
-        if (value instanceof GregorianCalendar) {
-            return new java.sql.Timestamp(((GregorianCalendar) value).getTime().getTime());
-        } else if (rows.get(getIndex()).getTypeInfo(columnName) == TypeInfo.DATE_TYPE_INFO) {
+        Object value = rows.get(index).get(columnName);
+        if (value instanceof GregorianCalendar cal) {
+            return new java.sql.Timestamp(cal.getTime().getTime());
+        } else if (rows.get(index).getTypeInfo(columnName) == TypeInfo.DATE_TYPE_INFO) {
             return new ColumnValueParser<>(this::parseDate, java.util.Date.class)
                 .parse(columnName)
                 .map(d -> new java.sql.Timestamp(d.getTime()))
@@ -319,7 +317,7 @@ public class CachedResultSet implements ResultSet, Serializable {
         try {
             return new SimpleDateFormat("HH:mm:ss.SSSX").parse(dateRepr);
         } catch (ParseException e) {
-            throw new RuntimeException(e);
+            return null;
         }
     }
 
@@ -337,7 +335,7 @@ public class CachedResultSet implements ResultSet, Serializable {
             .orElse(null);
     }
 
-    @Deprecated
+    @Deprecated(since="1.2")
     public BigDecimal getBigDecimal(int columnIndex, int scale) {
         Optional<BigDecimal> result = new ColumnValueParser<>(BigDecimal::new, BigDecimal.class)
             .parse(columnIndex);
@@ -345,7 +343,7 @@ public class CachedResultSet implements ResultSet, Serializable {
         return result.map(bigDecimal -> bigDecimal.setScale(scale, RoundingMode.HALF_EVEN)).orElse(null);
     }
 
-    @Deprecated
+    @Deprecated(since="1.2")
     public BigDecimal getBigDecimal(String columnName, int scale) {
         Optional<BigDecimal> result = new ColumnValueParser<>(BigDecimal::new, BigDecimal.class)
             .parse(columnName);
@@ -487,6 +485,10 @@ public class CachedResultSet implements ResultSet, Serializable {
     }
 
     public void beforeFirst() {
+        if (this.rowSupplier != null) throw new UnsupportedOperationException("Not implemented yet.");
+        if (!rows.isEmpty()) {
+            this.index = -1;
+        }
     }
 
     public void cancelRowUpdates() {
@@ -603,12 +605,12 @@ public class CachedResultSet implements ResultSet, Serializable {
         return null;
     }
 
-    @Deprecated
+    @Deprecated(since="1.2")
     public InputStream getUnicodeStream(int columnIndex) {
         return null;
     }
 
-    @Deprecated
+    @Deprecated(since="1.2")
     public InputStream getUnicodeStream(String columnName) {
         return null;
     }
@@ -1035,7 +1037,7 @@ public class CachedResultSet implements ResultSet, Serializable {
         if (o == null) {
             return null;
         } else {
-            return o instanceof String ? (String)o : String.valueOf(o);
+            return o instanceof String s ? s : String.valueOf(o);
         }
     }
 }
