@@ -6,7 +6,7 @@
   <parent>
     <artifactId>salesforce-jdbc</artifactId>
     <groupId>com.ascendix.salesforce</groupId>
-    <version>1.5.1-release</version>
+    <version>1.5.2-release</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <artifactId>sf-jdbc-driver</artifactId>
