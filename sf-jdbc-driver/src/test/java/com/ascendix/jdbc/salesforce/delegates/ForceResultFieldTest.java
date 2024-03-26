@@ -1,13 +1,13 @@
 package com.ascendix.jdbc.salesforce.delegates;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class ForceResultFieldTest {
+class ForceResultFieldTest {
 
     @Test
-    public void testFieldOrder() {
+    void testFieldOrder() {
         ForceResultField resultField = new ForceResultField("entity", "field", "name", "value");
         assertEquals("entity", resultField.getEntityType());
         assertEquals("field", resultField.getFieldType());

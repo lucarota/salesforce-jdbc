@@ -1,6 +1,6 @@
 package com.ascendix.jdbc.salesforce.statement.processor;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -12,11 +12,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class UpdateQueryAnalyzerTest {
 
-    public UpdateQueryAnalyzerTest() {
+    UpdateQueryAnalyzerTest() {
         PartnerService partnerService = mock(PartnerService.class);
         when(partnerService.describeSObject(eq("Account"))).thenReturn(describeSObject("Account"));
     }
@@ -28,7 +28,7 @@ public class UpdateQueryAnalyzerTest {
     }
 
     @Test
-    public void testProcessUpdate_One_ById() {
+    void testProcessUpdate_One_ById() {
         String soql = "Update Account set Name ='FirstAccount_new' where Id='001xx000003GeY0AAK'";
         final QueryAnalyzer queryAnalyzer = new QueryAnalyzer(soql, null, null);
         UpdateQueryAnalyzer analyzer = new UpdateQueryAnalyzer(queryAnalyzer);
@@ -47,7 +47,7 @@ public class UpdateQueryAnalyzerTest {
     }
 
     @Test
-    public void testProcessUpdate_One_ByName() {
+    void testProcessUpdate_One_ByName() {
         String soql = "Update Account set Name ='NEW_AccountName' where Name='FirstAccount_new'";
 
         final QueryAnalyzer queryAnalyzer = new QueryAnalyzer(soql, subSoql -> {
@@ -94,7 +94,7 @@ public class UpdateQueryAnalyzerTest {
     }
 
     @Test
-    public void testProcessUpdate_One_ByName_CALC() {
+    void testProcessUpdate_One_ByName_CALC() {
         String soql = "Update Account set Name=Name+'-' where Name='FirstAccount_new'";
 
         final QueryAnalyzer queryAnalyzer = new QueryAnalyzer(soql, subSoql -> {

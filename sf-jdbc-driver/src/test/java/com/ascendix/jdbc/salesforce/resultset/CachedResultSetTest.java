@@ -1,27 +1,25 @@
 package com.ascendix.jdbc.salesforce.resultset;
 
-import com.ascendix.jdbc.salesforce.metadata.ColumnMap;
-import com.ascendix.jdbc.salesforce.resultset.CachedResultSet;
-import org.junit.Before;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import com.ascendix.jdbc.salesforce.metadata.ColumnMap;
 import java.util.Calendar;
 import java.util.Date;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-
-public class CachedResultSetTest {
+class CachedResultSetTest {
 
     private CachedResultSet cachedResultSet;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         ColumnMap<String, Object> columnMap = new ColumnMap<>();
         cachedResultSet = new CachedResultSet(columnMap);
     }
 
     @Test
-    public void testParseDate() {
+    void testParseDate() {
         Date actual = cachedResultSet.parseDate("2017-06-23");
 
         Calendar calendar = Calendar.getInstance();

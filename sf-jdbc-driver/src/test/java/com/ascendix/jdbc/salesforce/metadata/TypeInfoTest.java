@@ -1,15 +1,14 @@
 package com.ascendix.jdbc.salesforce.metadata;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.sql.Types;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-
-public class TypeInfoTest {
+class TypeInfoTest {
 
     @Test
-    public void testLookupTypeInfo() {
+    void testLookupTypeInfo() {
         TypeInfo actual = TypeInfo.lookupTypeInfo("int");
 
         assertEquals("int", actual.getTypeName());
@@ -17,7 +16,7 @@ public class TypeInfoTest {
     }
 
     @Test
-    public void testLookupTypeInfo_IfTypeUnknown() {
+    void testLookupTypeInfo_IfTypeUnknown() {
         TypeInfo actual = TypeInfo.lookupTypeInfo("my strange type");
 
         assertEquals("other", actual.getTypeName());

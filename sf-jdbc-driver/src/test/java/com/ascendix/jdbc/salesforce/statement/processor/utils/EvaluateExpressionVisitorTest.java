@@ -1,20 +1,26 @@
 package com.ascendix.jdbc.salesforce.statement.processor.utils;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+
 import com.ascendix.jdbc.salesforce.exceptions.UnsupportedArgumentTypeException;
-import net.sf.jsqlparser.expression.*;
+import java.util.Map;
+import net.sf.jsqlparser.expression.DateValue;
+import net.sf.jsqlparser.expression.DoubleValue;
+import net.sf.jsqlparser.expression.Function;
+import net.sf.jsqlparser.expression.LongValue;
+import net.sf.jsqlparser.expression.StringValue;
+import net.sf.jsqlparser.expression.TimeValue;
+import net.sf.jsqlparser.expression.TimestampValue;
 import net.sf.jsqlparser.expression.operators.arithmetic.Addition;
 import net.sf.jsqlparser.expression.operators.arithmetic.Subtraction;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+class EvaluateExpressionVisitorTest {
 
-public class EvaluateExpressionVisitorTest {
-
-    public class EvaluateExpressionVisitorTesting extends EvaluateExpressionVisitor {
-        public EvaluateExpressionVisitorTesting(Map<String, Object> recordFieldsFromDB) {
+    static class EvaluateExpressionVisitorTesting extends EvaluateExpressionVisitor {
+        EvaluateExpressionVisitorTesting(Map<String, Object> recordFieldsFromDB) {
             super(recordFieldsFromDB);
         }
 
@@ -28,7 +34,7 @@ public class EvaluateExpressionVisitorTest {
     }
 
     @Test
-    public void testResolveSimpleTypes() {
+    void testResolveSimpleTypes() {
         Map<String, Object> recordFieldsFromDB = RecordFieldsBuilder.setId("001xx1111111111111").build();
 
         EvaluateExpressionVisitor visitorS1 = new EvaluateExpressionVisitor(recordFieldsFromDB);
@@ -58,7 +64,7 @@ public class EvaluateExpressionVisitorTest {
     }
 
     @Test
-    public void testResolveAdditions_Dates() {
+    void testResolveAdditions_Dates() {
         Map<String, Object> recordFieldsFromDB = RecordFieldsBuilder.setId("001xx1111111111111").build();
 
         EvaluateExpressionVisitor visitorTS1 = new EvaluateExpressionVisitor(recordFieldsFromDB);
@@ -84,7 +90,7 @@ public class EvaluateExpressionVisitorTest {
     }
 
     @Test
-    public void testResolveAdditions_SimpleTypes() {
+    void testResolveAdditions_SimpleTypes() {
         Map<String, Object> recordFieldsFromDB = RecordFieldsBuilder.setId("001xx1111111111111").build();
 
         EvaluateExpressionVisitor visitorSS = new EvaluateExpressionVisitor(recordFieldsFromDB);
@@ -167,7 +173,7 @@ public class EvaluateExpressionVisitorTest {
     }
 
     @Test
-    public void testResolveSubstractions_Dates() {
+    void testResolveSubstractions_Dates() {
         Map<String, Object> recordFieldsFromDB = RecordFieldsBuilder.setId("001xx1111111111111").build();
 
         EvaluateExpressionVisitor visitorTS1 = new EvaluateExpressionVisitor(recordFieldsFromDB);
@@ -193,7 +199,7 @@ public class EvaluateExpressionVisitorTest {
     }
 
     @Test
-    public void testResolveSubstractions_SimpleTypes() {
+    void testResolveSubstractions_SimpleTypes() {
         Map<String, Object> recordFieldsFromDB = RecordFieldsBuilder.setId("001xx1111111111111").build();
 
         EvaluateExpressionVisitor visitorSS = new EvaluateExpressionVisitor(recordFieldsFromDB);
@@ -311,7 +317,7 @@ public class EvaluateExpressionVisitorTest {
     }
 
     @Test
-    public void testResolveFunctions() {
+    void testResolveFunctions() {
         Map<String, Object> recordFieldsFromDB = RecordFieldsBuilder.setId("001xx1111111111111").build();
 
         EvaluateExpressionVisitor visitorS1 = new EvaluateExpressionVisitorTesting(recordFieldsFromDB);
