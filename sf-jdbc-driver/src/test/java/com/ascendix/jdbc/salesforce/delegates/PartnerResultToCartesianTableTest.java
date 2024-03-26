@@ -1,23 +1,21 @@
 package com.ascendix.jdbc.salesforce.delegates;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
-
-public class PartnerResultToCartesianTableTest {
+class PartnerResultToCartesianTableTest {
 
     @Test
-    public void testExpandSimple() {
-        List schema = Arrays.asList(new Object(), new Object(), new Object(), new Object());
+    void testExpandSimple() {
+        List<Object> schema = Arrays.asList(new Object(), new Object(), new Object(), new Object());
 
         List<List> expected = Arrays.asList(
-                (List) Arrays.asList(1, 2, 3, 4)
+            Arrays.asList(1, 2, 3, 4)
         );
 
         List<List> actual = PartnerResultToCartesianTable.expand(expected, schema);
@@ -26,14 +24,14 @@ public class PartnerResultToCartesianTableTest {
     }
 
     @Test
-    public void testExpandWhenNothingToExpand() {
-        List schema = Arrays.asList(new Object(), new Object(), new Object(), new Object());
+    void testExpandWhenNothingToExpand() {
+        List<Object> schema = Arrays.asList(new Object(), new Object(), new Object(), new Object());
 
         List<List> expected = Arrays.asList(
-                Arrays.asList(1, 2, 3, 4),
-                Arrays.asList("1", "2", "3", "4"),
-                Arrays.asList("11", "12", "13", "14"),
-                Arrays.asList("21", "22", "23", "24")
+            Arrays.asList(1, 2, 3, 4),
+            Arrays.asList("1", "2", "3", "4"),
+            Arrays.asList("11", "12", "13", "14"),
+            Arrays.asList("21", "22", "23", "24")
         );
 
         List<List> actual = PartnerResultToCartesianTable.expand(expected, schema);
@@ -42,17 +40,20 @@ public class PartnerResultToCartesianTableTest {
     }
 
     @Test
-    public void testExpandWhenOneNestedList() {
-        List schema = Arrays.asList(new Object(), Arrays.asList(new Object(), new Object(), new Object()), new Object(), new Object());
+    void testExpandWhenOneNestedList() {
+        List<Object> schema = Arrays.asList(new Object(),
+            Arrays.asList(new Object(), new Object(), new Object()),
+            new Object(),
+            new Object());
 
-        List<List> list = Arrays.asList(
-                (List) Arrays.asList("1", Arrays.asList("21", "22", "23"), "3", "4")
+        List<List> list = List.of(
+            Arrays.asList("1", Arrays.asList("21", "22", "23"), "3", "4")
         );
 
         List<List> expected = Arrays.asList(
-                Arrays.asList("1", "21", "3", "4"),
-                Arrays.asList("1", "22", "3", "4"),
-                Arrays.asList("1", "23", "3", "4")
+            Arrays.asList("1", "21", "3", "4"),
+            Arrays.asList("1", "22", "3", "4"),
+            Arrays.asList("1", "23", "3", "4")
         );
 
         List<List> actual = PartnerResultToCartesianTable.expand(list, schema);
@@ -61,18 +62,24 @@ public class PartnerResultToCartesianTableTest {
     }
 
     @Test
-    public void testExpandWhenTwoNestedListAndOneRow() {
-        List schema = Arrays.asList(new Object(), Arrays.asList(new Object(), new Object()), new Object(), Arrays.asList(new Object(), new Object()));
+    void testExpandWhenTwoNestedListAndOneRow() {
+        List<Object> schema = Arrays.asList(new Object(),
+            Arrays.asList(new Object(), new Object()),
+            new Object(),
+            Arrays.asList(new Object(), new Object()));
 
-        List<List> list = Arrays.asList(
-                (List) Arrays.asList(11, Arrays.asList(Arrays.asList(1, 2), Arrays.asList(3, 4)), 12, Arrays.asList(Arrays.asList(5, 6), Arrays.asList(7, 8)))
+        List<List> list = List.of(
+            Arrays.asList(11,
+                Arrays.asList(Arrays.asList(1, 2), Arrays.asList(3, 4)),
+                12,
+                Arrays.asList(Arrays.asList(5, 6), Arrays.asList(7, 8)))
         );
 
         List<List> expected = Arrays.asList(
-                Arrays.asList(11, 1, 2, 12, 5, 6),
-                Arrays.asList(11, 3, 4, 12, 5, 6),
-                Arrays.asList(11, 1, 2, 12, 7, 8),
-                Arrays.asList(11, 3, 4, 12, 7, 8)
+            Arrays.asList(11, 1, 2, 12, 5, 6),
+            Arrays.asList(11, 3, 4, 12, 5, 6),
+            Arrays.asList(11, 1, 2, 12, 7, 8),
+            Arrays.asList(11, 3, 4, 12, 7, 8)
         );
 
         List<List> actual = PartnerResultToCartesianTable.expand(list, schema);
@@ -84,20 +91,26 @@ public class PartnerResultToCartesianTableTest {
     }
 
     @Test
-    public void testExpandWhenOneNestedListAndTwoRows() {
-        List schema = Arrays.asList(new Object(), Arrays.asList(new Object(), new Object()), new Object(), new Object());
+    void testExpandWhenOneNestedListAndTwoRows() {
+        List<Object> schema = Arrays.asList(new Object(),
+            Arrays.asList(new Object(), new Object()),
+            new Object(),
+            new Object());
 
         List<List> list = Arrays.asList(
-                Arrays.asList(11, Arrays.asList(Arrays.asList(1, 2), Arrays.asList(3, 4)), 12, 13),
-                Arrays.asList(20, Arrays.asList(Arrays.asList(21, 22), Arrays.asList(23, 24), Arrays.asList(25, 26)), 41, 42)
+            Arrays.asList(11, Arrays.asList(Arrays.asList(1, 2), Arrays.asList(3, 4)), 12, 13),
+            Arrays.asList(20,
+                Arrays.asList(Arrays.asList(21, 22), Arrays.asList(23, 24), Arrays.asList(25, 26)),
+                41,
+                42)
         );
 
         List<List> expected = Arrays.asList(
-                Arrays.asList(11, 1, 2, 12, 13),
-                Arrays.asList(11, 3, 4, 12, 13),
-                Arrays.asList(20, 21, 22, 41, 42),
-                Arrays.asList(20, 23, 24, 41, 42),
-                Arrays.asList(20, 25, 26, 41, 42)
+            Arrays.asList(11, 1, 2, 12, 13),
+            Arrays.asList(11, 3, 4, 12, 13),
+            Arrays.asList(20, 21, 22, 41, 42),
+            Arrays.asList(20, 23, 24, 41, 42),
+            Arrays.asList(20, 25, 26, 41, 42)
         );
 
         List<List> actual = PartnerResultToCartesianTable.expand(list, schema);
@@ -106,15 +119,18 @@ public class PartnerResultToCartesianTableTest {
     }
 
     @Test
-    public void testExpandWhenOneNestedListIsEmpty() {
-        List schema = Arrays.asList(new Object(), Arrays.asList(new Object(), new Object()), new Object(), new Object());
+    void testExpandWhenOneNestedListIsEmpty() {
+        List<Object> schema = Arrays.asList(new Object(),
+            Arrays.asList(new Object(), new Object()),
+            new Object(),
+            new Object());
 
-        List<List> list = Arrays.asList(
-                (List) Arrays.asList(11, new ArrayList(), 12, 13)
+        List<List> list = List.of(
+            Arrays.asList(11, new ArrayList<>(), 12, 13)
         );
 
-        List<List> expected = Arrays.asList(
-                (List) Arrays.asList(11, null, null, 12, 13)
+        List<List> expected = List.of(
+            Arrays.asList(11, null, null, 12, 13)
         );
 
         List<List> actual = PartnerResultToCartesianTable.expand(list, schema);
@@ -123,20 +139,19 @@ public class PartnerResultToCartesianTableTest {
     }
 
     @Test
-    public void testExpandWhenNestedListIsEmpty() {
-        List schema = Arrays.asList(new Object(), Arrays.asList(new Object(), new Object()));
+    void testExpandWhenNestedListIsEmpty() {
+        List<Object> schema = Arrays.asList(new Object(), Arrays.asList(new Object(), new Object()));
 
-        List<List> list = Arrays.asList(
-                (List) Arrays.asList(11, new Object())
+        List<List> list = List.of(
+            Arrays.asList(11, new Object())
         );
 
-        List<List> expected = Arrays.asList(
-                (List) Arrays.asList(11, null, null)
+        List<List> expected = List.of(
+            Arrays.asList(11, null, null)
         );
 
         List<List> actual = PartnerResultToCartesianTable.expand(list, schema);
 
         assertEquals(actual, expected);
     }
-
 }

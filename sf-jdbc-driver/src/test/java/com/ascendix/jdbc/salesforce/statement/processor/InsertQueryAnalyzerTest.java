@@ -1,19 +1,19 @@
 package com.ascendix.jdbc.salesforce.statement.processor;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class InsertQueryAnalyzerTest {
+class InsertQueryAnalyzerTest {
 
     @Test
-    public void testProcessInsert_ValuesOne() {
+    void testProcessInsert_ValuesOne() {
         String soql = "insert into Account(Name, OwnerId, Title) values ('FirstAccount', '005xx1231231233123', Null)";
 
         final QueryAnalyzer queryAnalyzer = new QueryAnalyzer(soql, null, null);
@@ -35,7 +35,7 @@ public class InsertQueryAnalyzerTest {
     }
 
     @Test
-    public void testProcessInsert_ValuesOneSubSelect() {
+    void testProcessInsert_ValuesOneSubSelect() {
         String soql = "insert into Account(Name, OwnerId) values ('FirstAccount', " +
                 " (SELECT Id from User where Name='CollectionOwner-f CollectionOwner-l' LIMIT 1) " +
                 ")";
@@ -63,7 +63,7 @@ public class InsertQueryAnalyzerTest {
     }
 
     @Test
-    public void testProcessInsert_ValuesTwo() {
+    void testProcessInsert_ValuesTwo() {
         String soql = "insert into Account(Name, OwnerId) values ('FirstAccount', '005xx1111111111111'),  ('SecondAccount', '005xx2222222222222')";
 
         final QueryAnalyzer queryAnalyzer = new QueryAnalyzer(soql, null, null);

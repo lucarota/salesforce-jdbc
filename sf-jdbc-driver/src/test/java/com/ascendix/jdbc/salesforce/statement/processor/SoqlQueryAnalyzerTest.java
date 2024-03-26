@@ -1,6 +1,6 @@
 package com.ascendix.jdbc.salesforce.statement.processor;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -18,13 +18,13 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class SoqlQueryAnalyzerTest {
+class SoqlQueryAnalyzerTest {
 
     private final PartnerService partnerService;
 
-    public SoqlQueryAnalyzerTest() {
+    SoqlQueryAnalyzerTest() {
         partnerService = mock(PartnerService.class);
         when(partnerService.describeSObject(eq("Account"))).thenReturn(describeSObject("Account"));
         when(partnerService.describeSObject(eq("Contact"))).thenReturn(describeSObject("Contact"));
@@ -32,7 +32,7 @@ public class SoqlQueryAnalyzerTest {
     }
 
     @Test
-    public void testGetFieldNames_SimpleQuery() {
+    void testGetFieldNames_SimpleQuery() {
         String soql = " select Id ,Name \r\nfrom Account\r\n where something = 'nothing' ";
         final QueryAnalyzer queryAnalyzer = new QueryAnalyzer(soql, null, partnerService);
 
@@ -57,7 +57,7 @@ public class SoqlQueryAnalyzerTest {
     }
 
     @Test
-    public void testGetFieldNames_SelectWithReferences() {
+    void testGetFieldNames_SelectWithReferences() {
         String soql = " select Id , Account.Name \r\nfrom Contact\r\n where something = 'nothing' ";
         final QueryAnalyzer queryAnalyzer = new QueryAnalyzer(soql, null, partnerService);
         SoqlQueryAnalyzer analyzer = new SoqlQueryAnalyzer(queryAnalyzer);
@@ -69,7 +69,7 @@ public class SoqlQueryAnalyzerTest {
     }
 
     @Test
-    public void testGetFieldNames_SelectWithAggregateAliased() {
+    void testGetFieldNames_SelectWithAggregateAliased() {
         String soql = " select Id , Account.Name, count(id) aggrAlias1\r\nfrom Contact\r\n where something = 'nothing' ";
         final QueryAnalyzer queryAnalyzer = new QueryAnalyzer(soql, null, partnerService);
         SoqlQueryAnalyzer analyzer = new SoqlQueryAnalyzer(queryAnalyzer);
@@ -81,7 +81,7 @@ public class SoqlQueryAnalyzerTest {
     }
 
     @Test
-    public void testGetFieldNames_SubSelectWithSameFields() {
+    void testGetFieldNames_SubSelectWithSameFields() {
         String soql = " select Id, Account.Name, Owner.Id, Owner.Name from Account ";
         final QueryAnalyzer queryAnalyzer = new QueryAnalyzer(soql, null, partnerService);
         SoqlQueryAnalyzer analyzer = new SoqlQueryAnalyzer(queryAnalyzer);
@@ -93,7 +93,7 @@ public class SoqlQueryAnalyzerTest {
     }
 
     @Test
-    public void testGetFieldNames_SubSelectWithSameFieldAliases() {
+    void testGetFieldNames_SubSelectWithSameFieldAliases() {
         String soql = " select Id, Account.Name, Owner.Id, Owner.Name from Account ";
         final QueryAnalyzer queryAnalyzer = new QueryAnalyzer(soql, null, partnerService);
         SoqlQueryAnalyzer analyzer = new SoqlQueryAnalyzer(queryAnalyzer);
@@ -105,7 +105,7 @@ public class SoqlQueryAnalyzerTest {
     }
 
     @Test
-    public void testGetFieldNames_SelectWithAggregate() {
+    void testGetFieldNames_SelectWithAggregate() {
         String soql = " select Id , Account.Name, count(id)\r\nfrom Contact\r\n where something = 'nothing' ";
         final QueryAnalyzer queryAnalyzer = new QueryAnalyzer(soql, null, partnerService);
         SoqlQueryAnalyzer analyzer = new SoqlQueryAnalyzer(queryAnalyzer);
@@ -116,7 +116,7 @@ public class SoqlQueryAnalyzerTest {
     }
 
     @Test
-    public void testGetFromObjectName() {
+    void testGetFromObjectName() {
         String soql = " select Id , Account.Name \r\nfrom Contact\r\n where something = 'nothing' ";
         final QueryAnalyzer queryAnalyzer = new QueryAnalyzer(soql, null, partnerService);
         SoqlQueryAnalyzer analyzer = new SoqlQueryAnalyzer(queryAnalyzer);
@@ -127,7 +127,7 @@ public class SoqlQueryAnalyzerTest {
     }
 
     @Test
-    public void testGetSimpleFieldDefinitions() {
+    void testGetSimpleFieldDefinitions() {
         String soql = "SELECT Id, Name FROM Account";
         final QueryAnalyzer queryAnalyzer = new QueryAnalyzer(soql, null, partnerService);
         SoqlQueryAnalyzer analyzer = new SoqlQueryAnalyzer(queryAnalyzer);
@@ -144,7 +144,7 @@ public class SoqlQueryAnalyzerTest {
     }
 
     @Test
-    public void testGetReferenceFieldDefinitions() {
+    void testGetReferenceFieldDefinitions() {
         String soql = "SELECT Account.Name FROM Contact";
         final QueryAnalyzer queryAnalyzer = new QueryAnalyzer(soql, null, partnerService);
         SoqlQueryAnalyzer analyzer = new SoqlQueryAnalyzer(queryAnalyzer);
@@ -156,7 +156,7 @@ public class SoqlQueryAnalyzerTest {
     }
 
     @Test
-    public void testGetAggregateFieldDefinition() {
+    void testGetAggregateFieldDefinition() {
         String soql = "SELECT MIN(Name) FROM Contact";
         final QueryAnalyzer queryAnalyzer = new QueryAnalyzer(soql, null, partnerService);
         SoqlQueryAnalyzer analyzer = new SoqlQueryAnalyzer(queryAnalyzer);
@@ -168,7 +168,7 @@ public class SoqlQueryAnalyzerTest {
     }
 
     @Test
-    public void testGetAggregateFieldDefinitionWithoutParameter() {
+    void testGetAggregateFieldDefinitionWithoutParameter() {
         String soql = "SELECT Count() FROM Contact";
         final QueryAnalyzer queryAnalyzer = new QueryAnalyzer(soql, null, partnerService);
         SoqlQueryAnalyzer analyzer = new SoqlQueryAnalyzer(queryAnalyzer);
@@ -180,7 +180,7 @@ public class SoqlQueryAnalyzerTest {
     }
 
     @Test
-    public void testGetSimpleFieldWithQualifier() {
+    void testGetSimpleFieldWithQualifier() {
         String soql = "SELECT Contact.Id FROM Contact";
         final QueryAnalyzer queryAnalyzer = new QueryAnalyzer(soql, null, partnerService);
         SoqlQueryAnalyzer analyzer = new SoqlQueryAnalyzer(queryAnalyzer);
@@ -192,7 +192,7 @@ public class SoqlQueryAnalyzerTest {
     }
 
     @Test
-    public void testGetNamedAggregateFieldDefinitions() {
+    void testGetNamedAggregateFieldDefinitions() {
         String soql = "SELECT count(Name) nameCount FROM Account";
         final QueryAnalyzer queryAnalyzer = new QueryAnalyzer(soql, null, partnerService);
         SoqlQueryAnalyzer analyzer = new SoqlQueryAnalyzer(queryAnalyzer);
@@ -227,7 +227,7 @@ public class SoqlQueryAnalyzerTest {
     }
 
     @Test
-    public void testFetchFieldDefinitions_WithIncludedSelect() {
+    void testFetchFieldDefinitions_WithIncludedSelect() {
         String soql = "SELECT Name, (SELECT Id, max(LastName) maxLastName FROM Contacts), Id FROM Account";
         final QueryAnalyzer queryAnalyzer = new QueryAnalyzer(soql, null, partnerService);
         SoqlQueryAnalyzer analyzer = new SoqlQueryAnalyzer(queryAnalyzer);
@@ -253,7 +253,7 @@ public class SoqlQueryAnalyzerTest {
     }
 
     @Test
-    public void testFetchFieldDefinitions_Star() {
+    void testFetchFieldDefinitions_Star() {
         String soql = "SELECT * FROM Account";
         final QueryAnalyzer queryAnalyzer = new QueryAnalyzer(soql, null, partnerService);
         SoqlQueryAnalyzer analyzer = new SoqlQueryAnalyzer(queryAnalyzer);

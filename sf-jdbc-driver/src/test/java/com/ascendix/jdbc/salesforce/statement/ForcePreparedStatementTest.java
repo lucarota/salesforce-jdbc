@@ -1,8 +1,8 @@
 package com.ascendix.jdbc.salesforce.statement;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.mock;
 
 import com.ascendix.jdbc.salesforce.connection.ForceConnection;
@@ -14,18 +14,18 @@ import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.GregorianCalendar;
 import java.util.List;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class ForcePreparedStatementTest {
+class ForcePreparedStatementTest {
 
     private final ForceConnection connection;
 
-    public ForcePreparedStatementTest() {
+    ForcePreparedStatementTest() {
         connection = mock(ForceConnection.class);
     }
 
     @Test
-    public void testGetParamClass() {
+    void testGetParamClass() {
         assertEquals(String.class, ForcePreparedStatement.getParamClass("test"));
         assertEquals(Long.class, ForcePreparedStatement.getParamClass(1L));
         assertEquals(Object.class, ForcePreparedStatement.getParamClass(new SimpleDateFormat()));
@@ -33,14 +33,14 @@ public class ForcePreparedStatementTest {
     }
 
     @Test
-    public void testToSoqlStringParam() {
+    void testToSoqlStringParam() {
         assertEquals("'\\''", ForcePreparedStatement.toSoqlStringParam("'"));
         assertEquals("'\\\\'", ForcePreparedStatement.toSoqlStringParam("\\"));
         assertEquals("'\\';DELETE DATABASE \\\\a'", ForcePreparedStatement.toSoqlStringParam("';DELETE DATABASE \\a"));
     }
 
     @Test
-    public void testConvertToSoqlParam() {
+    void testConvertToSoqlParam() {
         assertEquals("123.45", ForcePreparedStatement.convertToSoqlParam(123.45));
         assertEquals("123.45", ForcePreparedStatement.convertToSoqlParam(123.45f));
         assertEquals("123", ForcePreparedStatement.convertToSoqlParam(123L));
@@ -51,7 +51,7 @@ public class ForcePreparedStatementTest {
     }
 
     @Test
-    public void testAddParameter() throws SQLException {
+    void testAddParameter() throws SQLException {
         ForcePreparedStatement statement = new ForcePreparedStatement(connection, "");
         statement.addParameter(1, "one");
         statement.addParameter(3, "two");
@@ -65,7 +65,7 @@ public class ForcePreparedStatementTest {
     }
 
     @Test
-    public void testSetParams() throws SQLException {
+    void testSetParams() throws SQLException {
         ForcePreparedStatement statement = new ForcePreparedStatement(connection, "");
         String query = "SELECT Something FROM Anything WERE name = ? AND age > ?";
         statement.addParameter(1, "one");
@@ -78,7 +78,7 @@ public class ForcePreparedStatementTest {
 
 
     @Test
-    public void testGetCacheMode() throws Exception {
+    void testGetCacheMode() throws Exception {
         ForcePreparedStatement statement = new ForcePreparedStatement(connection, "");
 
 
@@ -89,7 +89,7 @@ public class ForcePreparedStatementTest {
     }
 
     @Test
-    public void removeCacheHints() throws Exception {
+    void removeCacheHints() throws Exception {
         ForcePreparedStatement statement = new ForcePreparedStatement(connection, "");
         assertEquals("   select   name   from Account  ", getSqlAfterRemoveCacheHints(statement, " Cache global  select   name   from Account  "));
         assertEquals("  select name from Account", getSqlAfterRemoveCacheHints(statement, " Cache SesSioN select name from Account"));
