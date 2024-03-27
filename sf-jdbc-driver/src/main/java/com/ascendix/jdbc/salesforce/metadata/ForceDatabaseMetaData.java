@@ -12,6 +12,7 @@ import com.ascendix.jdbc.salesforce.delegates.PartnerService;
 import com.ascendix.jdbc.salesforce.resultset.CachedResultSet;
 import com.ascendix.jdbc.salesforce.resultset.CachedResultSetMetaData;
 import com.ascendix.jdbc.salesforce.statement.ForcePreparedStatement;
+import com.ascendix.jdbc.salesforce.utils.PatternToRegexUtils;
 import com.sforce.ws.ConnectionException;
 import com.sforce.ws.ConnectorConfig;
 import java.io.Serializable;
@@ -40,7 +41,6 @@ public class ForceDatabaseMetaData implements DatabaseMetaData, Serializable {
 
     private final transient PartnerService partnerService;
     private transient ForceConnection connection;
-    private List<Table> tablesCache;
     private int counter;
     private final Properties connInfo = new Properties();
 
@@ -64,7 +64,7 @@ public class ForceDatabaseMetaData implements DatabaseMetaData, Serializable {
         List<ColumnMap<String, Object>> rows = new ArrayList<>();
         List<String> typeList = types == null ? null : Arrays.asList(types);
         ColumnMap<String, Object> firstRow = null;
-        for (Table table : getTables()) {
+        for (Table table : getTables(tableNamePattern)) {
             String name = table.getName();
             boolean queryable = table.isQueryable();
 
@@ -93,23 +93,21 @@ public class ForceDatabaseMetaData implements DatabaseMetaData, Serializable {
         return new CachedResultSet(rows, ForcePreparedStatement.createMetaData(firstRow));
     }
 
-    private List<Table> getTables() throws SQLException {
-        if (tablesCache == null) {
-            try {
-                log.trace("[Meta] getTables requested - fetching");
-                tablesCache = partnerService.getTables();
-            } catch (ConnectionException e) {
-                throw new SQLException(e);
+    private List<Table> getTables(String tablePattern) throws SQLException {
+        try {
+            log.trace("[Meta] getTables requested - fetching");
+            if (tablePattern == null || "%".equals(tablePattern)) {
+                return partnerService.getTables();
+            } else {
+                return partnerService.getTables(PatternToRegexUtils.toRegEx(tablePattern));
             }
-        } else {
-            log.trace("[Meta] getTables requested - from cache");
+        } catch (ConnectionException e) {
+            throw new SQLException(e);
         }
-        return tablesCache;
     }
 
     public Table findTableInfo(String tableName) throws SQLException {
-        return getTables().stream()
-            .filter(table -> table.getName().equalsIgnoreCase(tableName))
+        return getTables(tableName).stream()
             .findFirst()
             .orElse(null);
     }
@@ -120,7 +118,7 @@ public class ForceDatabaseMetaData implements DatabaseMetaData, Serializable {
         AtomicInteger ordinal = new AtomicInteger(1);
         log.debug("[Meta] getColumns catalog={} schema={} table={} column={}", catalog, schemaPattern,
             tableNamePattern, columnNamePattern);
-        List<ColumnMap<String, Object>> rows = getTables().stream()
+        List<ColumnMap<String, Object>> rows = getTables(tableNamePattern).stream()
             .filter(table -> tableNamePattern == null || "%".equals(tableNamePattern.trim()) || table.getName()
                 .equalsIgnoreCase(tableNamePattern))
             .flatMap(table -> table.getColumns().stream())
@@ -157,7 +155,7 @@ public class ForceDatabaseMetaData implements DatabaseMetaData, Serializable {
                 put("IS_AUTOINCREMENT", "", STRING_TYPE_INFO);
                 put("IS_GENERATEDCOLUMN", "", STRING_TYPE_INFO);
             }})
-            .collect(Collectors.toList());
+            .collect(Collectors.toUnmodifiableList());
         ColumnMap<String, Object> firstRow = !rows.isEmpty() ? rows.get(0) : null;
         log.debug("[Meta] getColumns RESULT catalog={} schema={} table={} column={} firstRowFound={} ColumnsFound={}",
             catalog, schemaPattern, tableNamePattern, columnNamePattern, firstRow != null ? "yes" : "no", rows.size());
@@ -178,7 +176,7 @@ public class ForceDatabaseMetaData implements DatabaseMetaData, Serializable {
         log.debug("[Meta] getPrimaryKeys RESULT catalog={} schema={} table={}", catalog, schema, tableName);
         List<ColumnMap<String, Object>> maps = new ArrayList<>();
         ColumnMap<String, Object> firstRow = null;
-        for (Table table : getTables()) {
+        for (Table table : getTables(tableName)) {
             if (tableName == null || "%".equals(tableName.trim()) || table.getName().equalsIgnoreCase(tableName)) {
                 for (Column column : table.getColumns()) {
                     if (column.getName().equalsIgnoreCase("Id")) {
@@ -208,7 +206,7 @@ public class ForceDatabaseMetaData implements DatabaseMetaData, Serializable {
     public ResultSet getImportedKeys(String catalog, String schema, String tableName) throws SQLException {
         List<ColumnMap<String, Object>> maps = new ArrayList<>();
         ColumnMap<String, Object> firstRow = null;
-        for (Table table : getTables()) {
+        for (Table table : getTables(tableName)) {
             if (tableName == null || "%".equals(tableName.trim()) || table.getName().equalsIgnoreCase(tableName)) {
                 for (Column column : table.getColumns()) {
                     if (column.getReferencedTable() != null && column.getReferencedColumn() != null) {
@@ -221,7 +219,7 @@ public class ForceDatabaseMetaData implements DatabaseMetaData, Serializable {
                         map.put("FKTABLE_SCHEM", DEFAULT_SCHEMA, STRING_TYPE_INFO);
                         map.put("FKTABLE_NAME", tableName, STRING_TYPE_INFO);
                         map.put("FKCOLUMN_NAME", column.getName(), STRING_TYPE_INFO);
-                        map.put("KEY_SEQ", Integer.valueOf(counter++).shortValue(), SHORT_TYPE_INFO);
+                        map.put("KEY_SEQ", (short)counter++, SHORT_TYPE_INFO);
                         map.put("UPDATE_RULE", (short) 0, SHORT_TYPE_INFO);
                         map.put("DELETE_RULE", (short) 0, STRING_TYPE_INFO);
                         map.put("FK_NAME",
@@ -247,7 +245,7 @@ public class ForceDatabaseMetaData implements DatabaseMetaData, Serializable {
         boolean approximate) throws SQLException {
         List<ColumnMap<String, Object>> maps = new ArrayList<>();
         ColumnMap<String, Object> firstRow = null;
-        for (Table table : getTables()) {
+        for (Table table : getTables(tableName)) {
             if (tableName == null || "%".equals(tableName.trim()) || table.getName().equalsIgnoreCase(tableName)) {
                 for (Column column : table.getColumns()) {
                     if (column.getName().equalsIgnoreCase("Id")) {
@@ -377,7 +375,7 @@ public class ForceDatabaseMetaData implements DatabaseMetaData, Serializable {
 
     @Override
     public String getDatabaseProductName() {
-        return "Salesforce";
+        return DEFAULT_SCHEMA;
     }
 
     @Override
@@ -1192,6 +1190,7 @@ public class ForceDatabaseMetaData implements DatabaseMetaData, Serializable {
                 return this.getColumnName(column);
             }
 
+            @Override
             public String getColumnName(int column) {
                 return switch (column) {
                     case 1 -> "property";
@@ -1200,10 +1199,12 @@ public class ForceDatabaseMetaData implements DatabaseMetaData, Serializable {
                 };
             }
 
+            @Override
             public int getColumnType(int column) {
                 return java.sql.Types.VARCHAR;
             }
 
+            @Override
             public String getColumnTypeName(int column) {
                 return "text";
             }
