@@ -20,8 +20,8 @@ The current version of the driver should be compatible with **Salesforce Partner
 
 ## Get the driver
 Download the driver JAR file:
-1. Read-Only version 1.3.1 : from [here](../../raw/main/deliverables/sf-jdbc-driver-1.3.1-SNAPSHOT-jar-with-dependencies.jar)
-2. Write/Delete support version 1.4.5 : from [here](../../raw/main/deliverables/sf-jdbc-driver-1.4.5-SNAPSHOT-jar-with-dependencies.jar)
+1. Read-Only version 1.3.1
+2. Write/Delete support version 1.4.5
 
 ## Supported features
 1. Queries support native SOQL;
@@ -99,26 +99,11 @@ P.S. You need to use the machine host name in the connection url - not MyDomain 
 
 ## With Maven
 
-### Add repositories
-    <repositories>
-        <repository>
-            <id>com.ascendix.maven</id>
-            <name>Ascendix Maven Repo</name>
-            <url>https://github.com/ascendix/mvnrepo/raw/master</url>
-        </repository>
-        <repository>
-            <id>mulesoft-releases</id>
-            <name>MuleSoft Releases Repository</name>
-            <url>http://repository.mulesoft.org/releases/</url>
-            <layout>default</layout>
-        </repository>
-    </repositories>
-
 ### Add dependency   
     <dependency>
         <groupId>com.ascendix.salesforce</groupId>
-        <artifactId>sf-jdbc-driver</artifactId>
-        <version>1.4.0-SNAPSHOT</version>
+        <artifactId>salesforce-jdbc</artifactId>
+        <version>1.5.3-release</version>
      </dependency>
 
 
