@@ -16,10 +16,10 @@
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
+        <force-partner-api.version>60.1.1</force-partner-api.version>
         <lombok.version>1.18.22</lombok.version>
         <slf4j.version>1.7.36</slf4j.version>
         <commons-lang3.version>3.12.0</commons-lang3.version>
-        <force-partner-api.version>58.0.0</force-partner-api.version>
         <jsqlparser.version>4.9</jsqlparser.version>
         <ehcache.version>3.10.8</ehcache.version>
         <junit.version>5.9.3</junit.version>

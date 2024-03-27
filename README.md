@@ -16,7 +16,7 @@ These issues were fixed in the current version in this fork.
 [![Watch the demo video](docs/intelliJ.png)](docs/SOQL-JDBC-IntelliJ-demo-264.mp4)
 
 ## Supported Salesforce and Java versions
-The current version of the driver should be compatible with **Salesforce Partner API version 39.0 and higher** and **Java 8**.
+The current version of the driver should be compatible with **Salesforce Partner API version 58.0 and higher** and **Java 17**.
 
 ## Get the driver
 Download the driver JAR file:
