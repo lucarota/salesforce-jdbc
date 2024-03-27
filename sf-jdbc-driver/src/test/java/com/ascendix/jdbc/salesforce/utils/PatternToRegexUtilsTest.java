@@ -16,6 +16,7 @@ class PatternToRegexUtilsTest {
 
     static Stream<Arguments> data() {
         return Stream.of(
+            Arguments.of("%", "(?i)^.*$", List.of("abc", "XXX", "yyy.AAA_BBB"), List.of()),
             Arguments.of("a%", "(?i)^\\Qa\\E.*$", List.of("a", "abc"), List.of("bca", "x")),
             Arguments.of("a_", "(?i)^\\Qa\\E.$", List.of("ab"), List.of("a", "bc", "abc")),
             Arguments.of("a.", "(?i)^\\Qa.\\E$", List.of("a."), List.of("ab")),

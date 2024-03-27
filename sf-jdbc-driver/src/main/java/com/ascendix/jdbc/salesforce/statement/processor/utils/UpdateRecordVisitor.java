@@ -60,7 +60,7 @@ public class UpdateRecordVisitor extends ExpressionVisitorAdapter {
         recordFieldsToUpdate.put(columnName, timestampValue.getValue());
     }
 
-    EvaluateExpressionVisitor evaluator() {
+    private EvaluateExpressionVisitor evaluator() {
         return new EvaluateExpressionVisitor(recordFieldsFromDB);
     }
 

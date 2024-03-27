@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.function.Function;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
@@ -52,6 +53,17 @@ public class PartnerService {
         return tables;
     }
 
+    public List<Table> getTables(Pattern pattern) throws ConnectionException {
+        log.trace("[PartnerService] getTables IMPLEMENTED");
+        Map<String, DescribeSObjectResult> sObjects = getSObjectsDescription();
+        List<Table> tables = sObjects.values().stream()
+            .filter(o -> pattern.matcher(o.getName()).find())
+            .map(this::convertToTable)
+            .toList();
+        log.info("[PartnerService] getTables tables count={}", tables.size());
+        return tables;
+    }
+
     public DescribeSObjectResult describeSObject(String sObjectType) {
         try {
             if (!sObjectsCache.containsKey(sObjectType)) {
@@ -67,7 +79,7 @@ public class PartnerService {
     }
 
     public void cleanupGlobalCache() throws ConnectionException {
-        schemaCache = getDescribeGlobal();
+        resetSchemaCache();
         sObjectsCache.clear();
     }
 
@@ -110,6 +122,10 @@ public class PartnerService {
         return s.equalsIgnoreCase("double") ? "decimal" : s;
     }
 
+    private synchronized void resetSchemaCache() throws ConnectionException {
+       schemaCache = partnerConnection.describeGlobal();
+    }
+
     private synchronized DescribeGlobalResult getDescribeGlobal() throws ConnectionException {
         if (schemaCache == null) {
             schemaCache = partnerConnection.describeGlobal();
@@ -126,7 +142,7 @@ public class PartnerService {
     }
 
     private Map<String, DescribeSObjectResult> getSObjectsDescription() throws ConnectionException {
-        if (sObjectsCache.isEmpty()) {
+        if (sObjectsCache.isEmpty() || sObjectsCache.size() < getDescribeGlobal().getSobjects().length) {
             log.trace("Load all SObjects");
             Map<String, DescribeSObjectResult> cache;
             DescribeGlobalResult describeGlobals = getDescribeGlobal();
@@ -180,6 +196,7 @@ public class PartnerService {
             queryResult = queryResult == null ? partnerConnection.query(soql)
                 : partnerConnection.queryMore(queryResult.getQueryLocator());
 
+            partnerConnection.setSessionHeader(partnerConnection.getConfig().getSessionId());
             resultRows.addAll(extractQueryResultData(queryResult));
         } while (!queryResult.isDone());
 
