@@ -54,12 +54,12 @@ public class EvaluateExpressionVisitor extends ExpressionVisitorAdapter {
         return (String) result;
     }
 
-    public String getResultString(String ifNull) {
+    public String getResultString(String defaultValue) {
         if (result == null) {
-            return ifNull;
+            return defaultValue;
         }
-        if (result instanceof String) {
-            return ((String) result);
+        if (result instanceof String value) {
+            return value;
         }
         return result.toString();
     }
@@ -68,20 +68,20 @@ public class EvaluateExpressionVisitor extends ExpressionVisitorAdapter {
         if (result == null) {
             return 0;
         }
-        if (result instanceof Double) {
-            return ((Double) result).longValue();
+        if (result instanceof Double d) {
+            return d.longValue();
         }
-        if (result instanceof Float) {
-            return ((Float) result).longValue();
+        if (result instanceof Float f) {
+            return f.longValue();
         }
-        if (result instanceof Long) {
-            return ((Long) result);
+        if (result instanceof Long l) {
+            return l;
         }
-        if (result instanceof Integer) {
-            return ((Integer) result).longValue();
+        if (result instanceof Integer i) {
+            return i.longValue();
         }
-        if (result instanceof String) {
-            return Long.parseLong((String) result);
+        if (result instanceof String s) {
+            return Long.parseLong(s);
         }
         String message = String.format("Cannot convert to Fixed type %s value %s", result.getClass().getName(), result);
         log.error(message);
@@ -92,20 +92,20 @@ public class EvaluateExpressionVisitor extends ExpressionVisitorAdapter {
         if (result == null) {
             return 0d;
         }
-        if (result instanceof Double) {
-            return (Double) result;
+        if (result instanceof Double d) {
+            return d;
         }
-        if (result instanceof Float) {
-            return ((Float) result).doubleValue();
+        if (result instanceof Float f) {
+            return f.doubleValue();
         }
-        if (result instanceof Long) {
-            return ((Long) result).doubleValue();
+        if (result instanceof Long l) {
+            return l.doubleValue();
         }
-        if (result instanceof Integer) {
-            return ((Integer) result).doubleValue();
+        if (result instanceof Integer i) {
+            return i.doubleValue();
         }
-        if (result instanceof String) {
-            return Double.parseDouble((String) result);
+        if (result instanceof String s) {
+            return Double.parseDouble(s);
         }
         String message = String.format("Cannot convert to Float type %s value %s", result.getClass().getName(), result);
         log.error(message);
@@ -113,35 +113,27 @@ public class EvaluateExpressionVisitor extends ExpressionVisitorAdapter {
     }
 
     public boolean isResultString() {
-        return result != null && result instanceof String;
+        return result instanceof String;
     }
 
     public boolean isResultFixedNumber() {
-        return result != null && (
-            result instanceof Long ||
-                result instanceof Integer);
+        return result != null && (result instanceof Long || result instanceof Integer);
     }
 
     public boolean isResultFloatNumber() {
-        return result != null && (
-            result instanceof Double ||
-                result instanceof Float);
+        return result != null && (result instanceof Double || result instanceof Float);
     }
 
     public boolean isResultDateTime() {
-        return result != null && (
-            result instanceof Instant ||
-                result instanceof java.sql.Timestamp);
+        return result != null && (result instanceof Instant || result instanceof java.sql.Timestamp);
     }
 
     public boolean isResultTime() {
-        return result != null && (
-            result instanceof java.sql.Time);
+        return result instanceof java.sql.Time;
     }
 
     public boolean isResultDate() {
-        return result != null && (
-            result instanceof java.sql.Date);
+        return result instanceof java.sql.Date;
     }
 
     public boolean isResultNull() {
@@ -239,8 +231,8 @@ public class EvaluateExpressionVisitor extends ExpressionVisitorAdapter {
 
         Period changeDays = Period.ofDays(isAdding ? changeValue.intValue() : -changeValue.intValue());
         Duration changeSec = Duration.ofSeconds(isAdding ? secondsValue : -secondsValue);
-        if (left.result instanceof java.sql.Date) {
-            LocalDate instant = ((java.sql.Date) left.result).toLocalDate();
+        if (left.result instanceof java.sql.Date date) {
+            LocalDate instant = date.toLocalDate();
             instant = instant.plus(changeDays);
             result = java.sql.Date.valueOf(instant);
         }
@@ -249,14 +241,14 @@ public class EvaluateExpressionVisitor extends ExpressionVisitorAdapter {
             instant = instant.plus(changeSec);
             result = instant;
         }
-        if (left.result instanceof java.sql.Timestamp) {
-            Instant instant = ((java.sql.Timestamp) left.result).toInstant();
+        if (left.result instanceof java.sql.Timestamp timestamp) {
+            Instant instant = timestamp.toInstant();
             instant = instant.plus(changeDays);
             instant = instant.plus(changeSec);
             result = new java.sql.Timestamp(instant.toEpochMilli());
         }
-        if (left.result instanceof Time) {
-            LocalTime instant = ((java.sql.Time) left.result).toLocalTime();
+        if (left.result instanceof Time time) {
+            LocalTime instant = time.toLocalTime();
             instant = instant.plus(changeSec);
             result = java.sql.Time.valueOf(instant);
         }
@@ -272,13 +264,12 @@ public class EvaluateExpressionVisitor extends ExpressionVisitorAdapter {
         EvaluateExpressionVisitor subEvaluatorRight = subVisitor();
         addition.getRightExpression().accept(subEvaluatorRight);
 
-        if (!subEvaluatorLeft.isResultNull() && !subEvaluatorRight.isResultNull()) {
-            if ((subEvaluatorLeft.isResultDateTime() || subEvaluatorLeft.isResultDate()
-                || subEvaluatorLeft.isResultTime()) &&
-                (subEvaluatorRight.isResultFloatNumber() || subEvaluatorRight.isResultFixedNumber())) {
-                result = processDateNumberOperation(subEvaluatorLeft, subEvaluatorRight, true);
-                return;
-            }
+        if ((!subEvaluatorLeft.isResultNull() && !subEvaluatorRight.isResultNull())
+            && ((subEvaluatorLeft.isResultDateTime() || subEvaluatorLeft.isResultDate()
+            || subEvaluatorLeft.isResultTime()) &&
+            (subEvaluatorRight.isResultFloatNumber() || subEvaluatorRight.isResultFixedNumber()))) {
+            result = processDateNumberOperation(subEvaluatorLeft, subEvaluatorRight, true);
+            return;
         }
 
         boolean isString = subEvaluatorLeft.isResultString() || subEvaluatorRight.isResultString();
@@ -439,13 +430,12 @@ public class EvaluateExpressionVisitor extends ExpressionVisitorAdapter {
         EvaluateExpressionVisitor subEvaluatorRight = subVisitor();
         subtraction.getRightExpression().accept(subEvaluatorRight);
 
-        if (!subEvaluatorLeft.isResultNull() && !subEvaluatorRight.isResultNull()) {
-            if ((subEvaluatorLeft.isResultDateTime() || subEvaluatorLeft.isResultDate()
-                || subEvaluatorLeft.isResultTime()) &&
-                (subEvaluatorRight.isResultFloatNumber() || subEvaluatorRight.isResultFixedNumber())) {
-                result = processDateNumberOperation(subEvaluatorLeft, subEvaluatorRight, false);
-                return;
-            }
+        if ((!subEvaluatorLeft.isResultNull() && !subEvaluatorRight.isResultNull())
+            && ((subEvaluatorLeft.isResultDateTime() || subEvaluatorLeft.isResultDate()
+            || subEvaluatorLeft.isResultTime()) &&
+            (subEvaluatorRight.isResultFloatNumber() || subEvaluatorRight.isResultFixedNumber()))) {
+            result = processDateNumberOperation(subEvaluatorLeft, subEvaluatorRight, false);
+            return;
         }
 
         if (subEvaluatorLeft.isResultNull() || subEvaluatorRight.isResultNull()) {
