@@ -147,7 +147,6 @@ public class ForcePreparedStatement implements PreparedStatement, Iterator<List<
             log.info("[PrepStat] query KEEP ALIVE ");
             return CachedResultSet.EMPTY;
         }
-        soqlQuery = prepareQuery();
 
         if (AdminQueryProcessor.isAdminQuery(soqlQuery)) {
             return AdminQueryProcessor.processQuery(this, soqlQuery);
@@ -172,8 +171,7 @@ public class ForcePreparedStatement implements PreparedStatement, Iterator<List<
                 return new CachedResultSet(this, metaData);
             }
             List<FieldDef> fieldDefs = getRootEntityFieldDefinitions();
-            List<List> forceQueryResult = partnerService.query(getSoqlQueryAnalyzer().getSoqlQuery(),
-                fieldDefs);
+            List<List> forceQueryResult = partnerService.query(prepareQuery(getSoqlQueryAnalyzer().getSoqlQuery()), fieldDefs);
             if (!forceQueryResult.isEmpty()) {
                 List<ColumnMap<String, Object>> maps = Collections.synchronizedList(new LinkedList<>());
                 forceQueryResult.forEach(rec -> maps.add(convertToColumnMap(rec)));
@@ -202,7 +200,7 @@ public class ForcePreparedStatement implements PreparedStatement, Iterator<List<
             Map.Entry<List<List>, String> resultEntry;
             if (this.neverQueriedMore) {
                 this.neverQueriedMore = false;
-                resultEntry = partnerService.queryStart(getSoqlQueryAnalyzer().getSoqlQuery(),
+                resultEntry = partnerService.queryStart(prepareQuery(getSoqlQueryAnalyzer().getSoqlQuery()),
                     getRootEntityFieldDefinitions());
             } else if (this.queryMoreLocator != null) {
                 resultEntry = partnerService.queryMore(this.queryMoreLocator, getRootEntityFieldDefinitions());
@@ -220,10 +218,10 @@ public class ForcePreparedStatement implements PreparedStatement, Iterator<List<
         }
     }
 
-    private String prepareQuery() {
-        log.trace("[PrepStat] prepareQuery IMPLEMENTED {}", soqlQuery);
-        soqlQuery = preprocessQuery(soqlQuery);
-        return setParams(soqlQuery);
+    private String prepareQuery(String query) {
+        log.trace("[PrepStat] prepareQuery IMPLEMENTED {}", query);
+        query = preprocessQuery(query);
+        return setParams(query);
     }
 
     private String preprocessQuery(String soqlQuery) {
@@ -292,7 +290,7 @@ public class ForcePreparedStatement implements PreparedStatement, Iterator<List<
     }
 
     private String getCacheKey() {
-        String preparedQuery = prepareQuery();
+        String preparedQuery = prepareQuery(soqlQuery);
         String key = cacheMode == CacheMode.GLOBAL
             ? preparedQuery
             : connection.getUUID() + preparedQuery;
