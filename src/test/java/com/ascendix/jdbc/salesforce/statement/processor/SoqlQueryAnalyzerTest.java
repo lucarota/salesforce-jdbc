@@ -265,4 +265,14 @@ public class SoqlQueryAnalyzerTest {
         assertEquals("Id", fieldDef.getName());
         assertEquals("id", fieldDef.getType());
     }
+
+    @Test
+    public void testIncludes() {
+        String soql = "SELECT Account.Name FROM Contact where option includes ('option 1')";
+        final QueryAnalyzer queryAnalyzer = new QueryAnalyzer(soql, null, partnerService);
+        SoqlQueryAnalyzer analyzer = new SoqlQueryAnalyzer(queryAnalyzer);
+
+        List<FieldDef> actual = analyzer.getFieldDefinitions();
+        assertEquals(1, actual.size());
+    }
 }

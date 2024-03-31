@@ -96,16 +96,20 @@ P.S. You need to use the machine host name in the connection url - not MyDomain 
 2. ***Version >= 1.4.0*** Limited support of INSERT/UPDATE operations
 3. ***Version >= 1.4.1*** Limited support of DELETE operations
 
-
 ## With Maven
 
-### Add dependency   
+### Add dependency
     <dependency>
         <groupId>com.ascendix.salesforce</groupId>
         <artifactId>salesforce-jdbc</artifactId>
-        <version>1.5.3-release</version>
+        <version>1.5.4-release</version>
      </dependency>
 
+#### Warning
+The *1.5.4-release* uses a *custom version* of JSQLParser that adds the INCLUDES and EXCLUDES operators 
+needed for filters on picklists. 
+The change has been merged into the library, until the release of version 4.10 with the change,
+the [custom](https://github.com/lucarota/JSqlParser/tree/feature/salesforce-soql) version must be used.
 
 ## How to connect
 
