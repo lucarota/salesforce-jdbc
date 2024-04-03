@@ -461,7 +461,6 @@ public class ForcePreparedStatement implements PreparedStatement, Iterator<List<
     }
 
     private <T> List<T> flatten(List<T> listWithLists) {
-        log.trace("[PrepStat] flatten IMPLEMENTED ");
         return listWithLists.stream()
             .flatMap(
                 def -> def instanceof Collection
@@ -729,6 +728,7 @@ public class ForcePreparedStatement implements PreparedStatement, Iterator<List<
     @Override
     public ResultSet executeQuery(String sql) throws SQLException {
         log.trace("[PrepStat] executeQuery IMPLEMENTED {}", sql);
+        this.soqlQuery = sql;
         this.resultSet = executeQuery();
         return this.resultSet;
     }

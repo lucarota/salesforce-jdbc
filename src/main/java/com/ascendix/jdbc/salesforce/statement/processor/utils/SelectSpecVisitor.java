@@ -115,7 +115,14 @@ public class SelectSpecVisitor implements SelectItemVisitor {
             String subQuerySoql = subQuery.getPlainSelect().toString();
             Statement statement = CCJSqlParserUtil.parse(subQuerySoql);
             if (statement instanceof PlainSelect select) {
-                String relationshipName = select.getFromItem().toString();
+                String relationshipName;
+                String[] prefixNames = StringUtils.split(select.getFromItem().toString(), '.');
+                if (prefixNames.length > 0 && rootEntityName.equalsIgnoreCase(prefixNames[0])) {
+                    relationshipName = prefixNames[1];
+                } else {
+                    relationshipName = select.getFromItem().toString();
+                }
+
                 ChildRelationship relatedFrom = Arrays.stream(describeObject(rootEntityName).getChildRelationships())
                     .filter(rel -> relationshipName.equalsIgnoreCase(rel.getRelationshipName())).findFirst()
                     .orElseThrow(() -> new IllegalArgumentException(
@@ -124,7 +131,9 @@ public class SelectSpecVisitor implements SelectItemVisitor {
                 String fromObject = relatedFrom.getChildSObject();
                 select.setFromItem(new Table(fromObject));
 
-                SoqlQueryAnalyzer subQueryAnalyzer = new SoqlQueryAnalyzer(new QueryAnalyzer(select.toString(), null, partnerService));
+                SoqlQueryAnalyzer subQueryAnalyzer = new SoqlQueryAnalyzer(new QueryAnalyzer(select.toString(),
+                    null,
+                    partnerService));
                 fieldDefinitions.addAll(subQueryAnalyzer.getFieldDefinitions());
             }
         } catch (JSQLParserException e) {
