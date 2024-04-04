@@ -3,6 +3,7 @@ package com.ascendix.jdbc.salesforce.delegates;
 import com.ascendix.jdbc.salesforce.metadata.Column;
 import com.ascendix.jdbc.salesforce.metadata.Table;
 import com.ascendix.jdbc.salesforce.statement.FieldDef;
+import com.ascendix.jdbc.salesforce.utils.FieldDefTree;
 import com.ascendix.jdbc.salesforce.utils.IteratorUtils;
 import com.sforce.soap.partner.DeleteResult;
 import com.sforce.soap.partner.DescribeGlobalResult;
@@ -188,7 +189,7 @@ public class PartnerService {
         return removeServiceInfo(rows, null, rootEntityName == null ? null : (String) rootEntityName);
     }
 
-    public List<List> query(String soql, List<FieldDef> expectedSchema) throws ConnectionException {
+    public List<List> query(String soql, FieldDefTree expectedSchema) throws ConnectionException {
         log.trace("[PartnerService] query {}", soql);
         List<List> resultRows = Collections.synchronizedList(new LinkedList<>());
         QueryResult queryResult = null;
@@ -203,7 +204,7 @@ public class PartnerService {
         return PartnerResultToCartesianTable.expand(resultRows, expectedSchema);
     }
 
-    public Map.Entry<List<List>, String> queryStart(String soql, List<FieldDef> expectedSchema)
+    public Map.Entry<List<List>, String> queryStart(String soql, FieldDefTree expectedSchema)
         throws ConnectionException {
         log.trace("[PartnerService] queryStart {}", soql);
         QueryResult queryResult = partnerConnection.query(soql);
@@ -214,7 +215,7 @@ public class PartnerService {
         );
     }
 
-    public Map.Entry<List<List>, String> queryMore(String queryLocator, List<FieldDef> expectedSchema)
+    public Map.Entry<List<List>, String> queryMore(String queryLocator, FieldDefTree expectedSchema)
         throws ConnectionException {
         log.trace("[PartnerService] queryMore {}", queryLocator);
         QueryResult queryResult = partnerConnection.queryMore(queryLocator);
