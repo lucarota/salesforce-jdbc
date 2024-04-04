@@ -45,13 +45,13 @@ public class SoqlQueryAnalyzerTest {
     }
 
     private List<String> listFlatFieldNames(SoqlQueryAnalyzer analyzer) {
-        return analyzer.getFieldDefinitions().stream()
+        return analyzer.getFieldDefinitions().flatten().stream()
             .map(FieldDef::getName)
             .collect(Collectors.toList());
     }
 
     private List<String> listFlatFieldAliases(SoqlQueryAnalyzer analyzer) {
-        return analyzer.getFieldDefinitions().stream()
+        return analyzer.getFieldDefinitions().flatten().stream()
             .map(FieldDef::getAlias)
             .collect(Collectors.toList());
     }
@@ -132,7 +132,7 @@ public class SoqlQueryAnalyzerTest {
         final QueryAnalyzer queryAnalyzer = new QueryAnalyzer(soql, null, partnerService);
         SoqlQueryAnalyzer analyzer = new SoqlQueryAnalyzer(queryAnalyzer);
 
-        List<FieldDef> actual = analyzer.getFieldDefinitions();
+        List<FieldDef> actual = analyzer.getFieldDefinitions().flatten();
         assertEquals(2, actual.size());
         assertEquals("Id", actual.get(0).getName());
         assertEquals("id", actual.get(0).getType());
@@ -149,7 +149,7 @@ public class SoqlQueryAnalyzerTest {
         final QueryAnalyzer queryAnalyzer = new QueryAnalyzer(soql, null, partnerService);
         SoqlQueryAnalyzer analyzer = new SoqlQueryAnalyzer(queryAnalyzer);
 
-        List<FieldDef> actual = analyzer.getFieldDefinitions();
+        List<FieldDef> actual = analyzer.getFieldDefinitions().flatten();
         assertEquals(1, actual.size());
         assertEquals("Name", actual.get(0).getName());
         assertEquals("string", actual.get(0).getType());
@@ -161,7 +161,7 @@ public class SoqlQueryAnalyzerTest {
         final QueryAnalyzer queryAnalyzer = new QueryAnalyzer(soql, null, partnerService);
         SoqlQueryAnalyzer analyzer = new SoqlQueryAnalyzer(queryAnalyzer);
 
-        List<FieldDef> actual = analyzer.getFieldDefinitions();
+        List<FieldDef> actual = analyzer.getFieldDefinitions().flatten();
         assertEquals(1, actual.size());
         assertEquals("MIN", actual.get(0).getAlias());
         assertEquals("string", actual.get(0).getType());
@@ -173,7 +173,7 @@ public class SoqlQueryAnalyzerTest {
         final QueryAnalyzer queryAnalyzer = new QueryAnalyzer(soql, null, partnerService);
         SoqlQueryAnalyzer analyzer = new SoqlQueryAnalyzer(queryAnalyzer);
 
-        List<FieldDef> actual = analyzer.getFieldDefinitions();
+        List<FieldDef> actual = analyzer.getFieldDefinitions().flatten();
         assertEquals(1, actual.size());
         assertEquals("Count", actual.get(0).getName());
         assertEquals("int", actual.get(0).getType());
@@ -185,7 +185,7 @@ public class SoqlQueryAnalyzerTest {
         final QueryAnalyzer queryAnalyzer = new QueryAnalyzer(soql, null, partnerService);
         SoqlQueryAnalyzer analyzer = new SoqlQueryAnalyzer(queryAnalyzer);
 
-        List<FieldDef> actual = analyzer.getFieldDefinitions();
+        List<FieldDef> actual = analyzer.getFieldDefinitions().flatten();
         assertEquals(1, actual.size());
         assertEquals("Id", actual.get(0).getName());
         assertEquals("id", actual.get(0).getType());
@@ -197,7 +197,7 @@ public class SoqlQueryAnalyzerTest {
         final QueryAnalyzer queryAnalyzer = new QueryAnalyzer(soql, null, partnerService);
         SoqlQueryAnalyzer analyzer = new SoqlQueryAnalyzer(queryAnalyzer);
 
-        List<FieldDef> actual = analyzer.getFieldDefinitions();
+        List<FieldDef> actual = analyzer.getFieldDefinitions().flatten();
 
         assertEquals(1, actual.size());
         assertEquals("nameCount", actual.get(0).getName());
@@ -232,7 +232,7 @@ public class SoqlQueryAnalyzerTest {
         final QueryAnalyzer queryAnalyzer = new QueryAnalyzer(soql, null, partnerService);
         SoqlQueryAnalyzer analyzer = new SoqlQueryAnalyzer(queryAnalyzer);
 
-        List<FieldDef> actual = analyzer.getFieldDefinitions();
+        List<FieldDef> actual = analyzer.getFieldDefinitions().flatten();
 
         assertEquals(4, actual.size());
         FieldDef fieldDef = actual.get(0);
@@ -258,7 +258,7 @@ public class SoqlQueryAnalyzerTest {
         final QueryAnalyzer queryAnalyzer = new QueryAnalyzer(soql, null, partnerService);
         SoqlQueryAnalyzer analyzer = new SoqlQueryAnalyzer(queryAnalyzer);
 
-        List<FieldDef> actual = analyzer.getFieldDefinitions();
+        List<FieldDef> actual = analyzer.getFieldDefinitions().flatten();
 
         assertEquals(66, actual.size());
         FieldDef fieldDef = actual.get(0);
@@ -272,7 +272,7 @@ public class SoqlQueryAnalyzerTest {
         final QueryAnalyzer queryAnalyzer = new QueryAnalyzer(soql, null, partnerService);
         SoqlQueryAnalyzer analyzer = new SoqlQueryAnalyzer(queryAnalyzer);
 
-        List<FieldDef> actual = analyzer.getFieldDefinitions();
+        List<FieldDef> actual = analyzer.getFieldDefinitions().flatten();
         assertEquals(1, actual.size());
     }
 }

@@ -4,6 +4,8 @@ import com.ascendix.jdbc.salesforce.statement.FieldDef;
 import com.ascendix.jdbc.salesforce.statement.processor.utils.SelectSpecVisitor;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.ascendix.jdbc.salesforce.utils.FieldDefTree;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.jsqlparser.statement.select.PlainSelect;
 
@@ -11,7 +13,7 @@ import net.sf.jsqlparser.statement.select.PlainSelect;
 public class SoqlQueryAnalyzer {
 
     private final QueryAnalyzer queryAnalyzer;
-    private List<FieldDef> fieldDefinitions;
+    private FieldDefTree fieldDefinitions;
 
     public SoqlQueryAnalyzer(QueryAnalyzer queryAnalyzer) {
         this.queryAnalyzer = queryAnalyzer;
@@ -21,9 +23,9 @@ public class SoqlQueryAnalyzer {
         return queryAnalyzer.getQueryData().toString();
     }
 
-    public List<FieldDef> getFieldDefinitions() {
+    public FieldDefTree getFieldDefinitions() {
         if (fieldDefinitions == null) {
-            fieldDefinitions = new ArrayList<>();
+            fieldDefinitions = new FieldDefTree();
             String rootEntityName = queryAnalyzer.getFromObjectName();
             SelectSpecVisitor visitor = new SelectSpecVisitor(rootEntityName, fieldDefinitions, queryAnalyzer.getPartnerService());
             PlainSelect query = (PlainSelect) queryAnalyzer.getQueryData();

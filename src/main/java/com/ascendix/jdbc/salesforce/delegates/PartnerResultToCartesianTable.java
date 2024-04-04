@@ -1,5 +1,7 @@
 package com.ascendix.jdbc.salesforce.delegates;
 
+import com.ascendix.jdbc.salesforce.utils.FieldDefTree;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -9,13 +11,13 @@ import java.util.stream.Collectors;
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class PartnerResultToCartesianTable {
 
-    private final List<Object> schema;
+    private final FieldDefTree schema;
 
-    private PartnerResultToCartesianTable(List schema) {
+    private PartnerResultToCartesianTable(FieldDefTree schema) {
         this.schema = schema;
     }
 
-    public static List<List> expand(List<List> list, List schema) {
+    public static List<List> expand(List<List> list, FieldDefTree schema) {
         PartnerResultToCartesianTable expander = new PartnerResultToCartesianTable(schema);
         return expander.expandOn(list, 0, 0);
     }
@@ -29,11 +31,11 @@ public class PartnerResultToCartesianTable {
 
     private List<List> expandRow(List row, int columnPosition, int schemaPosition) {
         List<List> result = new ArrayList<>();
-        if (schemaPosition > schema.size() - 1) {
+        if (schemaPosition > schema.getChildrenCount() - 1) {
             result.add(row);
             return result;
-        } else if (schema.get(schemaPosition) instanceof List) {
-            int nestedListSize = ((List) schema.get(schemaPosition)).size();
+        } else if (!schema.getChild(schemaPosition).isLeaf()) {
+            int nestedListSize = schema.getChild(schemaPosition).getChildrenCount();
             Object value = row.get(columnPosition);
             List nestedList = value instanceof List ? (List) value : Collections.emptyList();
             if (nestedList.isEmpty()) {

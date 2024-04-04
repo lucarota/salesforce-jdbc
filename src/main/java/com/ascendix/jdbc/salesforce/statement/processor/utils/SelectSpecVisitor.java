@@ -4,6 +4,7 @@ import com.ascendix.jdbc.salesforce.delegates.PartnerService;
 import com.ascendix.jdbc.salesforce.statement.FieldDef;
 import com.ascendix.jdbc.salesforce.statement.processor.QueryAnalyzer;
 import com.ascendix.jdbc.salesforce.statement.processor.SoqlQueryAnalyzer;
+import com.ascendix.jdbc.salesforce.utils.FieldDefTree;
 import com.sforce.soap.partner.ChildRelationship;
 import com.sforce.soap.partner.DescribeSObjectResult;
 import com.sforce.soap.partner.Field;
@@ -27,10 +28,10 @@ import org.apache.commons.lang3.StringUtils;
 public class SelectSpecVisitor implements SelectItemVisitor {
 
     private final String rootEntityName;
-    private final List<FieldDef> fieldDefinitions;
+    private final FieldDefTree fieldDefinitions;
     private final PartnerService partnerService;
 
-    public SelectSpecVisitor(String rootEntityName, List<FieldDef> fieldDefinitions,
+    public SelectSpecVisitor(String rootEntityName, FieldDefTree fieldDefinitions,
         final PartnerService partnerService) {
         this.rootEntityName = rootEntityName;
         this.fieldDefinitions = fieldDefinitions;
@@ -55,7 +56,7 @@ public class SelectSpecVisitor implements SelectItemVisitor {
                 alias = objectPrefix + "." + name;
             }
             FieldDef result = createFieldDef(name, alias, prefixNames);
-            fieldDefinitions.add(result);
+            fieldDefinitions.addChild(result);
             /* Remove alias from query */
             fieldSpec.setAlias(null);
         } else if (fieldSpec.getExpression() instanceof net.sf.jsqlparser.expression.Function func) {
@@ -100,13 +101,13 @@ public class SelectSpecVisitor implements SelectItemVisitor {
 
     private void visitFunctionCallSpec(net.sf.jsqlparser.expression.Function functionCallSpec, String alias) {
         if (FUNCTIONS_HAS_INT_RESULT.contains(functionCallSpec.getName().toUpperCase())) {
-            fieldDefinitions.add(new FieldDef(alias, alias, "int"));
+            fieldDefinitions.addChild(new FieldDef(alias, alias, "int"));
         } else {
             Expression param = functionCallSpec.getParameters().get(0);
             String[] prefix = StringUtils.split(param.toString(), '.');
             List<String> prefixNames = List.of(ArrayUtils.remove(prefix, prefix.length - 1));
             FieldDef result = createFieldDef(param.toString(), alias, prefixNames);
-            fieldDefinitions.add(result);
+            fieldDefinitions.addChild(result);
         }
     }
 
@@ -134,7 +135,7 @@ public class SelectSpecVisitor implements SelectItemVisitor {
                 SoqlQueryAnalyzer subQueryAnalyzer = new SoqlQueryAnalyzer(new QueryAnalyzer(select.toString(),
                     null,
                     partnerService));
-                fieldDefinitions.addAll(subQueryAnalyzer.getFieldDefinitions());
+                fieldDefinitions.addTree(subQueryAnalyzer.getFieldDefinitions());
             }
         } catch (JSQLParserException e) {
             throw new RuntimeException(e);

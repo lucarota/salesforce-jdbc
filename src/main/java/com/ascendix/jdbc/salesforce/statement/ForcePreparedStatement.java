@@ -18,6 +18,7 @@ import com.ascendix.jdbc.salesforce.statement.processor.SoqlQueryAnalyzer;
 import com.ascendix.jdbc.salesforce.statement.processor.StatementTypeEnum;
 import com.ascendix.jdbc.salesforce.statement.processor.UpdateQueryAnalyzer;
 import com.ascendix.jdbc.salesforce.statement.processor.UpdateQueryProcessor;
+import com.ascendix.jdbc.salesforce.utils.FieldDefTree;
 import com.sforce.ws.ConnectionException;
 import java.io.InputStream;
 import java.io.Reader;
@@ -170,7 +171,7 @@ public class ForcePreparedStatement implements PreparedStatement, Iterator<List<
                 this.neverQueriedMore = true;
                 return new CachedResultSet(this, metaData);
             }
-            List<FieldDef> fieldDefs = getRootEntityFieldDefinitions();
+            FieldDefTree fieldDefs = getRootEntityFieldDefinitions();
             List<List> forceQueryResult = partnerService.query(prepareQuery(getSoqlQueryAnalyzer().getSoqlQuery()), fieldDefs);
             if (!forceQueryResult.isEmpty()) {
                 List<ColumnMap<String, Object>> maps = Collections.synchronizedList(new LinkedList<>());
@@ -318,8 +319,8 @@ public class ForcePreparedStatement implements PreparedStatement, Iterator<List<
     public List<Object> getParameters() {
         log.trace("[PrepStat] getParameters IMPLEMENTED {}", soqlQuery);
         int paramsCountInQuery = StringUtils.countMatches(soqlQuery, '?');
-        log.info("[PrepStat] getParameters   detected {} parameters", paramsCountInQuery);
-        log.info("[PrepStat] getParameters   parameters provided {}", parameters.size());
+        log.info("[PrepStat] getParameters - detected {} parameters", paramsCountInQuery);
+        log.info("[PrepStat] getParameters - provided {} parameters", parameters.size());
         if (parameters.size() < paramsCountInQuery) {
             parameters.addAll(Collections.nCopies(paramsCountInQuery - parameters.size(), null));
         }
@@ -434,7 +435,8 @@ public class ForcePreparedStatement implements PreparedStatement, Iterator<List<
             if (metadata == null) {
                 RowSetMetaDataImpl result = new RowSetMetaDataImpl();
                 SoqlQueryAnalyzer analyzer = getSoqlQueryAnalyzer();
-                List<FieldDef> resultFieldDefinitions = getRootEntityFieldDefinitions();
+                FieldDefTree rootFieldDefinitions = getRootEntityFieldDefinitions();
+                List<FieldDef> resultFieldDefinitions = rootFieldDefinitions.flatten();
                 int columnsCount = resultFieldDefinitions.size();
                 result.setColumnCount(columnsCount);
                 for (int i = 1; i <= columnsCount; i++) {
@@ -469,16 +471,16 @@ public class ForcePreparedStatement implements PreparedStatement, Iterator<List<
             ).toList();
     }
 
-    private List<FieldDef> fieldDefinitions;
+    private FieldDefTree fieldDefinitions;
 
-    private List<FieldDef> getRootEntityFieldDefinitions() {
+    private FieldDefTree getRootEntityFieldDefinitions() {
         log.trace("[PrepStat] getFieldDefinitions IMPLEMENTED ");
         if (fieldDefinitions == null) {
             fieldDefinitions = getSoqlQueryAnalyzer().getFieldDefinitions();
-            log.info("[PrepStat] getFieldDefinitions:\n  {}",
+            /*log.info("[PrepStat] getFieldDefinitions:\n  {}",
                 fieldDefinitions.stream()
                     .map(fd -> fd.getName() + ":" + fd.getType())
-                    .collect(Collectors.joining("\n  ")));
+                    .collect(Collectors.joining("\n  ")));*/
         }
         return fieldDefinitions;
     }
@@ -990,7 +992,7 @@ public class ForcePreparedStatement implements PreparedStatement, Iterator<List<
 
     @Override
     public void clearParameters() {
-        log.trace("[PrepStat] clearParameters 2 NOT_IMPLEMENTED");
+        parameters.clear();
     }
 
     @Override
