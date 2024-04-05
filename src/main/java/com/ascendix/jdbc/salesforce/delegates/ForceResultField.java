@@ -8,7 +8,6 @@ import lombok.Setter;
 import lombok.ToString;
 
 @Getter
-@ToString
 @EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
@@ -24,5 +23,10 @@ public class ForceResultField {
 
     public String getFullName() {
         return entityType != null ? entityType + "." + name : name;
+    }
+
+    @Override
+    public String toString() {
+        return getFullName() + " > " + name + '=' + value;
     }
 }

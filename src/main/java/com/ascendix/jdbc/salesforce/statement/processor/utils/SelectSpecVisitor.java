@@ -135,7 +135,7 @@ public class SelectSpecVisitor implements SelectItemVisitor {
                 SoqlQueryAnalyzer subQueryAnalyzer = new SoqlQueryAnalyzer(new QueryAnalyzer(select.toString(),
                     null,
                     partnerService));
-                fieldDefinitions.addTree(subQueryAnalyzer.getFieldDefinitions());
+                fieldDefinitions.addTreeNode(subQueryAnalyzer.getFieldDefinitions());
             }
         } catch (JSQLParserException e) {
             throw new RuntimeException(e);

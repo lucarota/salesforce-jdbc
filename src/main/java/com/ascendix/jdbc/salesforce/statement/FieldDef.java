@@ -2,8 +2,10 @@ package com.ascendix.jdbc.salesforce.statement;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.ToString;
 
 @Getter
+@ToString
 @EqualsAndHashCode
 public class FieldDef {
 
