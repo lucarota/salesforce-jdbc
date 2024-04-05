@@ -1,8 +1,8 @@
 package com.ascendix.jdbc.salesforce.delegates;
 
 import com.ascendix.jdbc.salesforce.statement.FieldDef;
-import com.ascendix.jdbc.salesforce.utils.FieldDefTree;
 import com.ascendix.jdbc.salesforce.utils.TreeNode;
+import org.apache.commons.collections.EnumerationUtils;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -16,173 +16,266 @@ public class PartnerResultToCartesianTableTest {
 
     @Test
     public void testExpandSimple() {
-        FieldDefTree schema = new FieldDefTree();
-        schema.addChild(new FieldDef("name", "", "string"));
-        schema.addChild(new FieldDef("name", "", "string"));
-        schema.addChild(new FieldDef("name", "", "string"));
-        schema.addChild(new FieldDef("name", "", "string"));
+        TreeNode<Object> schema = new TreeNode<>();
+        schema.addChild(new Object());
+        schema.addChild(new Object());
+        schema.addChild(new Object());
+        schema.addChild(new Object());
 
-        List<List> expected = Arrays.asList(
-            Arrays.asList(1, 2, 3, 4)
-        );
+        List<List<Integer>> expected = List.of(Arrays.asList(1, 2, 3, 4));
 
-        List<List> actual = PartnerResultToCartesianTable.expand(expected, schema);
+        TreeNode<Integer> row = new TreeNode<>();
+        row.addChild(1);
+        row.addChild(2);
+        row.addChild(3);
+        row.addChild(4);
+
+        List<TreeNode<Integer>> rows = new ArrayList<>();
+        rows.add(row);
+
+        PartnerResultToCartesianTable<Object, Integer> p = new PartnerResultToCartesianTable<>(schema);
+        List<List<Integer>> actual = p.expandOn(rows);
 
         assertEquals(expected, actual);
     }
 
     @Test
     public void testExpandWhenNothingToExpand() {
-        FieldDefTree schema = new FieldDefTree();
-        schema.addChild(new FieldDef("name", "", "string"));
-        schema.addChild(new FieldDef("name", "", "string"));
-        schema.addChild(new FieldDef("name", "", "string"));
-        schema.addChild(new FieldDef("name", "", "string"));
+        TreeNode<Object> schema = new TreeNode<>();
+        schema.addChild(new Object());
+        schema.addChild(new Object());
+        schema.addChild(new Object());
+        schema.addChild(new Object());
 
-        List<List> expected = Arrays.asList(
-            Arrays.asList(1, 2, 3, 4),
-            Arrays.asList("1", "2", "3", "4"),
-            Arrays.asList("11", "12", "13", "14"),
-            Arrays.asList("21", "22", "23", "24")
-        );
+        List<List<String>> expected = Arrays.asList(Arrays.asList("11", "12", "13", "14"),
+                Arrays.asList("21", "22", "23", "24"), Arrays.asList("31", "32", "33", "34"));
 
-        List<List> actual = PartnerResultToCartesianTable.expand(expected, schema);
+        TreeNode<String> row1 = new TreeNode<>();
+        row1.addChild("11");
+        row1.addChild("12");
+        row1.addChild("13");
+        row1.addChild("14");
+
+        TreeNode<String> row2 = new TreeNode<>();
+        row2.addChild("21");
+        row2.addChild("22");
+        row2.addChild("23");
+        row2.addChild("24");
+
+        TreeNode<String> row3 = new TreeNode<>();
+        row3.addChild("31");
+        row3.addChild("32");
+        row3.addChild("33");
+        row3.addChild("34");
+
+        List<TreeNode<String>> rows = new ArrayList<>();
+        rows.add(row1);
+        rows.add(row2);
+        rows.add(row3);
+
+        PartnerResultToCartesianTable<Object, String> p = new PartnerResultToCartesianTable<>(schema);
+        List<List<String>> actual = p.expandOn(rows);
 
         assertEquals(expected, actual);
     }
 
     @Test
     public void testExpandWhenOneNestedList() {
-        FieldDefTree schema = new FieldDefTree();
-        schema.addChild(new FieldDef("name", "", "string"));
-        schema.addChild(null)
-                .addChild(new FieldDef("name", "", "string"))
-                .addChild(new FieldDef("name", "", "string"))
-                .addChild(new FieldDef("name", "", "string"));
-        schema.addChild(new FieldDef("name", "", "string"));
-        schema.addChild(new FieldDef("name", "", "string"));
+        TreeNode<Object> schema = new TreeNode<>();
+        schema.addChild(new Object());
+        schema.addChild(null).addChild(new Object()).addChild(new Object()).addChild(new Object());
+        schema.addChild(new Object());
+        schema.addChild(new Object());
 
-        List<List> list = List.of(
-            Arrays.asList("1", Arrays.asList("21", "22", "23"), "3", "4")
-        );
+        TreeNode<String> row = new TreeNode<>();
+        row.addChild("1");
+        TreeNode<String> node = new TreeNode<>();
+        node.addChild("21");
+        node.addChild("22");
+        node.addChild("23");
+        row.addTreeNode(node);
+        row.addChild("3");
+        row.addChild("4");
+        List<TreeNode<String>> rows = new ArrayList<>();
+        rows.add(row);
 
-        List<List> expected = Arrays.asList(
-            Arrays.asList("1", "21", "3", "4"),
-            Arrays.asList("1", "22", "3", "4"),
-            Arrays.asList("1", "23", "3", "4")
-        );
+        PartnerResultToCartesianTable<Object, String> p = new PartnerResultToCartesianTable<>(schema);
+        List<List<String>> actual = p.expandOn(rows);
 
-        List<List> actual = PartnerResultToCartesianTable.expand(list, schema);
-
+        List<List<String>> expected = Arrays.asList(Arrays.asList("1", "21", "3", "4"),
+                Arrays.asList("1", "22", "3", "4"), Arrays.asList("1", "23", "3", "4"));
         assertEquals(expected, actual);
     }
 
     @Test
     public void testExpandWhenTwoNestedListAndOneRow() {
-        FieldDefTree schema = new FieldDefTree();
-        schema.addChild(new FieldDef("name", "", "string"));
-        TreeNode<FieldDef> node2 = schema.addChild(null);
-        node2.addChild(new FieldDef("name", "", "string"));
-        node2.addChild(new FieldDef("name", "", "string"));
-        schema.addChild(new FieldDef("name", "", "string"));
-        TreeNode<FieldDef> node4 = schema.addChild(null);
-        node4.addChild(new FieldDef("name", "", "string"));
-        node4.addChild(new FieldDef("name", "", "string"));
+        TreeNode<Object> schema = new TreeNode<>();
+        schema.addChild(new Object());
+        TreeNode<Object> node2 = schema.addChild(null);
+        node2.addChild(new Object());
+        node2.addChild(new Object());
+        schema.addChild(new Object());
+        TreeNode<Object> node4 = schema.addChild(null);
+        node4.addChild(new Object());
+        node4.addChild(new Object());
 
-        List<List> list = List.of(
-            Arrays.asList(11,
-                Arrays.asList(Arrays.asList(1, 2), Arrays.asList(3, 4)),
-                12,
-                Arrays.asList(Arrays.asList(5, 6), Arrays.asList(7, 8)))
-        );
+        TreeNode<Integer> subrow11 = new TreeNode<>();
+        subrow11.addChild(1);
+        subrow11.addChild(2);
 
-        List<List> expected = Arrays.asList(
-            Arrays.asList(11, 1, 2, 12, 5, 6),
-            Arrays.asList(11, 3, 4, 12, 5, 6),
-            Arrays.asList(11, 1, 2, 12, 7, 8),
-            Arrays.asList(11, 3, 4, 12, 7, 8)
-        );
+        TreeNode<Integer> subrow12 = new TreeNode<>();
+        subrow12.addChild(3);
+        subrow12.addChild(4);
 
-        List<List> actual = PartnerResultToCartesianTable.expand(list, schema);
+        TreeNode<Integer> subrow1 = new TreeNode<>();
+        subrow1.addTreeNode(subrow11);
+        subrow1.addTreeNode(subrow12);
+
+        TreeNode<Integer> subrow21 = new TreeNode<>();
+        subrow21.addChild(5);
+        subrow21.addChild(6);
+
+        TreeNode<Integer> subrow22 = new TreeNode<>();
+        subrow22.addChild(7);
+        subrow22.addChild(8);
+
+        TreeNode<Integer> subrow2 = new TreeNode<>();
+        subrow2.addTreeNode(subrow21);
+        subrow2.addTreeNode(subrow22);
+
+        TreeNode<Integer> row = new TreeNode<>();
+        row.addChild(11);
+        row.addTreeNode(subrow1);
+        row.addChild(12);
+        row.addTreeNode(subrow2);
+
+        List<TreeNode<Integer>> rows = new ArrayList<>();
+        rows.add(row);
+
+        List<List<Integer>> expected = Arrays.asList(Arrays.asList(11, 1, 2, 12, 5, 6),
+                Arrays.asList(11, 3, 4, 12, 5, 6), Arrays.asList(11, 1, 2, 12, 7, 8),
+                Arrays.asList(11, 3, 4, 12, 7, 8));
+
+        PartnerResultToCartesianTable<Object, Integer> p = new PartnerResultToCartesianTable<>(schema);
+        List<List<Integer>> actual = p.expandOn(rows);
 
         assertEquals(expected.size(), actual.size());
-        for (List l : expected) {
+        for (List<Integer> l : expected) {
             assertTrue(actual.contains(l));
         }
     }
 
     @Test
     public void testExpandWhenOneNestedListAndTwoRows() {
-        FieldDefTree schema = new FieldDefTree();
-        schema.addChild(new FieldDef("name", "", "string"));
-        TreeNode<FieldDef> node = schema.addChild(null);
-        node.addChild(new FieldDef("name", "", "string"));
-        node.addChild(new FieldDef("name", "", "string"));
-        schema.addChild(new FieldDef("name", "", "string"));
-        schema.addChild(new FieldDef("name", "", "string"));
+        TreeNode<Object> schema = new TreeNode<>();
+        schema.addChild(new Object());
+        TreeNode<Object> node = schema.addChild(null);
+        node.addChild(new Object());
+        node.addChild(new Object());
+        schema.addChild(new Object());
+        schema.addChild(new Object());
 
-        List<List> list = Arrays.asList(
-            Arrays.asList(11, Arrays.asList(Arrays.asList(1, 2), Arrays.asList(3, 4)), 12, 13),
-            Arrays.asList(20,
-                Arrays.asList(Arrays.asList(21, 22), Arrays.asList(23, 24), Arrays.asList(25, 26)),
-                41,
-                42)
-        );
+        TreeNode<Integer> subrow11 = new TreeNode<>();
+        subrow11.addChild(1);
+        subrow11.addChild(2);
 
-        List<List> expected = Arrays.asList(
-            Arrays.asList(11, 1, 2, 12, 13),
-            Arrays.asList(11, 3, 4, 12, 13),
-            Arrays.asList(20, 21, 22, 41, 42),
-            Arrays.asList(20, 23, 24, 41, 42),
-            Arrays.asList(20, 25, 26, 41, 42)
-        );
+        TreeNode<Integer> subrow12 = new TreeNode<>();
+        subrow12.addChild(3);
+        subrow12.addChild(4);
 
-        List<List> actual = PartnerResultToCartesianTable.expand(list, schema);
+        TreeNode<Integer> subrow1 = new TreeNode<>();
+        subrow1.addTreeNode(subrow11);
+        subrow1.addTreeNode(subrow12);
 
+        TreeNode<Integer> row1 = new TreeNode<>();
+        row1.addChild(11);
+        row1.addTreeNode(subrow1);
+        row1.addChild(12);
+        row1.addChild(13);
+
+        TreeNode<Integer> subrow21 = new TreeNode<>();
+        subrow21.addChild(21);
+        subrow21.addChild(22);
+
+        TreeNode<Integer> subrow22 = new TreeNode<>();
+        subrow22.addChild(23);
+        subrow22.addChild(24);
+
+        TreeNode<Integer> subrow23 = new TreeNode<>();
+        subrow23.addChild(25);
+        subrow23.addChild(26);
+
+        TreeNode<Integer> subrow2 = new TreeNode<>();
+        subrow2.addTreeNode(subrow21);
+        subrow2.addTreeNode(subrow22);
+        subrow2.addTreeNode(subrow23);
+
+        TreeNode<Integer> row2 = new TreeNode<>();
+        row2.addChild(20);
+        row2.addTreeNode(subrow2);
+        row2.addChild(41);
+        row2.addChild(42);
+
+        List<TreeNode<Integer>> rows = new ArrayList<>();
+        rows.add(row1);
+        rows.add(row2);
+        row1.printTree();
+        row2.printTree();
+        PartnerResultToCartesianTable<Object, Integer> p = new PartnerResultToCartesianTable<>(schema);
+        List<List<Integer>> actual = p.expandOn(rows);
+
+        List<List<Integer>> expected = Arrays.asList(Arrays.asList(11, 1, 2, 12, 13), Arrays.asList(11, 3, 4, 12, 13),
+                Arrays.asList(20, 21, 22, 41, 42), Arrays.asList(20, 23, 24, 41, 42),
+                Arrays.asList(20, 25, 26, 41, 42));
         assertEquals(expected, actual);
     }
 
     @Test
     public void testExpandWhenOneNestedListIsEmpty() {
-        FieldDefTree schema = new FieldDefTree();
-        schema.addChild(new FieldDef("name", "", "string"));
-        TreeNode<FieldDef> node = schema.addChild(null);
-        node.addChild(new FieldDef("name", "", "string"));
-        node.addChild(new FieldDef("name", "", "string"));
-        schema.addChild(new FieldDef("name", "", "string"));
-        schema.addChild(new FieldDef("name", "", "string"));
+        TreeNode<Object> schema = new TreeNode<>();
+        schema.addChild(new Object());
+        TreeNode<Object> node = schema.addChild(null);
+        node.addChild(new Object());
+        node.addChild(new Object());
+        schema.addChild(new Object());
+        schema.addChild(new Object());
 
-        List<List> list = List.of(
-            Arrays.asList(11, new ArrayList<>(), 12, 13)
-        );
+        TreeNode<Integer> row = new TreeNode<>();
+        row.addChild(11);
+        row.addTreeNode(new TreeNode<>());
+        row.addChild(12);
+        row.addChild(13);
 
-        List<List> expected = List.of(
-            Arrays.asList(11, null, null, 12, 13)
-        );
+        List<TreeNode<Integer>> rows = new ArrayList<>();
+        rows.add(row);
 
-        List<List> actual = PartnerResultToCartesianTable.expand(list, schema);
+        PartnerResultToCartesianTable<Object, Integer> p = new PartnerResultToCartesianTable<>(schema);
+        List<List<Integer>> actual = p.expandOn(rows);
 
+        List<List<Integer>> expected = List.of(Arrays.asList(11, null, null, 12, 13));
         assertEquals(expected, actual);
     }
 
     @Test
     public void testExpandWhenNestedListIsEmpty() {
-        FieldDefTree schema = new FieldDefTree();
-        schema.addChild(new FieldDef("name", "", "string"));
-        TreeNode<FieldDef> node = schema.addChild(null);
-        node.addChild(new FieldDef("name", "", "string"));
-        node.addChild(new FieldDef("name", "", "string"));
+        TreeNode<Object> schema = new TreeNode<>();
+        schema.addChild(new Object());
+        TreeNode<Object> node = schema.addChild(null);
+        node.addChild(new Object());
+        node.addChild(new Object());
 
-        List<List> list = List.of(
-            Arrays.asList(11, new Object())
-        );
+        TreeNode<Integer> row = new TreeNode<>();
+        row.addChild(11);
+        row.addTreeNode(new TreeNode<>());
 
-        List<List> expected = List.of(
-            Arrays.asList(11, null, null)
-        );
+        List<TreeNode<Integer>> rows = new ArrayList<>();
+        rows.add(row);
 
-        List<List> actual = PartnerResultToCartesianTable.expand(list, schema);
+        PartnerResultToCartesianTable<Object, Integer> p = new PartnerResultToCartesianTable<>(schema);
+        List<List<Integer>> actual = p.expandOn(rows);
 
+        List<List<Integer>> expected = List.of(Arrays.asList(11, null, null));
         assertEquals(expected, actual);
     }
+
 }

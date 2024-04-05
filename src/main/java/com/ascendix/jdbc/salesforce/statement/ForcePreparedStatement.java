@@ -172,7 +172,7 @@ public class ForcePreparedStatement implements PreparedStatement, Iterator<List<
                 return new CachedResultSet(this, metaData);
             }
             FieldDefTree fieldDefs = getRootEntityFieldDefinitions();
-            List<List> forceQueryResult = partnerService.query(prepareQuery(getSoqlQueryAnalyzer().getSoqlQuery()), fieldDefs);
+            List<List<ForceResultField>> forceQueryResult = partnerService.query(prepareQuery(getSoqlQueryAnalyzer().getSoqlQuery()), fieldDefs);
             if (!forceQueryResult.isEmpty()) {
                 List<ColumnMap<String, Object>> maps = Collections.synchronizedList(new LinkedList<>());
                 forceQueryResult.forEach(rec -> maps.add(convertToColumnMap(rec)));
@@ -198,7 +198,7 @@ public class ForcePreparedStatement implements PreparedStatement, Iterator<List<
     @SuppressWarnings({"rawtypes", "unchecked"})
     public List<ColumnMap<String, Object>> next() {
         try {
-            Map.Entry<List<List>, String> resultEntry;
+            Map.Entry<List<List<ForceResultField>>, String> resultEntry;
             if (this.neverQueriedMore) {
                 this.neverQueriedMore = false;
                 resultEntry = partnerService.queryStart(prepareQuery(getSoqlQueryAnalyzer().getSoqlQuery()),

@@ -2,9 +2,9 @@ package com.ascendix.jdbc.salesforce.delegates;
 
 import com.ascendix.jdbc.salesforce.metadata.Column;
 import com.ascendix.jdbc.salesforce.metadata.Table;
-import com.ascendix.jdbc.salesforce.statement.FieldDef;
 import com.ascendix.jdbc.salesforce.utils.FieldDefTree;
 import com.ascendix.jdbc.salesforce.utils.IteratorUtils;
+import com.ascendix.jdbc.salesforce.utils.TreeNode;
 import com.sforce.soap.partner.DeleteResult;
 import com.sforce.soap.partner.DescribeGlobalResult;
 import com.sforce.soap.partner.DescribeGlobalSObjectResult;
@@ -16,14 +16,8 @@ import com.sforce.soap.partner.SaveResult;
 import com.sforce.soap.partner.sobject.SObject;
 import com.sforce.ws.ConnectionException;
 import com.sforce.ws.bind.XmlObject;
-import java.util.AbstractMap;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+
+import java.util.*;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.function.Function;
 import java.util.regex.Pattern;
@@ -178,7 +172,7 @@ public class PartnerService {
         return result;
     }
 
-    private List<List> extractQueryResultData(QueryResult qr) {
+    private List<TreeNode<ForceResultField>> extractQueryResultData(QueryResult qr) {
         List<XmlObject> rows = Arrays.asList(qr.getRecords());
         // extract the root entity name
         Object rootEntityName = rows.stream()
@@ -189,9 +183,9 @@ public class PartnerService {
         return removeServiceInfo(rows, null, rootEntityName == null ? null : (String) rootEntityName);
     }
 
-    public List<List> query(String soql, FieldDefTree expectedSchema) throws ConnectionException {
+    public List<List<ForceResultField>> query(String soql, FieldDefTree expectedSchema) throws ConnectionException {
         log.trace("[PartnerService] query {}", soql);
-        List<List> resultRows = Collections.synchronizedList(new LinkedList<>());
+        List<TreeNode<ForceResultField>> resultRows = Collections.synchronizedList(new LinkedList<>());
         QueryResult queryResult = null;
         do {
             queryResult = queryResult == null ? partnerConnection.query(soql)
@@ -201,66 +195,74 @@ public class PartnerService {
             resultRows.addAll(extractQueryResultData(queryResult));
         } while (!queryResult.isDone());
 
-        return PartnerResultToCartesianTable.expand(resultRows, expectedSchema);
+        return FieldDefTree.expand(resultRows, expectedSchema);
     }
 
-    public Map.Entry<List<List>, String> queryStart(String soql, FieldDefTree expectedSchema)
+    public Map.Entry<List<List<ForceResultField>>, String> queryStart(String soql, FieldDefTree expectedSchema)
         throws ConnectionException {
         log.trace("[PartnerService] queryStart {}", soql);
         QueryResult queryResult = partnerConnection.query(soql);
         String queryLocator = queryResult.isDone() ? null : queryResult.getQueryLocator();
-        List<List> resultRows = extractQueryResultData(queryResult);
-        return new AbstractMap.SimpleEntry<>(PartnerResultToCartesianTable.expand(resultRows, expectedSchema),
+        List<TreeNode<ForceResultField>> resultRows = extractQueryResultData(queryResult);
+        return new AbstractMap.SimpleEntry<>(FieldDefTree.expand(resultRows, expectedSchema),
             queryLocator
         );
     }
 
-    public Map.Entry<List<List>, String> queryMore(String queryLocator, FieldDefTree expectedSchema)
+    public Map.Entry<List<List<ForceResultField>>, String> queryMore(String queryLocator, FieldDefTree expectedSchema)
         throws ConnectionException {
         log.trace("[PartnerService] queryMore {}", queryLocator);
         QueryResult queryResult = partnerConnection.queryMore(queryLocator);
         queryLocator = queryResult.isDone() ? null : queryResult.getQueryLocator();
-        List<List> resultRows = extractQueryResultData(queryResult);
-        return new AbstractMap.SimpleEntry<>(PartnerResultToCartesianTable.expand(resultRows, expectedSchema),
+        List<TreeNode<ForceResultField>> resultRows = extractQueryResultData(queryResult);
+        return new AbstractMap.SimpleEntry<>(FieldDefTree.expand(resultRows, expectedSchema),
             queryLocator
         );
     }
 
-    private List<List> removeServiceInfo(List<XmlObject> rows, String parentName, String rootEntityName) {
+    private List<TreeNode<ForceResultField>> removeServiceInfo(List<XmlObject> rows, String parentName, String rootEntityName) {
         return rows.stream()
             .filter(this::isDataObjectType)
             .map(row -> removeServiceInfo(row, parentName, rootEntityName))
             .collect(Collectors.toList());
     }
 
-    private List<ForceResultField> removeServiceInfo(XmlObject row, String parentName, String rootEntityName) {
-        return IteratorUtils.toList(row.getChildren()).stream()
-            .filter(this::isDataObjectType)
-            .skip(1) // Removes duplicate Id from SF Partner API response
-            // (https://developer.salesforce.com/forums/?id=906F00000008kciIAA)
-            .flatMap(field -> translateField(field, parentName, rootEntityName))
-            .toList();
+    private TreeNode<ForceResultField> removeServiceInfo(XmlObject row, String parentName, String rootEntityName) {
+        Iterator<XmlObject> children = row.getChildren();
+        TreeNode<ForceResultField> root = new TreeNode<>();
+        boolean skipFirst = true;
+        while (children.hasNext()) {
+            XmlObject field = children.next();
+            if (!isDataObjectType(field)) {
+                continue;
+            }
+            if (skipFirst) {
+                // Removes duplicate Id from SF Partner API response
+                // (https://developer.salesforce.com/forums/?id=906F00000008kciIAA)
+                skipFirst = false;
+                continue;
+            }
+            root.addTreeNode(translateField(field, parentName, rootEntityName));
+        }
+        return root;
     }
 
-    private Stream<ForceResultField> translateField(XmlObject field, String parentName, String rootEntityName) {
-        Stream.Builder outStream = Stream.builder();
-
+    private TreeNode<ForceResultField> translateField(XmlObject field, String parentName, String rootEntityName) {
         String fieldType = field.getXmlType() != null ? field.getXmlType().getLocalPart() : null;
         if ("sObject".equalsIgnoreCase(fieldType)) {
-            List<ForceResultField> childFields = removeServiceInfo(field,
+            TreeNode<ForceResultField> node = new TreeNode<>();
+            TreeNode<ForceResultField> childFields = removeServiceInfo(field,
                 field.getName().getLocalPart(),
                 rootEntityName);
-            childFields.forEach(outStream::add);
+            childFields.getChildren().forEach(node::addTreeNode);
+            return node;
+        } else if (isNestedResultset(field)) {
+            List<TreeNode<ForceResultField>> subNodes = removeServiceInfo(
+                    IteratorUtils.toList(field.getChildren()), field.getName().getLocalPart(), rootEntityName);
+            return new TreeNode<>(subNodes);
         } else {
-            if (isNestedResultset(field)) {
-                outStream.add(removeServiceInfo(IteratorUtils.toList(field.getChildren()),
-                    field.getName().getLocalPart(),
-                    rootEntityName));
-            } else {
-                outStream.add(toForceResultField(field, parentName, rootEntityName));
-            }
+            return new TreeNode<>(toForceResultField(field, parentName, rootEntityName));
         }
-        return outStream.build();
     }
 
     private ForceResultField toForceResultField(XmlObject field, String parentName, String rootEntityName) {
