@@ -195,7 +195,6 @@ public class ForcePreparedStatement implements PreparedStatement, Iterator<List<
     }
 
     @Override
-    @SuppressWarnings({"rawtypes", "unchecked"})
     public List<ColumnMap<String, Object>> next() {
         try {
             Map.Entry<List<List<ForceResultField>>, String> resultEntry;
@@ -209,7 +208,7 @@ public class ForcePreparedStatement implements PreparedStatement, Iterator<List<
                 return Collections.emptyList();
             }
             this.queryMoreLocator = resultEntry.getValue();
-            List result = Collections.synchronizedList(new LinkedList<>());
+            List<ColumnMap<String, Object>> result = Collections.synchronizedList(new LinkedList<>());
             Optional.ofNullable(resultEntry.getKey())
                 .orElseGet(Collections::emptyList)
                 .forEach(rec -> result.add(convertToColumnMap(rec)));
