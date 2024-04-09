@@ -1,4 +1,4 @@
-# sforce-jdbc
+# Salesforce JDBC Driver
 Salesforce JDBC driver allows Java programs to connect to a Salesforce data services using standard, database independent Java code. Is an open source JDBC driver written in Pure Java, 
 and communicates over SOAP/HTTP(S) protocol.
 The main purpose of the driver is to retrieve (only) data from Salesforce services for data analysis. Primary target platform for the driver usage is Eclipse BIRT engine.
@@ -186,7 +186,24 @@ Steps to update the partners.wsdl
 
 ## Version History
 
-### 1.5.0
+### 1.5.5
+
+#### Features
+
+* Updated jsqlparser to custom version for includes/excludes: Better control over parsing to streamline query execution.
+
+#### Fixes & Improvements
+
+* Fixed subquery relationship check: Ensured accurate relationship checks for subqueries, improving query accuracy.
+* Removed MapDB in favor of EHCache: Streamlined caching mechanism for better performance and reduced dependencies tree.
+
+#### Technical Updates
+
+* Upgraded to Java 17
+* Upgraded to junit 5: Enhancing testing capabilities for better code quality assurance.
+* Refactored query analyzer and processor: Streamlined query processing, optimized caching, and removed deprecated features for improved performance.
+* Added tree as query result: Now, queries return tree structures for enhanced data visualization and analysis.
+
 
 ### 1.4.4
 SOQL queries will try to expand the `SELECT * from Account` syntax for root query entity into up to 100 fields.
