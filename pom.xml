@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.ascendix.salesforce</groupId>
     <artifactId>salesforce-jdbc</artifactId>
-    <version>1.5.4-release</version>
+    <version>1.5.5-release</version>
     <packaging>jar</packaging>
     <scm>
         <connection>https://github.com/lucarota/salesforce-jdbc.git</connection>

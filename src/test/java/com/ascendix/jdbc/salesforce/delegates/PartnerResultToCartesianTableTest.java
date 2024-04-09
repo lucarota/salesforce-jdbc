@@ -1,17 +1,16 @@
 package com.ascendix.jdbc.salesforce.delegates;
 
-import com.ascendix.jdbc.salesforce.statement.FieldDef;
-import com.ascendix.jdbc.salesforce.utils.TreeNode;
-import org.apache.commons.collections.EnumerationUtils;
-import org.junit.jupiter.api.Test;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.ascendix.jdbc.salesforce.utils.TreeNode;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.Test;
+
+@Slf4j
 public class PartnerResultToCartesianTableTest {
 
     @Test
@@ -219,8 +218,8 @@ public class PartnerResultToCartesianTableTest {
         List<TreeNode<Integer>> rows = new ArrayList<>();
         rows.add(row1);
         rows.add(row2);
-        row1.printTree();
-        row2.printTree();
+        log.info(row1.toTree());
+        log.info(row2.toTree());
         PartnerResultToCartesianTable<Object, Integer> p = new PartnerResultToCartesianTable<>(schema);
         List<List<Integer>> actual = p.expandOn(rows);
 
