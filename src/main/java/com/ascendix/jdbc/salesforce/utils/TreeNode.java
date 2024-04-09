@@ -91,13 +91,13 @@ public class TreeNode<T> {
         return "Data: " + data + " Children: " + children.size();
     }
 
-    public void printTree() {
-        printAsciiTree(this, 0, false);
+    public String toTree() {
+        return toTree(this, 0, false);
     }
 
-    public void printAsciiTree(TreeNode<T> root, int level, boolean isLast) {
+    public String toTree(TreeNode<T> root, int level, boolean isLast) {
         if (root == null) {
-            return;
+            return "";
         }
 
         StringBuilder sb = new StringBuilder();
@@ -111,14 +111,13 @@ public class TreeNode<T> {
                 sb.append("├── ");
             }
         }
-        sb.append(root.data != null ? root.data : "<o>");
-        System.out.println(sb);
+        sb.append(root.data != null ? root.data : "<o>").append(System.lineSeparator());
 
         for (int i = 0; i < root.getChildrenCount(); i++) {
             TreeNode<T> child = root.getChild(i);
-            printAsciiTree(child, level + 1, i == root.getChildrenCount() - 1);
+            sb.append(toTree(child, level + 1, i == root.getChildrenCount() - 1));
         }
+        return sb.toString();
     }
-
 
 }

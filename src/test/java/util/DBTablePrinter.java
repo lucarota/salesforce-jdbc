@@ -466,9 +466,6 @@ public class DBTablePrinter {
             // column widths.
             int rowCount = 0;
             while (rs.next()) {
-
-                System.out.println("row: " + rowCount);
-
                 // NOTE: columnIndex for rs.getXXX methods STARTS AT 1 NOT 0
                 for (int i = 0; i < columnCount; i++) {
                     Column c = columns.get(i);
