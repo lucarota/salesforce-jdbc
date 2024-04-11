@@ -6,6 +6,24 @@
     <artifactId>salesforce-jdbc</artifactId>
     <version>1.5.5-release</version>
     <packaging>jar</packaging>
+
+    <name>Salesforce JDBC Driver</name>
+    <description>An Open Source JDBC Driver for Salesforce</description>
+    <url>https://lucarota.github.io/</url>
+    <developers>
+        <developer>
+            <name>Luca Rota</name>
+        </developer>
+    </developers>
+
+    <licenses>
+        <license>
+            <name>The MIT License (MIT)</name>
+            <url>https://opensource.org/license/MIT</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
     <scm>
         <connection>https://github.com/lucarota/salesforce-jdbc.git</connection>
         <developerConnection>https://github.com/lucarota/salesforce-jdbc.git</developerConnection>
