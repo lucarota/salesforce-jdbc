@@ -312,8 +312,7 @@ public class ForcePreparedStatement implements PreparedStatement, Iterator<List<
     public List<Object> getParameters() {
         log.trace("[PrepStat] getParameters IMPLEMENTED {}", soqlQuery);
         int paramsCountInQuery = StringUtils.countMatches(soqlQuery, '?');
-        log.info("[PrepStat] getParameters - detected {} parameters", paramsCountInQuery);
-        log.info("[PrepStat] getParameters - provided {} parameters", parameters.size());
+        log.debug("[PrepStat] getParameters - {}/{} parameters", paramsCountInQuery, parameters.size());
         if (parameters.size() < paramsCountInQuery) {
             parameters.addAll(Collections.nCopies(paramsCountInQuery - parameters.size(), null));
         }
