@@ -34,8 +34,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ForceDriver implements Driver {
 
-    public static final String SF_JDBC_DRIVER_NAME = "SF JDBC driver";
-
     private static final String ACCEPTABLE_URL = "jdbc:ascendix:salesforce";
     private static final Pattern URL_PATTERN = Pattern.compile("\\A" + ACCEPTABLE_URL + "://(.*)");
     private static final Pattern URL_HAS_AUTHORIZATION_SEGMENT = Pattern.compile(
@@ -46,6 +44,10 @@ public class ForceDriver implements Driver {
         "^(?<protocol>https?://)?(?<loginDomain>(?<host>(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5]))(:(?<port>[0-9]+))?)$");
     private static final Pattern VALID_HOST_NAME_REGEX = Pattern.compile(
         "^(?<protocol>https?://)?(?<loginDomain>(?<host>(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9]))(:(?<port>[0-9]+))?)$");
+
+    private static final String HTTPS = "https";
+    private static final String LOGIN_DOMAIN = "loginDomain";
+    public static final String PROTOCOL = "protocol";
 
     private static ForceConnectionInfo connectionInfo = null;
 
@@ -64,6 +66,12 @@ public class ForceDriver implements Driver {
         }
     }
 
+    public static void setConnectionInfo(String url, Properties properties) throws IOException {
+        if (connectionInfo == null) {
+            connectionInfo = ForceDriver.parseConnectionUrl(url, properties);
+        }
+    }
+
     @Override
     public Connection connect(String url, Properties properties) throws SQLException {
         if (!acceptsURL(url)) {
@@ -78,10 +86,7 @@ public class ForceDriver implements Driver {
             return null;
         }
         try {
-            if (connectionInfo == null) {
-                connectionInfo = parseConnectionUrl(url, properties);
-            }
-
+            ForceDriver.setConnectionInfo(url, properties);
             PartnerConnection partnerConnection = ForceService.createPartnerConnection(connectionInfo);
             PartnerService partnerService = new PartnerService(partnerConnection);
             return new ForceConnection(partnerConnection, partnerService);
@@ -94,7 +99,7 @@ public class ForceDriver implements Driver {
         return parseConnectionUrl(url, new Properties());
     }
 
-    private static ForceConnectionInfo parseConnectionUrl(String url, Properties properties) throws IOException {
+    public static ForceConnectionInfo parseConnectionUrl(String url, Properties properties) throws IOException {
         Properties connStringProps = getConnStringProperties(url);
         properties.putAll(connStringProps);
         ForceConnectionInfo info = new ForceConnectionInfo();
@@ -105,7 +110,7 @@ public class ForceDriver implements Driver {
         info.setSessionId(properties.getProperty("sessionId"));
         info.setLogfile(properties.getProperty("logfile"));
         info.setSandbox(resolveSandboxProperty(properties));
-        info.setHttps(resolveBooleanProperty(properties, "https", true));
+        info.setHttps(resolveBooleanProperty(properties, HTTPS, true));
         info.setVerifyConnectivity(resolveBooleanProperty(properties, "verifyConnectivity", false));
         if (resolveBooleanProperty(properties, "insecurehttps", false)) {
             HttpsTrustManager.allowAllSSL();
@@ -113,7 +118,7 @@ public class ForceDriver implements Driver {
         info.setReadTimeout(resolveIntProperty(properties, "readTimeout", info.getReadTimeout()));
         info.setConnectionTimeout(resolveIntProperty(properties, "connectionTimeout", info.getConnectionTimeout()));
         info.setApiVersion(resolveStringProperty(properties, "api", ForceService.DEFAULT_API_VERSION));
-        info.setLoginDomain(resolveStringProperty(properties, "loginDomain", ForceService.DEFAULT_LOGIN_DOMAIN));
+        info.setLoginDomain(resolveStringProperty(properties, LOGIN_DOMAIN, ForceService.DEFAULT_LOGIN_DOMAIN));
         return info;
     }
 
@@ -122,17 +127,17 @@ public class ForceDriver implements Driver {
         if (sandbox != null) {
             return Boolean.parseBoolean(sandbox);
         }
-        String loginDomain = properties.getProperty("loginDomain");
+        String loginDomain = properties.getProperty(LOGIN_DOMAIN);
         if (loginDomain != null) {
             return loginDomain.contains("test");
         }
         return false;
     }
 
-    private static Boolean resolveBooleanProperty(Properties properties, String propertyName, boolean defaultValue) {
+    private static boolean resolveBooleanProperty(Properties properties, String propertyName, boolean defaultValue) {
         String boolValue = properties.getProperty(propertyName);
         if (boolValue != null) {
-            return Boolean.valueOf(boolValue);
+            return Boolean.parseBoolean(boolValue);
         }
         return defaultValue;
     }
@@ -171,7 +176,7 @@ public class ForceDriver implements Driver {
             if (authMatcher.group(2) != null) {
                 result.put("password", authMatcher.group(2));
             }
-            result.put("loginDomain", authMatcher.group(3));
+            result.put(LOGIN_DOMAIN, authMatcher.group(3));
             if (authMatcher.groupCount() > 4 && authMatcher.group(5) != null) {
                 // has some other parameters - parse them from standard URL format like
                 // ?param1=value1&param2=value2
@@ -189,7 +194,7 @@ public class ForceDriver implements Driver {
             int endOfHost = dataString.contains(";") ? dataString.indexOf(";") - 1 : dataString.length() - 1;
             String possibleHost = dataString.substring(0, endOfHost + 1);
             if (!possibleHost.trim().isEmpty() && !possibleHost.contains("=")) {
-                result.put("loginDomain", possibleHost);
+                result.put(LOGIN_DOMAIN, possibleHost);
                 urlProperties = dataString.substring(endOfHost + 1);
             } else {
                 urlProperties = dataString;
@@ -198,19 +203,19 @@ public class ForceDriver implements Driver {
         } else {
             Matcher ipMatcher = VALID_IP_ADDRESS_REGEX.matcher(urlString);
             if (ipMatcher.matches()) {
-                result.put("loginDomain", ipMatcher.group("loginDomain"));
-                result.put("https", "true");
-                if (ipMatcher.group("protocol") != null && ipMatcher.group("protocol").equalsIgnoreCase("http://")) {
-                    result.put("https", "false");
+                result.put(LOGIN_DOMAIN, ipMatcher.group(LOGIN_DOMAIN));
+                result.put(HTTPS, "true");
+                if (ipMatcher.group(PROTOCOL) != null && ipMatcher.group(PROTOCOL).equalsIgnoreCase("http://")) {
+                    result.put(HTTPS, "false");
                 }
             } else {
                 Matcher hostMatcher = VALID_HOST_NAME_REGEX.matcher(urlString);
                 if (hostMatcher.matches()) {
-                    result.put("loginDomain", hostMatcher.group("loginDomain"));
-                    result.put("https", "true");
-                    if (hostMatcher.group("protocol") != null && hostMatcher.group("protocol")
+                    result.put(LOGIN_DOMAIN, hostMatcher.group(LOGIN_DOMAIN));
+                    result.put(HTTPS, "true");
+                    if (hostMatcher.group(PROTOCOL) != null && hostMatcher.group(PROTOCOL)
                         .equalsIgnoreCase("http://")) {
-                        result.put("https", "false");
+                        result.put(HTTPS, "false");
                     }
                 }
             }
@@ -264,12 +269,14 @@ public class ForceDriver implements Driver {
         public void checkClientTrusted(
             X509Certificate[] x509Certificates, String s)
             throws java.security.cert.CertificateException {
+            // Ignored
         }
 
         @Override
         public void checkServerTrusted(
             X509Certificate[] x509Certificates, String s)
             throws java.security.cert.CertificateException {
+            // Ignored
         }
 
         @Override
