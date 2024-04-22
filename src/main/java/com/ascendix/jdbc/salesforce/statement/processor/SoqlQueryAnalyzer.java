@@ -6,8 +6,6 @@ import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.statement.Statement;
-import net.sf.jsqlparser.statement.select.OrderByElement;
-import net.sf.jsqlparser.statement.select.OrderByVisitor;
 import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.SelectItem;
 
@@ -39,18 +37,15 @@ public class SoqlQueryAnalyzer {
             PlainSelect query = (PlainSelect) queryAnalyzer.getQueryData();
             final List<SelectItem<?>> selectItems = query.getSelectItems();
             if (query.getOrderByElements() != null) {
-                query.getOrderByElements().forEach(orderByElement -> orderByElement.accept(new OrderByVisitor() {
-                    @Override
-                    public void visit(final OrderByElement orderBy) {
-                        if (orderBy.getExpression() instanceof Column orderCol) {
-                            selectItems.forEach(item -> {
-                                if (item.getAlias() != null && item.getAlias()
-                                    .getName()
-                                    .equals(orderCol.getColumnName()) && item.getExpression() instanceof Column c) {
-                                    orderCol.setColumnName(c.getColumnName());
-                                }
-                            });
-                        }
+                query.getOrderByElements().forEach(orderByElement -> orderByElement.accept(orderBy -> {
+                    if (orderBy.getExpression() instanceof Column orderCol) {
+                        selectItems.forEach(item -> {
+                            if (item.getAlias() != null && item.getAlias()
+                                .getName()
+                                .equals(orderCol.getColumnName()) && item.getExpression() instanceof Column c) {
+                                orderCol.setColumnName(c.getColumnName());
+                            }
+                        });
                     }
                 }));
             }
