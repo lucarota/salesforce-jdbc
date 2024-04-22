@@ -651,8 +651,8 @@ public class DBTablePrinter {
             case Types.DATE, Types.TIME, Types.TIME_WITH_TIMEZONE, Types.TIMESTAMP, Types.TIMESTAMP_WITH_TIMEZONE ->
                 CATEGORY_DATETIME;
             case Types.BOOLEAN -> CATEGORY_BOOLEAN;
-            case Types.VARCHAR, Types.NVARCHAR, Types.LONGVARCHAR, Types.LONGNVARCHAR, Types.CHAR, Types.NCHAR ->
-                CATEGORY_STRING;
+            case Types.VARCHAR, Types.NVARCHAR, Types.LONGVARCHAR, Types.LONGNVARCHAR, Types.CHAR, Types.NCHAR,
+                 Types.ARRAY -> CATEGORY_STRING;
             default -> CATEGORY_OTHER;
         };
     }
