@@ -166,7 +166,7 @@ public class ForcePreparedStatement implements PreparedStatement, Iterator<List<
                 return new CachedResultSet(this, metaData);
             }
             FieldDefTree fieldDefs = getRootEntityFieldDefinitions();
-            List<List<ForceResultField>> forceQueryResult = partnerService.query(prepareQuery(getSoqlQueryAnalyzer().getSoqlQuery()), fieldDefs);
+            List<List<ForceResultField>> forceQueryResult = partnerService.query(prepareQuery(getSoqlQueryAnalyzer().getSoqlQueryString()), fieldDefs);
             if (!forceQueryResult.isEmpty()) {
                 List<ColumnMap<String, Object>> maps = Collections.synchronizedList(new LinkedList<>());
                 forceQueryResult.forEach(rec -> maps.add(convertToColumnMap(rec)));
@@ -194,7 +194,7 @@ public class ForcePreparedStatement implements PreparedStatement, Iterator<List<
             Map.Entry<List<List<ForceResultField>>, String> resultEntry;
             if (this.neverQueriedMore) {
                 this.neverQueriedMore = false;
-                resultEntry = partnerService.queryStart(prepareQuery(getSoqlQueryAnalyzer().getSoqlQuery()),
+                resultEntry = partnerService.queryStart(prepareQuery(getSoqlQueryAnalyzer().getSoqlQueryString()),
                     getRootEntityFieldDefinitions());
             } else if (this.queryMoreLocator != null) {
                 resultEntry = partnerService.queryMore(this.queryMoreLocator, getRootEntityFieldDefinitions());
@@ -491,7 +491,7 @@ public class ForcePreparedStatement implements PreparedStatement, Iterator<List<
         if (soqlQueryAnalyzer == null) {
             soqlQueryAnalyzer = new SoqlQueryAnalyzer(getQueryAnalyzer());
             if (soqlQueryAnalyzer.isExpandedStarSyntaxForFields()) {
-                this.soqlQuery = soqlQueryAnalyzer.getSoqlQuery();
+                this.soqlQuery = soqlQueryAnalyzer.getSoqlQueryString();
                 log.info("[PrepStat] Expanded Star Syntax to {}", soqlQuery);
             }
         }

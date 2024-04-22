@@ -1,13 +1,15 @@
 package com.ascendix.jdbc.salesforce.statement.processor;
 
-import com.ascendix.jdbc.salesforce.statement.FieldDef;
 import com.ascendix.jdbc.salesforce.statement.processor.utils.SelectSpecVisitor;
-import java.util.ArrayList;
-import java.util.List;
-
 import com.ascendix.jdbc.salesforce.utils.FieldDefTree;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
+import net.sf.jsqlparser.schema.Column;
+import net.sf.jsqlparser.statement.Statement;
+import net.sf.jsqlparser.statement.select.OrderByElement;
+import net.sf.jsqlparser.statement.select.OrderByVisitor;
 import net.sf.jsqlparser.statement.select.PlainSelect;
+import net.sf.jsqlparser.statement.select.SelectItem;
 
 @Slf4j
 public class SoqlQueryAnalyzer {
@@ -19,17 +21,40 @@ public class SoqlQueryAnalyzer {
         this.queryAnalyzer = queryAnalyzer;
     }
 
-    public String getSoqlQuery() {
+    public String getSoqlQueryString() {
         return queryAnalyzer.getQueryData().toString();
+    }
+
+    public Statement getSoqlQuery() {
+        return queryAnalyzer.getQueryData();
     }
 
     public FieldDefTree getFieldDefinitions() {
         if (fieldDefinitions == null) {
             fieldDefinitions = new FieldDefTree();
             String rootEntityName = queryAnalyzer.getFromObjectName();
-            SelectSpecVisitor visitor = new SelectSpecVisitor(rootEntityName, fieldDefinitions, queryAnalyzer.getPartnerService());
+            SelectSpecVisitor visitor = new SelectSpecVisitor(rootEntityName,
+                fieldDefinitions,
+                queryAnalyzer.getPartnerService());
             PlainSelect query = (PlainSelect) queryAnalyzer.getQueryData();
-            query.getSelectItems().forEach(spec -> spec.accept(visitor));
+            final List<SelectItem<?>> selectItems = query.getSelectItems();
+            if (query.getOrderByElements() != null) {
+                query.getOrderByElements().forEach(orderByElement -> orderByElement.accept(new OrderByVisitor() {
+                    @Override
+                    public void visit(final OrderByElement orderBy) {
+                        if (orderBy.getExpression() instanceof Column orderCol) {
+                            selectItems.forEach(item -> {
+                                if (item.getAlias() != null && item.getAlias()
+                                    .getName()
+                                    .equals(orderCol.getColumnName()) && item.getExpression() instanceof Column c) {
+                                    orderCol.setColumnName(c.getColumnName());
+                                }
+                            });
+                        }
+                    }
+                }));
+            }
+            selectItems.forEach(spec -> spec.accept(visitor));
         }
         return fieldDefinitions;
     }

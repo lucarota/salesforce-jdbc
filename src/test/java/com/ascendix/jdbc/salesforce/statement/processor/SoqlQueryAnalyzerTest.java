@@ -140,7 +140,7 @@ public class SoqlQueryAnalyzerTest {
         assertEquals("Name", actual.get(1).getName());
         assertEquals("string", actual.get(1).getType());
 
-        System.out.println(analyzer.getSoqlQuery());
+        System.out.println(analyzer.getSoqlQueryString());
     }
 
     @Test

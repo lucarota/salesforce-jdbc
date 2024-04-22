@@ -18,6 +18,7 @@ import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.Statement;
+import net.sf.jsqlparser.statement.select.FromItem;
 import net.sf.jsqlparser.statement.select.ParenthesedSelect;
 import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.SelectItem;
@@ -63,7 +64,7 @@ public class SelectSpecVisitor implements SelectItemVisitor {
             String alias = fieldSpec.getAlias() != null ? fieldSpec.getAlias().getName() : func.getName();
             visitFunctionCallSpec(func, alias);
         } else if (fieldSpec.getExpression() instanceof ParenthesedSelect subQuery) {
-            visitSubQuery(subQuery);
+            fieldSpec.setExpression(visitSubQuery(subQuery));
         }
     }
 
@@ -111,17 +112,18 @@ public class SelectSpecVisitor implements SelectItemVisitor {
         }
     }
 
-    private void visitSubQuery(ParenthesedSelect subQuery) {
+    private ParenthesedSelect visitSubQuery(ParenthesedSelect subQuery) {
         try {
             String subQuerySoql = subQuery.getPlainSelect().toString();
             Statement statement = CCJSqlParserUtil.parse(subQuerySoql);
             if (statement instanceof PlainSelect select) {
+                final FromItem from = select.getFromItem();
                 String relationshipName;
-                String[] prefixNames = StringUtils.split(select.getFromItem().toString(), '.');
+                String[] prefixNames = StringUtils.split(from.toString(), '.');
                 if (prefixNames.length > 0 && rootEntityName.equalsIgnoreCase(prefixNames[0])) {
                     relationshipName = prefixNames[1];
                 } else {
-                    relationshipName = select.getFromItem().toString();
+                    relationshipName = from.toString();
                 }
 
                 ChildRelationship relatedFrom = Arrays.stream(describeObject(rootEntityName).getChildRelationships())
@@ -132,14 +134,17 @@ public class SelectSpecVisitor implements SelectItemVisitor {
                 String fromObject = relatedFrom.getChildSObject();
                 select.setFromItem(new Table(fromObject));
 
-                SoqlQueryAnalyzer subQueryAnalyzer = new SoqlQueryAnalyzer(new QueryAnalyzer(select.toString(),
-                    null,
-                    partnerService));
+                SoqlQueryAnalyzer subQueryAnalyzer = new SoqlQueryAnalyzer(new QueryAnalyzer(select.toString(),null, partnerService));
                 fieldDefinitions.addTreeNode(subQueryAnalyzer.getFieldDefinitions());
+
+                final PlainSelect soqlQuery = (PlainSelect)subQueryAnalyzer.getSoqlQuery();
+                soqlQuery.setFromItem(from);
+                subQuery.withSelect(soqlQuery);
             }
         } catch (JSQLParserException e) {
             throw new RuntimeException(e);
         }
+        return subQuery;
     }
 
     private Field findField(String name, DescribeSObjectResult objectDesc, Function<Field, String> nameFetcher) {
