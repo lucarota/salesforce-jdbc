@@ -29,13 +29,13 @@ public class UpdateQueryAnalyzer {
         this.queryAnalyzer = queryAnalyzer;
     }
 
-    public List<Map<String, Object>> getRecords() {
+    public List<Map<String, Object>> getRecords(List<Object> parameters) {
         if (queryAnalyzer.getQueryData() != null && records == null) {
             records = new ArrayList<>();
             final Function<String, List<Map<String, Object>>> subSelectResolver = queryAnalyzer.getSubSelectResolver();
 
             final Update query = (Update) queryAnalyzer.getQueryData();
-            String id = queryAnalyzer.checkIsDirectIdWhere(query.getWhere());
+            String id = queryAnalyzer.checkIsDirectIdWhere(query.getWhere(), parameters);
             List<UpdateSet> updateSets = query.getUpdateSets();
             if (id != null) {
                 Set<String> columnsToFetch = new HashSet<>();
@@ -49,7 +49,7 @@ public class UpdateQueryAnalyzer {
                     for (UpdateSet updateSet : updateSets) {
                         List<Column> columns = updateSet.getColumns();
                         for (Column column : columns) {
-                            updateSet.getValues().accept(new ValueToStringVisitor(rec, column.getColumnName(),
+                            updateSet.getValues().accept(new ValueToStringVisitor(rec, column.getColumnName(), parameters,
                                     subSelectResolver));
                         }
 

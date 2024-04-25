@@ -16,19 +16,14 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class UpdateQueryProcessor {
 
-    public static CachedResultSet processQuery(ForcePreparedStatement statement, String soqlQuery,
+    public static CachedResultSet processQuery(ForcePreparedStatement statement, List<Object> parameters,
         PartnerService partnerService, UpdateQueryAnalyzer updateQueryAnalyzer) {
         CommandLogCachedResultSet resultSet = new CommandLogCachedResultSet();
-        if (soqlQuery == null || soqlQuery.trim().isEmpty()) {
-            resultSet.log("No UPDATE query found");
-            return resultSet;
-        }
 
         try {
             int updateCount = 0;
-            List<Map<String, Object>> recordsToUpdate = updateQueryAnalyzer.getRecords();
-            ISaveResult[] records = partnerService.saveRecords(updateQueryAnalyzer.getFromObjectName(),
-                recordsToUpdate);
+            List<Map<String, Object>> recordsToUpdate = updateQueryAnalyzer.getRecords(parameters);
+            ISaveResult[] records = partnerService.saveRecords(updateQueryAnalyzer.getFromObjectName(), recordsToUpdate);
             for (ISaveResult result : records) {
                 if (result.isSuccess()) {
                     resultSet.log(updateQueryAnalyzer.getFromObjectName() + " updated with Id=" + result.getId());
