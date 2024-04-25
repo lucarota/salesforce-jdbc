@@ -1,12 +1,18 @@
 package com.ascendix.jdbc.salesforce.statement.processor.utils;
 
+import com.ascendix.jdbc.salesforce.utils.ParamUtils;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.jsqlparser.expression.*;
 import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.Select;
 
-import java.util.List;
-import java.util.Map;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.*;
 
 @Slf4j
 public class ValueToStringVisitor extends ExpressionVisitorAdapter {
@@ -14,11 +20,13 @@ public class ValueToStringVisitor extends ExpressionVisitorAdapter {
     private final Map<String, Object> fieldValues;
     private final String columnName;
     private final java.util.function.Function<String, List<Map<String, Object>>> subSelectResolver;
+    private final List<Object> parameters;
 
-    public ValueToStringVisitor(Map<String, Object> fieldValues, String columnName,
-        java.util.function.Function<String, List<Map<String, Object>>> subSelectResolver) {
+    public ValueToStringVisitor(Map<String, Object> fieldValues, String columnName, List<Object> parameters,
+                                java.util.function.Function<String, List<Map<String, Object>>> subSelectResolver) {
         this.fieldValues = fieldValues;
         this.columnName = columnName;
+        this.parameters = parameters;
         this.subSelectResolver = subSelectResolver;
     }
 
@@ -70,5 +78,45 @@ public class ValueToStringVisitor extends ExpressionVisitorAdapter {
             }
         }
         fieldValues.put(columnName, value);
+    }
+
+    @Override
+    public void visit(JdbcParameter parameter) {
+        int idx = parameter.getIndex() - 1;
+        Object o = parameters.get(idx);
+        fieldValues.put(columnName, getParameterStr(o));
+    }
+
+    private static String getParameterStr(Object o) {
+        if (o == null) {
+            return "NULL";
+        } else if (o instanceof Date date) {
+            Calendar cal = GregorianCalendar.getInstance();
+            cal.setTime(date);
+            if (cal.get(Calendar.MILLISECOND) == 0 && cal.get(Calendar.SECOND) == 0 && cal.get(
+                    Calendar.MINUTE) == 0 && cal.get(Calendar.HOUR_OF_DAY) == 0) {
+                LocalDate localDate = Instant.ofEpochMilli(date.getTime()).atZone(ZoneId.systemDefault()).toLocalDate();
+
+                return ParamUtils.SQL_DATE_FORMAT.format(localDate);
+            } else {
+                LocalDateTime localDateTime = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+                return ParamUtils.SQL_TIMESTAMP_FORMAT.format(localDateTime);
+            }
+        } else if (o instanceof Calendar cal) {
+            if (cal.get(Calendar.MILLISECOND) == 0 && cal.get(Calendar.SECOND) == 0 && cal.get(
+                    Calendar.MINUTE) == 0 && cal.get(Calendar.HOUR_OF_DAY) == 0) {
+                LocalDate localDate = Instant.ofEpochMilli(cal.getTimeInMillis()).atZone(ZoneId.systemDefault())
+                        .toLocalDate();
+
+                return ParamUtils.SQL_DATE_FORMAT.format(localDate);
+            } else {
+                LocalDateTime localDateTime = cal.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+                return ParamUtils.SQL_TIMESTAMP_FORMAT.format(localDateTime);
+            }
+        } else if (o instanceof BigDecimal d) {
+            return d.toPlainString();
+        } else {
+            return o.toString();
+        }
     }
 }

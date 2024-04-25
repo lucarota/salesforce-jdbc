@@ -36,8 +36,8 @@ public class UpdateQueryAnalyzerTest {
         assertEquals("Account", analyzer.getFromObjectName());
 
         // Verify we have exactly one record to save
-        assertEquals(1, analyzer.getRecords().size());
-        Map<String, Object> record = analyzer.getRecords().get(0);
+        assertEquals(1, analyzer.getRecords(List.of()).size());
+        Map<String, Object> record = analyzer.getRecords(List.of()).get(0);
         // Verify the fields count for the first record
         assertEquals(2, record.size());
         // Verify the fields' names for the first record
@@ -66,9 +66,9 @@ public class UpdateQueryAnalyzerTest {
         assertEquals("Account", analyzer.getFromObjectName());
 
         // Verify we have exactly three record to save
-        assertEquals(3, analyzer.getRecords().size());
+        assertEquals(3, analyzer.getRecords(List.of()).size());
 
-        Map<String, Object> record = analyzer.getRecords().get(0);
+        Map<String, Object> record = analyzer.getRecords(List.of()).get(0);
         // Verify the fields count for the first record
         assertEquals(2, record.size());
         // Verify the fields' names for the first record
@@ -76,7 +76,7 @@ public class UpdateQueryAnalyzerTest {
         assertEquals("NEW_AccountName", record.get("Name"));
         assertEquals("005xx1111111111111", record.get("Id"));
 
-        record = analyzer.getRecords().get(1);
+        record = analyzer.getRecords(List.of()).get(1);
         // Verify the fields count for the first record
         assertEquals(2, record.size());
         // Verify the fields' names for the first record
@@ -84,7 +84,7 @@ public class UpdateQueryAnalyzerTest {
         assertEquals("NEW_AccountName", record.get("Name"));
         assertEquals("005xx2222222222222", record.get("Id"));
 
-        record = analyzer.getRecords().get(2);
+        record = analyzer.getRecords(List.of()).get(2);
         // Verify the fields count for the first record
         assertEquals(2, record.size());
         // Verify the fields' names for the first record
@@ -113,9 +113,9 @@ public class UpdateQueryAnalyzerTest {
         assertEquals("Account", analyzer.getFromObjectName());
 
         // Verify we have exactly three record to save
-        assertEquals(3, analyzer.getRecords().size());
+        assertEquals(3, analyzer.getRecords(List.of()).size());
 
-        Map<String, Object> record = analyzer.getRecords().get(0);
+        Map<String, Object> record = analyzer.getRecords(List.of()).get(0);
         // Verify the fields count for the first record
         assertEquals(2, record.size());
         // Verify the fields' names for the first record
@@ -123,7 +123,7 @@ public class UpdateQueryAnalyzerTest {
         assertEquals("Acc_01-", record.get("Name"));
         assertEquals("005xx1111111111111", record.get("Id"));
 
-        record = analyzer.getRecords().get(1);
+        record = analyzer.getRecords(List.of()).get(1);
         // Verify the fields count for the first record
         assertEquals(2, record.size());
         // Verify the fields' names for the first record
@@ -131,7 +131,7 @@ public class UpdateQueryAnalyzerTest {
         assertEquals("Acc_02-", record.get("Name"));
         assertEquals("005xx2222222222222", record.get("Id"));
 
-        record = analyzer.getRecords().get(2);
+        record = analyzer.getRecords(List.of()).get(2);
         // Verify the fields count for the first record
         assertEquals(2, record.size());
         // Verify the fields' names for the first record

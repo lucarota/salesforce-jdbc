@@ -150,13 +150,13 @@ public class ForcePreparedStatement implements PreparedStatement, Iterator<List<
         final QueryAnalyzer analyzer = getQueryAnalyzer();
 
         if (analyzer.analyse(soqlQuery, StatementTypeEnum.INSERT)) {
-            return InsertQueryProcessor.processQuery(this, soqlQuery, partnerService, getInsertQueryAnalyzer());
+            return InsertQueryProcessor.processQuery(this, getParameters(), partnerService, getInsertQueryAnalyzer());
         }
         if (analyzer.analyse(soqlQuery, StatementTypeEnum.UPDATE)) {
-            return UpdateQueryProcessor.processQuery(this, soqlQuery, partnerService, getUpdateQueryAnalyzer());
+            return UpdateQueryProcessor.processQuery(this, getParameters(), partnerService, getUpdateQueryAnalyzer());
         }
         if (analyzer.analyse(soqlQuery, StatementTypeEnum.DELETE)) {
-            return DeleteQueryProcessor.processQuery(soqlQuery, partnerService, getDeleteQueryAnalyzer());
+            return DeleteQueryProcessor.processQuery(getParameters(), partnerService, getDeleteQueryAnalyzer());
         }
 
         try {

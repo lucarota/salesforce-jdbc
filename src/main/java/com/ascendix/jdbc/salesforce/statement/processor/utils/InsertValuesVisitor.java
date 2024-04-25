@@ -17,11 +17,13 @@ public class InsertValuesVisitor extends SelectVisitorAdapter {
     private final Function<String, List<Map<String, Object>>> subSelectResolver;
     private final List<Column> columns;
     private final List<Map<String, Object>> records;
+    private final List<Object> parameters;
 
-    public InsertValuesVisitor(List<Column> columns, List<Map<String, Object>> records,
+    public InsertValuesVisitor(List<Column> columns, List<Map<String, Object>> records, List<Object> parameters,
         Function<String, List<Map<String, Object>>> subSelectResolver) {
         this.columns = columns;
         this.records = records;
+        this.parameters = parameters;
         this.subSelectResolver = subSelectResolver;
     }
 
@@ -31,14 +33,14 @@ public class InsertValuesVisitor extends SelectVisitorAdapter {
 
         for (Expression e : values.getExpressions()) {
             if (e instanceof ExpressionList expressionList) {
-                new Values(expressionList).accept(new InsertValuesVisitor(columns, records, subSelectResolver));
+                new Values(expressionList).accept(new InsertValuesVisitor(columns, records, parameters, subSelectResolver));
             } else {
                 HashMap<String, Object> fieldValues = new HashMap<>();
                 records.add(fieldValues);
                 for (int i = 0; i < columns.size(); i++) {
                     Expression expression = values.getExpressions().get(i);
                     expression.accept(
-                        new ValueToStringVisitor(fieldValues, columns.get(i).getColumnName(), subSelectResolver));
+                        new ValueToStringVisitor(fieldValues, columns.get(i).getColumnName(), parameters, subSelectResolver));
                 }
                 break;
             }

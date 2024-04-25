@@ -8,24 +8,21 @@ import com.sforce.soap.partner.IError;
 import com.sforce.soap.partner.ISaveResult;
 import com.sforce.ws.ConnectionException;
 import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class InsertQueryProcessor {
 
-    public static CachedResultSet processQuery(ForcePreparedStatement statement, String soqlQuery,
+    public static CachedResultSet processQuery(ForcePreparedStatement statement, List<Object> parameters,
         PartnerService partnerService, InsertQueryAnalyzer insertQueryAnalyzer) {
         CommandLogCachedResultSet resultSet = new CommandLogCachedResultSet();
-        if (soqlQuery == null || soqlQuery.trim().isEmpty()) {
-            resultSet.log("No INSERT query found");
-            return resultSet;
-        }
 
         try {
             int updateCount = 0;
             String fromObjectName = insertQueryAnalyzer.getFromObjectName();
-            ISaveResult[] records = partnerService.createRecords(fromObjectName, insertQueryAnalyzer.getRecords());
+            ISaveResult[] records = partnerService.createRecords(fromObjectName, insertQueryAnalyzer.getRecords(parameters));
 
             for (ISaveResult result : records) {
                 if (result.isSuccess()) {

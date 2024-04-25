@@ -14,16 +14,12 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class DeleteQueryProcessor {
 
-    public static CachedResultSet processQuery(String soqlQuery, PartnerService partnerService,
+    public static CachedResultSet processQuery(List<Object> parameters, PartnerService partnerService,
         DeleteQueryAnalyzer deleteQueryAnalyzer) {
         CommandLogCachedResultSet resultSet = new CommandLogCachedResultSet();
-        if (soqlQuery == null || soqlQuery.trim().isEmpty()) {
-            resultSet.log("No DELETE query found");
-            return resultSet;
-        }
 
         try {
-            List<String> recordsToDelete = deleteQueryAnalyzer.getRecords();
+            List<String> recordsToDelete = deleteQueryAnalyzer.getRecords(parameters);
             DeleteResult[] records = partnerService.deleteRecords(recordsToDelete);
             for (DeleteResult result : records) {
                 if (result.isSuccess()) {

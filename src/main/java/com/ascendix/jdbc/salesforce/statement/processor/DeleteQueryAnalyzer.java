@@ -19,11 +19,11 @@ public class DeleteQueryAnalyzer {
         this.queryAnalyzer = queryAnalyzer;
     }
 
-    public List<String> getRecords() {
+    public List<String> getRecords(List<Object> parameters) {
         if (queryAnalyzer.getQueryData() != null && records == null) {
             records = new ArrayList<>();
             final Delete query = (Delete) queryAnalyzer.getQueryData();
-            String id = queryAnalyzer.checkIsDirectIdWhere(query.getWhere());
+            String id = queryAnalyzer.checkIsDirectIdWhere(query.getWhere(), parameters);
             if (id != null) {
                 records.add(id);
 

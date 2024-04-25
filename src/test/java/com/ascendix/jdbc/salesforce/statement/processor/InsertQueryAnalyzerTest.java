@@ -22,8 +22,8 @@ public class InsertQueryAnalyzerTest {
         assertEquals("Account", analyzer.getFromObjectName());
 
         // Verify we have exactly one record to save
-        assertEquals(1, analyzer.getRecords().size());
-        Map<String, Object> record = analyzer.getRecords().get(0);
+        assertEquals(1, analyzer.getRecords(List.of()).size());
+        Map<String, Object> record = analyzer.getRecords(List.of()).get(0);
         // Verify the fields count for the first record
         assertEquals(3, record.size());
         // Verify the fields' names for the first record
@@ -52,8 +52,8 @@ public class InsertQueryAnalyzerTest {
         assertEquals("Account", analyzer.getFromObjectName());
 
         // Verify we have exactly one record to save
-        assertEquals(1, analyzer.getRecords().size());
-        Map<String, Object> record = analyzer.getRecords().get(0);
+        assertEquals(1, analyzer.getRecords(List.of()).size());
+        Map<String, Object> record = analyzer.getRecords(List.of()).get(0);
         // Verify the fields count for the first record
         assertEquals(2, record.size());
         // Verify the fields' names for the first record
@@ -72,10 +72,10 @@ public class InsertQueryAnalyzerTest {
         assertEquals("Account", analyzer.getFromObjectName());
 
         // Verify we have exactly one record to save
-        assertEquals(2, analyzer.getRecords().size());
+        assertEquals(2, analyzer.getRecords(List.of()).size());
 
         // Verify the first record
-        Map<String, Object> record = analyzer.getRecords().get(0);
+        Map<String, Object> record = analyzer.getRecords(List.of()).get(0);
         // Verify the fields count for the first record
         assertEquals(2, record.size());
         // Verify the fields' names for the first record
@@ -84,7 +84,7 @@ public class InsertQueryAnalyzerTest {
         assertEquals("005xx1111111111111", record.get("OwnerId"));
 
         // Verify the second record
-        record = analyzer.getRecords().get(1);
+        record = analyzer.getRecords(List.of()).get(1);
         // Verify the fields count for the second record
         assertEquals(2, record.size());
         // Verify the fields' names for the first record

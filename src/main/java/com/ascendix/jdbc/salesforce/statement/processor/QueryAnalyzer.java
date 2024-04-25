@@ -10,6 +10,7 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.expression.Expression;
+import net.sf.jsqlparser.expression.JdbcParameter;
 import net.sf.jsqlparser.expression.StringValue;
 import net.sf.jsqlparser.expression.operators.relational.EqualsTo;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
@@ -107,19 +108,28 @@ public class QueryAnalyzer {
     /**
      * Checks if this update is using WHERE Id='001xx010201' notation and no other criteria
      */
-    protected String checkIsDirectIdWhere(Expression where) {
+    protected String checkIsDirectIdWhere(Expression where, List<Object> parameters) {
         if (where instanceof final EqualsTo whereRoot) {
             // direct ID comparison like Id='001xx192918212'
             if (whereRoot.getLeftExpression() instanceof final Column col
-                && whereRoot.getRightExpression() instanceof StringValue value
                 && "id".equalsIgnoreCase(col.getColumnName())) {
-                return value.getValue();
+                if (whereRoot.getRightExpression() instanceof StringValue value) {
+                    return value.getValue();
+                }
+                if (whereRoot.getRightExpression() instanceof JdbcParameter param) {
+                    return parameters.get(param.getIndex() - 1).toString();
+                }
             }
+
             // direct ID comparison like '001xx192918212'=Id
-            if (whereRoot.getLeftExpression() instanceof StringValue value
-                && whereRoot.getRightExpression() instanceof final Column col
+            if (whereRoot.getRightExpression() instanceof final Column col
                 && "id".equalsIgnoreCase(col.getColumnName())) {
-                return value.getValue();
+                if (whereRoot.getLeftExpression() instanceof StringValue value) {
+                    return value.getValue();
+                }
+                if (whereRoot.getLeftExpression() instanceof JdbcParameter param) {
+                    return parameters.get(param.getIndex() - 1).toString();
+                }
             }
         }
         return null;
