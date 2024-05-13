@@ -50,7 +50,7 @@ public class UpdateQueryAnalyzerTest {
     public void testProcessUpdate_One_ByName() {
         String soql = "Update Account set Name ='NEW_AccountName' where Name='FirstAccount_new'";
 
-        final QueryAnalyzer queryAnalyzer = new QueryAnalyzer(soql, subSoql -> {
+        final QueryAnalyzer queryAnalyzer = new QueryAnalyzer(soql, (subSoql, parameters) -> {
             if ("SELECT Id FROM Account WHERE Name = 'FirstAccount_new'".equals(subSoql)) {
                 return Arrays.asList(
                     RecordFieldsBuilder.id("005xx1111111111111"),
@@ -97,7 +97,7 @@ public class UpdateQueryAnalyzerTest {
     public void testProcessUpdate_One_ByName_CALC() {
         String soql = "Update Account set Name=Name+'-' where Name='FirstAccount_new'";
 
-        final QueryAnalyzer queryAnalyzer = new QueryAnalyzer(soql, subSoql -> {
+        final QueryAnalyzer queryAnalyzer = new QueryAnalyzer(soql, (subSoql, parameters) -> {
             if ("SELECT Id, Name FROM Account WHERE Name = 'FirstAccount_new'".equals(subSoql)) {
                 return Arrays.asList(
                     RecordFieldsBuilder.setId("005xx1111111111111").set("Name", "Acc_01").build(),

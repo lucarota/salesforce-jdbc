@@ -1,29 +1,34 @@
 package com.ascendix.jdbc.salesforce.statement.processor.utils;
 
 import com.ascendix.jdbc.salesforce.utils.ParamUtils;
-import lombok.extern.slf4j.Slf4j;
-import net.sf.jsqlparser.expression.*;
-import net.sf.jsqlparser.statement.select.PlainSelect;
-import net.sf.jsqlparser.statement.select.Select;
-
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
+import java.util.function.BiFunction;
+import lombok.extern.slf4j.Slf4j;
+import net.sf.jsqlparser.expression.DoubleValue;
+import net.sf.jsqlparser.expression.ExpressionVisitorAdapter;
+import net.sf.jsqlparser.expression.HexValue;
+import net.sf.jsqlparser.expression.JdbcParameter;
+import net.sf.jsqlparser.expression.LongValue;
+import net.sf.jsqlparser.expression.NullValue;
+import net.sf.jsqlparser.expression.StringValue;
+import net.sf.jsqlparser.statement.select.PlainSelect;
+import net.sf.jsqlparser.statement.select.Select;
 
 @Slf4j
 public class ValueToStringVisitor extends ExpressionVisitorAdapter {
 
     private final Map<String, Object> fieldValues;
     private final String columnName;
-    private final java.util.function.Function<String, List<Map<String, Object>>> subSelectResolver;
+    private final BiFunction<String, List<Object>, List<Map<String, Object>>> subSelectResolver;
     private final List<Object> parameters;
 
     public ValueToStringVisitor(Map<String, Object> fieldValues, String columnName, List<Object> parameters,
-                                java.util.function.Function<String, List<Map<String, Object>>> subSelectResolver) {
+                                BiFunction<String, List<Object>, List<Map<String, Object>>> subSelectResolver) {
         this.fieldValues = fieldValues;
         this.columnName = columnName;
         this.parameters = parameters;
@@ -67,7 +72,7 @@ public class ValueToStringVisitor extends ExpressionVisitorAdapter {
         if (plainSelect != null) {
             log.trace("[VtoxSVisitor] SubSelect {}={}", columnName, plainSelect);
             if (subSelectResolver != null) {
-                List<Map<String, Object>> records = subSelectResolver.apply(plainSelect.toString());
+                List<Map<String, Object>> records = subSelectResolver.apply(plainSelect.toString(), parameters);
                 if (records.size() == 1 && records.get(0).size() == 1) {
                     // return the value as plain value
                     value = records.get(0).entrySet().iterator().next().getValue();
@@ -91,7 +96,7 @@ public class ValueToStringVisitor extends ExpressionVisitorAdapter {
         if (o == null) {
             return "NULL";
         } else if (o instanceof Date date) {
-            Calendar cal = GregorianCalendar.getInstance();
+            Calendar cal = Calendar.getInstance();
             cal.setTime(date);
             if (cal.get(Calendar.MILLISECOND) == 0 && cal.get(Calendar.SECOND) == 0 && cal.get(
                     Calendar.MINUTE) == 0 && cal.get(Calendar.HOUR_OF_DAY) == 0) {

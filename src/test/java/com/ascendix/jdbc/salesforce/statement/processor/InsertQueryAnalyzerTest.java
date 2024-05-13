@@ -39,7 +39,7 @@ public class InsertQueryAnalyzerTest {
         String soql = "insert into Account(Name, OwnerId) values ('FirstAccount', " +
                 " (SELECT Id from User where Name='CollectionOwner-f CollectionOwner-l' LIMIT 1) " +
                 ")";
-        final QueryAnalyzer queryAnalyzer = new QueryAnalyzer(soql, subSoql -> {
+        final QueryAnalyzer queryAnalyzer = new QueryAnalyzer(soql, (subSoql, parameter) -> {
             if ("SELECT Id FROM User WHERE Name = 'CollectionOwner-f CollectionOwner-l' LIMIT 1".equals(subSoql)) {
                 Map<String, Object> record = new HashMap<>();
                 record.put("id", "005xx1231231233123");
