@@ -89,10 +89,10 @@ public class ValueToStringVisitor extends ExpressionVisitorAdapter {
     public void visit(JdbcParameter parameter) {
         int idx = parameter.getIndex() - 1;
         Object o = parameters.get(idx);
-        fieldValues.put(columnName, getParameterStr(o));
+        fieldValues.put(columnName, getParameter(o));
     }
 
-    private static String getParameterStr(Object o) {
+    private static Object getParameter(Object o) {
         if (o == null) {
             return "NULL";
         } else if (o instanceof Date date) {
@@ -118,10 +118,8 @@ public class ValueToStringVisitor extends ExpressionVisitorAdapter {
                 LocalDateTime localDateTime = cal.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
                 return ParamUtils.SQL_TIMESTAMP_FORMAT.format(localDateTime);
             }
-        } else if (o instanceof BigDecimal d) {
-            return d.toPlainString();
         } else {
-            return o.toString();
+            return o;
         }
     }
 }

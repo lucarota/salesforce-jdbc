@@ -1,5 +1,13 @@
 package com.ascendix.jdbc.salesforce.statement.processor.utils;
 
+import com.ascendix.jdbc.salesforce.utils.ParamUtils;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.jsqlparser.expression.*;
 import net.sf.jsqlparser.expression.operators.arithmetic.*;
@@ -16,12 +24,14 @@ public class UpdateRecordVisitor extends ExpressionVisitorAdapter {
     private final Map<String, Object> recordFieldsToUpdate;
     private final Map<String, Object> recordFieldsFromDB;
     private final String columnName;
+    private final List<Object> parameters;
 
     public UpdateRecordVisitor(Map<String, Object> recordFieldsToUpdate,
-        Map<String, Object> recordFieldsFromDB, String columnName) {
+        Map<String, Object> recordFieldsFromDB, String columnName, List<Object> parameters) {
         this.recordFieldsToUpdate = recordFieldsToUpdate;
         this.recordFieldsFromDB = recordFieldsFromDB;
         this.columnName = columnName;
+        this.parameters = parameters;
     }
 
     @Override
@@ -398,5 +408,43 @@ public class UpdateRecordVisitor extends ExpressionVisitorAdapter {
     public void visit(XMLSerializeExpr aThis) {
         log.trace("[UpdateVisitor] XMLSerializeExpr");
         evaluate(aThis);
+    }
+
+    @Override
+    public void visit(JdbcParameter parameter) {
+        int idx = parameter.getIndex() - 1;
+        Object o = parameters.get(idx);
+        recordFieldsToUpdate.put(columnName, getParameter(o));
+    }
+
+    private static Object getParameter(Object o) {
+        if (o == null) {
+            return "NULL";
+        } else if (o instanceof Date date) {
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(date);
+            if (cal.get(Calendar.MILLISECOND) == 0 && cal.get(Calendar.SECOND) == 0 && cal.get(
+                Calendar.MINUTE) == 0 && cal.get(Calendar.HOUR_OF_DAY) == 0) {
+                LocalDate localDate = Instant.ofEpochMilli(date.getTime()).atZone(ZoneId.systemDefault()).toLocalDate();
+
+                return ParamUtils.SQL_DATE_FORMAT.format(localDate);
+            } else {
+                LocalDateTime localDateTime = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+                return ParamUtils.SQL_TIMESTAMP_FORMAT.format(localDateTime);
+            }
+        } else if (o instanceof Calendar cal) {
+            if (cal.get(Calendar.MILLISECOND) == 0 && cal.get(Calendar.SECOND) == 0 && cal.get(
+                Calendar.MINUTE) == 0 && cal.get(Calendar.HOUR_OF_DAY) == 0) {
+                LocalDate localDate = Instant.ofEpochMilli(cal.getTimeInMillis()).atZone(ZoneId.systemDefault())
+                    .toLocalDate();
+
+                return ParamUtils.SQL_DATE_FORMAT.format(localDate);
+            } else {
+                LocalDateTime localDateTime = cal.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+                return ParamUtils.SQL_TIMESTAMP_FORMAT.format(localDateTime);
+            }
+        } else {
+            return o;
+        }
     }
 }
