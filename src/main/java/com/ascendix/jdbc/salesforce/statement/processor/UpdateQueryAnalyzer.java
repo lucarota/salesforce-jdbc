@@ -80,8 +80,7 @@ public class UpdateQueryAnalyzer {
                     List<Column> columns = updateSet.getColumns();
                     for (int i = 0; i < columns.size(); i++) {
                         Expression expr = updateSet.getValue(i);
-                        expr.accept(new UpdateRecordVisitor(rec, subRecord, columns.get(i).getColumnName())
-                        );
+                        expr.accept(new UpdateRecordVisitor(rec, subRecord, columns.get(i).getColumnName(), parameters));
                     }
                 }
             }
