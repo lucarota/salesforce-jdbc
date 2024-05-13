@@ -5,7 +5,7 @@ import com.sforce.soap.partner.DescribeSObjectResult;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
+import java.util.function.BiFunction;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.jsqlparser.JSQLParserException;
@@ -27,13 +27,13 @@ import net.sf.jsqlparser.statement.update.Update;
 public class QueryAnalyzer {
 
     private String soql;
-    private final Function<String, List<Map<String, Object>>> subSelectResolver;
+    private final BiFunction<String, List<Object>, List<Map<String, Object>>> subSelectResolver;
     private Statement queryData;
     private final PartnerService partnerService;
     private boolean expandedStarSyntaxForFields = false;
 
     public QueryAnalyzer(String soql,
-        Function<String, List<Map<String, Object>>> subSelectResolver, PartnerService partnerService) {
+        BiFunction<String, List<Object>, List<Map<String, Object>>> subSelectResolver, PartnerService partnerService) {
         this.soql = soql;
         this.subSelectResolver = subSelectResolver;
         this.partnerService = partnerService;
@@ -108,7 +108,7 @@ public class QueryAnalyzer {
     /**
      * Checks if this update is using WHERE Id='001xx010201' notation and no other criteria
      */
-    protected String checkIsDirectIdWhere(Expression where, List<Object> parameters) {
+    protected String getIdValue(Expression where, List<Object> parameters) {
         if (where instanceof final EqualsTo whereRoot) {
             // direct ID comparison like Id='001xx192918212'
             if (whereRoot.getLeftExpression() instanceof final Column col

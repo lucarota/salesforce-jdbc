@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
+import java.util.function.BiFunction;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.jsqlparser.statement.insert.Insert;
 import net.sf.jsqlparser.statement.select.Select;
@@ -24,15 +24,14 @@ public class InsertQueryAnalyzer {
     public List<Map<String, Object>> getRecords(List<Object> parameters) {
         if (queryAnalyzer.getQueryData() != null && records == null) {
             records = new ArrayList<>();
-            final Function<String, List<Map<String, Object>>> subSelectResolver = queryAnalyzer.getSubSelectResolver();
+            final BiFunction<String, List<Object>, List<Map<String, Object>>> subSelectResolver = queryAnalyzer.getSubSelectResolver();
             final Insert query = (Insert) queryAnalyzer.getQueryData();
             Select select = query.getSelect();
             if (select instanceof Values) {
                 query.getValues().accept(new InsertValuesVisitor(query.getColumns(), records, parameters, subSelectResolver));
             } else if (select != null && subSelectResolver != null) {
                 log.info("Insert/Update has a sub-select: {}", select);
-                List<Map<String, Object>> subRecords = subSelectResolver.apply(
-                        select.getPlainSelect().toString());
+                List<Map<String, Object>> subRecords = subSelectResolver.apply(select.getPlainSelect().toString(), parameters);
                 log.info("Insert/Update fetched {} records from a sub-select: {}", subRecords.size(), select);
                 for (Map<String, Object> subRecord : subRecords) {
                     // this subRecord is LinkedHashMap - so the order of fields is determined by soql

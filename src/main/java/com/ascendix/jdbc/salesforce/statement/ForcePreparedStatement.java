@@ -161,12 +161,13 @@ public class ForcePreparedStatement implements PreparedStatement, Iterator<List<
 
         try {
             final ResultSetMetaData metaData = getMetaData();
+            soqlQuery = prepareQuery(getSoqlQueryAnalyzer().getSoqlQueryString());
             if (cacheMode == CacheMode.NO_CACHE) {
                 this.neverQueriedMore = true;
                 return new CachedResultSet(this, metaData);
             }
             FieldDefTree fieldDefs = getRootEntityFieldDefinitions();
-            List<List<ForceResultField>> forceQueryResult = partnerService.query(prepareQuery(getSoqlQueryAnalyzer().getSoqlQueryString()), fieldDefs);
+            List<List<ForceResultField>> forceQueryResult = partnerService.query(soqlQuery, fieldDefs);
             if (!forceQueryResult.isEmpty()) {
                 List<ColumnMap<String, Object>> maps = Collections.synchronizedList(new LinkedList<>());
                 forceQueryResult.forEach(rec -> maps.add(convertToColumnMap(rec)));
@@ -194,8 +195,7 @@ public class ForcePreparedStatement implements PreparedStatement, Iterator<List<
             Map.Entry<List<List<ForceResultField>>, String> resultEntry;
             if (this.neverQueriedMore) {
                 this.neverQueriedMore = false;
-                resultEntry = partnerService.queryStart(prepareQuery(getSoqlQueryAnalyzer().getSoqlQueryString()),
-                    getRootEntityFieldDefinitions());
+                resultEntry = partnerService.queryStart(soqlQuery, getRootEntityFieldDefinitions());
             } else if (this.queryMoreLocator != null) {
                 resultEntry = partnerService.queryMore(this.queryMoreLocator, getRootEntityFieldDefinitions());
             } else {
@@ -519,11 +519,12 @@ public class ForcePreparedStatement implements PreparedStatement, Iterator<List<
         return deleteQueryAnalyzer;
     }
 
-    private List<Map<String, Object>> runResolveSubselect(String soql) {
+    private List<Map<String, Object>> runResolveSubselect(String soql, List<Object> parameters) {
         List<Map<String, Object>> results = new ArrayList<>();
         log.info("Resolving subselect \n{}", soql);
         try {
             ForcePreparedStatement forcePreparedStatement = new ForcePreparedStatement(connection, soql);
+            forcePreparedStatement.addParameters(parameters);
             ResultSet rs = forcePreparedStatement.query();
 
             while (rs.next()) {
@@ -610,6 +611,10 @@ public class ForcePreparedStatement implements PreparedStatement, Iterator<List<
     @Override
     public int getMaxRows() {
         return maxRows;
+    }
+
+    private void addParameters(List<Object> parameters) {
+        this.parameters.addAll(parameters);
     }
 
     protected void addParameter(int parameterIndex, Object x) {

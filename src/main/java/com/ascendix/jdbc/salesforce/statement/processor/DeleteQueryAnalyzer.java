@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.jsqlparser.JSQLParserException;
+import net.sf.jsqlparser.expression.ExpressionVisitorAdapter;
+import net.sf.jsqlparser.expression.JdbcParameter;
 import net.sf.jsqlparser.statement.delete.Delete;
 import net.sf.jsqlparser.statement.select.Select;
 import net.sf.jsqlparser.util.SelectUtils;
@@ -23,7 +25,7 @@ public class DeleteQueryAnalyzer {
         if (queryAnalyzer.getQueryData() != null && records == null) {
             records = new ArrayList<>();
             final Delete query = (Delete) queryAnalyzer.getQueryData();
-            String id = queryAnalyzer.checkIsDirectIdWhere(query.getWhere(), parameters);
+            String id = queryAnalyzer.getIdValue(query.getWhere(), parameters);
             if (id != null) {
                 records.add(id);
 
@@ -35,7 +37,8 @@ public class DeleteQueryAnalyzer {
                     Select select = SelectUtils.buildSelectFromTableAndExpressions(query.getTable(),"Id");
                     select.getPlainSelect().setWhere(query.getWhere());
 
-                    List<Map<String, Object>> subRecords = queryAnalyzer.getSubSelectResolver().apply(select.toString());
+                    final List<Object> whereParameters = getWhereParameters(parameters, query);
+                    List<Map<String, Object>> subRecords = queryAnalyzer.getSubSelectResolver().apply(select.toString(), whereParameters);
 
                     for (Map<String, Object> subRecord : subRecords) {
                         // this subRecord is LinkedHashMap - so the order of fields is determined by soql
@@ -52,6 +55,19 @@ public class DeleteQueryAnalyzer {
             }
         }
         return records;
+    }
+
+    private static List<Object> getWhereParameters(final List<Object> parameters, final Delete query) {
+        List<Object> whereParameters = new ArrayList<>();
+        query.getWhere().accept(new ExpressionVisitorAdapter() {
+            @Override
+            public void visit(JdbcParameter parameter) {
+                int idx = parameter.getIndex() - 1;
+                Object o = parameters.get(idx);
+                whereParameters.add(o);
+            }
+        });
+        return whereParameters;
     }
 
     public String getFromObjectName() {
