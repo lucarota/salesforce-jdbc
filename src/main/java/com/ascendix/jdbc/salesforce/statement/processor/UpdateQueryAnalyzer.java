@@ -1,6 +1,7 @@
 package com.ascendix.jdbc.salesforce.statement.processor;
 
 import com.ascendix.jdbc.salesforce.statement.processor.utils.ColumnsFinderVisitor;
+import com.ascendix.jdbc.salesforce.statement.processor.utils.UpdateRecordVisitor;
 import com.ascendix.jdbc.salesforce.statement.processor.utils.ValueToStringVisitor;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,6 +12,7 @@ import java.util.Set;
 import java.util.function.BiFunction;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.jsqlparser.JSQLParserException;
+import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.ExpressionVisitorAdapter;
 import net.sf.jsqlparser.expression.JdbcParameter;
 import net.sf.jsqlparser.schema.Column;
@@ -68,7 +70,20 @@ public class UpdateQueryAnalyzer {
             List<Map<String, Object>> subRecords = subSelectResolver.apply(select.toString(), whereParameters);
 
             for (Map<String, Object> subRecord : subRecords) {
-                populateRecordsById(parameters, subRecord.get("Id").toString(), updateSets, subSelectResolver);
+                // this subRecord is LinkedHashMap - so the order of fields is determined by soql
+                Map<String, Object> rec = new HashMap<>();
+                records.add(rec);
+                rec.put("Id", subRecord.get("Id"));
+
+                // Iterating over the received entities and adding fields to update
+                for (UpdateSet updateSet : updateSets) {
+                    List<Column> columns = updateSet.getColumns();
+                    for (int i = 0; i < columns.size(); i++) {
+                        Expression expr = updateSet.getValue(i);
+                        expr.accept(new UpdateRecordVisitor(rec, subRecord, columns.get(i).getColumnName())
+                        );
+                    }
+                }
             }
         } catch (JSQLParserException e) {
             log.error("Failed request to fetch the applicable entities: error in columns to fetch", e);
