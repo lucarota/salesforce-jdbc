@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.ascendix.salesforce</groupId>
     <artifactId>salesforce-jdbc</artifactId>
-    <version>1.5.5${suffix.version}-release</version>
+    <version>1.5.6${suffix.version}-release</version>
     <packaging>jar</packaging>
 
     <name>Salesforce JDBC Driver</name>
@@ -33,6 +33,7 @@
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <suffix.version></suffix.version>
 
         <force-partner-api.version>60.1.1</force-partner-api.version>
         <lombok.version>1.18.30</lombok.version>
