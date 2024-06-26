@@ -258,6 +258,10 @@ public class ForcePreparedStatement implements PreparedStatement, Iterator<List<
         if (name == null) {
             return TypeInfo.OTHER_TYPE_INFO;
         }
+        if (name.indexOf(".") != 1) {
+            /* Remove relation reference */
+            name = name.substring(name.indexOf(".") + 1);
+        }
         try {
             for (int i = 1; i <= metadata.getColumnCount(); i++) {
                 if (name.equalsIgnoreCase(metadata.getColumnName(i))) {
