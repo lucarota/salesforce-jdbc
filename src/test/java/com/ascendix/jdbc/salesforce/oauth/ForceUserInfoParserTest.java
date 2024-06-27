@@ -1,10 +1,9 @@
 package com.ascendix.jdbc.salesforce.oauth;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-import com.ascendix.jdbc.salesforce.oauth.ForceUserInfo;
-import com.ascendix.jdbc.salesforce.oauth.ForceUserInfoParser;
+import com.ascendix.jdbc.salesforce.connection.ForceService;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ForceUserInfoParserTest {
 
@@ -39,6 +38,6 @@ public class ForceUserInfoParserTest {
         assertEquals("America/Los_Angeles", userInfo.getTimeZone());
         assertEquals("en-US", userInfo.getLocale());
         assertEquals("my-instance", userInfo.getInstance());
-        assertEquals("https://my-instance.salesforce.com/services/data/v45/sobjects/", userInfo.getPartnerUrl());
+        assertEquals("https://my-instance.salesforce.com/services/data/v" + ForceService.DEFAULT_API_VERSION + "/sobjects/", userInfo.getPartnerUrl());
     }
 }

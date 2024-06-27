@@ -1,13 +1,12 @@
 package com.ascendix.jdbc.salesforce.oauth;
 
+import com.ascendix.jdbc.salesforce.connection.ForceService;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Map;
 
 @SuppressWarnings("unchecked")
 public class ForceUserInfoParser {
-
-    private static final String API_VERSION = "45";
 
     public static ForceUserInfo parse(String json) {
         ForceUserInfo userInfo = new ForceUserInfo();
@@ -67,7 +66,7 @@ public class ForceUserInfoParser {
         if (userInfo.getUrls() == null || !userInfo.getUrls().containsKey("partner")) {
             throw new IllegalStateException("User info doesn't contain partner URL: " + userInfo.getUrls());
         }
-        userInfo.setPartnerUrl(userInfo.getUrls().get("partner").replace("{version}", API_VERSION));
+        userInfo.setPartnerUrl(userInfo.getUrls().get("partner").replace("{version}", ForceService.DEFAULT_API_VERSION));
     }
 
     private static void extractInstance(ForceUserInfo userInfo) {
