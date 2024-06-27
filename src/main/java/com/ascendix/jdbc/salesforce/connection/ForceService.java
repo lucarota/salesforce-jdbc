@@ -28,7 +28,7 @@ public class ForceService {
     private static final String SANDBOX_LOGIN_DOMAIN = "test.salesforce.com";
     private static final long OAUTH_CONNECTION_TIMEOUT = TimeUnit.SECONDS.toMillis(10);
     private static final long OAUTH_READ_TIMEOUT = TimeUnit.SECONDS.toMillis(30);
-    public static final String DEFAULT_API_VERSION = "50.0";
+    public static final String DEFAULT_API_VERSION = "61";
 
     private static final Map<String, String> partnerUrlCache = new HashMap<>();
     public static final String UNEXPECTED_ERROR = "Failed to connect, unexpected error:";
@@ -66,7 +66,9 @@ public class ForceService {
                     return Connector.newConnection(partnerConfig);
                 } else {
                     info.setSandbox(true);
-                    partnerConfig.setAuthEndpoint(buildAuthEndpoint(info));
+                    String endpoint = buildAuthEndpoint(info);
+                    partnerConfig.setAuthEndpoint(endpoint);
+                    partnerConfig.setServiceEndpoint(endpoint);
                     connection = Connector.newConnection(partnerConfig);
                 }
             } else {
