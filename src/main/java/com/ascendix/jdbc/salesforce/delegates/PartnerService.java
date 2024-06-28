@@ -5,25 +5,17 @@ import com.ascendix.jdbc.salesforce.metadata.Table;
 import com.ascendix.jdbc.salesforce.utils.FieldDefTree;
 import com.ascendix.jdbc.salesforce.utils.IteratorUtils;
 import com.ascendix.jdbc.salesforce.utils.TreeNode;
-import com.sforce.soap.partner.DeleteResult;
-import com.sforce.soap.partner.DescribeGlobalResult;
-import com.sforce.soap.partner.DescribeGlobalSObjectResult;
-import com.sforce.soap.partner.DescribeSObjectResult;
-import com.sforce.soap.partner.Field;
-import com.sforce.soap.partner.PartnerConnection;
-import com.sforce.soap.partner.QueryResult;
-import com.sforce.soap.partner.SaveResult;
+import com.sforce.soap.partner.*;
 import com.sforce.soap.partner.sobject.SObject;
 import com.sforce.ws.ConnectionException;
 import com.sforce.ws.bind.XmlObject;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class PartnerService {
@@ -180,7 +172,7 @@ public class PartnerService {
             .findFirst()
             .map(XmlObject::getValue)
             .orElse(null);
-        return removeServiceInfo(rows, null, rootEntityName == null ? null : (String) rootEntityName);
+        return removeServiceInfo(rows, null, (String) rootEntityName);
     }
 
     public List<List<ForceResultField>> query(String soql, FieldDefTree expectedSchema) throws ConnectionException {
@@ -204,9 +196,7 @@ public class PartnerService {
         QueryResult queryResult = partnerConnection.query(soql);
         String queryLocator = queryResult.isDone() ? null : queryResult.getQueryLocator();
         List<TreeNode<ForceResultField>> resultRows = extractQueryResultData(queryResult);
-        return new AbstractMap.SimpleEntry<>(FieldDefTree.expand(resultRows, expectedSchema),
-            queryLocator
-        );
+        return new AbstractMap.SimpleEntry<>(FieldDefTree.expand(resultRows, expectedSchema), queryLocator);
     }
 
     public Map.Entry<List<List<ForceResultField>>, String> queryMore(String queryLocator, FieldDefTree expectedSchema)

@@ -18,12 +18,22 @@ public class FieldDef {
      * 1) Owner.Name  for select Owner.Name from Account
      * 2) maxLastName for MAX(LastName)
      */
+    private final String fullName;
     private final String alias;
     private final String type;
 
-    public FieldDef(String name, String alias, String type) {
+    public FieldDef(String name, String fullName, String alias, String type) {
         this.name = name;
+        this.fullName = fullName;
         this.alias = alias;
         this.type = type;
+    }
+
+    public String getEntity() {
+        int dot = fullName.lastIndexOf(".");
+        if (dot == -1) {
+            return "";
+        }
+        return fullName.substring(dot + 1);
     }
 }
