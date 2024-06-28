@@ -1,14 +1,15 @@
 package com.ascendix.jdbc.salesforce.delegates;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import com.ascendix.jdbc.salesforce.utils.TreeNode;
+import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.Test;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Slf4j
 public class PartnerResultToCartesianTableTest {
@@ -32,7 +33,8 @@ public class PartnerResultToCartesianTableTest {
         List<TreeNode<Integer>> rows = new ArrayList<>();
         rows.add(row);
 
-        PartnerResultToCartesianTable<Object, Integer> p = new PartnerResultToCartesianTable<>(schema);
+        PartnerResultToCartesianTable<Object, Integer> p = new PartnerResultToCartesianTable<>(schema, (s, r) -> r);
+
         List<List<Integer>> actual = p.expandOn(rows);
 
         assertEquals(expected, actual);
@@ -72,7 +74,7 @@ public class PartnerResultToCartesianTableTest {
         rows.add(row2);
         rows.add(row3);
 
-        PartnerResultToCartesianTable<Object, String> p = new PartnerResultToCartesianTable<>(schema);
+        PartnerResultToCartesianTable<Object, String> p = new PartnerResultToCartesianTable<>(schema, (s, r) -> r);
         List<List<String>> actual = p.expandOn(rows);
 
         assertEquals(expected, actual);
@@ -98,7 +100,7 @@ public class PartnerResultToCartesianTableTest {
         List<TreeNode<String>> rows = new ArrayList<>();
         rows.add(row);
 
-        PartnerResultToCartesianTable<Object, String> p = new PartnerResultToCartesianTable<>(schema);
+        PartnerResultToCartesianTable<Object, String> p = new PartnerResultToCartesianTable<>(schema, (s, r) -> r);
         List<List<String>> actual = p.expandOn(rows);
 
         List<List<String>> expected = Arrays.asList(Arrays.asList("1", "21", "3", "4"),
@@ -155,7 +157,7 @@ public class PartnerResultToCartesianTableTest {
                 Arrays.asList(11, 3, 4, 12, 5, 6), Arrays.asList(11, 1, 2, 12, 7, 8),
                 Arrays.asList(11, 3, 4, 12, 7, 8));
 
-        PartnerResultToCartesianTable<Object, Integer> p = new PartnerResultToCartesianTable<>(schema);
+        PartnerResultToCartesianTable<Object, Integer> p = new PartnerResultToCartesianTable<>(schema, (s, r) -> r);
         List<List<Integer>> actual = p.expandOn(rows);
 
         assertEquals(expected.size(), actual.size());
@@ -220,7 +222,7 @@ public class PartnerResultToCartesianTableTest {
         rows.add(row2);
         log.info(row1.toTree());
         log.info(row2.toTree());
-        PartnerResultToCartesianTable<Object, Integer> p = new PartnerResultToCartesianTable<>(schema);
+        PartnerResultToCartesianTable<Object, Integer> p = new PartnerResultToCartesianTable<>(schema, (s, r) -> r);
         List<List<Integer>> actual = p.expandOn(rows);
 
         List<List<Integer>> expected = Arrays.asList(Arrays.asList(11, 1, 2, 12, 13), Arrays.asList(11, 3, 4, 12, 13),
@@ -248,7 +250,7 @@ public class PartnerResultToCartesianTableTest {
         List<TreeNode<Integer>> rows = new ArrayList<>();
         rows.add(row);
 
-        PartnerResultToCartesianTable<Object, Integer> p = new PartnerResultToCartesianTable<>(schema);
+        PartnerResultToCartesianTable<Object, Integer> p = new PartnerResultToCartesianTable<>(schema, (s, r) -> r);
         List<List<Integer>> actual = p.expandOn(rows);
 
         List<List<Integer>> expected = List.of(Arrays.asList(11, null, null, 12, 13));
@@ -270,7 +272,7 @@ public class PartnerResultToCartesianTableTest {
         List<TreeNode<Integer>> rows = new ArrayList<>();
         rows.add(row);
 
-        PartnerResultToCartesianTable<Object, Integer> p = new PartnerResultToCartesianTable<>(schema);
+        PartnerResultToCartesianTable<Object, Integer> p = new PartnerResultToCartesianTable<>(schema, (s, r) -> r);
         List<List<Integer>> actual = p.expandOn(rows);
 
         List<List<Integer>> expected = List.of(Arrays.asList(11, null, null));

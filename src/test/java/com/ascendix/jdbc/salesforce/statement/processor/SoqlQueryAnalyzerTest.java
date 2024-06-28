@@ -7,6 +7,7 @@ import static org.mockito.Mockito.when;
 
 import com.ascendix.jdbc.salesforce.delegates.PartnerService;
 import com.ascendix.jdbc.salesforce.statement.FieldDef;
+import com.ascendix.jdbc.salesforce.utils.FieldDefTree;
 import com.sforce.soap.partner.DescribeSObjectResult;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.security.NoTypePermission;
@@ -29,6 +30,9 @@ public class SoqlQueryAnalyzerTest {
         when(partnerService.describeSObject(eq("Account"))).thenReturn(describeSObject("Account"));
         when(partnerService.describeSObject(eq("Contact"))).thenReturn(describeSObject("Contact"));
         when(partnerService.describeSObject(eq("User"))).thenReturn(describeSObject("User"));
+        when(partnerService.describeSObject(eq("Order"))).thenReturn(describeSObject("Order"));
+        when(partnerService.describeSObject(eq("zqu__Quote__c"))).thenReturn(describeSObject("zqu__Quote__c"));
+        when(partnerService.describeSObject(eq("Zuora__Subscription__c"))).thenReturn(describeSObject("Zuora__Subscription__c"));
     }
 
     @Test
@@ -274,5 +278,76 @@ public class SoqlQueryAnalyzerTest {
 
         List<FieldDef> actual = analyzer.getFieldDefinitions().flatten();
         assertEquals(1, actual.size());
+    }
+
+    @Test
+    public void testRelationFieldDefinitions() {
+        String soql = """
+            select Id, Name, Status, CreatedDate, OrderNumber, Order_Id__c,
+              Activation_Key__c , Zuora_Quote__r.zqu__Status__c,
+              Zuora_Quote__c , RecordTypeId, Terminal_Class__c,
+              Zuora_Quote__r.Customer_Subscription__r.OSS_Technical_Account_ID__c,
+              Order.Zuora_Quote__r.Customer_Subscription__r.Name
+            from Order
+        """;
+        final QueryAnalyzer queryAnalyzer = new QueryAnalyzer(soql, null, partnerService);
+        SoqlQueryAnalyzer analyzer = new SoqlQueryAnalyzer(queryAnalyzer);
+
+        FieldDefTree fieldDefinitions = analyzer.getFieldDefinitions();
+        System.out.println(fieldDefinitions.toTree());
+        List<FieldDef> actual = fieldDefinitions.flatten();
+
+        assertEquals(13, actual.size());
+        FieldDef fieldDef = actual.get(0);
+        assertEquals("Id", fieldDef.getName());
+        assertEquals("id", fieldDef.getType());
+
+        fieldDef = actual.get(1);
+        assertEquals("Name", fieldDef.getName());
+        assertEquals("string", fieldDef.getType());
+
+        fieldDef = actual.get(2);
+        assertEquals("Status", fieldDef.getAlias());
+        assertEquals("picklist", fieldDef.getType());
+
+        fieldDef = actual.get(3);
+        assertEquals("CreatedDate", fieldDef.getName());
+        assertEquals("datetime", fieldDef.getType());
+
+        fieldDef = actual.get(4);
+        assertEquals("OrderNumber", fieldDef.getName());
+        assertEquals("string", fieldDef.getType());
+
+        fieldDef = actual.get(5);
+        assertEquals("Order_Id__c", fieldDef.getName());
+        assertEquals("string", fieldDef.getType());
+
+        fieldDef = actual.get(6);
+        assertEquals("Activation_Key__c", fieldDef.getName());
+        assertEquals("string", fieldDef.getType());
+
+        fieldDef = actual.get(7);
+        assertEquals("zqu__Status__c", fieldDef.getName());
+        assertEquals("picklist", fieldDef.getType());
+
+        fieldDef = actual.get(8);
+        assertEquals("OSS_Technical_Account_ID__c", fieldDef.getName());
+        assertEquals("string", fieldDef.getType());
+
+        fieldDef = actual.get(9);
+        assertEquals("Name", fieldDef.getName());
+        assertEquals("string", fieldDef.getType());
+
+        fieldDef = actual.get(10);
+        assertEquals("Zuora_Quote__c", fieldDef.getName());
+        assertEquals("reference", fieldDef.getType());
+
+        fieldDef = actual.get(11);
+        assertEquals("RecordTypeId", fieldDef.getName());
+        assertEquals("reference", fieldDef.getType());
+
+        fieldDef = actual.get(12);
+        assertEquals("Terminal_Class__c", fieldDef.getName());
+        assertEquals("picklist", fieldDef.getType());
     }
 }

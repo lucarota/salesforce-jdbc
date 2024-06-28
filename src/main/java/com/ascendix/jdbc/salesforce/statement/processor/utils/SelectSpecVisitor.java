@@ -8,9 +8,8 @@ import com.ascendix.jdbc.salesforce.utils.FieldDefTree;
 import com.sforce.soap.partner.ChildRelationship;
 import com.sforce.soap.partner.DescribeSObjectResult;
 import com.sforce.soap.partner.Field;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+
+import java.util.*;
 import java.util.function.Function;
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.expression.Expression;
@@ -30,6 +29,7 @@ public class SelectSpecVisitor implements SelectItemVisitor {
 
     private final String rootEntityName;
     private final FieldDefTree fieldDefinitions;
+    private final Map<String, Integer> positions = new HashMap<>();
     private final PartnerService partnerService;
 
     public SelectSpecVisitor(String rootEntityName, FieldDefTree fieldDefinitions,
@@ -57,7 +57,18 @@ public class SelectSpecVisitor implements SelectItemVisitor {
                 alias = objectPrefix + "." + name;
             }
             FieldDef result = createFieldDef(name, alias, prefixNames);
-            fieldDefinitions.addChild(result);
+            if (!prefixNames.isEmpty()) {
+                int position = fieldDefinitions.getChildrenCount();
+                for (String prefix : prefixNames) {
+                    if (positions.containsKey(prefix)) {
+                        position = positions.get(prefix) + 1;
+                    }
+                    positions.put(prefix, position);
+                }
+                fieldDefinitions.addChild(result, position);
+            } else {
+                fieldDefinitions.addChild(result);
+            }
             /* Remove alias from query */
             fieldSpec.setAlias(null);
         } else if (fieldSpec.getExpression() instanceof net.sf.jsqlparser.expression.Function func) {
@@ -74,14 +85,19 @@ public class SelectSpecVisitor implements SelectItemVisitor {
         if (!fieldPrefixes.isEmpty() && fieldPrefixes.get(0).equalsIgnoreCase(fromObject)) {
             fieldPrefixes.remove(0);
         }
+        StringBuilder prefix = new StringBuilder();
         while (!fieldPrefixes.isEmpty()) {
             String referenceName = fieldPrefixes.get(0);
+            prefix.append(referenceName).append(".");
             Field reference = findField(referenceName, describeObject(fromObject), Field::getRelationshipName);
             fromObject = reference.getReferenceTo()[0];
             fieldPrefixes.remove(0);
         }
-        String type = findField(name, describeObject(fromObject), Field::getName).getType().name();
-        return new FieldDef(name, alias, type);
+        Field field = findField(name, describeObject(fromObject), Field::getName);
+        String type = field.getType().name();
+
+        name = field.getName();
+        return new FieldDef(name, prefix + name, alias, type);
     }
 
     private static final List<String> FUNCTIONS_HAS_INT_RESULT = Arrays.asList("COUNT",
@@ -102,7 +118,7 @@ public class SelectSpecVisitor implements SelectItemVisitor {
 
     private void visitFunctionCallSpec(net.sf.jsqlparser.expression.Function functionCallSpec, String alias) {
         if (FUNCTIONS_HAS_INT_RESULT.contains(functionCallSpec.getName().toUpperCase())) {
-            fieldDefinitions.addChild(new FieldDef(alias, alias, "int"));
+            fieldDefinitions.addChild(new FieldDef(alias, alias, alias, "int"));
         } else {
             Expression param = functionCallSpec.getParameters().get(0);
             String[] prefix = StringUtils.split(param.toString(), '.');

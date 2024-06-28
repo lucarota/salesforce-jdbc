@@ -6,14 +6,17 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
 public class PartnerResultToCartesianTable<S, R> {
 
     private final TreeNode<S> schema;
+    private final BiFunction<TreeNode<S>, List<R>, List<R>> addMissingColumns;
 
-    public PartnerResultToCartesianTable(TreeNode<S> schema) {
+    public PartnerResultToCartesianTable(TreeNode<S> schema, BiFunction<TreeNode<S>, List<R>, List<R>> addMissingColumns) {
         this.schema = schema;
+        this.addMissingColumns = addMissingColumns;
     }
 
     public List<List<R>> expandOn(List<TreeNode<R>> rows) {
@@ -29,7 +32,7 @@ public class PartnerResultToCartesianTable<S, R> {
 
     private List<List<R>> expandRow(TreeNode<R> row, int columnPosition, int schemaPosition) {
         if (schemaPosition > schema.getChildrenCount() - 1) {
-            return List.of(row.flatten());
+            return List.of(addMissingColumns.apply(schema, row.flatten()));
         } else if (schema.getChild(schemaPosition).isLeaf()) {
             return expandOn(List.of(row), columnPosition + 1, schemaPosition + 1);
         } else {
