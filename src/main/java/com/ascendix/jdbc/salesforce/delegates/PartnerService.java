@@ -85,6 +85,11 @@ public class PartnerService {
             column.setNillable(field.isNillable());
             column.setCalculated(field.isCalculated() || field.isAutoNumber());
             column.setLength(field.getLength());
+            column.setUnique(field.isUnique());
+            column.setIndexed(
+                    field.getName().equals("Id") ||
+                    field.isAutoNumber() ||
+                    (field.isUnique() && field.isExternalId()));
             String[] referenceTos = field.getReferenceTo();
             List<String> sObjectTypes = getSObjectTypes();
             if (referenceTos != null) {
