@@ -25,5 +25,9 @@ public class Column implements Serializable {
     @Setter
     private boolean nillable;
     @Setter
+    private boolean unique;
+    @Setter
     private boolean calculated;
+    @Setter
+    private boolean indexed;
 }
