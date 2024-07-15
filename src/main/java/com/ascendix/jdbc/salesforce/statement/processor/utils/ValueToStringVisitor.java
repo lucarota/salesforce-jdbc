@@ -1,26 +1,23 @@
 package com.ascendix.jdbc.salesforce.statement.processor.utils;
 
 import com.ascendix.jdbc.salesforce.utils.ParamUtils;
-import java.math.BigDecimal;
+import lombok.extern.slf4j.Slf4j;
+import net.sf.jsqlparser.expression.*;
+import net.sf.jsqlparser.statement.select.PlainSelect;
+import net.sf.jsqlparser.statement.select.Select;
+
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.*;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 import java.util.function.BiFunction;
-import lombok.extern.slf4j.Slf4j;
-import net.sf.jsqlparser.expression.DoubleValue;
-import net.sf.jsqlparser.expression.ExpressionVisitorAdapter;
-import net.sf.jsqlparser.expression.HexValue;
-import net.sf.jsqlparser.expression.JdbcParameter;
-import net.sf.jsqlparser.expression.LongValue;
-import net.sf.jsqlparser.expression.NullValue;
-import net.sf.jsqlparser.expression.StringValue;
-import net.sf.jsqlparser.statement.select.PlainSelect;
-import net.sf.jsqlparser.statement.select.Select;
 
 @Slf4j
-public class ValueToStringVisitor extends ExpressionVisitorAdapter {
+public class ValueToStringVisitor extends ExpressionVisitorAdapter<Expression> {
 
     private final Map<String, Object> fieldValues;
     private final String columnName;
@@ -36,37 +33,42 @@ public class ValueToStringVisitor extends ExpressionVisitorAdapter {
     }
 
     @Override
-    public void visit(NullValue nullValue) {
+    public <S> Expression visit(NullValue nullValue, S context) {
         log.trace("[VtoSVisitor] NullValue");
         fieldValues.put(columnName, null);
+        return null;
     }
 
     @Override
-    public void visit(DoubleValue doubleValue) {
+    public <S> Expression visit(DoubleValue doubleValue, S context) {
         log.warn("[VtoSVisitor] DoubleValue {}={}", columnName, doubleValue.getValue());
         fieldValues.put(columnName, doubleValue.getValue());
+        return null;
     }
 
     @Override
-    public void visit(LongValue longValue) {
+    public <S> Expression visit(LongValue longValue, S context) {
         log.warn("[VtoSVisitor] LongValue {}={}", columnName, longValue.getValue());
         fieldValues.put(columnName, longValue.getValue());
+        return null;
     }
 
     @Override
-    public void visit(HexValue hexValue) {
+    public <S> Expression visit(HexValue hexValue, S context) {
         log.warn("[VtoSVisitor] HexValue {}={}", columnName, hexValue.getValue());
         fieldValues.put(columnName, hexValue.getValue());
+        return null;
     }
 
     @Override
-    public void visit(StringValue stringValue) {
+    public <S> Expression visit(StringValue stringValue, S context) {
         log.trace("[VtoSVisitor] StringValue {}={}", columnName, stringValue.getValue());
         fieldValues.put(columnName, stringValue.getValue());
+        return null;
     }
 
     @Override
-    public void visit(Select subSelect) {
+    public <S> Expression visit(Select subSelect, S context) {
         Object value = null;
         PlainSelect plainSelect = subSelect.getPlainSelect();
         if (plainSelect != null) {
@@ -83,13 +85,15 @@ public class ValueToStringVisitor extends ExpressionVisitorAdapter {
             }
         }
         fieldValues.put(columnName, value);
+        return null;
     }
 
     @Override
-    public void visit(JdbcParameter parameter) {
+    public <S> Expression visit(JdbcParameter parameter, S context) {
         int idx = parameter.getIndex() - 1;
         Object o = parameters.get(idx);
         fieldValues.put(columnName, getParameter(o));
+        return null;
     }
 
     private static Object getParameter(Object o) {

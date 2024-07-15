@@ -17,15 +17,11 @@ import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.Statement;
-import net.sf.jsqlparser.statement.select.FromItem;
-import net.sf.jsqlparser.statement.select.ParenthesedSelect;
-import net.sf.jsqlparser.statement.select.PlainSelect;
-import net.sf.jsqlparser.statement.select.SelectItem;
-import net.sf.jsqlparser.statement.select.SelectItemVisitor;
+import net.sf.jsqlparser.statement.select.*;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
-public class SelectSpecVisitor implements SelectItemVisitor {
+public class SelectSpecVisitor implements SelectItemVisitor<Expression> {
 
     private final String rootEntityName;
     private final FieldDefTree fieldDefinitions;
@@ -40,7 +36,12 @@ public class SelectSpecVisitor implements SelectItemVisitor {
     }
 
     @Override
-    public void visit(SelectItem fieldSpec) {
+    public <S> Expression visit(SelectItem<? extends Expression> fieldSpec, S context) {
+        visitInternal((SelectItem<Expression>) fieldSpec);
+        return null;
+    }
+
+    private void visitInternal(SelectItem<Expression> fieldSpec) {
         if (fieldSpec.getExpression() instanceof Column column) {
             String name = column.getColumnName();
             String alias = fieldSpec.getAlias() != null ? fieldSpec.getAlias().getName() : name;
@@ -128,7 +129,7 @@ public class SelectSpecVisitor implements SelectItemVisitor {
         }
     }
 
-    private ParenthesedSelect visitSubQuery(ParenthesedSelect subQuery) {
+    private Expression visitSubQuery(ParenthesedSelect subQuery) {
         try {
             String subQuerySoql = subQuery.getPlainSelect().toString();
             Statement statement = CCJSqlParserUtil.parse(subQuerySoql);
