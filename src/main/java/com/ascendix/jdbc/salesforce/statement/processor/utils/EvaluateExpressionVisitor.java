@@ -1,42 +1,21 @@
 package com.ascendix.jdbc.salesforce.statement.processor.utils;
 
 import com.ascendix.jdbc.salesforce.exceptions.UnsupportedArgumentTypeException;
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
+import net.sf.jsqlparser.expression.*;
+import net.sf.jsqlparser.expression.operators.arithmetic.*;
+import net.sf.jsqlparser.schema.Column;
+
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.sql.Time;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.Period;
+import java.time.*;
 import java.util.Date;
 import java.util.Map;
-import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
-import net.sf.jsqlparser.expression.CaseExpression;
-import net.sf.jsqlparser.expression.DateValue;
-import net.sf.jsqlparser.expression.DoubleValue;
-import net.sf.jsqlparser.expression.ExpressionVisitorAdapter;
-import net.sf.jsqlparser.expression.Function;
-import net.sf.jsqlparser.expression.HexValue;
-import net.sf.jsqlparser.expression.LongValue;
-import net.sf.jsqlparser.expression.NullValue;
-import net.sf.jsqlparser.expression.Parenthesis;
-import net.sf.jsqlparser.expression.StringValue;
-import net.sf.jsqlparser.expression.TimeValue;
-import net.sf.jsqlparser.expression.TimestampValue;
-import net.sf.jsqlparser.expression.operators.arithmetic.Addition;
-import net.sf.jsqlparser.expression.operators.arithmetic.BitwiseLeftShift;
-import net.sf.jsqlparser.expression.operators.arithmetic.BitwiseRightShift;
-import net.sf.jsqlparser.expression.operators.arithmetic.Concat;
-import net.sf.jsqlparser.expression.operators.arithmetic.Division;
-import net.sf.jsqlparser.expression.operators.arithmetic.IntegerDivision;
-import net.sf.jsqlparser.expression.operators.arithmetic.Multiplication;
-import net.sf.jsqlparser.expression.operators.arithmetic.Subtraction;
-import net.sf.jsqlparser.schema.Column;
 
 @Slf4j
-public class EvaluateExpressionVisitor extends ExpressionVisitorAdapter {
+public class EvaluateExpressionVisitor extends ExpressionVisitorAdapter<Expression> {
 
     protected Map<String, Object> recordFieldsFromDB;
     @Getter
@@ -141,93 +120,95 @@ public class EvaluateExpressionVisitor extends ExpressionVisitorAdapter {
     }
 
     @Override
-    public void visit(BitwiseRightShift aThis) {
+    public <S> Expression visit(BitwiseRightShift aThis, S context) {
         log.warn("[EvaluateExpressionVisitor] BitwiseRightShift");
+        return null;
     }
 
     @Override
-    public void visit(BitwiseLeftShift aThis) {
+    public <S> Expression visit(BitwiseLeftShift aThis, S context) {
         log.warn("[EvaluateExpressionVisitor] BitwiseLeftShift");
+        return null;
     }
 
     @Override
-    public void visit(NullValue nullValue) {
+    public <S> Expression visit(NullValue nullValue, S context) {
         log.trace("[EvaluateExpressionVisitor] NullValue");
         result = null;
+        return null;
     }
 
     @Override
-    public void visit(Function function) {
+    public <S> Expression visit(Function function, S context) {
         log.trace("[EvaluateExpressionVisitor] Function function={}", function.getName());
         if ("now".equalsIgnoreCase(function.getName())) {
             result = new Date();
-            return;
+            return null;
         }
         if ("getdate".equalsIgnoreCase(function.getName())) {
             result = LocalDate.now();
-            return;
+            return null;
         }
         throw new RuntimeException("Function '" + function.getName() + "' is not implemented.");
     }
 
     @Override
-    public void visit(DoubleValue doubleValue) {
+    public <S> Expression visit(DoubleValue doubleValue, S context) {
         log.trace("[EvaluateExpressionVisitor] DoubleValue={}", doubleValue.getValue());
         result = doubleValue.getValue();
+        return null;
     }
 
     @Override
-    public void visit(LongValue longValue) {
+    public <S> Expression visit(LongValue longValue, S context) {
         log.trace("[EvaluateExpressionVisitor] LongValue={}", longValue.getValue());
         result = longValue.getValue();
+        return null;
     }
 
     @Override
-    public void visit(HexValue hexValue) {
+    public <S> Expression visit(HexValue hexValue, S context) {
         log.trace("[EvaluateExpressionVisitor] HexValue={}", hexValue.getValue());
         result = hexValue.getValue();
+        return null;
     }
 
     @Override
-    public void visit(DateValue dateValue) {
+    public <S> Expression visit(DateValue dateValue, S context) {
         log.trace("[EvaluateExpressionVisitor] DateValue={}", dateValue.getValue());
         result = dateValue.getValue();
+        return null;
     }
 
     @Override
-    public void visit(TimeValue timeValue) {
+    public <S> Expression visit(TimeValue timeValue, S context) {
         log.trace("[EvaluateExpressionVisitor] BitwiseRightShift={}", timeValue.getValue());
         result = timeValue.getValue();
+        return null;
     }
 
     @Override
-    public void visit(TimestampValue timestampValue) {
+    public <S> Expression visit(TimestampValue timestampValue, S context) {
         log.trace("[EvaluateExpressionVisitor] TimestampValue={}", timestampValue.getValue());
         result = timestampValue.getValue();
+        return null;
     }
 
     @Override
-    public void visit(Parenthesis parenthesis) {
-        EvaluateExpressionVisitor subEvaluatorLeft = subVisitor();
-        parenthesis.getExpression().accept(subEvaluatorLeft);
-        result = subEvaluatorLeft.getResult();
-        log.trace("[EvaluateExpressionVisitor] Parenthesis={}", result);
-    }
-
-    @Override
-    public void visit(StringValue stringValue) {
+    public <S> Expression visit(StringValue stringValue, S context) {
         log.trace("[EvaluateExpressionVisitor] StringValue={}", stringValue.getValue());
         result = stringValue.getValue();
+        return null;
     }
 
-    Object processDateNumberOperation(EvaluateExpressionVisitor left, EvaluateExpressionVisitor right,
-        boolean isAdding) {
+    private Object processDateNumberOperation(EvaluateExpressionVisitor left, EvaluateExpressionVisitor right,
+                                              boolean isAdding) {
         BigDecimal changeValue = BigDecimal.valueOf(right.getResultFloatNumber());
         // https://oracle-base.com/articles/misc/oracle-dates-timestamps-and-intervals
         // Also rounding - because otherwise 1 second will be 0.999993600
         long secondsValue = changeValue.subtract(BigDecimal.valueOf(changeValue.intValue()))
-            .multiply(BigDecimal.valueOf(86400), new MathContext(4))
-            .longValue();
+                .multiply(BigDecimal.valueOf(86400), new MathContext(4))
+                .longValue();
 
         Period changeDays = Period.ofDays(isAdding ? changeValue.intValue() : -changeValue.intValue());
         Duration changeSec = Duration.ofSeconds(isAdding ? secondsValue : -secondsValue);
@@ -257,7 +238,7 @@ public class EvaluateExpressionVisitor extends ExpressionVisitorAdapter {
     }
 
     @Override
-    public void visit(Addition addition) {
+    public <S> Expression visit(Addition addition, S context) {
         log.trace("[EvaluateExpressionVisitor] Addition");
         EvaluateExpressionVisitor subEvaluatorLeft = subVisitor();
         addition.getLeftExpression().accept(subEvaluatorLeft);
@@ -265,22 +246,22 @@ public class EvaluateExpressionVisitor extends ExpressionVisitorAdapter {
         addition.getRightExpression().accept(subEvaluatorRight);
 
         if ((!subEvaluatorLeft.isResultNull() && !subEvaluatorRight.isResultNull())
-            && ((subEvaluatorLeft.isResultDateTime() || subEvaluatorLeft.isResultDate()
-            || subEvaluatorLeft.isResultTime()) &&
-            (subEvaluatorRight.isResultFloatNumber() || subEvaluatorRight.isResultFixedNumber()))) {
+                && ((subEvaluatorLeft.isResultDateTime() || subEvaluatorLeft.isResultDate()
+                || subEvaluatorLeft.isResultTime()) &&
+                (subEvaluatorRight.isResultFloatNumber() || subEvaluatorRight.isResultFixedNumber()))) {
             result = processDateNumberOperation(subEvaluatorLeft, subEvaluatorRight, true);
-            return;
+            return null;
         }
 
         boolean isString = subEvaluatorLeft.isResultString() || subEvaluatorRight.isResultString();
         try {
             if (subEvaluatorLeft.isResultFloatNumber() || subEvaluatorRight.isResultFloatNumber()) {
                 result = subEvaluatorLeft.getResultFloatNumber() + subEvaluatorRight.getResultFloatNumber();
-                return;
+                return null;
             }
             if (subEvaluatorLeft.isResultFixedNumber() || subEvaluatorRight.isResultFixedNumber()) {
                 result = subEvaluatorLeft.getResultFixedNumber() + subEvaluatorRight.getResultFixedNumber();
-                return;
+                return null;
             }
         } catch (NumberFormatException e) {
             isString = true;
@@ -289,24 +270,24 @@ public class EvaluateExpressionVisitor extends ExpressionVisitorAdapter {
         if (isString) {
             // if string - convert to string "null"
             result = subEvaluatorLeft.getResultString("null") + subEvaluatorRight.getResultString("null");
-            return;
+            return null;
         }
 
         if (subEvaluatorLeft.isResultNull() || subEvaluatorRight.isResultNull()) {
             // if any of the parameters is null - return null
             result = null;
-            return;
+            return null;
         }
         result = null;
         String message = String.format("Addition not implemented for types %s and %s",
-            subEvaluatorLeft.result.getClass().getName(),
-            subEvaluatorRight.result.getClass().getName());
+                subEvaluatorLeft.result.getClass().getName(),
+                subEvaluatorRight.result.getClass().getName());
         log.error(message);
         throw new UnsupportedArgumentTypeException(message);
     }
 
     @Override
-    public void visit(Division division) {
+    public <S> Expression visit(Division division, S context) {
         log.trace("[EvaluateExpressionVisitor] Division");
         EvaluateExpressionVisitor subEvaluatorLeft = subVisitor();
         division.getLeftExpression().accept(subEvaluatorLeft);
@@ -316,36 +297,36 @@ public class EvaluateExpressionVisitor extends ExpressionVisitorAdapter {
         if (subEvaluatorLeft.isResultNull() || subEvaluatorRight.isResultNull()) {
             // if any of the parameters is null - return null
             result = null;
-            return;
+            return null;
         }
 
         boolean isString = subEvaluatorLeft.isResultString() || subEvaluatorRight.isResultString();
         if (isString) {
             String message = String.format("Division not implemented for types %s and %s",
-                subEvaluatorLeft.result.getClass().getName(),
-                subEvaluatorRight.result.getClass().getName());
+                    subEvaluatorLeft.result.getClass().getName(),
+                    subEvaluatorRight.result.getClass().getName());
             log.error(message);
             throw new UnsupportedArgumentTypeException(message);
         }
 
         if (subEvaluatorLeft.isResultFloatNumber() || subEvaluatorRight.isResultFloatNumber()) {
             result = subEvaluatorLeft.getResultFloatNumber() / subEvaluatorRight.getResultFloatNumber();
-            return;
+            return null;
         }
         if (subEvaluatorLeft.isResultFixedNumber() || subEvaluatorRight.isResultFixedNumber()) {
             result = subEvaluatorLeft.getResultFixedNumber() / subEvaluatorRight.getResultFixedNumber();
-            return;
+            return null;
         }
         result = null;
         String message = String.format("Division not implemented for types %s and %s",
-            subEvaluatorLeft.result.getClass().getName(),
-            subEvaluatorRight.result.getClass().getName());
+                subEvaluatorLeft.result.getClass().getName(),
+                subEvaluatorRight.result.getClass().getName());
         log.error(message);
         throw new UnsupportedArgumentTypeException(message);
     }
 
     @Override
-    public void visit(IntegerDivision division) {
+    public <S> Expression visit(IntegerDivision division, S context) {
         log.trace("[EvaluateExpressionVisitor] IntegerDivision");
         EvaluateExpressionVisitor subEvaluatorLeft = subVisitor();
         division.getLeftExpression().accept(subEvaluatorLeft);
@@ -355,36 +336,36 @@ public class EvaluateExpressionVisitor extends ExpressionVisitorAdapter {
         if (subEvaluatorLeft.isResultNull() || subEvaluatorRight.isResultNull()) {
             // if any of the parameters is null - return null
             result = null;
-            return;
+            return null;
         }
 
         boolean isString = subEvaluatorLeft.isResultString() || subEvaluatorRight.isResultString();
         if (isString) {
             String message = String.format("Division not implemented for types %s and %s",
-                subEvaluatorLeft.result.getClass().getName(),
-                subEvaluatorRight.result.getClass().getName());
+                    subEvaluatorLeft.result.getClass().getName(),
+                    subEvaluatorRight.result.getClass().getName());
             log.error(message);
             throw new UnsupportedArgumentTypeException(message);
         }
 
         if (subEvaluatorLeft.isResultFloatNumber() || subEvaluatorRight.isResultFloatNumber()) {
             result = Double.doubleToLongBits(
-                subEvaluatorLeft.getResultFloatNumber() / subEvaluatorRight.getResultFloatNumber());
-            return;
+                    subEvaluatorLeft.getResultFloatNumber() / subEvaluatorRight.getResultFloatNumber());
+            return null;
         }
         if (subEvaluatorLeft.isResultFixedNumber() || subEvaluatorRight.isResultFixedNumber()) {
             result = subEvaluatorLeft.getResultFixedNumber() / subEvaluatorRight.getResultFixedNumber();
-            return;
+            return null;
         }
         String message = String.format("Division not implemented for types %s and %s",
-            subEvaluatorLeft.result.getClass().getName(),
-            subEvaluatorRight.result.getClass().getName());
+                subEvaluatorLeft.result.getClass().getName(),
+                subEvaluatorRight.result.getClass().getName());
         log.error(message);
         throw new UnsupportedArgumentTypeException(message);
     }
 
     @Override
-    public void visit(Multiplication multiplication) {
+    public <S> Expression visit(Multiplication multiplication, S context) {
         log.trace("[EvaluateExpressionVisitor] Multiplication");
         EvaluateExpressionVisitor subEvaluatorLeft = subVisitor();
         multiplication.getLeftExpression().accept(subEvaluatorLeft);
@@ -394,36 +375,36 @@ public class EvaluateExpressionVisitor extends ExpressionVisitorAdapter {
         if (subEvaluatorLeft.isResultNull() || subEvaluatorRight.isResultNull()) {
             // if any of the parameters is null - return null
             result = null;
-            return;
+            return null;
         }
 
         boolean isString = subEvaluatorLeft.isResultString() || subEvaluatorRight.isResultString();
         if (isString) {
             String message = String.format("Multiplication not implemented for types %s and %s",
-                subEvaluatorLeft.result.getClass().getName(),
-                subEvaluatorRight.result.getClass().getName());
+                    subEvaluatorLeft.result.getClass().getName(),
+                    subEvaluatorRight.result.getClass().getName());
             log.error(message);
             throw new UnsupportedArgumentTypeException(message);
         }
 
         if (subEvaluatorLeft.isResultFloatNumber() || subEvaluatorRight.isResultFloatNumber()) {
             result = subEvaluatorLeft.getResultFloatNumber() * subEvaluatorRight.getResultFloatNumber();
-            return;
+            return null;
         }
         if (subEvaluatorLeft.isResultFixedNumber() || subEvaluatorRight.isResultFixedNumber()) {
             result = subEvaluatorLeft.getResultFixedNumber() * subEvaluatorRight.getResultFixedNumber();
-            return;
+            return null;
         }
         result = null;
         String message = String.format("Multiplication not implemented for types %s and %s",
-            subEvaluatorLeft.result.getClass().getName(),
-            subEvaluatorRight.result.getClass().getName());
+                subEvaluatorLeft.result.getClass().getName(),
+                subEvaluatorRight.result.getClass().getName());
         log.error(message);
         throw new UnsupportedArgumentTypeException(message);
     }
 
     @Override
-    public void visit(Subtraction subtraction) {
+    public <S> Expression visit(Subtraction subtraction, S context) {
         log.trace("[EvaluateExpressionVisitor] Subtraction");
         EvaluateExpressionVisitor subEvaluatorLeft = subVisitor();
         subtraction.getLeftExpression().accept(subEvaluatorLeft);
@@ -431,59 +412,61 @@ public class EvaluateExpressionVisitor extends ExpressionVisitorAdapter {
         subtraction.getRightExpression().accept(subEvaluatorRight);
 
         if ((!subEvaluatorLeft.isResultNull() && !subEvaluatorRight.isResultNull())
-            && ((subEvaluatorLeft.isResultDateTime() || subEvaluatorLeft.isResultDate()
-            || subEvaluatorLeft.isResultTime()) &&
-            (subEvaluatorRight.isResultFloatNumber() || subEvaluatorRight.isResultFixedNumber()))) {
+                && ((subEvaluatorLeft.isResultDateTime() || subEvaluatorLeft.isResultDate()
+                || subEvaluatorLeft.isResultTime()) &&
+                (subEvaluatorRight.isResultFloatNumber() || subEvaluatorRight.isResultFixedNumber()))) {
             result = processDateNumberOperation(subEvaluatorLeft, subEvaluatorRight, false);
-            return;
+            return null;
         }
 
         if (subEvaluatorLeft.isResultNull() || subEvaluatorRight.isResultNull()) {
             // if any of the parameters is null - return null
             result = null;
-            return;
+            return null;
         }
 
         boolean isString = subEvaluatorLeft.isResultString() || subEvaluatorRight.isResultString();
         if (isString) {
             String message = String.format("Subtraction not implemented for types %s and %s",
-                subEvaluatorLeft.result.getClass().getName(),
-                subEvaluatorRight.result.getClass().getName());
+                    subEvaluatorLeft.result.getClass().getName(),
+                    subEvaluatorRight.result.getClass().getName());
             log.error(message);
             throw new UnsupportedArgumentTypeException(message);
         }
 
         if (subEvaluatorLeft.isResultFloatNumber() || subEvaluatorRight.isResultFloatNumber()) {
             result = subEvaluatorLeft.getResultFloatNumber() - subEvaluatorRight.getResultFloatNumber();
-            return;
+            return null;
         }
         if (subEvaluatorLeft.isResultFixedNumber() || subEvaluatorRight.isResultFixedNumber()) {
             result = subEvaluatorLeft.getResultFixedNumber() - subEvaluatorRight.getResultFixedNumber();
-            return;
+            return null;
         }
         String message = String.format("Subtraction not implemented for types %s and %s",
-            subEvaluatorLeft.result.getClass().getName(),
-            subEvaluatorRight.result.getClass().getName());
+                subEvaluatorLeft.result.getClass().getName(),
+                subEvaluatorRight.result.getClass().getName());
         log.error(message);
         result = null;
         throw new UnsupportedArgumentTypeException(message);
     }
 
     @Override
-    public void visit(Column tableColumn) {
+    public <S> Expression visit(Column tableColumn, S context) {
         log.trace("[EvaluateExpressionVisitor] Column column={}", tableColumn.getColumnName());
         result = recordFieldsFromDB.get(tableColumn.getColumnName());
+        return null;
     }
 
     @Override
-    public void visit(CaseExpression caseExpression) {
+    public <S> Expression visit(CaseExpression caseExpression, S context) {
         log.trace("[EvaluateExpressionVisitor] CaseExpression");
         EvaluateExpressionVisitor caseEvaluatorLeft = subVisitor();
         caseExpression.getSwitchExpression().accept(caseEvaluatorLeft);
+        return null;
     }
 
     @Override
-    public void visit(Concat concat) {
+    public <S> Expression visit(Concat concat, S context) {
         log.trace("[EvaluateExpressionVisitor] Concat");
         EvaluateExpressionVisitor subEvaluatorLeft = subVisitor();
         concat.getLeftExpression().accept(subEvaluatorLeft);
@@ -491,5 +474,6 @@ public class EvaluateExpressionVisitor extends ExpressionVisitorAdapter {
         concat.getRightExpression().accept(subEvaluatorRight);
 
         result = subEvaluatorLeft.getResultString("null") + subEvaluatorRight.getResultString("null");
+        return null;
     }
 }

@@ -5,13 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 
 import com.ascendix.jdbc.salesforce.exceptions.UnsupportedArgumentTypeException;
 import java.util.Map;
-import net.sf.jsqlparser.expression.DateValue;
-import net.sf.jsqlparser.expression.DoubleValue;
-import net.sf.jsqlparser.expression.Function;
-import net.sf.jsqlparser.expression.LongValue;
-import net.sf.jsqlparser.expression.StringValue;
-import net.sf.jsqlparser.expression.TimeValue;
-import net.sf.jsqlparser.expression.TimestampValue;
+
+import net.sf.jsqlparser.expression.*;
 import net.sf.jsqlparser.expression.operators.arithmetic.Addition;
 import net.sf.jsqlparser.expression.operators.arithmetic.Subtraction;
 import org.junit.jupiter.api.Test;
@@ -24,12 +19,13 @@ public class EvaluateExpressionVisitorTest {
             super(recordFieldsFromDB);
         }
 
-        public void visit(Function function) {
+        public <S> Expression visit(Function function, S context) {
             if ("now".equalsIgnoreCase(function.getName())) {
                 result = "2021-Test-Day 12:12:12";
             } else {
                 super.visit(function);
             }
+            return null;
         }
     }
 

@@ -1,9 +1,5 @@
 package com.ascendix.jdbc.salesforce.statement.processor.utils;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.function.BiFunction;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.operators.relational.ExpressionList;
@@ -11,8 +7,13 @@ import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.statement.select.SelectVisitorAdapter;
 import net.sf.jsqlparser.statement.select.Values;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.function.BiFunction;
+
 @Slf4j
-public class InsertValuesVisitor extends SelectVisitorAdapter {
+public class InsertValuesVisitor extends SelectVisitorAdapter<Expression> {
 
     private final BiFunction<String, List<Object>, List<Map<String, Object>>> subSelectResolver;
     private final List<Column> columns;
@@ -28,12 +29,13 @@ public class InsertValuesVisitor extends SelectVisitorAdapter {
     }
 
     @Override
-    public void visit(Values values) {
+    public <S> Expression visit(Values values, S context) {
         log.trace("Expression Visitor");
 
         for (Expression e : values.getExpressions()) {
-            if (e instanceof ExpressionList expressionList) {
-                new Values(expressionList).accept(new InsertValuesVisitor(columns, records, parameters, subSelectResolver));
+            if (e instanceof ExpressionList<? extends Expression> expressionList) {
+                InsertValuesVisitor selectVisitor = new InsertValuesVisitor(columns, records, parameters, subSelectResolver);
+                new Values((ExpressionList<Expression>) expressionList).accept(selectVisitor, null);
             } else {
                 HashMap<String, Object> fieldValues = new HashMap<>();
                 records.add(fieldValues);
@@ -45,5 +47,6 @@ public class InsertValuesVisitor extends SelectVisitorAdapter {
                 break;
             }
         }
+        return null;
     }
 }

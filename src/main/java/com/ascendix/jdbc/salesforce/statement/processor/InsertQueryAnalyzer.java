@@ -28,7 +28,7 @@ public class InsertQueryAnalyzer {
             final Insert query = (Insert) queryAnalyzer.getQueryData();
             Select select = query.getSelect();
             if (select instanceof Values) {
-                query.getValues().accept(new InsertValuesVisitor(query.getColumns(), records, parameters, subSelectResolver));
+                query.getValues().accept(new InsertValuesVisitor(query.getColumns(), records, parameters, subSelectResolver), null);
             } else if (select != null && subSelectResolver != null) {
                 log.info("Insert/Update has a sub-select: {}", select);
                 List<Map<String, Object>> subRecords = subSelectResolver.apply(select.getPlainSelect().toString(), parameters);

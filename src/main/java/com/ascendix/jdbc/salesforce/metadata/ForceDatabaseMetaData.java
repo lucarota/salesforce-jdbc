@@ -8,6 +8,7 @@ import static com.ascendix.jdbc.salesforce.metadata.TypeInfo.STRING_TYPE_INFO;
 
 import com.ascendix.jdbc.salesforce.ForceDriver;
 import com.ascendix.jdbc.salesforce.connection.ForceConnection;
+import com.ascendix.jdbc.salesforce.connection.ForceService;
 import com.ascendix.jdbc.salesforce.delegates.PartnerService;
 import com.ascendix.jdbc.salesforce.resultset.CachedResultSet;
 import com.ascendix.jdbc.salesforce.resultset.CachedResultSetMetaData;
@@ -397,7 +398,7 @@ public class ForceDatabaseMetaData implements DatabaseMetaData, Serializable {
 
     @Override
     public int getDriverMinorVersion() {
-        return 5;
+        return 6;
     }
 
     @Override
@@ -1114,7 +1115,7 @@ public class ForceDatabaseMetaData implements DatabaseMetaData, Serializable {
 
     @Override
     public int getDatabaseMajorVersion() {
-        return 52;
+        return Integer.parseInt(ForceService.DEFAULT_API_VERSION);
     }
 
     @Override
