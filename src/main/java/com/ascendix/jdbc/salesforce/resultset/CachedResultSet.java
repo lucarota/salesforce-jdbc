@@ -197,6 +197,7 @@ public class CachedResultSet implements ResultSet, Serializable {
             return parse(value);
         }
 
+        @SuppressWarnings("unchecked")
         private Optional<T> parse(Object o) {
             if (o == null) {
                 return Optional.empty();
@@ -617,20 +618,6 @@ public class CachedResultSet implements ResultSet, Serializable {
 
     public SQLWarning getWarnings() {
         return warningsChain;
-    }
-
-    public void addWarning(SQLWarning warn) {
-        log.info("Adding Warning: {}", warn.getMessage());
-        if (warningsChain != null) {
-            SQLWarning last = warningsChain;
-            while (last != null && last.getNextWarning() != null) {
-                last = last.getNextWarning();
-            }
-            assert last != null;
-            last.setNextWarning(warn);
-        } else {
-            warningsChain = warn;
-        }
     }
 
     public void addWarning(String reason) {
