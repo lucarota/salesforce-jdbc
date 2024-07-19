@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.ascendix.salesforce</groupId>
     <artifactId>salesforce-jdbc</artifactId>
-    <version>1.6.0${suffix.version}-release</version>
+    <version>1.6.1${suffix.version}-release</version>
     <packaging>jar</packaging>
 
     <name>Salesforce JDBC Driver</name>

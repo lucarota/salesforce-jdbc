@@ -44,6 +44,7 @@ public class UpdateQueryAnalyzer {
                 boolean isFunctionFound = findSubFields(columnsToFetch, updateSets);
                 if (columnsToFetch.isEmpty() && !isFunctionFound) {
                     populateRecordsById(parameters, id, updateSets, subSelectResolver);
+                    return records;
                 }
             }
             // otherwise we need to fetch all the Entity Ids applicable to this WHERE condition and then build a records using these Ids with fields to update
