@@ -388,7 +388,7 @@ public class ForceDatabaseMetaData implements DatabaseMetaData, Serializable {
 
     @Override
     public String getDriverVersion() {
-        return getDriverMajorVersion() + "." + getDriverMinorVersion() + ".1";
+        return getDriverMajorVersion() + "." + getDriverMinorVersion() + ".3";
     }
 
     @Override

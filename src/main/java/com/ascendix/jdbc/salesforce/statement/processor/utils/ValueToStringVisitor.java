@@ -92,13 +92,16 @@ public class ValueToStringVisitor extends ExpressionVisitorAdapter<Expression> {
     public <S> Expression visit(JdbcParameter parameter, S context) {
         int idx = parameter.getIndex() - 1;
         Object o = parameters.get(idx);
-        fieldValues.put(columnName, getParameter(o));
+        fieldValues.put(columnName, o);
         return null;
     }
 
     private static Object getParameter(Object o) {
         if (o == null) {
             return "NULL";
+        } else if (o instanceof java.sql.Date date) {
+            LocalDate localDate = Instant.ofEpochMilli(date.getTime()).atZone(ZoneId.systemDefault()).toLocalDate();
+            return ParamUtils.SQL_DATE_FORMAT.format(localDate);
         } else if (o instanceof Date date) {
             Calendar cal = Calendar.getInstance();
             cal.setTime(date);
