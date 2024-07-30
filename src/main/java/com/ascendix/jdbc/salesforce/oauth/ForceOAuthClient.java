@@ -18,6 +18,7 @@ public class ForceOAuthClient {
     private static final String BAD_TOKEN_SF_ERROR_CODE = "Bad_OAuth_Token";
     private static final String MISSING_TOKEN_SF_ERROR_CODE = "Missing_OAuth_Token";
     private static final String WRONG_ORG_SF_ERROR_CODE = "Wrong_Org";
+    private static final String FORBIDDEN = "Forbidden";
     private static final String BAD_ID_SF_ERROR_CODE = "Bad_Id";
     private static final String INTERNAL_SERVER_ERROR_SF_ERROR_CODE = "Internal Error";
     private static final int MAX_RETRIES = 5;
@@ -76,10 +77,11 @@ public class ForceOAuthClient {
     }
 
     private boolean isBadTokenError(int statusCode, String content) {
-        return ((statusCode == HttpURLConnection.HTTP_FORBIDDEN) && StringUtils.equalsAnyIgnoreCase(content,
+        return ((statusCode == HttpURLConnection.HTTP_FORBIDDEN) &&
+            StringUtils.equalsAnyIgnoreCase(content,
                 BAD_TOKEN_SF_ERROR_CODE, MISSING_TOKEN_SF_ERROR_CODE,
-                WRONG_ORG_SF_ERROR_CODE)) || (statusCode == HttpURLConnection.HTTP_NOT_FOUND && StringUtils.equalsIgnoreCase(
-                content, BAD_ID_SF_ERROR_CODE));
+                WRONG_ORG_SF_ERROR_CODE, FORBIDDEN)) ||
+            (statusCode == HttpURLConnection.HTTP_NOT_FOUND && StringUtils.equalsIgnoreCase(content, BAD_ID_SF_ERROR_CODE));
     }
 
     private boolean isForceInternalError(int statusCode, String content) {
