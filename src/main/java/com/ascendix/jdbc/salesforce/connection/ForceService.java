@@ -1,5 +1,6 @@
 package com.ascendix.jdbc.salesforce.connection;
 
+import com.ascendix.jdbc.salesforce.oauth.BadOAuthTokenException;
 import com.ascendix.jdbc.salesforce.oauth.ForceOAuthClient;
 import com.sforce.soap.partner.Connector;
 import com.sforce.soap.partner.PartnerConnection;
@@ -94,12 +95,17 @@ public class ForceService {
         partnerConfig.setSessionRenewer(new ForceSessionRenewal());
         partnerConfig.setUsername(info.getUserName());
         partnerConfig.setPassword(info.getPassword());
-        final String sessionId = info.getSessionId();
-        partnerConfig.setSessionId(sessionId);
+        String sessionId = info.getSessionId();
         partnerConfig.setAuthEndpoint(buildAuthEndpoint(info));
         if (sessionId != null) {
-            partnerConfig.setServiceEndpoint(ForceService.getPartnerUrl(sessionId, info.isSandbox()));
+            try {
+                partnerConfig.setServiceEndpoint(ForceService.getPartnerUrl(sessionId, info.isSandbox()));
+            } catch (BadOAuthTokenException e) {
+                info.setSessionId(null);
+                sessionId = null;
+            }
         }
+        partnerConfig.setSessionId(sessionId);
 
         if (info.getLogfile() != null) {
             try {

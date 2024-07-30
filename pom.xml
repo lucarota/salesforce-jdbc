@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.ascendix.salesforce</groupId>
     <artifactId>salesforce-jdbc</artifactId>
-    <version>1.6.3${suffix.version}-release</version>
+    <version>1.6.4${suffix.version}-release</version>
     <packaging>jar</packaging>
 
     <name>Salesforce JDBC Driver</name>
@@ -192,11 +192,11 @@
                                     <relocations>
                                         <relocation>
                                             <pattern>net.sf</pattern>
-                                            <shadedPattern>shaded.net.sf</shadedPattern>
+                                            <shadedPattern>sf.shaded.net.sf</shadedPattern>
                                         </relocation>
                                         <relocation>
                                             <pattern>org.apache</pattern>
-                                            <shadedPattern>shaded.org.apache</shadedPattern>
+                                            <shadedPattern>sf.shaded.org.apache</shadedPattern>
                                         </relocation>
                                     </relocations>
                                 </configuration>
