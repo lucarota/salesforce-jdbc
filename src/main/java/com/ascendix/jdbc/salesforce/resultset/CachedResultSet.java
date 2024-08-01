@@ -388,27 +388,31 @@ public class CachedResultSet implements ResultSet, Serializable {
     }
 
     public int getInt(String columnName) {
-        return new ColumnValueParser<>(Integer::parseInt, Integer.class)
+        return new ColumnValueParser<>(Double::parseDouble, Double.class)
             .parse(columnName)
-            .orElse(0);
+            .orElse(0d)
+            .intValue();
     }
 
     public int getInt(int columnIndex) {
-        return new ColumnValueParser<>(Integer::parseInt, Integer.class)
+        return new ColumnValueParser<>(Double::parseDouble, Double.class)
             .parse(columnIndex)
-            .orElse(0);
+            .orElse(0d)
+            .intValue();
     }
 
     public short getShort(String columnName) {
-        return new ColumnValueParser<>(Short::parseShort, Short.class)
+        return new ColumnValueParser<>(Double::parseDouble, Double.class)
             .parse(columnName)
-            .orElse((short) 0);
+            .orElse(0d)
+            .shortValue();
     }
 
     public short getShort(int columnIndex) {
-        return new ColumnValueParser<>(Short::parseShort, Short.class)
+        return new ColumnValueParser<>(Double::parseDouble, Double.class)
             .parse(columnIndex)
-            .orElse((short) 0);
+            .orElse(0d)
+            .shortValue();
     }
 
     public InputStream getBinaryStream(int columnIndex) {
