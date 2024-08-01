@@ -258,7 +258,7 @@ public class ForcePreparedStatement implements PreparedStatement, Iterator<List<
         if (name == null) {
             return TypeInfo.OTHER_TYPE_INFO;
         }
-        if (name.indexOf(".") != 1) {
+        if (name.contains(".")) {
             /* Remove relation reference */
             name = name.substring(name.indexOf(".") + 1);
         }
