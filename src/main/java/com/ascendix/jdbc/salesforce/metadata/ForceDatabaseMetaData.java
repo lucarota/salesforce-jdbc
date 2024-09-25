@@ -101,7 +101,7 @@ public class ForceDatabaseMetaData implements DatabaseMetaData, Serializable {
             if (tablePattern == null || "%".equals(tablePattern)) {
                 return partnerService.getTables();
             } else {
-                return partnerService.getTables(PatternToRegexUtils.toRegEx(tablePattern));
+                return partnerService.getTables(tablePattern);
             }
         } catch (ConnectionException e) {
             throw new SQLException(e);
@@ -388,7 +388,7 @@ public class ForceDatabaseMetaData implements DatabaseMetaData, Serializable {
 
     @Override
     public String getDriverVersion() {
-        return getDriverMajorVersion() + "." + getDriverMinorVersion() + ".3";
+        return getDriverMajorVersion() + "." + getDriverMinorVersion() + ".5";
     }
 
     @Override

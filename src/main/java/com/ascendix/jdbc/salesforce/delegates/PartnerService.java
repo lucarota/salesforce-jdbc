@@ -6,8 +6,10 @@ import com.ascendix.jdbc.salesforce.metadata.Column;
 import com.ascendix.jdbc.salesforce.metadata.Table;
 import com.ascendix.jdbc.salesforce.utils.FieldDefTree;
 import com.ascendix.jdbc.salesforce.utils.IteratorUtils;
+import com.ascendix.jdbc.salesforce.utils.PatternToRegexUtils;
 import com.ascendix.jdbc.salesforce.utils.TreeNode;
 import com.sforce.soap.partner.*;
+import com.sforce.soap.partner.fault.InvalidSObjectFault;
 import com.sforce.soap.partner.sobject.SObject;
 import com.sforce.ws.ConnectionException;
 import com.sforce.ws.bind.XmlObject;
@@ -22,6 +24,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class PartnerService {
 
+    private static final int BATCH_SIZE = 100;
     private final PartnerConnection partnerConnection;
 
     private static DescribeGlobalResult schemaCache;
@@ -41,15 +44,23 @@ public class PartnerService {
         return tables;
     }
 
-    public List<Table> getTables(Pattern pattern) throws ConnectionException {
+    public List<Table> getTables(String tablePattern) throws ConnectionException {
         log.trace("[PartnerService] getTables IMPLEMENTED");
-        Map<String, DescribeSObjectResult> sObjects = getSObjectsDescription();
-        List<Table> tables = sObjects.values().stream()
-            .filter(o -> pattern.matcher(o.getName()).find())
-            .map(this::convertToTable)
-            .toList();
-        log.info("[PartnerService] getTables tables count={}", tables.size());
-        return tables;
+        final DescribeSObjectResult sObject = describeSObject(tablePattern);
+        if (sObject != null) {
+            List<Table> tables = List.of(convertToTable(sObject));
+            log.info("[PartnerService] getTables tables count={}", tables.size());
+            return tables;
+        } else {
+            final Pattern pattern = PatternToRegexUtils.toRegEx(tablePattern);
+            Map<String, DescribeSObjectResult> sObjects = getSObjectsDescription();
+            List<Table> tables = sObjects.values().stream()
+                .filter(o -> pattern.matcher(o.getName()).find())
+                .map(this::convertToTable)
+                .toList();
+            log.info("[PartnerService] getTables tables count={}", tables.size());
+            return tables;
+        }
     }
 
     public DescribeSObjectResult describeSObject(String sObjectType) {
@@ -61,6 +72,8 @@ public class PartnerService {
             } else {
                 return sObjectsCache.get(sObjectType);
             }
+        } catch (InvalidSObjectFault e) {
+            return null;
         } catch (ConnectionException e) {
             throw new RuntimeException(e);
         }
@@ -81,30 +94,26 @@ public class PartnerService {
     }
 
     private Column convertToColumn(Field field) {
-        try {
-            Column column = new Column(field.getName(), getType(field));
-            column.setNillable(field.isNillable());
-            column.setCalculated(field.isCalculated() || field.isAutoNumber());
-            column.setLength(field.getLength());
-            column.setUnique(field.isUnique());
-            column.setIndexed(
-                    field.getName().equals("Id") ||
-                    field.isAutoNumber() ||
-                    (field.isUnique() && field.isExternalId()));
-            String[] referenceTos = field.getReferenceTo();
-            List<String> sObjectTypes = getSObjectTypes();
-            if (referenceTos != null) {
-                for (String referenceTo : referenceTos) {
-                    if (sObjectTypes.contains(referenceTo)) {
-                        column.setReferencedTable(referenceTo);
-                        column.setReferencedColumn("Id");
-                    }
+        Column column = new Column(field.getName(), getType(field));
+        column.setNillable(field.isNillable());
+        column.setCalculated(field.isCalculated() || field.isAutoNumber());
+        column.setLength(field.getLength());
+        column.setUnique(field.isUnique());
+        column.setIndexed(
+                field.getName().equals("Id") ||
+                field.isAutoNumber() ||
+                (field.isUnique() && field.isExternalId()));
+        String[] referenceTos = field.getReferenceTo();
+        if (referenceTos != null) {
+            for (String referenceTo : referenceTos) {
+                String sObjectType = getSObjectType(referenceTo);
+                if (sObjectType != null) {
+                    column.setReferencedTable(referenceTo);
+                    column.setReferencedColumn("Id");
                 }
             }
-            return column;
-        } catch (ConnectionException e) {
-            throw new RuntimeException(e);
         }
+        return column;
     }
 
     private String getType(Field field) {
@@ -127,11 +136,12 @@ public class PartnerService {
         return schemaCache;
     }
 
-    private List<String> getSObjectTypes() throws ConnectionException {
-        final Map<String, DescribeSObjectResult> sObjects = getSObjectsDescription();
-        return sObjects.values().stream()
-                .map(DescribeSObjectResult::getName)
-                .toList();
+    private String getSObjectType(String sObject) {
+        final DescribeSObjectResult describeSObject = describeSObject(sObject);
+        if (describeSObject != null) {
+            return describeSObject.getName();
+        }
+        return null;
     }
 
     private Map<String, DescribeSObjectResult> getSObjectsDescription() throws ConnectionException {
@@ -142,8 +152,7 @@ public class PartnerService {
             List<String> tableNames = Arrays.stream(describeGlobals.getSobjects())
                 .map(DescribeGlobalSObjectResult::getName)
                 .toList();
-            List<List<String>> tableNamesBatched = toBatches(tableNames, 100);
-            cache = tableNamesBatched.stream()
+            cache =  toBatches(tableNames).stream()
                 .flatMap(batch -> describeSObjects(batch).stream())
                 .collect(Collectors.toMap(DescribeSObjectResult::getName, Function.identity()));
             sObjectsCache.putAll(cache);
@@ -161,10 +170,10 @@ public class PartnerService {
         }
     }
 
-    private <T> List<List<T>> toBatches(List<T> objects, int batchSize) {
+    private <T> List<List<T>> toBatches(List<T> objects) {
         List<List<T>> result = new ArrayList<>();
-        for (int fromIndex = 0; fromIndex < objects.size(); fromIndex += batchSize) {
-            int toIndex = Math.min(fromIndex + batchSize, objects.size());
+        for (int fromIndex = 0; fromIndex < objects.size(); fromIndex += BATCH_SIZE) {
+            int toIndex = Math.min(fromIndex + BATCH_SIZE, objects.size());
             result.add(objects.subList(fromIndex, toIndex));
         }
         return result;
