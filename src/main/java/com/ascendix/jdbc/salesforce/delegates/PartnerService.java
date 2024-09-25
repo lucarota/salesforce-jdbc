@@ -1,5 +1,7 @@
 package com.ascendix.jdbc.salesforce.delegates;
 
+import static java.lang.String.CASE_INSENSITIVE_ORDER;
+
 import com.ascendix.jdbc.salesforce.metadata.Column;
 import com.ascendix.jdbc.salesforce.metadata.Table;
 import com.ascendix.jdbc.salesforce.utils.FieldDefTree;
@@ -23,8 +25,7 @@ public class PartnerService {
     private final PartnerConnection partnerConnection;
 
     private static DescribeGlobalResult schemaCache;
-    private static final Map<String, DescribeSObjectResult> sObjectsCache = new ConcurrentSkipListMap<>(
-            java.lang.String.CASE_INSENSITIVE_ORDER);
+    private static final Map<String, DescribeSObjectResult> sObjectsCache = new ConcurrentSkipListMap<>(CASE_INSENSITIVE_ORDER);
 
     public PartnerService(PartnerConnection partnerConnection) {
         this.partnerConnection = partnerConnection;
@@ -317,7 +318,11 @@ public class PartnerService {
             SObject rec = records[i] = new SObject();
             rec.setType(entityName);
             for (Map.Entry<String, Object> field : recordDef.entrySet()) {
-                rec.setField(field.getKey(), field.getValue());
+                if (field.getValue() == null ) {
+                    rec.setFieldsToNull(new String[] {field.getKey()});
+                } else {
+                    rec.setField(field.getKey(), field.getValue());
+                }
             }
         }
         // Make a create call and pass it the array of sObjects
