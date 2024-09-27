@@ -28,14 +28,14 @@ public class PartnerService {
     private final PartnerConnection partnerConnection;
 
     private static DescribeGlobalResult schemaCache;
-    private static final Map<String, DescribeSObjectResult> sObjectsCache = new ConcurrentSkipListMap<>(CASE_INSENSITIVE_ORDER);
+    private static final Map<String, DescribeSObjectResult> sObjectsCache = new ConcurrentSkipListMap<>(
+        CASE_INSENSITIVE_ORDER);
 
     public PartnerService(PartnerConnection partnerConnection) {
         this.partnerConnection = partnerConnection;
     }
 
     public List<Table> getTables() throws ConnectionException {
-        log.trace("[PartnerService] getTables IMPLEMENTED");
         Map<String, DescribeSObjectResult> sObjects = getSObjectsDescription();
         List<Table> tables = sObjects.values().stream()
             .map(this::convertToTable)
@@ -45,7 +45,6 @@ public class PartnerService {
     }
 
     public List<Table> getTables(String tablePattern) throws ConnectionException {
-        log.trace("[PartnerService] getTables IMPLEMENTED");
         final DescribeSObjectResult sObject = describeSObject(tablePattern);
         if (sObject != null) {
             List<Table> tables = List.of(convertToTable(sObject));
@@ -100,7 +99,7 @@ public class PartnerService {
         column.setLength(field.getLength());
         column.setUnique(field.isUnique());
         column.setIndexed(
-                field.getName().equals("Id") ||
+            field.getName().equals("Id") ||
                 field.isAutoNumber() ||
                 (field.isUnique() && field.isExternalId()));
         String[] referenceTos = field.getReferenceTo();
@@ -125,7 +124,7 @@ public class PartnerService {
     }
 
     private synchronized void resetSchemaCache() throws ConnectionException {
-       schemaCache = partnerConnection.describeGlobal();
+        schemaCache = partnerConnection.describeGlobal();
     }
 
     private synchronized DescribeGlobalResult getDescribeGlobal() throws ConnectionException {
@@ -137,22 +136,25 @@ public class PartnerService {
     }
 
     private String getSObjectType(String sObject) {
-        final DescribeSObjectResult describeSObject = describeSObject(sObject);
-        if (describeSObject != null) {
-            return describeSObject.getName();
+        try {
+            return Arrays.stream(getDescribeGlobal().getSobjects())
+                .map(DescribeGlobalSObjectResult::getName)
+                .filter(sObject::equalsIgnoreCase)
+                .findFirst().orElse(null);
+        } catch (ConnectionException e) {
+            return null;
         }
-        return null;
     }
 
     private Map<String, DescribeSObjectResult> getSObjectsDescription() throws ConnectionException {
-        if (sObjectsCache.isEmpty() || sObjectsCache.size() < getDescribeGlobal().getSobjects().length) {
+        DescribeGlobalResult describeGlobals = getDescribeGlobal();
+        if (sObjectsCache.isEmpty() || sObjectsCache.size() < describeGlobals.getSobjects().length) {
             log.trace("Load all SObjects");
             Map<String, DescribeSObjectResult> cache;
-            DescribeGlobalResult describeGlobals = getDescribeGlobal();
             List<String> tableNames = Arrays.stream(describeGlobals.getSobjects())
                 .map(DescribeGlobalSObjectResult::getName)
                 .toList();
-            cache =  toBatches(tableNames).stream()
+            cache = toBatches(tableNames).stream()
                 .flatMap(batch -> describeSObjects(batch).stream())
                 .collect(Collectors.toMap(DescribeSObjectResult::getName, Function.identity()));
             sObjectsCache.putAll(cache);
@@ -166,7 +168,7 @@ public class PartnerService {
             result = partnerConnection.describeSObjects(batch.toArray(new String[0]));
             return Arrays.asList(result);
         } catch (ConnectionException e) {
-            throw new RuntimeException(e);
+            return List.of();
         }
     }
 
@@ -225,7 +227,8 @@ public class PartnerService {
         );
     }
 
-    private List<TreeNode<ForceResultField>> removeServiceInfo(List<XmlObject> rows, String parentName, String rootEntityName) {
+    private List<TreeNode<ForceResultField>> removeServiceInfo(List<XmlObject> rows, String parentName,
+        String rootEntityName) {
         return rows.stream()
             .filter(this::isDataObjectType)
             .map(row -> removeServiceInfo(row, parentName, rootEntityName))
@@ -235,19 +238,19 @@ public class PartnerService {
     private TreeNode<ForceResultField> removeServiceInfo(XmlObject row, String parentName, String rootEntityName) {
         Iterator<XmlObject> children = row.getChildren();
         TreeNode<ForceResultField> root = new TreeNode<>();
-        boolean skipFirst = true;
+        boolean isFirstDataObject = true;
         while (children.hasNext()) {
             XmlObject field = children.next();
             if (!isDataObjectType(field)) {
                 continue;
             }
-            if (skipFirst) {
+            if (isFirstDataObject) {
                 // Removes duplicate Id from SF Partner API response
                 // (https://developer.salesforce.com/forums/?id=906F00000008kciIAA)
-                skipFirst = false;
-                continue;
+                isFirstDataObject = false;
+            } else {
+                root.addTreeNode(translateField(field, parentName, rootEntityName));
             }
-            root.addTreeNode(translateField(field, parentName, rootEntityName));
         }
         return root;
     }
@@ -263,7 +266,7 @@ public class PartnerService {
             return node;
         } else if (isNestedResultset(field)) {
             List<TreeNode<ForceResultField>> subNodes = removeServiceInfo(
-                    IteratorUtils.toList(field.getChildren()), field.getName().getLocalPart(), rootEntityName);
+                IteratorUtils.toList(field.getChildren()), field.getName().getLocalPart(), rootEntityName);
             return new TreeNode<>(subNodes);
         } else {
             return new TreeNode<>(toForceResultField(field, parentName, rootEntityName));
@@ -327,8 +330,8 @@ public class PartnerService {
             SObject rec = records[i] = new SObject();
             rec.setType(entityName);
             for (Map.Entry<String, Object> field : recordDef.entrySet()) {
-                if (field.getValue() == null ) {
-                    rec.setFieldsToNull(new String[] {field.getKey()});
+                if (field.getValue() == null) {
+                    rec.setFieldsToNull(new String[]{field.getKey()});
                 } else {
                     rec.setField(field.getKey(), field.getValue());
                 }
