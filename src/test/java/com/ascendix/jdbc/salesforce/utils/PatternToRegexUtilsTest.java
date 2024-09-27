@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.text.ParseException;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -28,7 +27,7 @@ public class PatternToRegexUtilsTest {
 
     @ParameterizedTest
     @MethodSource("data")
-    public void toRegEx(String input, String expected, List<String> testOK, List<String> testKO) throws ParseException {
+    public void toRegEx(String input, String expected, List<String> testOK, List<String> testKO) {
         final Pattern actual = PatternToRegexUtils.toRegEx(input);
         assertEquals(expected, actual.toString());
 
