@@ -2,7 +2,7 @@ package com.ascendix.jdbc.salesforce.statement.processor;
 
 import com.ascendix.jdbc.salesforce.delegates.PartnerService;
 import com.sforce.soap.partner.DescribeSObjectResult;
-import com.sforce.soap.partner.Field;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
@@ -10,7 +10,6 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.expression.Expression;
-import net.sf.jsqlparser.expression.Function;
 import net.sf.jsqlparser.expression.JdbcParameter;
 import net.sf.jsqlparser.expression.StringValue;
 import net.sf.jsqlparser.expression.operators.relational.EqualsTo;
@@ -32,7 +31,6 @@ public class QueryAnalyzer {
     private Statement queryData;
     private final PartnerService partnerService;
     private boolean expandedStarSyntaxForFields = false;
-    private Field[] expandedFields;
 
     public QueryAnalyzer(String soql,
         BiFunction<String, List<Object>, List<Map<String, Object>>> subSelectResolver, PartnerService partnerService) {
@@ -76,13 +74,12 @@ public class QueryAnalyzer {
                 queryData = CCJSqlParserUtil.parse(soql);
                 if (queryData instanceof PlainSelect select) {
                     this.expandedStarSyntaxForFields = false;
-                    expandedFields = null;
                     if ("*".equals(select.getSelectItem(0).toString())) {
                         select.getSelectItems().clear();
                         this.expandedStarSyntaxForFields = true;
-                        select.addSelectItem(new Function("FIELDS", new Column(null, "ALL")));
                         DescribeSObjectResult describeSObjectResult = describeObject(select.getFromItem().toString());
-                        expandedFields = describeSObjectResult.getFields();
+                        Arrays.stream(describeSObjectResult.getFields())
+                            .forEach(f -> select.addSelectItem(new Column(null, f.getName())));
                     }
                     this.soql = select.toString();
                     return select;
