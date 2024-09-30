@@ -92,14 +92,17 @@ public class UpdateQueryAnalyzer {
 
     private static List<Object> getWhereParameters(final List<Object> parameters, final Update query) {
         List<Object> whereParameters = new ArrayList<>();
-        query.getWhere().accept(new ExpressionVisitorAdapter() {
-            @Override
-            public void visit(JdbcParameter parameter) {
-                int idx = parameter.getIndex() - 1;
-                Object o = parameters.get(idx);
-                whereParameters.add(o);
-            }
-        });
+        final Expression where = query.getWhere();
+        if (where != null) {
+            where.accept(new ExpressionVisitorAdapter() {
+                @Override
+                public void visit(JdbcParameter parameter) {
+                    int idx = parameter.getIndex() - 1;
+                    Object o = parameters.get(idx);
+                    whereParameters.add(o);
+                }
+            });
+        }
         return whereParameters;
     }
 

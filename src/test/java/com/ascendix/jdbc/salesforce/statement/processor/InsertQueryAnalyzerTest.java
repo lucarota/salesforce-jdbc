@@ -21,17 +21,17 @@ public class InsertQueryAnalyzerTest {
 
         assertEquals("Account", analyzer.getFromObjectName());
 
-        // Verify we have exactly one record to save
+        // Verify we have exactly one rec to save
         assertEquals(1, analyzer.getRecords(List.of()).size());
-        Map<String, Object> record = analyzer.getRecords(List.of()).get(0);
-        // Verify the fields count for the first record
-        assertEquals(3, record.size());
-        // Verify the fields' names for the first record
-        assertEquals(Set.of("Name", "OwnerId", "Title"), record.keySet());
-        assertEquals("FirstAccount", record.get("Name"));
-        assertEquals("005xx1231231233123", record.get("OwnerId"));
-        assertTrue(record.containsKey("Title"));
-        assertNull(record.get("Title"));
+        Map<String, Object> rec = analyzer.getRecords(List.of()).get(0);
+        // Verify the fields count for the first rec
+        assertEquals(3, rec.size());
+        // Verify the fields' names for the first rec
+        assertEquals(Set.of("Name", "OwnerId", "Title"), rec.keySet());
+        assertEquals("FirstAccount", rec.get("Name"));
+        assertEquals("005xx1231231233123", rec.get("OwnerId"));
+        assertTrue(rec.containsKey("Title"));
+        assertNull(rec.get("Title"));
     }
 
     @Test
@@ -41,9 +41,9 @@ public class InsertQueryAnalyzerTest {
                 ")";
         final QueryAnalyzer queryAnalyzer = new QueryAnalyzer(soql, (subSoql, parameter) -> {
             if ("SELECT Id FROM User WHERE Name = 'CollectionOwner-f CollectionOwner-l' LIMIT 1".equals(subSoql)) {
-                Map<String, Object> record = new HashMap<>();
-                record.put("id", "005xx1231231233123");
-                return List.of(record);
+                Map<String, Object> rec = new HashMap<>();
+                rec.put("id", "005xx1231231233123");
+                return List.of(rec);
             }
             return List.of();
         }, null);
@@ -51,15 +51,15 @@ public class InsertQueryAnalyzerTest {
 
         assertEquals("Account", analyzer.getFromObjectName());
 
-        // Verify we have exactly one record to save
+        // Verify we have exactly one rec to save
         assertEquals(1, analyzer.getRecords(List.of()).size());
-        Map<String, Object> record = analyzer.getRecords(List.of()).get(0);
-        // Verify the fields count for the first record
-        assertEquals(2, record.size());
-        // Verify the fields' names for the first record
-        assertEquals(Set.of("Name", "OwnerId"), record.keySet());
-        assertEquals("FirstAccount", record.get("Name"));
-        assertEquals("005xx1231231233123", record.get("OwnerId"));
+        Map<String, Object> rec = analyzer.getRecords(List.of()).get(0);
+        // Verify the fields count for the first rec
+        assertEquals(2, rec.size());
+        // Verify the fields' names for the first rec
+        assertEquals(Set.of("Name", "OwnerId"), rec.keySet());
+        assertEquals("FirstAccount", rec.get("Name"));
+        assertEquals("005xx1231231233123", rec.get("OwnerId"));
     }
 
     @Test
@@ -71,25 +71,25 @@ public class InsertQueryAnalyzerTest {
 
         assertEquals("Account", analyzer.getFromObjectName());
 
-        // Verify we have exactly one record to save
+        // Verify we have exactly one rec to save
         assertEquals(2, analyzer.getRecords(List.of()).size());
 
-        // Verify the first record
-        Map<String, Object> record = analyzer.getRecords(List.of()).get(0);
-        // Verify the fields count for the first record
-        assertEquals(2, record.size());
-        // Verify the fields' names for the first record
-        assertEquals(Set.of("Name", "OwnerId"), record.keySet());
-        assertEquals("FirstAccount", record.get("Name"));
-        assertEquals("005xx1111111111111", record.get("OwnerId"));
+        // Verify the first rec
+        Map<String, Object> rec = analyzer.getRecords(List.of()).get(0);
+        // Verify the fields count for the first rec
+        assertEquals(2, rec.size());
+        // Verify the fields' names for the first rec
+        assertEquals(Set.of("Name", "OwnerId"), rec.keySet());
+        assertEquals("FirstAccount", rec.get("Name"));
+        assertEquals("005xx1111111111111", rec.get("OwnerId"));
 
-        // Verify the second record
-        record = analyzer.getRecords(List.of()).get(1);
-        // Verify the fields count for the second record
-        assertEquals(2, record.size());
-        // Verify the fields' names for the first record
-        assertEquals(Set.of("Name", "OwnerId"), record.keySet());
-        assertEquals("SecondAccount", record.get("Name"));
-        assertEquals("005xx2222222222222", record.get("OwnerId"));
+        // Verify the second rec
+        rec = analyzer.getRecords(List.of()).get(1);
+        // Verify the fields count for the second rec
+        assertEquals(2, rec.size());
+        // Verify the fields' names for the first rec
+        assertEquals(Set.of("Name", "OwnerId"), rec.keySet());
+        assertEquals("SecondAccount", rec.get("Name"));
+        assertEquals("005xx2222222222222", rec.get("OwnerId"));
     }
 }
