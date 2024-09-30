@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.jsqlparser.JSQLParserException;
+import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.ExpressionVisitorAdapter;
 import net.sf.jsqlparser.expression.JdbcParameter;
 import net.sf.jsqlparser.statement.delete.Delete;
@@ -59,14 +60,17 @@ public class DeleteQueryAnalyzer {
 
     private static List<Object> getWhereParameters(final List<Object> parameters, final Delete query) {
         List<Object> whereParameters = new ArrayList<>();
-        query.getWhere().accept(new ExpressionVisitorAdapter() {
-            @Override
-            public void visit(JdbcParameter parameter) {
-                int idx = parameter.getIndex() - 1;
-                Object o = parameters.get(idx);
-                whereParameters.add(o);
-            }
-        });
+        final Expression where = query.getWhere();
+        if (where != null) {
+            where.accept(new ExpressionVisitorAdapter() {
+                @Override
+                public void visit(JdbcParameter parameter) {
+                    int idx = parameter.getIndex() - 1;
+                    Object o = parameters.get(idx);
+                    whereParameters.add(o);
+                }
+            });
+        }
         return whereParameters;
     }
 
