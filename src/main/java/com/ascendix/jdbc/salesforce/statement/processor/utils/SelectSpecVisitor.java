@@ -35,6 +35,7 @@ public class SelectSpecVisitor implements SelectItemVisitor<Expression> {
         this.partnerService = partnerService;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public <S> Expression visit(SelectItem<? extends Expression> fieldSpec, S context) {
         visitInternal((SelectItem<Expression>) fieldSpec);

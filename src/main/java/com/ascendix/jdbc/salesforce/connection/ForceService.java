@@ -2,6 +2,7 @@ package com.ascendix.jdbc.salesforce.connection;
 
 import com.ascendix.jdbc.salesforce.oauth.BadOAuthTokenException;
 import com.ascendix.jdbc.salesforce.oauth.ForceOAuthClient;
+import com.ascendix.jdbc.salesforce.oauth.ForceUserInfo;
 import com.sforce.soap.partner.Connector;
 import com.sforce.soap.partner.PartnerConnection;
 import com.sforce.soap.partner.QueryResult;
@@ -31,17 +32,16 @@ public class ForceService {
     private static final long OAUTH_READ_TIMEOUT = TimeUnit.SECONDS.toMillis(30);
     public static final String DEFAULT_API_VERSION = "61";
 
-    private static final Map<String, String> partnerUrlCache = new HashMap<>();
+    private static final Map<String, ForceUserInfo> userInfoCache = new HashMap<>();
     public static final String UNEXPECTED_ERROR = "Failed to connect, unexpected error:";
     public static final String CONNECT_FAILED = "Failed to connect to the host";
 
     private static String getPartnerUrl(String accessToken, boolean sandbox) {
-        return partnerUrlCache.computeIfAbsent(accessToken, s -> getPartnerUrlFromUserInfo(accessToken, sandbox));
+        return userInfoCache.computeIfAbsent(accessToken, s -> getUserInfo(accessToken, sandbox)).getPartnerUrl();
     }
 
-    private static String getPartnerUrlFromUserInfo(String accessToken, boolean sandbox) {
-        return new ForceOAuthClient(OAUTH_CONNECTION_TIMEOUT, OAUTH_READ_TIMEOUT).getUserInfo(accessToken, sandbox)
-            .getPartnerUrl();
+    public static String getOrgId(String accessToken, boolean sandbox) {
+        return userInfoCache.computeIfAbsent(accessToken, s -> getUserInfo(accessToken, sandbox)).getOrganizationId();
     }
 
     public static PartnerConnection createPartnerConnection(ForceConnectionInfo info) throws ConnectionException {
@@ -63,7 +63,7 @@ public class ForceService {
         } catch (ConnectionException ce) {
             if (!info.isSandbox()) {
                 if (sessionId != null) {
-                    partnerConfig.setServiceEndpoint(ForceService.getPartnerUrl(sessionId, true));
+                    partnerConfig.setServiceEndpoint(getPartnerUrl(sessionId, true));
                     return Connector.newConnection(partnerConfig);
                 } else {
                     info.setSandbox(true);
@@ -155,5 +155,9 @@ public class ForceService {
         final String loginDomain = info.getLoginDomain() != null ? info.getLoginDomain() : DEFAULT_LOGIN_DOMAIN;
         String domain = info.isSandbox() ? SANDBOX_LOGIN_DOMAIN : loginDomain;
         return String.format("%s://%s/services/Soap/u/%s", protocol, domain, info.getApiVersion());
+    }
+
+    private static ForceUserInfo getUserInfo(String accessToken, boolean sandbox) {
+        return new ForceOAuthClient(OAUTH_CONNECTION_TIMEOUT, OAUTH_READ_TIMEOUT).getUserInfo(accessToken, sandbox);
     }
 }

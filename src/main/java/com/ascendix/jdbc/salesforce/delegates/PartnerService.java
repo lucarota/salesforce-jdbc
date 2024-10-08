@@ -26,50 +26,48 @@ public class PartnerService {
 
     private static final int BATCH_SIZE = 100;
     private final PartnerConnection partnerConnection;
+    private final String orgId;
 
-    private static DescribeGlobalResult schemaCache;
-    private static final Map<String, DescribeSObjectResult> sObjectsCache = new ConcurrentSkipListMap<>(
-        CASE_INSENSITIVE_ORDER);
+    private static final Map<String, DescribeGlobalResult> schemaCache = new HashMap<>();
+    private static final Map<String, Map<String, DescribeSObjectResult>> sObjectsCache = new HashMap<>();
 
-    public PartnerService(PartnerConnection partnerConnection) {
+    public PartnerService(PartnerConnection partnerConnection, final String orgId) {
         this.partnerConnection = partnerConnection;
+        this.orgId = orgId;
+        final String connectionId = getConnectionId();
+        sObjectsCache.putIfAbsent(connectionId, new ConcurrentSkipListMap<>(CASE_INSENSITIVE_ORDER));
     }
 
     public List<Table> getTables() throws ConnectionException {
         Map<String, DescribeSObjectResult> sObjects = getSObjectsDescription();
-        List<Table> tables = sObjects.values().stream()
+        return sObjects.values().stream()
             .map(this::convertToTable)
             .toList();
-        log.info("[PartnerService] getTables tables count={}", tables.size());
-        return tables;
     }
 
     public List<Table> getTables(String tablePattern) throws ConnectionException {
         final DescribeSObjectResult sObject = describeSObject(tablePattern);
         if (sObject != null) {
-            List<Table> tables = List.of(convertToTable(sObject));
-            log.info("[PartnerService] getTables tables count={}", tables.size());
-            return tables;
+            return List.of(convertToTable(sObject));
         } else {
             final Pattern pattern = PatternToRegexUtils.toRegEx(tablePattern);
             Map<String, DescribeSObjectResult> sObjects = getSObjectsDescription();
-            List<Table> tables = sObjects.values().stream()
+            return sObjects.values().stream()
                 .filter(o -> pattern.matcher(o.getName()).find())
                 .map(this::convertToTable)
                 .toList();
-            log.info("[PartnerService] getTables tables count={}", tables.size());
-            return tables;
         }
     }
 
     public DescribeSObjectResult describeSObject(String sObjectType) {
         try {
-            if (!sObjectsCache.containsKey(sObjectType)) {
+            final Map<String, DescribeSObjectResult> cache = sObjectsCache.get(getConnectionId());
+            if (!cache.containsKey(sObjectType)) {
                 DescribeSObjectResult description = partnerConnection.describeSObject(sObjectType);
-                sObjectsCache.put(sObjectType, description);
+                cache.put(sObjectType, description);
                 return description;
             } else {
-                return sObjectsCache.get(sObjectType);
+                return cache.get(sObjectType);
             }
         } catch (InvalidSObjectFault e) {
             return null;
@@ -89,7 +87,7 @@ public class PartnerService {
         List<Column> columns = fields.stream()
             .map(this::convertToColumn)
             .toList();
-        return new Table(so.getName(), null, columns, so.isQueryable());
+        return new Table(so.getName(), null, columns);
     }
 
     private Column convertToColumn(Field field) {
@@ -115,6 +113,13 @@ public class PartnerService {
         return column;
     }
 
+    private String getConnectionId() {
+        if (orgId != null) {
+            return orgId;
+        }
+        return this.partnerConnection.getConfig().getUsername();
+    }
+
     private String getType(Field field) {
         String s = field.getType().toString();
         if (s.startsWith("_")) {
@@ -124,15 +129,15 @@ public class PartnerService {
     }
 
     private synchronized void resetSchemaCache() throws ConnectionException {
-        schemaCache = partnerConnection.describeGlobal();
+        schemaCache.put(getConnectionId(), partnerConnection.describeGlobal());
     }
 
     private synchronized DescribeGlobalResult getDescribeGlobal() throws ConnectionException {
-        if (schemaCache == null) {
-            schemaCache = partnerConnection.describeGlobal();
+        if (schemaCache.get(getConnectionId()) == null) {
+            schemaCache.put(getConnectionId(), partnerConnection.describeGlobal());
         }
 
-        return schemaCache;
+        return schemaCache.get(getConnectionId());
     }
 
     private String getSObjectType(String sObject) {
@@ -148,18 +153,20 @@ public class PartnerService {
 
     private Map<String, DescribeSObjectResult> getSObjectsDescription() throws ConnectionException {
         DescribeGlobalResult describeGlobals = getDescribeGlobal();
-        if (sObjectsCache.isEmpty() || sObjectsCache.size() < describeGlobals.getSobjects().length) {
+        final Map<String, DescribeSObjectResult> cache = sObjectsCache.get(getConnectionId());
+        if (cache.isEmpty()
+            || cache.size() < describeGlobals.getSobjects().length) {
             log.trace("Load all SObjects");
-            Map<String, DescribeSObjectResult> cache;
             List<String> tableNames = Arrays.stream(describeGlobals.getSobjects())
+                .filter(DescribeGlobalSObjectResult::isQueryable)
                 .map(DescribeGlobalSObjectResult::getName)
                 .toList();
-            cache = toBatches(tableNames).stream()
+            Map<String, DescribeSObjectResult> sObjectResultMap = toBatches(tableNames).stream()
                 .flatMap(batch -> describeSObjects(batch).stream())
                 .collect(Collectors.toMap(DescribeSObjectResult::getName, Function.identity()));
-            sObjectsCache.putAll(cache);
+            cache.putAll(sObjectResultMap);
         }
-        return sObjectsCache;
+        return cache;
     }
 
     private List<DescribeSObjectResult> describeSObjects(List<String> batch) {

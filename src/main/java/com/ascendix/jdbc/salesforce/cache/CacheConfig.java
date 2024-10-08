@@ -1,8 +1,6 @@
 package com.ascendix.jdbc.salesforce.cache;
 
 import com.ascendix.jdbc.salesforce.resultset.CachedResultSet;
-import java.sql.ResultSetMetaData;
-import javax.sql.rowset.RowSetMetaDataImpl;
 import org.ehcache.Cache;
 import org.ehcache.CacheManager;
 import org.ehcache.config.builders.CacheConfigurationBuilder;

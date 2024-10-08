@@ -20,7 +20,7 @@ public class ForceSessionRenewal implements SessionRenewer {
         header.name = new QName("urn:partner.soap.sforce.com", "SessionHeader");
         header.headerElement = sessionHeader;
         if (sessionHeader != null && sessionHeader.getSessionId() != null) {
-            ForceDriver.setSessionId(sessionHeader.getSessionId());
+            config.setSessionId(sessionHeader.getSessionId());
         }
         return header;
     }

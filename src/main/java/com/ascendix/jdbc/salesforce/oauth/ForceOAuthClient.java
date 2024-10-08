@@ -33,46 +33,51 @@ public class ForceOAuthClient {
 
     public ForceUserInfo getUserInfo(String accessToken, boolean sandbox) {
         String loginUrl = sandbox ? TEST_LOGIN_URL : LOGIN_URL;
-        HttpURLConnection connection = null;
         int tryCount = 0;
-        while (true) {
+
+        while (tryCount < MAX_RETRIES) {
             try {
-                URL url = new URL(loginUrl);
-                connection = (HttpURLConnection) url.openConnection();
-                connection.setRequestProperty("Authorization", "Bearer " + accessToken);
-                connection.setDoInput(true);
-                connection.setRequestMethod("GET");
-                connection.setConnectTimeout(Math.toIntExact(connectTimeout));
-                connection.setReadTimeout(Math.toIntExact(readTimeout));
-
+                HttpURLConnection connection = createConnection(loginUrl, accessToken);
                 int responseCode = connection.getResponseCode();
-                if (responseCode == HttpURLConnection.HTTP_OK) {
-                    BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-                    StringBuilder response = new StringBuilder();
-                    String line;
-                    while ((line = in.readLine()) != null) {
-                        response.append(line);
-                    }
-                    in.close();
 
-                    return ForceUserInfoParser.parse(response.toString());
+                if (responseCode == HttpURLConnection.HTTP_OK) {
+                    return parseResponse(connection);
                 } else if (isBadTokenError(responseCode, connection.getResponseMessage())) {
                     throw new BadOAuthTokenException("Bad OAuth Token: " + accessToken);
-                } else if (isForceInternalError(responseCode, connection.getResponseMessage()) && tryCount < MAX_RETRIES) {
-                    tryCount++;
+                } else if (isForceInternalError(responseCode, connection.getResponseMessage())) {
+                    tryCount++; // Retry
+                } else {
+                    throw new ForceClientException("Response error: " + responseCode + " " + connection.getResponseMessage());
                 }
-                throw new ForceClientException("Response error: " + responseCode + " " + connection.getResponseMessage());
             } catch (IOException e) {
-                if (tryCount < MAX_RETRIES) {
-                    tryCount++;
-                    continue; // try one more time
-                }
-                throw new ForceClientException("IO error: " + e.getMessage(), e);
-            } finally {
-                if (connection != null) {
-                    connection.disconnect();
-                }
+                tryCount++;
             }
+        }
+
+        throw new ForceClientException("Maximum retries exceeded");
+    }
+
+    private HttpURLConnection createConnection(String loginUrl, String accessToken) throws IOException {
+        URL url = new URL(loginUrl);
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestProperty("Authorization", "Bearer " + accessToken);
+        connection.setDoInput(true);
+        connection.setRequestMethod("GET");
+        connection.setConnectTimeout(Math.toIntExact(connectTimeout));
+        connection.setReadTimeout(Math.toIntExact(readTimeout));
+        return connection;
+    }
+
+    private ForceUserInfo parseResponse(HttpURLConnection connection) throws IOException {
+        try (BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
+            StringBuilder response = new StringBuilder();
+            String line;
+            while ((line = in.readLine()) != null) {
+                response.append(line);
+            }
+            return ForceUserInfoParser.parse(response.toString());
+        } finally {
+            connection.disconnect();
         }
     }
 
@@ -87,15 +92,5 @@ public class ForceOAuthClient {
     private boolean isForceInternalError(int statusCode, String content) {
         return statusCode == HttpURLConnection.HTTP_NOT_FOUND && StringUtils.equalsIgnoreCase(content,
                 INTERNAL_SERVER_ERROR_SF_ERROR_CODE);
-    }
-
-    private static class ForceClientException extends RuntimeException {
-        public ForceClientException(String message) {
-            super(message);
-        }
-
-        public ForceClientException(String message, Throwable cause) {
-            super(message, cause);
-        }
     }
 }
