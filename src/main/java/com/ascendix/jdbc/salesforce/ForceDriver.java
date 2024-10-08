@@ -4,6 +4,7 @@ import com.ascendix.jdbc.salesforce.connection.ForceConnection;
 import com.ascendix.jdbc.salesforce.connection.ForceConnectionInfo;
 import com.ascendix.jdbc.salesforce.connection.ForceService;
 import com.ascendix.jdbc.salesforce.delegates.PartnerService;
+import com.ascendix.jdbc.salesforce.utils.Constants;
 import com.sforce.soap.partner.PartnerConnection;
 import com.sforce.ws.ConnectionException;
 import java.io.ByteArrayInputStream;
@@ -49,26 +50,12 @@ public class ForceDriver implements Driver {
     private static final String LOGIN_DOMAIN = "loginDomain";
     public static final String PROTOCOL = "protocol";
 
-    private static ForceConnectionInfo connectionInfo = null;
-
     static {
         try {
             log.info("[ForceDriver] registration");
             DriverManager.registerDriver(new ForceDriver());
-        } catch (Exception e) {
+        } catch (SQLException e) {
             throw new RuntimeException("Failed register ForceDriver: " + e.getMessage(), e);
-        }
-    }
-
-    public static void setSessionId(String sessionId) {
-        if (connectionInfo != null) {
-            connectionInfo.setSessionId(sessionId);
-        }
-    }
-
-    public static void setConnectionInfo(String url, Properties properties) throws IOException {
-        if (connectionInfo == null) {
-            connectionInfo = ForceDriver.parseConnectionUrl(url, properties);
         }
     }
 
@@ -86,9 +73,14 @@ public class ForceDriver implements Driver {
             return null;
         }
         try {
-            ForceDriver.setConnectionInfo(url, properties);
+            ForceConnectionInfo connectionInfo = ForceDriver.parseConnectionUrl(url, properties);
             PartnerConnection partnerConnection = ForceService.createPartnerConnection(connectionInfo);
-            PartnerService partnerService = new PartnerService(partnerConnection);
+
+            String orgId = null;
+            if (connectionInfo.getSessionId() != null) {
+                orgId = ForceService.getOrgId(connectionInfo.getSessionId(), connectionInfo.isSandbox());
+            }
+            PartnerService partnerService = new PartnerService(partnerConnection, orgId);
             return new ForceConnection(partnerConnection, partnerService);
         } catch (ConnectionException | IOException e) {
             throw new SQLException(e);
@@ -242,12 +234,12 @@ public class ForceDriver implements Driver {
 
     @Override
     public int getMajorVersion() {
-        return 1;
+        return Constants.DRIVER_MAJOR_VER;
     }
 
     @Override
     public int getMinorVersion() {
-        return 1;
+        return Constants.DRIVER_MINOR_VER;
     }
 
     @Override

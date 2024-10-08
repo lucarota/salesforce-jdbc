@@ -13,7 +13,7 @@ import com.ascendix.jdbc.salesforce.delegates.PartnerService;
 import com.ascendix.jdbc.salesforce.resultset.CachedResultSet;
 import com.ascendix.jdbc.salesforce.resultset.CachedResultSetMetaData;
 import com.ascendix.jdbc.salesforce.statement.ForcePreparedStatement;
-import com.ascendix.jdbc.salesforce.utils.PatternToRegexUtils;
+import com.ascendix.jdbc.salesforce.utils.Constants;
 import com.sforce.ws.ConnectionException;
 import com.sforce.ws.ConnectorConfig;
 
@@ -30,7 +30,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -40,7 +39,6 @@ public class ForceDatabaseMetaData implements DatabaseMetaData, Serializable {
     public static final String DEFAULT_SCHEMA = "Salesforce";
     public static final String DEFAULT_CATALOG = "Ascendix";
     public static final String DEFAULT_TABLE_TYPE = "TABLE";
-    public static final String ENTITY_TABLE_TYPE = "ENTITY";
 
     private final transient PartnerService partnerService;
     private transient ForceConnection connection;
@@ -61,23 +59,21 @@ public class ForceDatabaseMetaData implements DatabaseMetaData, Serializable {
 
     @Override
     public ResultSet getTables(String catalog, String schemaPattern, String tableNamePattern, String[] types)
-            throws SQLException {
+        throws SQLException {
         log.trace("[Meta] getTables catalog={} schema={} table={}", catalog, schemaPattern, tableNamePattern);
         List<ColumnMap<String, Object>> rows = new ArrayList<>();
         List<String> typeList = types == null ? null : Arrays.asList(types);
-        ColumnMap<String, Object> firstRow = null;
         for (Table table : getTables(tableNamePattern)) {
             String name = table.getName();
-            boolean queryable = table.isQueryable();
 
-            if ((typeList == null || (queryable && typeList.contains(DEFAULT_TABLE_TYPE))) &&
-                    (tableNamePattern == null || "%".equals(tableNamePattern.trim()) || name.equalsIgnoreCase(
-                            tableNamePattern))) {
+            if ((typeList == null || typeList.contains(DEFAULT_TABLE_TYPE)) &&
+                (tableNamePattern == null || "%".equals(tableNamePattern.trim()) || name.equalsIgnoreCase(
+                    tableNamePattern))) {
                 ColumnMap<String, Object> map = new ColumnMap<>();
                 map.put("TABLE_CAT", DEFAULT_CATALOG, TypeInfo.STRING_TYPE_INFO);
                 map.put("TABLE_SCHEM", DEFAULT_SCHEMA, STRING_TYPE_INFO);
                 map.put("TABLE_NAME", name, STRING_TYPE_INFO);
-                map.put("TABLE_TYPE", queryable ? DEFAULT_TABLE_TYPE : ENTITY_TABLE_TYPE, STRING_TYPE_INFO);
+                map.put("TABLE_TYPE", DEFAULT_TABLE_TYPE, STRING_TYPE_INFO);
                 map.put("REMARKS", table.getComments(), STRING_TYPE_INFO);
                 map.put("TYPE_CAT", null, STRING_TYPE_INFO);
                 map.put("TYPE_SCHEM", null, STRING_TYPE_INFO);
@@ -85,14 +81,11 @@ public class ForceDatabaseMetaData implements DatabaseMetaData, Serializable {
                 map.put("SELF_REFERENCING_COL_NAME", null, STRING_TYPE_INFO);
                 map.put("REF_GENERATION", null, STRING_TYPE_INFO);
                 rows.add(map);
-                if (firstRow == null) {
-                    firstRow = map;
-                }
             }
         }
-        log.trace("[Meta] getTables RESULT catalog={} schema={} table={} firstRowFound={} TablesFound={}",
-            catalog, schemaPattern, tableNamePattern, (firstRow != null ? "yes" : "no"), rows.size());
-        return new CachedResultSet(rows, ForcePreparedStatement.createMetaData(firstRow));
+        log.trace("[Meta] getTables RESULT catalog={} schema={} table={} TablesFound={}",
+            catalog, schemaPattern, tableNamePattern, rows.size());
+        return new CachedResultSet(rows, ForcePreparedStatement.createMetaData(rows.get(0)));
     }
 
     private List<Table> getTables(String tablePattern) throws SQLException {
@@ -110,52 +103,52 @@ public class ForceDatabaseMetaData implements DatabaseMetaData, Serializable {
 
     @Override
     public ResultSet getColumns(String catalog, String schemaPattern, String tableNamePattern,
-                                String columnNamePattern) throws SQLException {
+        String columnNamePattern) throws SQLException {
         AtomicInteger ordinal = new AtomicInteger(1);
         log.debug("[Meta] getColumns catalog={} schema={} table={} column={}", catalog, schemaPattern,
-                tableNamePattern, columnNamePattern);
+            tableNamePattern, columnNamePattern);
         List<ColumnMap<String, Object>> rows = getTables(tableNamePattern).stream()
-                .filter(table -> tableNamePattern == null || "%".equals(tableNamePattern.trim()) || table.getName()
-                        .equalsIgnoreCase(tableNamePattern))
-                .flatMap(table -> table.getColumns().stream())
-                .filter(column -> columnNamePattern == null || "%".equals(columnNamePattern.trim()) || column.getName()
-                        .equalsIgnoreCase(columnNamePattern))
-                .map(column -> new ColumnMap<String, Object>() {{
-                    TypeInfo typeInfo = TypeInfo.lookupTypeInfo(column.getType());
-                    put("TABLE_CAT", DEFAULT_CATALOG, STRING_TYPE_INFO);
-                    put("TABLE_SCHEM", DEFAULT_SCHEMA, STRING_TYPE_INFO);
-                    put("TABLE_NAME", column.getTable().getName(), STRING_TYPE_INFO);
-                    put("COLUMN_NAME", column.getName(), STRING_TYPE_INFO);
-                    put("DATA_TYPE", typeInfo != null ? typeInfo.getSqlDataType() : Types.OTHER, INT_TYPE_INFO);
-                    put("TYPE_NAME", column.getType(), STRING_TYPE_INFO);
-                    put("COLUMN_SIZE", column.getLength(), INT_TYPE_INFO);
-                    put("BUFFER_LENGTH", 0, INT_TYPE_INFO);
-                    put("DECIMAL_DIGITS", 0, INT_TYPE_INFO);
-                    put("NUM_PREC_RADIX", typeInfo != null ? typeInfo.getRadix() : 10, INT_TYPE_INFO);
-                    put("NULLABLE",
-                            column.isNillable() ? DatabaseMetaData.columnNullable : DatabaseMetaData.columnNoNulls,
-                            INT_TYPE_INFO);
-                    put("REMARKS", column.getComments(), STRING_TYPE_INFO);
-                    put("COLUMN_DEF", null, STRING_TYPE_INFO);
-                    put("SQL_DATA_TYPE", null, INT_TYPE_INFO);
-                    put("SQL_DATETIME_SUB", null, INT_TYPE_INFO);
-                    put("CHAR_OCTET_LENGTH", 0, INT_TYPE_INFO);
-                    put("ORDINAL_POSITION", ordinal.getAndIncrement(), INT_TYPE_INFO);
-                    put("IS_NULLABLE", column.isNillable() ? "YES" : "NO", STRING_TYPE_INFO);
-                    put("SCOPE_CATLOG", null, STRING_TYPE_INFO);
-                    put("SCOPE_SCHEMA", null, STRING_TYPE_INFO);
-                    put("SCOPE_TABLE", null, STRING_TYPE_INFO);
-                    put("SOURCE_DATA_TYPE",
-                            (short) TypeInfo.lookupTypeInfo(column.getType()).getSqlDataType(),
-                            SHORT_TYPE_INFO);
-                    put("IS_AUTOINCREMENT", "", STRING_TYPE_INFO);
-                    put("IS_GENERATEDCOLUMN", "", STRING_TYPE_INFO);
-                }})
-                .collect(Collectors.toUnmodifiableList());
-        ColumnMap<String, Object> firstRow = !rows.isEmpty() ? rows.get(0) : null;
-        log.debug("[Meta] getColumns RESULT catalog={} schema={} table={} column={} firstRowFound={} ColumnsFound={}",
-                catalog, schemaPattern, tableNamePattern, columnNamePattern, firstRow != null ? "yes" : "no", rows.size());
-        return new CachedResultSet(rows, ForcePreparedStatement.createMetaData(firstRow));
+            .filter(table -> tableNamePattern == null || "%".equals(tableNamePattern.trim()) || table.getName()
+                .equalsIgnoreCase(tableNamePattern))
+            .flatMap(table -> table.getColumns().stream())
+            .filter(column -> columnNamePattern == null || "%".equals(columnNamePattern.trim()) || column.getName()
+                .equalsIgnoreCase(columnNamePattern))
+            .map(column -> {
+                final ColumnMap<String, Object> cm = new ColumnMap<>();
+                TypeInfo typeInfo = TypeInfo.lookupTypeInfo(column.getType());
+                cm.put("TABLE_CAT", DEFAULT_CATALOG, STRING_TYPE_INFO);
+                cm.put("TABLE_SCHEM", DEFAULT_SCHEMA, STRING_TYPE_INFO);
+                cm.put("TABLE_NAME", column.getTable().getName(), STRING_TYPE_INFO);
+                cm.put("COLUMN_NAME", column.getName(), STRING_TYPE_INFO);
+                cm.put("DATA_TYPE", typeInfo != null ? typeInfo.getSqlDataType() : Types.OTHER, INT_TYPE_INFO);
+                cm.put("TYPE_NAME", column.getType(), STRING_TYPE_INFO);
+                cm.put("COLUMN_SIZE", column.getLength(), INT_TYPE_INFO);
+                cm.put("BUFFER_LENGTH", 0, INT_TYPE_INFO);
+                cm.put("DECIMAL_DIGITS", 0, INT_TYPE_INFO);
+                cm.put("NUM_PREC_RADIX", typeInfo != null ? typeInfo.getRadix() : 10, INT_TYPE_INFO);
+                cm.put("NULLABLE",
+                    column.isNillable() ? DatabaseMetaData.columnNullable : DatabaseMetaData.columnNoNulls,
+                    INT_TYPE_INFO);
+                cm.put("REMARKS", column.getComments(), STRING_TYPE_INFO);
+                cm.put("COLUMN_DEF", null, STRING_TYPE_INFO);
+                cm.put("SQL_DATA_TYPE", null, INT_TYPE_INFO);
+                cm.put("SQL_DATETIME_SUB", null, INT_TYPE_INFO);
+                cm.put("CHAR_OCTET_LENGTH", 0, INT_TYPE_INFO);
+                cm.put("ORDINAL_POSITION", ordinal.getAndIncrement(), INT_TYPE_INFO);
+                cm.put("IS_NULLABLE", column.isNillable() ? "YES" : "NO", STRING_TYPE_INFO);
+                cm.put("SCOPE_CATLOG", null, STRING_TYPE_INFO);
+                cm.put("SCOPE_SCHEMA", null, STRING_TYPE_INFO);
+                cm.put("SCOPE_TABLE", null, STRING_TYPE_INFO);
+                cm.put("SOURCE_DATA_TYPE",
+                    (short) TypeInfo.lookupTypeInfo(column.getType()).getSqlDataType(),
+                    SHORT_TYPE_INFO);
+                cm.put("IS_AUTOINCREMENT", "", STRING_TYPE_INFO);
+                cm.put("IS_GENERATEDCOLUMN", "", STRING_TYPE_INFO);
+                return cm;
+            }).toList();
+        log.debug("[Meta] getColumns RESULT catalog={} schema={} table={} column={} ColumnsFound={}",
+            catalog, schemaPattern, tableNamePattern, columnNamePattern, rows.size());
+        return new CachedResultSet(rows, ForcePreparedStatement.createMetaData(rows.get(0)));
     }
 
     @Override
@@ -171,7 +164,6 @@ public class ForceDatabaseMetaData implements DatabaseMetaData, Serializable {
     public ResultSet getPrimaryKeys(String catalog, String schema, String tableName) throws SQLException {
         log.debug("[Meta] getPrimaryKeys RESULT catalog={} schema={} table={}", catalog, schema, tableName);
         List<ColumnMap<String, Object>> maps = new ArrayList<>();
-        ColumnMap<String, Object> firstRow = null;
         for (Table table : getTables(tableName)) {
             if (tableName == null || "%".equals(tableName.trim()) || table.getName().equalsIgnoreCase(tableName)) {
                 for (Column column : table.getColumns()) {
@@ -183,25 +175,24 @@ public class ForceDatabaseMetaData implements DatabaseMetaData, Serializable {
                         map.put("COLUMN_NAME", column.getName(), STRING_TYPE_INFO);
                         map.put("KEY_SEQ", (short) 1, SHORT_TYPE_INFO);
                         map.put("PK_NAME",
-                                String.format("%s_%s_%s_PRIMARYKEY", DEFAULT_CATALOG, DEFAULT_SCHEMA, table.getName()),
-                                STRING_TYPE_INFO);
+                            String.format("%s_%s_%s_PRIMARYKEY", DEFAULT_CATALOG, DEFAULT_SCHEMA, table.getName()),
+                            STRING_TYPE_INFO);
                         maps.add(map);
-                        if (firstRow == null) {
-                            firstRow = map;
-                        }
                     }
                 }
             }
         }
-        log.debug("[Meta] getPrimaryKeys RESULT catalog={} schema={} table={} firstRowFound={} KeysFound={}",
-            catalog, schema, tableName, (firstRow != null ? "yes" : "no"), maps.size());
-        return new CachedResultSet(maps, ForcePreparedStatement.createMetaData(firstRow));
+        log.debug("[Meta] getPrimaryKeys RESULT catalog={} schema={} table={} KeysFound={}",
+            catalog,
+            schema,
+            tableName,
+            maps.size());
+        return new CachedResultSet(maps, ForcePreparedStatement.createMetaData(maps.get(0)));
     }
 
     @Override
     public ResultSet getImportedKeys(String catalog, String schema, String tableName) throws SQLException {
         List<ColumnMap<String, Object>> maps = new ArrayList<>();
-        ColumnMap<String, Object> firstRow = null;
         for (Table table : getTables(tableName)) {
             if (tableName == null || "%".equals(tableName.trim()) || table.getName().equalsIgnoreCase(tableName)) {
                 for (Column column : table.getColumns()) {
@@ -219,28 +210,28 @@ public class ForceDatabaseMetaData implements DatabaseMetaData, Serializable {
                         map.put("UPDATE_RULE", (short) DatabaseMetaData.importedKeyNoAction, SHORT_TYPE_INFO);
                         map.put("DELETE_RULE", (short) DatabaseMetaData.importedKeyNoAction, STRING_TYPE_INFO);
                         map.put("FK_NAME",
-                                String.format("FK_%s_%s_REF_%s_%s", column.getReferencedTable(), column.getName(), column.getReferencedTable(), column.getReferencedColumn()),
-                                STRING_TYPE_INFO);
+                            String.format("FK_%s_%s_REF_%s_%s",
+                                column.getReferencedTable(),
+                                column.getName(),
+                                column.getReferencedTable(),
+                                column.getReferencedColumn()),
+                            STRING_TYPE_INFO);
                         map.put("PK_NAME",
-                                String.format("PK_%s_%s", column.getReferencedTable(), column.getReferencedColumn()),
-                                STRING_TYPE_INFO);
+                            String.format("PK_%s_%s", column.getReferencedTable(), column.getReferencedColumn()),
+                            STRING_TYPE_INFO);
                         map.put("DEFERRABILITY", (short) DatabaseMetaData.importedKeyNotDeferrable, SHORT_TYPE_INFO);
                         maps.add(map);
-                        if (firstRow == null) {
-                            firstRow = map;
-                        }
                     }
                 }
             }
         }
-        return new CachedResultSet(maps, ForcePreparedStatement.createMetaData(firstRow));
+        return new CachedResultSet(maps, ForcePreparedStatement.createMetaData(maps.get(0)));
     }
 
     @Override
     public ResultSet getIndexInfo(String catalog, String schema, String tableName, boolean unique,
-                                  boolean approximate) throws SQLException {
+        boolean approximate) throws SQLException {
         List<ColumnMap<String, Object>> maps = new ArrayList<>();
-        ColumnMap<String, Object> firstRow = null;
         for (Table table : getTables(tableName)) {
             if (tableName == null || "%".equals(tableName.trim()) || table.getName().equalsIgnoreCase(tableName)) {
                 for (Column column : table.getColumns()) {
@@ -254,9 +245,9 @@ public class ForceDatabaseMetaData implements DatabaseMetaData, Serializable {
                     map.put("NON_UNIQUE", !column.isUnique(), BOOL_TYPE_INFO);
                     map.put("INDEX_QUALIFIER", "", STRING_TYPE_INFO);
                     map.put("INDEX_NAME",
-                            String.format("%S_%S_%S_%S_INDEX", DEFAULT_CATALOG, DEFAULT_SCHEMA, table.getName(),
-                                    column.getName().equals("Id") ? "PRIMARYKEY" : column.getName()),
-                            STRING_TYPE_INFO);
+                        String.format("%S_%S_%S_%S_INDEX", DEFAULT_CATALOG, DEFAULT_SCHEMA, table.getName(),
+                            column.getName().equals("Id") ? "PRIMARYKEY" : column.getName()),
+                        STRING_TYPE_INFO);
                     map.put("TYPE", DatabaseMetaData.tableIndexOther, SHORT_TYPE_INFO);
                     map.put("ORDINAL_POSITION", (short) 1, SHORT_TYPE_INFO);
                     map.put("COLUMN_NAME", column.getName(), STRING_TYPE_INFO);
@@ -266,14 +257,10 @@ public class ForceDatabaseMetaData implements DatabaseMetaData, Serializable {
                     map.put("FILTER_CONDITION", null, STRING_TYPE_INFO);
 
                     maps.add(map);
-
-                    if (firstRow == null) {
-                        firstRow = map;
-                    }
                 }
             }
         }
-        return new CachedResultSet(maps, ForcePreparedStatement.createMetaData(firstRow));
+        return new CachedResultSet(maps, ForcePreparedStatement.createMetaData(maps.get(0)));
     }
 
     @Override
@@ -285,7 +272,6 @@ public class ForceDatabaseMetaData implements DatabaseMetaData, Serializable {
 
     @Override
     public ResultSet getTypeInfo() {
-        ColumnMap<String, Object> firstRow = null;
         List<ColumnMap<String, Object>> rows = new ArrayList<>();
         for (TypeInfo typeInfo : TypeInfo.values()) {
             ColumnMap<String, Object> row = new ColumnMap<>();
@@ -309,11 +295,8 @@ public class ForceDatabaseMetaData implements DatabaseMetaData, Serializable {
             row.put("NUM_PREC_RADIX", typeInfo.getRadix(), INT_TYPE_INFO);
 
             rows.add(row);
-            if (firstRow == null) {
-                firstRow = row;
-            }
         }
-        return new CachedResultSet(rows, ForcePreparedStatement.createMetaData(firstRow));
+        return new CachedResultSet(rows, ForcePreparedStatement.createMetaData(rows.get(0)));
     }
 
     @Override
@@ -388,17 +371,17 @@ public class ForceDatabaseMetaData implements DatabaseMetaData, Serializable {
 
     @Override
     public String getDriverVersion() {
-        return getDriverMajorVersion() + "." + getDriverMinorVersion() + ".6";
+        return Constants.DRIVER_VERSION;
     }
 
     @Override
     public int getDriverMajorVersion() {
-        return 1;
+        return Constants.DRIVER_MAJOR_VER;
     }
 
     @Override
     public int getDriverMinorVersion() {
-        return 6;
+        return Constants.DRIVER_MAJOR_VER;
     }
 
     @Override
@@ -921,15 +904,15 @@ public class ForceDatabaseMetaData implements DatabaseMetaData, Serializable {
     @Override
     public ResultSet getProcedures(String catalog, String schemaPattern, String procedureNamePattern) {
         log.info("[Meta] getProcedures requested NOT_IMPLEMENTED catalog={} schema={} proc={}", catalog, schemaPattern,
-                procedureNamePattern);
+            procedureNamePattern);
         return new CachedResultSet(CachedResultSetMetaData.EMPTY);
     }
 
     @Override
     public ResultSet getProcedureColumns(String catalog, String schemaPattern, String procedureNamePattern,
-                                         String columnNamePattern) {
+        String columnNamePattern) {
         log.info("[Meta] getProcedureColumns requested NOT_IMPLEMENTED catalog={} schema={} proc={} col={}", catalog,
-                schemaPattern, procedureNamePattern, columnNamePattern);
+            schemaPattern, procedureNamePattern, columnNamePattern);
         return new CachedResultSet(CachedResultSetMetaData.EMPTY);
     }
 
@@ -944,49 +927,49 @@ public class ForceDatabaseMetaData implements DatabaseMetaData, Serializable {
     @Override
     public ResultSet getColumnPrivileges(String catalog, String schema, String table, String columnNamePattern) {
         log.info("[Meta] getColumnPrivileges requested NOT_IMPLEMENTED catalog={} schema={} table={} col={}", catalog,
-                schema, table, columnNamePattern);
+            schema, table, columnNamePattern);
         return new CachedResultSet(CachedResultSetMetaData.EMPTY);
     }
 
     @Override
     public ResultSet getTablePrivileges(String catalog, String schemaPattern, String tableNamePattern) {
         log.info("[Meta] getTablePrivileges requested NOT_IMPLEMENTED catalog={} schema={} table={}", catalog,
-                schemaPattern, tableNamePattern);
+            schemaPattern, tableNamePattern);
         return new CachedResultSet(CachedResultSetMetaData.EMPTY);
     }
 
     @Override
     public ResultSet getBestRowIdentifier(String catalog, String schema, String table, int scope, boolean nullable) {
         log.info("[Meta] getBestRowIdentifier requested NOT_IMPLEMENTED catalog={} schema={} table={}", catalog,
-                schema, table);
+            schema, table);
         return new CachedResultSet(CachedResultSetMetaData.EMPTY);
     }
 
     @Override
     public ResultSet getVersionColumns(String catalog, String schema, String table) {
         log.info("[Meta] getVersionColumns requested NOT_IMPLEMENTED catalog={} schema={} table={}", catalog,
-                schema, table);
+            schema, table);
         return new CachedResultSet(CachedResultSetMetaData.EMPTY);
     }
 
     @Override
     public ResultSet getExportedKeys(String catalog, String schema, String table) {
         log.info("[Meta] getExportedKeys requested NOT_IMPLEMENTED catalog={} schema={} table={}", catalog,
-                schema, table);
+            schema, table);
         return new CachedResultSet(CachedResultSetMetaData.EMPTY);
     }
 
     @Override
     public ResultSet getCrossReference(String parentCatalog, String parentSchema, String parentTable,
-                                       String foreignCatalog, String foreignSchema, String foreignTable) {
+        String foreignCatalog, String foreignSchema, String foreignTable) {
         log.trace(
-                "[Meta] getCrossReference requested NOT_IMPLEMENTED parentCat={} parentSc={} parentTable={} catalog={} schema={} table={}",
-                parentCatalog,
-                parentSchema,
-                parentTable,
-                foreignCatalog,
-                foreignSchema,
-                foreignTable);
+            "[Meta] getCrossReference requested NOT_IMPLEMENTED parentCat={} parentSc={} parentTable={} catalog={} schema={} table={}",
+            parentCatalog,
+            parentSchema,
+            parentTable,
+            foreignCatalog,
+            foreignSchema,
+            foreignTable);
 
         return new CachedResultSet(CachedResultSetMetaData.EMPTY);
     }
@@ -1085,21 +1068,22 @@ public class ForceDatabaseMetaData implements DatabaseMetaData, Serializable {
     @Override
     public ResultSet getSuperTypes(String catalog, String schemaPattern, String typeNamePattern) {
         log.info("[Meta] getSuperTypes requested NOT_IMPLEMENTED catalog={} schema={} type={}", catalog,
-                schemaPattern, typeNamePattern);
+            schemaPattern, typeNamePattern);
         return new CachedResultSet(CachedResultSetMetaData.EMPTY);
     }
 
     @Override
     public ResultSet getSuperTables(String catalog, String schemaPattern, String tableNamePattern) {
         log.info("[Meta] getSuperTables requested NOT_IMPLEMENTED catalog={} schema={} table={}",
-                catalog, schemaPattern, tableNamePattern);
+            catalog, schemaPattern, tableNamePattern);
         return new CachedResultSet(CachedResultSetMetaData.EMPTY);
     }
 
     @Override
-    public ResultSet getAttributes(String catalog, String schemaPattern, String typeNamePattern, String attributeNamePattern) {
+    public ResultSet getAttributes(String catalog, String schemaPattern, String typeNamePattern,
+        String attributeNamePattern) {
         log.info("[Meta] getAttributes requested NOT_IMPLEMENTED catalog={} schema={} type={} attr={}", catalog,
-                schemaPattern, typeNamePattern, attributeNamePattern);
+            schemaPattern, typeNamePattern, attributeNamePattern);
         return new CachedResultSet(CachedResultSetMetaData.EMPTY);
     }
 
@@ -1212,23 +1196,23 @@ public class ForceDatabaseMetaData implements DatabaseMetaData, Serializable {
     @Override
     public ResultSet getFunctions(String catalog, String schemaPattern, String functionNamePattern) {
         log.info("[Meta] getFunctions requested NOT_IMPLEMENTED catalog={} schema={} func={}", catalog,
-                schemaPattern, functionNamePattern);
+            schemaPattern, functionNamePattern);
         return new CachedResultSet(CachedResultSetMetaData.EMPTY);
     }
 
     @Override
     public ResultSet getFunctionColumns(String catalog, String schemaPattern, String functionNamePattern,
-                                        String columnNamePattern) {
+        String columnNamePattern) {
         log.info("[Meta] getFunctionColumns requested NOT_IMPLEMENTED catalog={} schema={} func={} col={}", catalog,
-                schemaPattern, functionNamePattern, columnNamePattern);
+            schemaPattern, functionNamePattern, columnNamePattern);
         return new CachedResultSet(CachedResultSetMetaData.EMPTY);
     }
 
     @Override
     public ResultSet getPseudoColumns(String catalog, String schemaPattern, String tableNamePattern,
-                                      String columnNamePattern) {
+        String columnNamePattern) {
         log.info("[Meta] getPseudoColumns requested NOT_IMPLEMENTED catalog={} schema={} table={}  column={}",
-                catalog, schemaPattern, tableNamePattern, columnNamePattern);
+            catalog, schemaPattern, tableNamePattern, columnNamePattern);
         return new CachedResultSet(CachedResultSetMetaData.EMPTY);
     }
 
@@ -1244,7 +1228,7 @@ public class ForceDatabaseMetaData implements DatabaseMetaData, Serializable {
     public static void main(String[] args) throws SQLException {
         ForceDatabaseMetaData metadata = new ForceDatabaseMetaData();
         System.out.println(metadata.getDriverName() + " version " + metadata.getDriverVersion() + " for API "
-                + metadata.getDatabaseProductVersion());
+            + metadata.getDatabaseProductVersion());
 
         if (args.length > 0) {
             System.out.println("Test the tables from the url ");
@@ -1252,7 +1236,7 @@ public class ForceDatabaseMetaData implements DatabaseMetaData, Serializable {
             ForceConnection connection = (ForceConnection) driver.connect(args[0], new Properties());
 
             ForceDatabaseMetaData metaData = new ForceDatabaseMetaData(connection,
-                    new PartnerService(connection.getPartnerConnection()));
+                new PartnerService(connection.getPartnerConnection(),null));
             ResultSet tables = metaData.getTables("catalog", "", "%", null);
             int count = 0;
             while (tables.next()) {

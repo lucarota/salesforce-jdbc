@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.ascendix.salesforce</groupId>
     <artifactId>salesforce-jdbc</artifactId>
-    <version>1.6.6${suffix.version}-release</version>
+    <version>1.6.7${suffix.version}-release</version>
     <packaging>jar</packaging>
 
     <name>Salesforce JDBC Driver</name>
@@ -35,6 +35,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <suffix.version></suffix.version>
 
+        <!-- Remember to also update ForceService.DEFAULT_API_VERSION -->
         <force-partner-api.version>61.1.0</force-partner-api.version>
         <lombok.version>1.18.30</lombok.version>
         <slf4j.version>1.7.36</slf4j.version>
