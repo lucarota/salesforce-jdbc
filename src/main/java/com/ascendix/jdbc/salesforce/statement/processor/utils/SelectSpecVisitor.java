@@ -8,18 +8,15 @@ import com.ascendix.jdbc.salesforce.utils.FieldDefTree;
 import com.sforce.soap.partner.ChildRelationship;
 import com.sforce.soap.partner.DescribeSObjectResult;
 import com.sforce.soap.partner.Field;
-
-import java.util.*;
-import java.util.function.Function;
-import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.expression.Expression;
-import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.schema.Table;
-import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.select.*;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+
+import java.util.*;
+import java.util.function.Function;
 
 public class SelectSpecVisitor implements SelectItemVisitor<Expression> {
 
@@ -131,37 +128,30 @@ public class SelectSpecVisitor implements SelectItemVisitor<Expression> {
     }
 
     private Expression visitSubQuery(ParenthesedSelect subQuery) {
-        try {
-            String subQuerySoql = subQuery.getPlainSelect().toString();
-            Statement statement = CCJSqlParserUtil.parse(subQuerySoql);
-            if (statement instanceof PlainSelect select) {
-                final FromItem from = select.getFromItem();
-                String relationshipName;
-                String[] prefixNames = StringUtils.split(from.toString(), '.');
-                if (prefixNames.length > 0 && rootEntityName.equalsIgnoreCase(prefixNames[0])) {
-                    relationshipName = prefixNames[1];
-                } else {
-                    relationshipName = from.toString();
-                }
-
-                ChildRelationship relatedFrom = Arrays.stream(describeObject(rootEntityName).getChildRelationships())
-                    .filter(rel -> relationshipName.equalsIgnoreCase(rel.getRelationshipName())).findFirst()
-                    .orElseThrow(() -> new IllegalArgumentException(
-                        "Unresolved relationship in subquery \"" + subQuerySoql + "\""));
-
-                String fromObject = relatedFrom.getChildSObject();
-                select.setFromItem(new Table(fromObject));
-
-                SoqlQueryAnalyzer subQueryAnalyzer = new SoqlQueryAnalyzer(new QueryAnalyzer(select.toString(),null, partnerService));
-                fieldDefinitions.addTreeNode(subQueryAnalyzer.getFieldDefinitions());
-
-                final PlainSelect soqlQuery = (PlainSelect)subQueryAnalyzer.getSoqlQuery();
-                soqlQuery.setFromItem(from);
-                subQuery.withSelect(soqlQuery);
-            }
-        } catch (JSQLParserException e) {
-            throw new RuntimeException(e);
+        PlainSelect select = subQuery.getPlainSelect();
+        final FromItem from = select.getFromItem();
+        String relationshipName;
+        String[] prefixNames = StringUtils.split(from.toString(), '.');
+        if (prefixNames.length > 1 && rootEntityName.equalsIgnoreCase(prefixNames[0])) {
+            relationshipName = prefixNames[1];
+        } else {
+            relationshipName = from.toString();
         }
+
+        ChildRelationship relatedFrom = Arrays.stream(describeObject(rootEntityName).getChildRelationships())
+            .filter(rel -> relationshipName.equalsIgnoreCase(rel.getRelationshipName())).findFirst()
+            .orElseThrow(() -> new IllegalArgumentException(
+                "Unresolved relationship in subquery \"" + subQuery.getPlainSelect().toString() + "\""));
+
+        String fromObject = relatedFrom.getChildSObject();
+        select.setFromItem(new Table(fromObject));
+
+        SoqlQueryAnalyzer subQueryAnalyzer = new SoqlQueryAnalyzer(new QueryAnalyzer(select.toString(),null, partnerService));
+        fieldDefinitions.addTreeNode(subQueryAnalyzer.getFieldDefinitions());
+
+        final PlainSelect soqlQuery = (PlainSelect)subQueryAnalyzer.getSoqlQuery();
+        soqlQuery.setFromItem(from);
+        subQuery.withSelect(soqlQuery);
         return subQuery;
     }
 
