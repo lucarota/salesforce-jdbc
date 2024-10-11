@@ -38,7 +38,7 @@
         <!-- Remember to also update ForceService.DEFAULT_API_VERSION -->
         <force-partner-api.version>61.1.0</force-partner-api.version>
         <lombok.version>1.18.30</lombok.version>
-        <slf4j.version>1.7.36</slf4j.version>
+        <slf4j.version>2.0.7</slf4j.version>
         <commons-lang3.version>3.12.0</commons-lang3.version>
         <jsqlparser.version>5.0</jsqlparser.version>
         <ehcache.version>3.10.8</ehcache.version>
@@ -128,9 +128,9 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-jdbc</artifactId>
-            <version>6.1.3</version>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>${slf4j.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
