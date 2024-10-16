@@ -12,17 +12,22 @@ public class ColumnMap<K, V> implements Serializable {
 
     @Getter
     private final ArrayList<K> columnNames = new ArrayList<>();
+    private final ArrayList<K> columnLabels = new ArrayList<>();
     @Getter
     private final ArrayList<V> values = new ArrayList<>();
     @Getter
     private final ArrayList<TypeInfo> types = new ArrayList<>();
-    private int columnPosition = 0;
+
+    public V put(K key, K label, V value, TypeInfo typeInfo) {
+        columnNames.add(key);
+        columnLabels.add(label);
+        values.add(value);
+        types.add(typeInfo);
+        return value;
+    }
 
     public V put(K key, V value, TypeInfo typeInfo) {
-        columnNames.add(columnPosition, key);
-        values.add(columnPosition, value);
-        types.add(columnPosition, typeInfo);
-        columnPosition++;
+        put(key, key, value, typeInfo);
         return value;
     }
 
@@ -33,11 +38,17 @@ public class ColumnMap<K, V> implements Serializable {
 
     public V get(K key) {
         int index = columnNames.indexOf(key);
+        if (index == -1) {
+            index = columnLabels.indexOf(key);
+        }
         return index != -1 ? values.get(index) : null;
     }
 
     public TypeInfo getTypeInfo(K key) {
         int index = columnNames.indexOf(key);
+        if (index == -1) {
+            index = columnLabels.indexOf(key);
+        }
         return index != -1 ? types.get(index) : null;
     }
 
