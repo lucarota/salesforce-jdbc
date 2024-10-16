@@ -22,7 +22,6 @@ public class SelectSpecVisitor implements SelectItemVisitor<Expression> {
 
     private final String rootEntityName;
     private final FieldDefTree fieldDefinitions;
-    private final Map<String, Integer> positions = new HashMap<>();
     private final PartnerService partnerService;
 
     public SelectSpecVisitor(String rootEntityName, FieldDefTree fieldDefinitions,
@@ -53,21 +52,14 @@ public class SelectSpecVisitor implements SelectItemVisitor<Expression> {
             }
             // If Object Name specified - verify it is not the same as SOQL root entity
             if (fieldSpec.getAlias() == null && objectPrefix != null && !objectPrefix.equals(rootEntityName)) {
-                alias = objectPrefix + "." + name;
+                if (prefixNames.size() > 1 && prefixNames.get(0).equals(rootEntityName)) {
+                    alias = String.join(".", prefixNames.subList(1, prefixNames.size())) + name;
+                } else {
+                    alias = column.getTable().getFullyQualifiedName()+ "." + name;
+                }
             }
             FieldDef result = createFieldDef(name, alias, prefixNames);
-            if (!prefixNames.isEmpty()) {
-                int position = fieldDefinitions.getChildrenCount();
-                for (String prefix : prefixNames) {
-                    if (positions.containsKey(prefix)) {
-                        position = positions.get(prefix) + 1;
-                    }
-                    positions.put(prefix, position);
-                }
-                fieldDefinitions.addChild(result, position);
-            } else {
-                fieldDefinitions.addChild(result);
-            }
+            fieldDefinitions.addChild(result);
             /* Remove alias from query */
             fieldSpec.setAlias(null);
         } else if (fieldSpec.getExpression() instanceof net.sf.jsqlparser.expression.Function func) {
@@ -95,7 +87,6 @@ public class SelectSpecVisitor implements SelectItemVisitor<Expression> {
         Field field = findField(name, describeObject(fromObject), Field::getName);
         String type = field.getType().name();
 
-        name = field.getName();
         return new FieldDef(name, prefix + name, alias, type);
     }
 

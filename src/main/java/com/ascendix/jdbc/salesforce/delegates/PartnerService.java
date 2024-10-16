@@ -267,7 +267,7 @@ public class PartnerService {
         if ("sObject".equalsIgnoreCase(fieldType)) {
             TreeNode<ForceResultField> node = new TreeNode<>();
             TreeNode<ForceResultField> childFields = removeServiceInfo(field,
-                field.getName().getLocalPart(),
+                parentName != null ? parentName + "." + field.getName().getLocalPart() : field.getName().getLocalPart(),
                 rootEntityName);
             childFields.getChildren().forEach(node::addTreeNode);
             return node;
