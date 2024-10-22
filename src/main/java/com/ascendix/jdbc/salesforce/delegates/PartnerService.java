@@ -4,6 +4,7 @@ import static java.lang.String.CASE_INSENSITIVE_ORDER;
 
 import com.ascendix.jdbc.salesforce.metadata.Column;
 import com.ascendix.jdbc.salesforce.metadata.Table;
+import com.ascendix.jdbc.salesforce.oauth.ForceClientException;
 import com.ascendix.jdbc.salesforce.utils.FieldDefTree;
 import com.ascendix.jdbc.salesforce.utils.IteratorUtils;
 import com.ascendix.jdbc.salesforce.utils.PatternToRegexUtils;
@@ -28,7 +29,7 @@ public class PartnerService {
     private final PartnerConnection partnerConnection;
     private final String orgId;
 
-    private static final Map<String, DescribeGlobalResult> schemaCache = new HashMap<>();
+    private static final Map<String, List<DescribeGlobalSObjectResult>> schemaCache = new HashMap<>();
     private static final Map<String, Map<String, DescribeSObjectResult>> sObjectsCache = new HashMap<>();
 
     public PartnerService(PartnerConnection partnerConnection, final String orgId) {
@@ -72,11 +73,11 @@ public class PartnerService {
         } catch (InvalidSObjectFault e) {
             return null;
         } catch (ConnectionException e) {
-            throw new RuntimeException(e);
+            throw new ForceClientException("Connection Error", e);
         }
     }
 
-    public void cleanupGlobalCache() throws ConnectionException {
+    public void cleanupGlobalCache() {
         resetSchemaCache();
         sObjectsCache.clear();
     }
@@ -128,13 +129,17 @@ public class PartnerService {
         return s.equalsIgnoreCase("double") ? "decimal" : s;
     }
 
-    private synchronized void resetSchemaCache() throws ConnectionException {
-        schemaCache.put(getConnectionId(), partnerConnection.describeGlobal());
+    private synchronized void resetSchemaCache() {
+        schemaCache.remove(getConnectionId());
     }
 
-    private synchronized DescribeGlobalResult getDescribeGlobal() throws ConnectionException {
+    private synchronized List<DescribeGlobalSObjectResult> getDescribeGlobal() throws ConnectionException {
         if (schemaCache.get(getConnectionId()) == null) {
-            schemaCache.put(getConnectionId(), partnerConnection.describeGlobal());
+            final DescribeGlobalResult describeGlobals = partnerConnection.describeGlobal();
+            final List<DescribeGlobalSObjectResult> describeGlobalsResult = Arrays.stream(describeGlobals.getSobjects())
+                .filter(DescribeGlobalSObjectResult::isQueryable)
+                .toList();
+            schemaCache.put(getConnectionId(), describeGlobalsResult);
         }
 
         return schemaCache.get(getConnectionId());
@@ -142,7 +147,7 @@ public class PartnerService {
 
     private String getSObjectType(String sObject) {
         try {
-            return Arrays.stream(getDescribeGlobal().getSobjects())
+            return getDescribeGlobal().stream()
                 .map(DescribeGlobalSObjectResult::getName)
                 .filter(sObject::equalsIgnoreCase)
                 .findFirst().orElse(null);
@@ -152,12 +157,12 @@ public class PartnerService {
     }
 
     private Map<String, DescribeSObjectResult> getSObjectsDescription() throws ConnectionException {
-        DescribeGlobalResult describeGlobals = getDescribeGlobal();
+        List<DescribeGlobalSObjectResult> describeGlobals = getDescribeGlobal();
         final Map<String, DescribeSObjectResult> cache = sObjectsCache.get(getConnectionId());
         if (cache.isEmpty()
-            || cache.size() < describeGlobals.getSobjects().length) {
+            || cache.size() < describeGlobals.size()) {
             log.trace("Load all SObjects");
-            List<String> tableNames = Arrays.stream(describeGlobals.getSobjects())
+            List<String> tableNames = describeGlobals.stream()
                 .filter(DescribeGlobalSObjectResult::isQueryable)
                 .map(DescribeGlobalSObjectResult::getName)
                 .toList();

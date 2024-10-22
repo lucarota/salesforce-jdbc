@@ -62,12 +62,13 @@ public class DeleteQueryAnalyzer {
         List<Object> whereParameters = new ArrayList<>();
         final Expression where = query.getWhere();
         if (where != null) {
-            where.accept(new ExpressionVisitorAdapter() {
+            where.accept(new ExpressionVisitorAdapter<Expression>() {
                 @Override
-                public void visit(JdbcParameter parameter) {
+                public <S> Expression visit(JdbcParameter parameter, S context) {
                     int idx = parameter.getIndex() - 1;
                     Object o = parameters.get(idx);
                     whereParameters.add(o);
+                    return null;
                 }
             });
         }
