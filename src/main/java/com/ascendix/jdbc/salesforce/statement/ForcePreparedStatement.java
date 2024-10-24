@@ -273,6 +273,15 @@ public class ForcePreparedStatement implements PreparedStatement, Iterator<List<
                     return TypeInfo.lookupTypeInfo(metadata.getColumnTypeName(i));
                 }
             }
+            String[] prefix = StringUtils.split(name, '.');
+            if (prefix.length > 0) {
+                name = String.join(".", List.of(prefix).subList(1, prefix.length));
+                for (int i = 1; i <= metadata.getColumnCount(); i++) {
+                    if (name.equalsIgnoreCase(metadata.getColumnName(i))) {
+                        return TypeInfo.lookupTypeInfo(metadata.getColumnTypeName(i));
+                    }
+                }
+            }
         } catch (SQLException e) {
             // ignore
         }

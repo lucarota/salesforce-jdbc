@@ -204,7 +204,7 @@ public class CachedResultSet implements ResultSet, Serializable {
             }
 
             if (o instanceof String val) {
-                return Optional.of(conversion.apply(val));
+                return Optional.ofNullable(conversion.apply(val));
             }
 
             if (o.getClass().isAssignableFrom(clazz)) {
@@ -217,7 +217,7 @@ public class CachedResultSet implements ResultSet, Serializable {
                 }
             }
 
-            return Optional.of(conversion.apply(o.toString()));
+            return Optional.ofNullable(conversion.apply(o.toString()));
         }
     }
 

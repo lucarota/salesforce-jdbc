@@ -55,7 +55,7 @@ public class SelectSpecVisitor implements SelectItemVisitor<Expression> {
                 if (prefixNames.size() > 1 && prefixNames.get(0).equals(rootEntityName)) {
                     alias = String.join(".", prefixNames.subList(1, prefixNames.size())) + name;
                 } else {
-                    alias = column.getTable().getFullyQualifiedName()+ "." + name;
+                    alias = column.getTable().getFullyQualifiedName() + "." + name;
                 }
             }
             FieldDef result = createFieldDef(name, alias, prefixNames);
