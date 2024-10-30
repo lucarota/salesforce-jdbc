@@ -331,23 +331,24 @@ public class SoqlQueryAnalyzerTest {
         assertEquals("picklist", fieldDef.getType());
 
         fieldDef = actual.get(8);
-        assertEquals("Zuora_Quote__c", fieldDef.getName());
-        assertEquals("reference", fieldDef.getType());
-
-        fieldDef = actual.get(9);
-        assertEquals("RecordTypeId", fieldDef.getName());
-        assertEquals("reference", fieldDef.getType());
-
-        fieldDef = actual.get(10);
-        assertEquals("Terminal_Class__c", fieldDef.getName());
-        assertEquals("picklist", fieldDef.getType());
-
-        fieldDef = actual.get(11);
         assertEquals("OSS_Technical_Account_ID__c", fieldDef.getName());
         assertEquals("string", fieldDef.getType());
 
-        fieldDef = actual.get(12);
+        fieldDef = actual.get(9);
         assertEquals("Name", fieldDef.getName());
         assertEquals("string", fieldDef.getType());
+
+        fieldDef = actual.get(10);
+        assertEquals("Zuora_Quote__c", fieldDef.getName());
+        assertEquals("reference", fieldDef.getType());
+
+        fieldDef = actual.get(11);
+        assertEquals("RecordTypeId", fieldDef.getName());
+        assertEquals("reference", fieldDef.getType());
+
+        fieldDef = actual.get(12);
+        assertEquals("Terminal_Class__c", fieldDef.getName());
+        assertEquals("picklist", fieldDef.getType());
+
     }
 }
