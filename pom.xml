@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.ascendix.salesforce</groupId>
     <artifactId>salesforce-jdbc</artifactId>
-    <version>1.6.10${suffix.version}-release</version>
+    <version>1.6.11-release</version>
     <packaging>jar</packaging>
 
     <name>Salesforce JDBC Driver</name>
@@ -33,7 +33,6 @@
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <suffix.version></suffix.version>
 
         <!-- Remember to also update ForceService.DEFAULT_API_VERSION -->
         <force-partner-api.version>61.1.0</force-partner-api.version>
@@ -49,7 +48,7 @@
 
         <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
         <versions-maven-plugin.version>2.8.1</versions-maven-plugin.version>
-        <maven-surefire-plugin.version>3.1.2</maven-surefire-plugin.version>
+        <maven-surefire-plugin.version>3.2.5</maven-surefire-plugin.version>
         <maven-source-plugin.version>3.3.0</maven-source-plugin.version>
         <maven-jar-plugin.version>3.3.0</maven-jar-plugin.version>
         <maven-assembly-plugin.version>3.6.0</maven-assembly-plugin.version>
@@ -144,11 +143,6 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>${maven-surefire-plugin.version}</version>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
                 <version>${maven-jar-plugin.version}</version>
             </plugin>
@@ -170,7 +164,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.2.5</version>
+                <version>${maven-surefire-plugin.version}</version>
                 <dependencies>
                     <dependency>
                         <groupId>org.apache.maven.surefire</groupId>
@@ -199,7 +193,7 @@
         <profile>
             <id>single-jar</id>
             <properties>
-                <suffix.version>-fatjar</suffix.version>
+                <project.version>1.6.11-fatjar-release</project.version>
             </properties>
             <build>
                 <plugins>
@@ -214,6 +208,19 @@
                                     <goal>shade</goal>
                                 </goals>
                                 <configuration>
+                                    <filters>
+                                        <filter>
+                                            <artifact>*:*</artifact>
+                                            <excludes>
+                                                <exclude>META-INF/module-info.class</exclude>
+                                                <exclude>META-INF/LICENSE</exclude>
+                                                <exclude>META-INF/NOTICE</exclude>
+                                                <exclude>META-INF/LICENSE.txt</exclude>
+                                                <exclude>META-INF/NOTICE.txt</exclude>
+                                                <exclude>META-INF/MANIFEST.MF</exclude>
+                                            </excludes>
+                                        </filter>
+                                    </filters>
                                     <relocations>
                                         <relocation>
                                             <pattern>net.sf</pattern>

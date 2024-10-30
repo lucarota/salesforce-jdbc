@@ -22,6 +22,7 @@ public class SelectSpecVisitor implements SelectItemVisitor<Expression> {
 
     private final String rootEntityName;
     private final FieldDefTree fieldDefinitions;
+    private final Map<String, Integer> positions = new HashMap<>();
     private final PartnerService partnerService;
 
     public SelectSpecVisitor(String rootEntityName, FieldDefTree fieldDefinitions,
@@ -44,22 +45,21 @@ public class SelectSpecVisitor implements SelectItemVisitor<Expression> {
             String alias = fieldSpec.getAlias() != null ? fieldSpec.getAlias().getName() : name;
 
             String objectPrefix = null;
-            List<String> prefixNames = List.of();
+            List<String> prefixNames = new ArrayList<>();
             if (column.getTable() != null) {
                 objectPrefix = column.getTable().getName();
                 String[] prefix = StringUtils.split(column.getTable().getFullyQualifiedName(), '.');
-                prefixNames = List.of(prefix);
+                prefixNames.addAll(List.of(prefix));
             }
             // If Object Name specified - verify it is not the same as SOQL root entity
-            if (fieldSpec.getAlias() == null && objectPrefix != null && !objectPrefix.equals(rootEntityName)) {
-                if (prefixNames.size() > 1 && prefixNames.get(0).equals(rootEntityName)) {
-                    alias = String.join(".", prefixNames.subList(1, prefixNames.size())) + name;
-                } else {
-                    alias = column.getTable().getFullyQualifiedName() + "." + name;
-                }
-            }
+            alias = removeRootEntity(fieldSpec, column, objectPrefix, prefixNames, alias, name);
             FieldDef result = createFieldDef(name, alias, prefixNames);
-            fieldDefinitions.addChild(result);
+            if (!prefixNames.isEmpty()) {
+                int position = getPosition(prefixNames);
+                fieldDefinitions.addChild(result, position);
+            } else {
+                fieldDefinitions.addChild(result);
+            }
             /* Remove alias from query */
             fieldSpec.setAlias(null);
         } else if (fieldSpec.getExpression() instanceof net.sf.jsqlparser.expression.Function func) {
@@ -68,6 +68,32 @@ public class SelectSpecVisitor implements SelectItemVisitor<Expression> {
         } else if (fieldSpec.getExpression() instanceof ParenthesedSelect subQuery) {
             fieldSpec.setExpression(visitSubQuery(subQuery));
         }
+    }
+
+    private String removeRootEntity(final SelectItem<Expression> fieldSpec, final Column column, final String objectPrefix,
+        final List<String> prefixNames, String alias, final String name) {
+        if (fieldSpec.getAlias() == null && objectPrefix != null && !objectPrefix.equals(rootEntityName)) {
+            if (prefixNames.size() > 1 && prefixNames.get(0).equals(rootEntityName)) {
+                prefixNames.remove(rootEntityName);
+                alias = String.join(".", prefixNames) + "." + name;
+            } else {
+                alias = column.getTable().getFullyQualifiedName() + "." + name;
+            }
+        }
+        return alias;
+    }
+
+    private int getPosition(final List<String> prefixNames) {
+        int position = fieldDefinitions.getChildrenCount();
+        String prefix = null;
+        for (final String prefixName : prefixNames) {
+            prefix = prefix != null ? String.join(".", prefix, prefixName) : prefixName;
+            if (positions.containsKey(prefix)) {
+                position = positions.get(prefix) + 1;
+            }
+            positions.put(prefix, position);
+        }
+        return position;
     }
 
     private FieldDef createFieldDef(String name, String alias, List<String> prefixNames) {
