@@ -26,24 +26,7 @@ import java.math.BigDecimal;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
-import java.sql.Array;
-import java.sql.Blob;
-import java.sql.Clob;
-import java.sql.Connection;
-import java.sql.Date;
-import java.sql.NClob;
-import java.sql.ParameterMetaData;
-import java.sql.PreparedStatement;
-import java.sql.Ref;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.RowId;
-import java.sql.SQLException;
-import java.sql.SQLWarning;
-import java.sql.SQLXML;
-import java.sql.Statement;
-import java.sql.Time;
-import java.sql.Timestamp;
+import java.sql.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -140,8 +123,8 @@ public class ForcePreparedStatement implements PreparedStatement, Iterator<List<
         this.resultSetReturned = false;
         setCacheMode(soql);
         this.resultSet = cacheMode == CacheMode.NO_CACHE
-            ? query()
-            : loadFromDataCache();
+                ? query()
+                : loadFromDataCache();
     }
 
     private CachedResultSet query() throws SQLException {
@@ -212,8 +195,8 @@ public class ForcePreparedStatement implements PreparedStatement, Iterator<List<
             this.queryMoreLocator = resultEntry.getValue();
             List<ColumnMap<String, Object>> result = Collections.synchronizedList(new LinkedList<>());
             Optional.ofNullable(resultEntry.getKey())
-                .orElseGet(Collections::emptyList)
-                .forEach(rec -> result.add(convertToColumnMap(rec)));
+                    .orElseGet(Collections::emptyList)
+                    .forEach(rec -> result.add(convertToColumnMap(rec)));
             return result;
         } catch (ConnectionException e) {
             throw new RuntimeException(new SQLException(e));
@@ -236,9 +219,9 @@ public class ForcePreparedStatement implements PreparedStatement, Iterator<List<
         String soqlQueryProcessed = soqlQuery;
         if (soqlQuery.contains("{ts")) {
             soqlQueryProcessed = soqlQuery.trim()
-                .replaceAll(
-                    "\\{ts\\s*'(\\d\\d\\d\\d-\\d\\d-\\d\\d)(T|\\s)(\\d\\d:\\d\\d:\\d\\d)(Z|[+-]\\d\\d\\d\\d|)'\\}",
-                    "$1T$3$4");
+                    .replaceAll(
+                            "\\{ts\\s*'(\\d{4}-\\d{2}-\\d{2})(T|\\s)(\\d{2}:\\d{2}:\\d{2})(Z|[+-]\\d{3,4}|)(\\.\\d+)?'\\s*}",
+                            "$1T$3$4Z");
         }
         return soqlQueryProcessed;
     }
@@ -248,18 +231,18 @@ public class ForcePreparedStatement implements PreparedStatement, Iterator<List<
         // Flatten not only child records, but also Lists of Lists - for Relations - list of subrecords
         recordFields = flatten(recordFields);
         recordFields.stream()
-            .map(field -> field == null ? new ForceResultField() : field)
-            .forEach(field -> {
-                TypeInfo typeInfo = TypeInfo.OTHER_TYPE_INFO;
-                if (field.getFieldType() != null) {
-                    typeInfo = TypeInfo.lookupTypeInfo(field.getFieldType());
-                }
-                if (typeInfo == TypeInfo.OTHER_TYPE_INFO) {
-                    typeInfo = findColumnType(field.getName());
-                }
-                String columnLabel = findColumnLabel(field.getName());
-                columnMap.put(field.getFullName(), columnLabel, field.getValue(), typeInfo);
-            });
+                .map(field -> field == null ? new ForceResultField() : field)
+                .forEach(field -> {
+                    TypeInfo typeInfo = TypeInfo.OTHER_TYPE_INFO;
+                    if (field.getFieldType() != null) {
+                        typeInfo = TypeInfo.lookupTypeInfo(field.getFieldType());
+                    }
+                    if (typeInfo == TypeInfo.OTHER_TYPE_INFO) {
+                        typeInfo = findColumnType(field.getName());
+                    }
+                    String columnLabel = findColumnLabel(field.getName());
+                    columnMap.put(field.getFullName(), columnLabel, field.getValue(), typeInfo);
+                });
         return columnMap;
     }
 
@@ -320,8 +303,8 @@ public class ForcePreparedStatement implements PreparedStatement, Iterator<List<
     private String getCacheKey() {
         String preparedQuery = prepareQuery(soqlQuery);
         String key = cacheMode == CacheMode.GLOBAL
-            ? preparedQuery
-            : connection.getUUID() + preparedQuery;
+                ? preparedQuery
+                : connection.getUUID() + preparedQuery;
         return sha256(key);
     }
 
@@ -365,7 +348,7 @@ public class ForcePreparedStatement implements PreparedStatement, Iterator<List<
 
     private static final Map<Class<?>, Function<Object, String>> paramConverters = new HashMap<>();
 
-    public static final String ISO_DATETIME = "yyyy-MM-dd'T'HH:mm:ssZ";
+    public static final String ISO_DATETIME = "yyyy-MM-dd'T'HH:mm:ss'+00:00'";
 
     static {
         paramConverters.put(String.class, ForcePreparedStatement::toSoqlStringParam);
@@ -391,9 +374,8 @@ public class ForcePreparedStatement implements PreparedStatement, Iterator<List<
         // Convert the string date representation to SOQL
         // like {ts '2021-10-21 12:01:02Z'}
         // to 2021-10-21 12:01:02-0000
-        if (String.class.equals(paramClass) && ((String) paramValue).startsWith("{ts")) {
-            paramValue = convertStringToDate((String) paramValue);
-            paramClass = getParamClass(paramValue);
+        if (paramValue instanceof String param && param.startsWith("{ts")) {
+            paramValue = convertStringToDate(param);
         }
         return paramConverters.get(paramClass).apply(paramValue);
     }
@@ -404,8 +386,8 @@ public class ForcePreparedStatement implements PreparedStatement, Iterator<List<
         }
         try {
             String paramValueCleared = paramValue.trim()
-                .replaceAll("^\\{ts\\s*'(.*)'\\}$", "$1")
-                .replaceAll("Z$", "+0000");
+                    .replaceAll("^\\{ts\\s*'(.*)'}$", "$1")
+                    .replaceAll("Z$", "+00:00");
             return new SimpleDateFormat(ISO_DATETIME).parse(paramValueCleared);
         } catch (ParseException e) {
             log.error("Failed to convert value to date [{}]", paramValue, e);
@@ -437,8 +419,8 @@ public class ForcePreparedStatement implements PreparedStatement, Iterator<List<
                 result.setColumnLabel(i, fieldName);
                 TypeInfo typeInfo = row.getTypes().get(i - 1);
                 log.trace(
-                    "[PrepStat] createMetaData (" + i + ") " + fieldName + " : " + typeInfo.getTypeName() + " => "
-                        + typeInfo.getSqlDataType());
+                        "[PrepStat] createMetaData (" + i + ") " + fieldName + " : " + typeInfo.getTypeName() + " => "
+                                + typeInfo.getSqlDataType());
                 result.setColumnType(i, typeInfo.getSqlDataType());
                 result.setColumnTypeName(i, typeInfo.getTypeName());
                 result.setPrecision(i, typeInfo.getPrecision());
@@ -490,11 +472,11 @@ public class ForcePreparedStatement implements PreparedStatement, Iterator<List<
 
     private <T> List<T> flatten(List<T> listWithLists) {
         return listWithLists.stream()
-            .flatMap(
-                def -> def instanceof Collection
-                    ? flatten((List<T>) def).stream() // MultiLevel flattening
-                    : Stream.of(def)
-            ).toList();
+                .flatMap(
+                        def -> def instanceof Collection
+                                ? flatten((List<T>) def).stream() // MultiLevel flattening
+                                : Stream.of(def)
+                ).toList();
     }
 
     private FieldDefTree fieldDefinitions;
@@ -587,8 +569,8 @@ public class ForcePreparedStatement implements PreparedStatement, Iterator<List<
     public ResultSetMetaData getMetaData() throws SQLException {
         log.trace("[PrepStat] getMetaData IMPLEMENTED ");
         return cacheMode == CacheMode.NO_CACHE
-            ? loadMetaData()
-            : loadFromMetaDataCache();
+                ? loadMetaData()
+                : loadFromMetaDataCache();
     }
 
     private ResultSetMetaData loadFromMetaDataCache() throws SQLException {
@@ -816,15 +798,15 @@ public class ForcePreparedStatement implements PreparedStatement, Iterator<List<
         ResultSet toReturn = updateCount < 0 ? resultSet : null;
         if (this.resultSetReturned) {
             log.trace("[PrepStat] getResultSet IMPLEMENTED Already Returned {}\n {}{}",
-                soqlQuery,
-                (resultSet == null ? " resultSet is NULL" : "resultSet is present"),
-                (toReturn == null ? " -> Not to be returned" : " -> Returning"));
+                    soqlQuery,
+                    (resultSet == null ? " resultSet is NULL" : "resultSet is present"),
+                    (toReturn == null ? " -> Not to be returned" : " -> Returning"));
             return null;
         }
         this.resultSetReturned = true;
         log.trace("[PrepStat] getResultSet IMPLEMENTED " + soqlQuery + "\n {}{}",
-            (resultSet == null ? " resultSet is NULL" : "resultSet is present"),
-            (toReturn == null ? " -> Not to be returned" : " -> Returning"));
+                (resultSet == null ? " resultSet is NULL" : "resultSet is present"),
+                (toReturn == null ? " -> Not to be returned" : " -> Returning"));
         return toReturn;
     }
 
@@ -843,12 +825,12 @@ public class ForcePreparedStatement implements PreparedStatement, Iterator<List<
     public boolean getMoreResults() throws SQLException {
         if (updateCount >= 0) {
             log.trace(
-                "[PrepStat] getMoreResults IMPLEMENTED (false) updateCount=" + updateCount + " sql=" + soqlQuery);
+                    "[PrepStat] getMoreResults IMPLEMENTED (false) updateCount=" + updateCount + " sql=" + soqlQuery);
             return false;
         }
         boolean more = resultSet != null && resultSet.next();
         log.trace(
-            "[PrepStat] getMoreResults IMPLEMENTED (" + more + ") updateCount=" + updateCount + " sql=" + soqlQuery);
+                "[PrepStat] getMoreResults IMPLEMENTED (" + more + ") updateCount=" + updateCount + " sql=" + soqlQuery);
         return more;
     }
 
@@ -860,7 +842,7 @@ public class ForcePreparedStatement implements PreparedStatement, Iterator<List<
     @Override
     public void setFetchDirection(int direction) throws SQLException {
         if (direction != ResultSet.FETCH_FORWARD && direction != ResultSet.FETCH_REVERSE
-            && direction != ResultSet.FETCH_UNKNOWN) {
+                && direction != ResultSet.FETCH_UNKNOWN) {
             throw new SQLException("Unsupported direction: " + direction);
         } else {
             this.fetchDirection = direction;
@@ -893,24 +875,7 @@ public class ForcePreparedStatement implements PreparedStatement, Iterator<List<
     }
 
     @Override
-    public void addBatch(String sql) {
-        log.trace("[PrepStat] addBatch NOT_IMPLEMENTED {}", sql);
-    }
-
-    @Override
-    public void clearBatch() {
-        log.trace("[PrepStat] clearBatch NOT_IMPLEMENTED");
-    }
-
-    @Override
-    public int[] executeBatch() {
-        log.trace("[PrepStat] executeBatch NOT_IMPLEMENTED");
-        return new int[]{};
-    }
-
-    @Override
     public Connection getConnection() {
-        log.trace("[PrepStat] getConnection IMPLEMENTED ");
         return connection;
     }
 
@@ -924,7 +889,7 @@ public class ForcePreparedStatement implements PreparedStatement, Iterator<List<
     public ResultSet getGeneratedKeys() throws SQLException {
         if (autoGeneratedKeys != Statement.RETURN_GENERATED_KEYS) {
             throw new SQLException(
-                "Cannot return generated keys: query was not set with Statement.RETURN_GENERATED_KEYS");
+                    "Cannot return generated keys: query was not set with Statement.RETURN_GENERATED_KEYS");
         }
 
         return this.resultSet;
@@ -972,12 +937,6 @@ public class ForcePreparedStatement implements PreparedStatement, Iterator<List<
     }
 
     @Override
-    public void setPoolable(boolean poolable) {
-        log.trace("[PrepStat] setPoolable NOT_IMPLEMENTED");
-        throw new UnsupportedOperationException("The setPoolable is not implemented yet.");
-    }
-
-    @Override
     public boolean isPoolable() {
         return false;
     }
@@ -994,13 +953,12 @@ public class ForcePreparedStatement implements PreparedStatement, Iterator<List<
 
     @Override
     public <T> T unwrap(Class<T> iface) {
-        log.trace("[PrepStat] unwrap NOT_IMPLEMENTED");
-        throw new UnsupportedOperationException("The unwrap is not implemented yet.");
+        return iface.isInstance(this) ? iface.cast(this) : null;
     }
 
     @Override
     public boolean isWrapperFor(Class<?> iface) {
-        return false;
+        return iface.isInstance(this);
     }
 
     @Override
@@ -1020,183 +978,178 @@ public class ForcePreparedStatement implements PreparedStatement, Iterator<List<
     }
 
     @Override
-    public void addBatch() {
-        log.trace("[PrepStat] addBatch NOT_IMPLEMENTED");
-    }
-
-    @Override
-    public void setRowId(int parameterIndex, RowId x) {
-        log.trace("[PrepStat] setRowId NOT_IMPLEMENTED");
-    }
-
-    @Override
     public void setNString(int parameterIndex, String value) {
-        log.trace("[PrepStat] setNString IMPLEMENTED ");
         setString(parameterIndex, value);
     }
 
     @Override
-    public void setNCharacterStream(int parameterIndex, Reader value, long length) {
-        log.trace("[PrepStat] setNCharacterStream NOT_IMPLEMENTED");
-        throw new UnsupportedOperationException("The setNCharacterStream is not implemented yet.");
+    public void addBatch() throws SQLException {
+        throw new SQLFeatureNotSupportedException("The addBatch is not implemented yet.");
     }
 
     @Override
-    public void setNCharacterStream(int parameterIndex, Reader value) {
-        log.trace("[PrepStat] setNCharacterStream NOT_IMPLEMENTED");
-        throw new UnsupportedOperationException("The setNCharacterStream is not implemented yet.");
+    public void addBatch(String sql) throws SQLException {
+        throw new SQLFeatureNotSupportedException("The addBatch is not implemented yet.");
     }
 
     @Override
-    public void setNClob(int parameterIndex, NClob value) {
-        log.trace("[PrepStat] setNClob NOT_IMPLEMENTED");
-        throw new UnsupportedOperationException("The setNClob is not implemented yet.");
+    public void clearBatch() throws SQLException {
+        throw new SQLFeatureNotSupportedException("The clearBatch is not implemented yet.");
     }
 
     @Override
-    public void setNClob(int parameterIndex, Reader reader) {
-        log.trace("[PrepStat] setNClob NOT_IMPLEMENTED");
-        throw new UnsupportedOperationException("The setNClob is not implemented yet.");
+    public int[] executeBatch() throws SQLException {
+        throw new SQLFeatureNotSupportedException("The executeBatch is not implemented yet.");
     }
 
     @Override
-    public void setBlob(int parameterIndex, InputStream inputStream, long length) {
-        log.trace("[PrepStat] setBlob NOT_IMPLEMENTED");
+    public void setPoolable(boolean poolable) throws SQLException {
+        throw new SQLFeatureNotSupportedException("The setPoolable is not implemented yet.");
     }
 
     @Override
-    public void setNClob(int parameterIndex, Reader reader, long length) {
-        log.trace("[PrepStat] setNClob NOT_IMPLEMENTED");
-        throw new UnsupportedOperationException("The setNClob is not implemented yet.");
+    public void setRowId(int parameterIndex, RowId x) throws SQLException {
+        throw new SQLFeatureNotSupportedException("The setRowId is not implemented yet.");
     }
 
     @Override
-    public void setSQLXML(int parameterIndex, SQLXML xmlObject) {
-        log.trace("[PrepStat] setSQLXML NOT_IMPLEMENTED");
-        throw new UnsupportedOperationException("The setSQLXML is not implemented yet.");
+    public void setNCharacterStream(int parameterIndex, Reader value, long length) throws SQLException {
+        throw new SQLFeatureNotSupportedException("The setNCharacterStream is not implemented yet.");
     }
 
     @Override
-    public void setBinaryStream(int parameterIndex, InputStream x, long length) {
-        log.trace("[PrepStat] setBinaryStream NOT_IMPLEMENTED");
+    public void setNCharacterStream(int parameterIndex, Reader value) throws SQLException {
+        throw new SQLFeatureNotSupportedException("The setNCharacterStream is not implemented yet.");
     }
 
     @Override
-    public void setBinaryStream(int parameterIndex, InputStream x) {
-        log.trace("[PrepStat] setBinaryStream NOT_IMPLEMENTED");
+    public void setNClob(int parameterIndex, NClob value) throws SQLException {
+        throw new SQLFeatureNotSupportedException("The setNClob is not implemented yet.");
     }
 
     @Override
-    public void setBlob(int parameterIndex, InputStream inputStream) {
-        log.trace("[PrepStat] setBlob NOT_IMPLEMENTED");
+    public void setNClob(int parameterIndex, Reader reader) throws SQLException {
+        throw new SQLFeatureNotSupportedException("The setNClob is not implemented yet.");
     }
 
     @Override
-    public void setArray(int i, Array x) {
-        log.trace("[PrepStat] setArray NOT_IMPLEMENTED");
-        throw new UnsupportedOperationException("The setArray is not implemented yet.");
+    public void setBlob(int parameterIndex, InputStream inputStream, long length) throws SQLException {
+        throw new SQLFeatureNotSupportedException("The setBlob is not implemented yet.");
     }
 
     @Override
-    public void setAsciiStream(int parameterIndex, InputStream x, int length) {
-        log.trace("[PrepStat] setAsciiStream NOT_IMPLEMENTED");
-        throw new UnsupportedOperationException("The setAsciiStream is not implemented yet.");
+    public void setNClob(int parameterIndex, Reader reader, long length) throws SQLException {
+        throw new SQLFeatureNotSupportedException("The setNClob is not implemented yet.");
     }
 
     @Override
-    public void setAsciiStream(int parameterIndex, InputStream x) {
-        log.trace("[PrepStat] setAsciiStream NOT_IMPLEMENTED");
-        throw new UnsupportedOperationException("The setAsciiStream is not implemented yet.");
+    public void setSQLXML(int parameterIndex, SQLXML xmlObject) throws SQLException {
+        throw new SQLFeatureNotSupportedException("The setSQLXML is not implemented yet.");
     }
 
     @Override
-    public void setAsciiStream(int parameterIndex, InputStream x, long length) {
-        log.trace("[PrepStat] setAsciiStream NOT_IMPLEMENTED");
-        throw new UnsupportedOperationException("The setAsciiStream is not implemented yet.");
+    public void setBinaryStream(int parameterIndex, InputStream x, long length) throws SQLException {
+        throw new SQLFeatureNotSupportedException("The setBinaryStream is not implemented yet.");
     }
 
     @Override
-    public void setBinaryStream(int parameterIndex, InputStream x, int length) {
-        log.trace("[PrepStat] setBinaryStream NOT_IMPLEMENTED");
-        throw new UnsupportedOperationException("The setBinaryStream is not implemented yet.");
+    public void setBinaryStream(int parameterIndex, InputStream x) throws SQLException {
+        throw new SQLFeatureNotSupportedException("The setBinaryStream is not implemented yet.");
     }
 
     @Override
-    public void setBlob(int i, Blob x) {
-        log.trace("[PrepStat] setBlob NOT_IMPLEMENTED");
-        throw new UnsupportedOperationException("The setBlob is not implemented yet.");
+    public void setBlob(int parameterIndex, InputStream inputStream) throws SQLException {
+        throw new SQLFeatureNotSupportedException("The setBlob is not implemented yet.");
     }
 
     @Override
-    public void setBytes(int parameterIndex, byte[] x) {
-        log.trace("[PrepStat] setBytes NOT_IMPLEMENTED");
-        throw new UnsupportedOperationException("The setBytes is not implemented yet.");
+    public void setArray(int i, Array x) throws SQLException {
+        throw new SQLFeatureNotSupportedException("The setArray is not implemented yet.");
     }
 
     @Override
-    public void setCharacterStream(int parameterIndex, Reader reader, int length) {
-        log.trace("[PrepStat] setCharacterStream NOT_IMPLEMENTED");
-        throw new UnsupportedOperationException("The setCharacterStream is not implemented yet.");
+    public void setAsciiStream(int parameterIndex, InputStream x, int length) throws SQLException {
+        throw new SQLFeatureNotSupportedException("The setAsciiStream is not implemented yet.");
     }
 
     @Override
-    public void setCharacterStream(int parameterIndex, Reader reader) {
-        log.trace("[PrepStat] setCharacterStream NOT_IMPLEMENTED");
-        throw new UnsupportedOperationException("The setCharacterStream is not implemented yet.");
+    public void setAsciiStream(int parameterIndex, InputStream x) throws SQLException {
+        throw new SQLFeatureNotSupportedException("The setAsciiStream is not implemented yet.");
     }
 
     @Override
-    public void setCharacterStream(int parameterIndex, Reader reader, long length) {
-        log.trace("[PrepStat] setCharacterStream NOT_IMPLEMENTED");
-        throw new UnsupportedOperationException("The setCharacterStream is not implemented yet.");
+    public void setAsciiStream(int parameterIndex, InputStream x, long length) throws SQLException {
+        throw new SQLFeatureNotSupportedException("The setAsciiStream is not implemented yet.");
     }
 
     @Override
-    public void setClob(int i, Clob x) {
-        log.trace("[PrepStat] setClob NOT_IMPLEMENTED");
-        throw new UnsupportedOperationException("The setClob is not implemented yet.");
+    public void setBinaryStream(int parameterIndex, InputStream x, int length) throws SQLException {
+        throw new SQLFeatureNotSupportedException("The setBinaryStream is not implemented yet.");
     }
 
     @Override
-    public void setClob(int parameterIndex, Reader reader, long length) {
-        log.trace("[PrepStat] setClob NOT_IMPLEMENTED");
-        throw new UnsupportedOperationException("The setClob is not implemented yet.");
+    public void setBlob(int i, Blob x) throws SQLException {
+        throw new SQLFeatureNotSupportedException("The setBlob is not implemented yet.");
     }
 
     @Override
-    public void setClob(int parameterIndex, Reader reader) {
-        log.trace("[PrepStat] setClob NOT_IMPLEMENTED");
-        throw new UnsupportedOperationException("The setClob is not implemented yet.");
+    public void setBytes(int parameterIndex, byte[] x) throws SQLException {
+        throw new SQLFeatureNotSupportedException("The setBytes is not implemented yet.");
     }
 
     @Override
-    public void setDate(int parameterIndex, Date x, Calendar cal) {
-        log.trace("[PrepStat] setDate NOT_IMPLEMENTED");
-        throw new UnsupportedOperationException("The setDate is not implemented yet.");
+    public void setCharacterStream(int parameterIndex, Reader reader, int length) throws SQLException {
+        throw new SQLFeatureNotSupportedException("The setCharacterStream is not implemented yet.");
     }
 
     @Override
-    public void setRef(int i, Ref x) {
-        log.trace("[PrepStat] setRef NOT_IMPLEMENTED");
-        throw new UnsupportedOperationException("The setRef is not implemented yet.");
+    public void setCharacterStream(int parameterIndex, Reader reader) throws SQLException {
+        throw new SQLFeatureNotSupportedException("The setCharacterStream is not implemented yet.");
     }
 
     @Override
-    public void setTime(int parameterIndex, Time x, Calendar cal) {
-        log.trace("[PrepStat] setRef NOT_IMPLEMENTED");
-        throw new UnsupportedOperationException("The setTime is not implemented yet.");
+    public void setCharacterStream(int parameterIndex, Reader reader, long length) throws SQLException {
+        throw new SQLFeatureNotSupportedException("The setCharacterStream is not implemented yet.");
     }
 
     @Override
-    public void setTimestamp(int parameterIndex, Timestamp x, Calendar cal) {
-        log.trace("[PrepStat] setRef NOT_IMPLEMENTED");
-        throw new UnsupportedOperationException("The setTimestamp is not implemented yet.");
+    public void setClob(int i, Clob x) throws SQLException {
+        throw new SQLFeatureNotSupportedException("The setClob is not implemented yet.");
     }
 
     @Override
-    public void setURL(int parameterIndex, URL x) {
-        log.trace("[PrepStat] setRef NOT_IMPLEMENTED");
-        throw new UnsupportedOperationException("The setURL is not implemented yet.");
+    public void setClob(int parameterIndex, Reader reader, long length) throws SQLException {
+        throw new SQLFeatureNotSupportedException("The setClob is not implemented yet.");
+    }
+
+    @Override
+    public void setClob(int parameterIndex, Reader reader) throws SQLException {
+        throw new SQLFeatureNotSupportedException("The setClob is not implemented yet.");
+    }
+
+    @Override
+    public void setDate(int parameterIndex, Date x, Calendar cal) throws SQLException {
+        throw new SQLFeatureNotSupportedException("The setDate is not implemented yet.");
+    }
+
+    @Override
+    public void setRef(int i, Ref x) throws SQLException {
+        throw new SQLFeatureNotSupportedException("The setRef is not implemented yet.");
+    }
+
+    @Override
+    public void setTime(int parameterIndex, Time x, Calendar cal) throws SQLException {
+        throw new SQLFeatureNotSupportedException("The setTime is not implemented yet.");
+    }
+
+    @Override
+    public void setTimestamp(int parameterIndex, Timestamp x, Calendar cal) throws SQLException {
+        throw new SQLFeatureNotSupportedException("The setTimestamp is not implemented yet.");
+    }
+
+    @Override
+    public void setURL(int parameterIndex, URL x) throws SQLException {
+        throw new SQLFeatureNotSupportedException("The setURL is not implemented yet.");
     }
 
     /**
@@ -1204,8 +1157,7 @@ public class ForcePreparedStatement implements PreparedStatement, Iterator<List<
      */
     @Deprecated(since = "1.2")
     @Override
-    public void setUnicodeStream(int parameterIndex, InputStream x, int length) {
-        log.trace("[PrepStat] setUnicodeStream NOT_IMPLEMENTED");
-        throw new UnsupportedOperationException("The setUnicodeStream is not implemented yet.");
+    public void setUnicodeStream(int parameterIndex, InputStream x, int length) throws SQLException {
+        throw new SQLFeatureNotSupportedException("The setUnicodeStream is not implemented yet.");
     }
 }
