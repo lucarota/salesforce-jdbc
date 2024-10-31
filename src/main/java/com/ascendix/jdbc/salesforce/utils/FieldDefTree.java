@@ -34,7 +34,9 @@ public class FieldDefTree extends TreeNode<FieldDef> {
                     }
                     for (int i = 0; i < schemaSize; i++) {
                         FieldDef field = schema.getChild(i).getData();
-                        if (!field.getFullName().equals(row.get(i).getFullName())) {
+                        if (row.size() == i) {
+                            row.add(new ForceResultField(field.getEntity(), field.getType(), field.getName(), null));
+                        } else if (!field.getFullName().equals(row.get(i).getFullName())) {
                             row.add(i, new ForceResultField(field.getEntity(), field.getType(), field.getName(), null));
                         }
                     }
