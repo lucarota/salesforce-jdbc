@@ -40,22 +40,29 @@ public class ValueToStringVisitor extends ExpressionVisitorAdapter<Expression> {
     }
 
     @Override
+    public <S> Expression visit(BooleanValue booleanValue, S context) {
+        log.trace("[VtoSVisitor] DoubleValue {}={}", columnName, booleanValue.getValue());
+        fieldValues.put(columnName, booleanValue.getValue());
+        return null;
+    }
+
+    @Override
     public <S> Expression visit(DoubleValue doubleValue, S context) {
-        log.warn("[VtoSVisitor] DoubleValue {}={}", columnName, doubleValue.getValue());
+        log.trace("[VtoSVisitor] DoubleValue {}={}", columnName, doubleValue.getValue());
         fieldValues.put(columnName, doubleValue.getValue());
         return null;
     }
 
     @Override
     public <S> Expression visit(LongValue longValue, S context) {
-        log.warn("[VtoSVisitor] LongValue {}={}", columnName, longValue.getValue());
+        log.trace("[VtoSVisitor] LongValue {}={}", columnName, longValue.getValue());
         fieldValues.put(columnName, longValue.getValue());
         return null;
     }
 
     @Override
     public <S> Expression visit(HexValue hexValue, S context) {
-        log.warn("[VtoSVisitor] HexValue {}={}", columnName, hexValue.getValue());
+        log.trace("[VtoSVisitor] HexValue {}={}", columnName, hexValue.getValue());
         fieldValues.put(columnName, hexValue.getValue());
         return null;
     }
@@ -72,7 +79,7 @@ public class ValueToStringVisitor extends ExpressionVisitorAdapter<Expression> {
         Object value = null;
         PlainSelect plainSelect = subSelect.getPlainSelect();
         if (plainSelect != null) {
-            log.trace("[VtoxSVisitor] SubSelect {}={}", columnName, plainSelect);
+            log.trace("[VtoSVisitor] SubSelect {}={}", columnName, plainSelect);
             if (subSelectResolver != null) {
                 List<Map<String, Object>> records = subSelectResolver.apply(plainSelect.toString(), parameters);
                 if (records.size() == 1 && records.get(0).size() == 1) {
