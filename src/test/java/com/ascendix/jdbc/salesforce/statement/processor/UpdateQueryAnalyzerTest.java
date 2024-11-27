@@ -1,6 +1,7 @@
 package com.ascendix.jdbc.salesforce.statement.processor;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -260,5 +261,25 @@ class UpdateQueryAnalyzerTest {
         assertEquals(Set.of("Name", "Id"), rec.keySet());
         assertEquals("FirstAccount_new", rec.get("Name"));
         assertEquals("005xx1111111111111", rec.get("Id"));
+    }
+
+    @Test
+    void testProcessUpdate_Boolean_ById() {
+        String soql = "Update Account set Name ='FirstAccount_new', IsDeleted=true where Id='001xx000003GeY0AAK'";
+        final QueryAnalyzer queryAnalyzer = new QueryAnalyzer(soql, null, null);
+        UpdateQueryAnalyzer analyzer = new UpdateQueryAnalyzer(queryAnalyzer);
+
+        assertEquals("Account", analyzer.getFromObjectName());
+
+        // Verify we have exactly one rec to save
+        assertEquals(1, analyzer.getRecords(List.of()).size());
+        Map<String, Object> rec = analyzer.getRecords(List.of()).get(0);
+        // Verify the fields count for the first rec
+        assertEquals(3, rec.size());
+        // Verify the fields' names for the first rec
+        assertEquals(Set.of("IsDeleted", "Name", "Id"), rec.keySet());
+        assertEquals("FirstAccount_new", rec.get("Name"));
+        assertTrue((Boolean) rec.get("IsDeleted"));
+        assertEquals("001xx000003GeY0AAK", rec.get("Id"));
     }
 }
