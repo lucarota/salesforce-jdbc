@@ -52,6 +52,7 @@ public class CachedResultSet implements ResultSet, Serializable {
     private List<ColumnMap<String, Object>> rows;
     private ResultSetMetaData metadata;
     private SQLWarning warningsChain;
+    private boolean wasNull;
 
     private transient Iterator<List<ColumnMap<String, Object>>> rowSupplier;
 
@@ -189,11 +190,13 @@ public class CachedResultSet implements ResultSet, Serializable {
 
         public Optional<T> parse(int columnIndex) {
             Object value = getObject(columnIndex);
+            wasNull = (value == null);
             return parse(value);
         }
 
         public Optional<T> parse(String columnName) {
             Object value = getObject(columnName);
+            wasNull = (value == null);
             return parse(value);
         }
 
@@ -243,7 +246,13 @@ public class CachedResultSet implements ResultSet, Serializable {
 
     protected java.util.Date parseDate(String dateRepr) {
         try {
-            return new SimpleDateFormat("yyyy-MM-dd").parse(dateRepr);
+            if (dateRepr == null) {
+                wasNull = true;
+                return null;
+            } else {
+                wasNull = false;
+                return new SimpleDateFormat("yyyy-MM-dd").parse(dateRepr);
+            }
         } catch (ParseException e) {
             return null;
         }
@@ -265,7 +274,13 @@ public class CachedResultSet implements ResultSet, Serializable {
 
     private java.util.Date parseDateTime(String dateRepr) {
         try {
-            return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSX").parse(dateRepr);
+            if (dateRepr == null) {
+                wasNull = true;
+                return null;
+            } else {
+                wasNull = false;
+                return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSX").parse(dateRepr);
+            }
         } catch (ParseException e) {
             return null;
         }
@@ -273,6 +288,7 @@ public class CachedResultSet implements ResultSet, Serializable {
 
     public Timestamp getTimestamp(int columnIndex) {
         Object value = rows.get(index).getByIndex(columnIndex);
+        wasNull = (value == null);
         if (value instanceof GregorianCalendar calendar) {
             return new java.sql.Timestamp(calendar.getTime().getTime());
         } else if (rows.get(index).getTypeInfoByIndex(columnIndex) == TypeInfo.DATE_TYPE_INFO) {
@@ -290,6 +306,7 @@ public class CachedResultSet implements ResultSet, Serializable {
 
     public Timestamp getTimestamp(String columnName) {
         Object value = rows.get(index).get(columnName);
+        wasNull = (value == null);
         if (value instanceof GregorianCalendar cal) {
             return new java.sql.Timestamp(cal.getTime().getTime());
         } else if (rows.get(index).getTypeInfo(columnName) == TypeInfo.DATE_TYPE_INFO) {
@@ -316,7 +333,13 @@ public class CachedResultSet implements ResultSet, Serializable {
 
     private java.util.Date parseTime(String dateRepr) {
         try {
-            return new SimpleDateFormat("HH:mm:ss.SSSX").parse(dateRepr);
+            if (dateRepr == null) {
+                wasNull = true;
+                return null;
+            } else {
+                wasNull = false;
+                return new SimpleDateFormat("HH:mm:ss.SSSX").parse(dateRepr);
+            }
         } catch (ParseException e) {
             return null;
         }
@@ -477,6 +500,57 @@ public class CachedResultSet implements ResultSet, Serializable {
         throw new UnsupportedOperationException("Not implemented yet.");
     }
 
+    public void beforeFirst() {
+        if (this.rowSupplier != null) throw new UnsupportedOperationException("Not implemented yet.");
+        if (!rows.isEmpty()) {
+            this.index = -1;
+        }
+    }
+
+    public void clearWarnings() {
+        log.info("clearWarnings");
+        this.warningsChain = null;
+    }
+
+    public int getType() {
+        return ResultSet.TYPE_FORWARD_ONLY;
+    }
+
+
+    public int getConcurrency() {
+        return ResultSet.CONCUR_READ_ONLY;
+    }
+
+    public int getFetchDirection() {
+        return ResultSet.FETCH_UNKNOWN;
+    }
+
+    public SQLWarning getWarnings() {
+        return warningsChain;
+    }
+
+    public void addWarning(String reason) {
+        log.info("Adding Warning: {}", reason);
+        if (warningsChain != null) {
+            SQLWarning last = warningsChain;
+            while (last != null && last.getNextWarning() != null) {
+                last = last.getNextWarning();
+            }
+            assert last != null;
+            last.setNextWarning(new SQLWarning(reason));
+        } else {
+            warningsChain = new SQLWarning(reason);
+        }
+    }
+
+    public boolean wasNull() {
+        return wasNull;
+    }
+
+    public int getHoldability() {
+        return ResultSet.CLOSE_CURSORS_AT_COMMIT;
+    }
+
     //
     // Not implemented below here
     //
@@ -489,27 +563,13 @@ public class CachedResultSet implements ResultSet, Serializable {
         log.warn("after last check");
     }
 
-    public void beforeFirst() {
-        if (this.rowSupplier != null) throw new UnsupportedOperationException("Not implemented yet.");
-        if (!rows.isEmpty()) {
-            this.index = -1;
-        }
-    }
-
     public void cancelRowUpdates() {
     }
 
-    public void clearWarnings() {
-        log.info("clearWarnings");
-        this.warningsChain = null;
-    }
-
     public void close() {
-
     }
 
     public void deleteRow() {
-
     }
 
     public int findColumn(String columnName) {
@@ -548,29 +608,19 @@ public class CachedResultSet implements ResultSet, Serializable {
         return null;
     }
 
-    public int getConcurrency() {
-        return ResultSet.CONCUR_READ_ONLY;
-    }
-
     public String getCursorName() {
         return null;
-    }
-
-    public int getFetchDirection() {
-        return ResultSet.FETCH_UNKNOWN;
     }
 
     public int getFetchSize() {
         return 0;
     }
 
-    public Object getObject(int i, Map<String, Class<?>> map)
-        {
+    public Object getObject(int i, Map<String, Class<?>> map) {
         return null;
     }
 
-    public Object getObject(String colName, Map<String, Class<?>> map)
-        {
+    public Object getObject(String colName, Map<String, Class<?>> map) {
         return null;
     }
 
@@ -598,10 +648,6 @@ public class CachedResultSet implements ResultSet, Serializable {
         return null;
     }
 
-    public int getType() {
-        return ResultSet.TYPE_FORWARD_ONLY;
-    }
-
     public URL getURL(int columnIndex) {
         return null;
     }
@@ -620,24 +666,6 @@ public class CachedResultSet implements ResultSet, Serializable {
         return null;
     }
 
-    public SQLWarning getWarnings() {
-        return warningsChain;
-    }
-
-    public void addWarning(String reason) {
-        log.info("Adding Warning: {}", reason);
-        if (warningsChain != null) {
-            SQLWarning last = warningsChain;
-            while (last != null && last.getNextWarning() != null) {
-                last = last.getNextWarning();
-            }
-            assert last != null;
-            last.setNextWarning(new SQLWarning(reason));
-        } else {
-            warningsChain = new SQLWarning(reason);
-        }
-    }
-
     public void insertRow() throws SQLException {
         throw new SQLException("Feature is not supported.", "HY000", 1);
     }
@@ -649,7 +677,6 @@ public class CachedResultSet implements ResultSet, Serializable {
     }
 
     public boolean previous() {
-
         return false;
     }
 
@@ -657,22 +684,18 @@ public class CachedResultSet implements ResultSet, Serializable {
     }
 
     public boolean relative(int rows) {
-
         return false;
     }
 
     public boolean rowDeleted() {
-
         return false;
     }
 
     public boolean rowInserted() {
-
         return false;
     }
 
     public boolean rowUpdated() {
-
         return false;
     }
 
@@ -685,28 +708,22 @@ public class CachedResultSet implements ResultSet, Serializable {
     public void updateArray(String columnName, Array x) {
     }
 
-    public void updateAsciiStream(int columnIndex, InputStream x, int length)
-        {
+    public void updateAsciiStream(int columnIndex, InputStream x, int length) {
     }
 
-    public void updateAsciiStream(String columnName, InputStream x, int length)
-        {
+    public void updateAsciiStream(String columnName, InputStream x, int length) {
     }
 
-    public void updateBigDecimal(int columnIndex, BigDecimal x)
-        {
+    public void updateBigDecimal(int columnIndex, BigDecimal x) {
     }
 
-    public void updateBigDecimal(String columnName, BigDecimal x)
-        {
+    public void updateBigDecimal(String columnName, BigDecimal x) {
     }
 
-    public void updateBinaryStream(int columnIndex, InputStream x, int length)
-        {
+    public void updateBinaryStream(int columnIndex, InputStream x, int length) {
     }
 
-    public void updateBinaryStream(String columnName, InputStream x, int length)
-        {
+    public void updateBinaryStream(String columnName, InputStream x, int length) {
     }
 
     public void updateBlob(int columnIndex, Blob x) {
@@ -733,12 +750,10 @@ public class CachedResultSet implements ResultSet, Serializable {
     public void updateBytes(String columnName, byte[] x) {
     }
 
-    public void updateCharacterStream(int columnIndex, Reader x, int length)
-        {
+    public void updateCharacterStream(int columnIndex, Reader x, int length) {
     }
 
-    public void updateCharacterStream(String columnName, Reader reader,
-        int length) {
+    public void updateCharacterStream(String columnName, Reader reader, int length) {
     }
 
     public void updateClob(int columnIndex, Clob x) {
@@ -789,12 +804,10 @@ public class CachedResultSet implements ResultSet, Serializable {
     public void updateObject(String columnName, Object x) {
     }
 
-    public void updateObject(int columnIndex, Object x, int scale)
-        {
+    public void updateObject(int columnIndex, Object x, int scale) {
     }
 
-    public void updateObject(String columnName, Object x, int scale)
-        {
+    public void updateObject(String columnName, Object x, int scale) {
     }
 
     public void updateRef(int columnIndex, Ref x) {
@@ -824,36 +837,25 @@ public class CachedResultSet implements ResultSet, Serializable {
     public void updateTime(String columnName, Time x) {
     }
 
-    public void updateTimestamp(int columnIndex, Timestamp x)
-        {
+    public void updateTimestamp(int columnIndex, Timestamp x) {
     }
 
-    public void updateTimestamp(String columnName, Timestamp x)
-        {
-    }
-
-    public boolean wasNull() {
-
-        return false;
+    public void updateTimestamp(String columnName, Timestamp x) {
     }
 
     public <T> T unwrap(Class<T> iface) {
-
         return null;
     }
 
     public boolean isWrapperFor(Class<?> iface) {
-
         return false;
     }
 
     public RowId getRowId(int columnIndex) {
-
         return null;
     }
 
     public RowId getRowId(String columnLabel) {
-
         return null;
     }
 
@@ -863,12 +865,7 @@ public class CachedResultSet implements ResultSet, Serializable {
     public void updateRowId(String columnLabel, RowId x) {
     }
 
-    public int getHoldability() {
-        return ResultSet.CLOSE_CURSORS_AT_COMMIT;
-    }
-
     public boolean isClosed() {
-
         return false;
     }
 
@@ -885,12 +882,10 @@ public class CachedResultSet implements ResultSet, Serializable {
     }
 
     public NClob getNClob(int columnIndex) {
-
         return null;
     }
 
     public NClob getNClob(String columnLabel) {
-
         return null;
     }
 
@@ -900,7 +895,6 @@ public class CachedResultSet implements ResultSet, Serializable {
     }
 
     public SQLXML getSQLXML(String columnLabel) {
-
         return null;
     }
 
@@ -911,22 +905,18 @@ public class CachedResultSet implements ResultSet, Serializable {
     }
 
     public String getNString(int columnIndex) {
-
         return null;
     }
 
     public String getNString(String columnLabel) {
-
         return null;
     }
 
     public Reader getNCharacterStream(int columnIndex) {
-
         return null;
     }
 
     public Reader getNCharacterStream(String columnLabel) {
-
         return null;
     }
 
@@ -1026,8 +1016,10 @@ public class CachedResultSet implements ResultSet, Serializable {
 
     private String convertToString(Object o) {
         if (o == null) {
+            wasNull = true;
             return null;
         } else {
+            wasNull = false;
             return o instanceof String s ? s : String.valueOf(o);
         }
     }
