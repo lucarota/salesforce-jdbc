@@ -40,7 +40,7 @@
         <lombok.version>1.18.30</lombok.version>
         <slf4j.version>2.0.7</slf4j.version>
         <commons-lang3.version>3.12.0</commons-lang3.version>
-        <jsqlparser.version>5.1-SNAPSHOT</jsqlparser.version>
+        <jsqlparser.version>5.1</jsqlparser.version>
         <ehcache.version>3.10.8</ehcache.version>
         <junit.version>5.9.3</junit.version>
         <mockito.version>5.7.0</mockito.version>
@@ -56,15 +56,6 @@
         <maven-deploy-plugin.version>3.1.1</maven-deploy-plugin.version>
         <unit-platform-launcher.version>1.9.3</unit-platform-launcher.version>
     </properties>
-    <repositories>
-        <repository>
-            <id>jsqlparser-snapshots</id>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-            <url>https://oss.sonatype.org/content/groups/public/</url>
-        </repository>
-    </repositories>
     <dependencies>
         <dependency>
             <groupId>org.projectlombok</groupId>
