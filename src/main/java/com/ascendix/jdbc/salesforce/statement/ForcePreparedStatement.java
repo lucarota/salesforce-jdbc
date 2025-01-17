@@ -366,7 +366,9 @@ public class ForcePreparedStatement implements PreparedStatement, Iterator<List<
     }
 
     protected static String toSoqlStringParam(Object param) {
-        return "'" + param.toString().replaceAll("\\\\", "\\\\\\\\").replaceAll("'", "\\\\'") + "'";
+        return "'" + param.toString()
+            .replaceAll("'", "\\\\'")
+            .replaceAll("\\\\", "\\\\\\\\") + "'";
     }
 
     protected static String convertToSoqlParam(Object paramValue) {
