@@ -71,7 +71,9 @@ public class QueryAnalyzer {
     protected Statement getQueryData(boolean silentMode) {
         if (queryData == null) {
             try {
-                queryData = CCJSqlParserUtil.parse(soql);
+                queryData = CCJSqlParserUtil.parse(soql,
+        parser -> parser.withBackslashEscapeCharacter(true)
+                );
                 if (queryData instanceof PlainSelect select) {
                     this.expandedStarSyntaxForFields = false;
                     if ("*".equals(select.getSelectItem(0).toString())) {
