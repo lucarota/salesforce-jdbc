@@ -26,7 +26,7 @@ public class UpdateQueryProcessor {
             ISaveResult[] records = partnerService.saveRecords(updateQueryAnalyzer.getFromObjectName(), recordsToUpdate);
             for (ISaveResult result : records) {
                 if (result.isSuccess()) {
-                    resultSet.log(updateQueryAnalyzer.getFromObjectName() + " updated with Id=" + result.getId());
+                    resultSet.setId(result.getId());
                     updateCount++;
                 } else {
                     resultSet.addWarning(updateQueryAnalyzer.getFromObjectName() + " failed to update with error="

@@ -53,7 +53,7 @@ public class AdminQueryProcessor {
     public static CachedResultSet processQuery(ForcePreparedStatement statement, String soqlQuery) throws SQLException {
         CommandLogCachedResultSet resultSet = new CommandLogCachedResultSet();
         if (soqlQuery == null || soqlQuery.trim().isEmpty()) {
-            resultSet.log("No SOQL or ADMIN query found");
+            resultSet.addWarning("No SOQL or ADMIN query found");
             return resultSet;
         }
         soqlQuery = soqlQuery.trim();
@@ -64,13 +64,13 @@ public class AdminQueryProcessor {
             try {
                 boolean reconnected = statement.reconnect(url, userName, userPass);
                 if (reconnected) {
-                    resultSet.log("Admin query: CONNECTION SUCCESSFUL as " + userName + " to " + host);
+                    resultSet.addWarning("Admin query: CONNECTION SUCCESSFUL as " + userName + " to " + host);
                 } else {
-                    resultSet.log("Admin query: CONNECTION FAILED as " + userName + " to " + host);
+                    resultSet.addWarning("Admin query: CONNECTION FAILED as " + userName + " to " + host);
                     return false;
                 }
             } catch (Exception e) {
-                resultSet.log("Admin query: CONNECTION ERROR as " + userName + " to " + host + " : " + e.getMessage());
+                resultSet.addWarning("Admin query: CONNECTION ERROR as " + userName + " to " + host + " : " + e.getMessage());
                 throw new SQLException("CONNECTION ERROR as " + userName + " to " + host + " : " + e.getMessage(),
                     "08000",
                     e);
@@ -91,8 +91,8 @@ public class AdminQueryProcessor {
         Matcher matcher = LOGIN_INFO_COMMAND.matcher(soqlQuery);
         if (matcher.matches()) {
             if (resultSet != null) {
-                resultSet.log("Admin query: CONNECT INFO");
-                resultSet.log("Host: " + statement.getConnection());
+                resultSet.setId("Admin query: CONNECT INFO");
+                resultSet.setId("Host: " + statement.getConnection());
             }
         }
     }
@@ -106,7 +106,7 @@ public class AdminQueryProcessor {
         }
         if (matcher.matches()) {
             if (resultSet != null) {
-                resultSet.log("Admin query: CONNECT ATTEMPT");
+                resultSet.setId("Admin query: CONNECT ATTEMPT");
             }
 
             String userName = matcher.group("username");
@@ -154,7 +154,7 @@ public class AdminQueryProcessor {
                     host = EXISTING_HOST;
                 }
                 if (resultSet != null) {
-                    resultSet.log(
+                    resultSet.setId(
                         "Admin query: CONNECTION ERROR as " + userName + " to " + host + " : " + e.getMessage());
                 }
                 throw new SQLException("CONNECTION ERROR as " + userName + " to " + host + " : " + e.getMessage(),

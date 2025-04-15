@@ -23,7 +23,7 @@ public class DeleteQueryProcessor {
             DeleteResult[] records = partnerService.deleteRecords(recordsToDelete);
             for (DeleteResult result : records) {
                 if (result.isSuccess()) {
-                    resultSet.log(deleteQueryAnalyzer.getFromObjectName() + " deleted with Id=" + result.getId());
+                    resultSet.setId(result.getId());
                 } else {
                     resultSet.addWarning(deleteQueryAnalyzer.getFromObjectName() + " failed to delete with error="
                         + Arrays.stream(result.getErrors()).map(IError::getMessage).collect(Collectors.joining(",")));
