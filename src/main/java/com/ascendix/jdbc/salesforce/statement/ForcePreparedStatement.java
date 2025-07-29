@@ -211,8 +211,8 @@ public class ForcePreparedStatement implements PreparedStatement, Iterator<List<
 
     private String preprocessQuery(String soqlQuery) {
         // Preprocess some sugar like Date Literals into SOQL format
-        // {ts '2021-10-12 00:00:12Z'}
-        // 2021-10-12T00:00:12Z
+        // '{ts 2021-10-12 00:00:12Z}'
+        // '{ts 2021-10-12T00:00:12Z}'
         if (soqlQuery == null) {
             return soqlQuery;
         }
@@ -220,8 +220,8 @@ public class ForcePreparedStatement implements PreparedStatement, Iterator<List<
         if (soqlQuery.contains("{ts")) {
             soqlQueryProcessed = soqlQuery.trim()
                     .replaceAll(
-                            "\\{ts\\s*'(\\d{4}-\\d{2}-\\d{2})(T|\\s)(\\d{2}:\\d{2}:\\d{2})(Z|[+-]\\d{3,4}|)(\\.\\d+)?'\\s*}",
-                            "$1T$3$4Z");
+                            "'\\{ts\\s*(\\d{4}-\\d{2}-\\d{2})(T|\\s)(\\d{2}:\\d{2}:\\d{2})(Z|[+-]\\d{3,4}|)(\\.\\d+)?\\s*}'",
+                            "$1T$3$4");
         }
         return soqlQueryProcessed;
     }
@@ -374,7 +374,7 @@ public class ForcePreparedStatement implements PreparedStatement, Iterator<List<
     protected static String convertToSoqlParam(Object paramValue) {
         Class<?> paramClass = getParamClass(paramValue);
         // Convert the string date representation to SOQL
-        // like {ts '2021-10-21 12:01:02Z'}
+        // like '{ts 2021-10-21 12:01:02Z}'
         // to 2021-10-21 12:01:02-0000
         if (paramValue instanceof String param && param.startsWith("{ts")) {
             paramValue = convertStringToDate(param);
