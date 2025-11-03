@@ -33,7 +33,7 @@
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <revision>1.6.16-release</revision>
+        <revision>1.6.17-release</revision>
 
         <!-- Remember to also update ForceService.DEFAULT_API_VERSION -->
         <force-partner-api.version>61.1.0</force-partner-api.version>
@@ -200,7 +200,7 @@
         <profile>
             <id>single-jar</id>
             <properties>
-                <revision>1.6.16-fatjar-release</revision>
+                <revision>1.6.17-fatjar-release</revision>
             </properties>
             <build>
                 <plugins>

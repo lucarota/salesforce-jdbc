@@ -101,7 +101,9 @@ public class CachedResultSet implements ResultSet, Serializable {
     }
 
     public boolean first() {
-        if (this.rowSupplier != null) throw new UnsupportedOperationException("Not implemented yet.");
+        if (this.rowSupplier != null) {
+            throw new UnsupportedOperationException("Not implemented yet.");
+        }
         if (!rows.isEmpty()) {
             this.index = 0;
             return true;
@@ -111,7 +113,9 @@ public class CachedResultSet implements ResultSet, Serializable {
     }
 
     public boolean last() {
-        if (this.rowSupplier != null) throw new UnsupportedOperationException("Not implemented yet.");
+        if (this.rowSupplier != null) {
+            throw new UnsupportedOperationException("Not implemented yet.");
+        }
         if (!rows.isEmpty()) {
             this.index = rows.size() - 1;
             return true;
@@ -137,28 +141,38 @@ public class CachedResultSet implements ResultSet, Serializable {
     public boolean next() {
         if (!rows.isEmpty()) {
             increaseIndex();
-            if (index < rows.size()) return true;
+            if (index < rows.size()) {
+                return true;
+            }
         }
         return nextSupplied() && next();
     }
 
     public boolean isAfterLast() {
-        if (this.rowSupplier != null) throw new UnsupportedOperationException("Not implemented yet.");
+        if (this.rowSupplier != null) {
+            throw new UnsupportedOperationException("Not implemented yet.");
+        }
         return !rows.isEmpty() && index == rows.size();
     }
 
     public boolean isBeforeFirst() {
-        if (this.rowSupplier != null) throw new UnsupportedOperationException("Not implemented yet.");
+        if (this.rowSupplier != null) {
+            throw new UnsupportedOperationException("Not implemented yet.");
+        }
         return !rows.isEmpty() && index == -1;
     }
 
     public boolean isFirst() {
-        if (this.rowSupplier != null) throw new UnsupportedOperationException("Not implemented yet.");
+        if (this.rowSupplier != null) {
+            throw new UnsupportedOperationException("Not implemented yet.");
+        }
         return !rows.isEmpty() && index == 0;
     }
 
     public boolean isLast() {
-        if (this.rowSupplier != null) throw new UnsupportedOperationException("Not implemented yet.");
+        if (this.rowSupplier != null) {
+            throw new UnsupportedOperationException("Not implemented yet.");
+        }
         return !rows.isEmpty() && index == rows.size() - 1;
     }
 
@@ -314,7 +328,6 @@ public class CachedResultSet implements ResultSet, Serializable {
                 .parse(columnName)
                 .map(d -> new java.sql.Timestamp(d.getTime()))
                 .orElse(null);
-
         } else {
             return new ColumnValueParser<>(this::parseDateTime, java.util.Date.class)
                 .parse(columnName)
@@ -359,7 +372,7 @@ public class CachedResultSet implements ResultSet, Serializable {
             .orElse(null);
     }
 
-    @Deprecated(since="1.2")
+    @Deprecated(since = "1.2")
     public BigDecimal getBigDecimal(int columnIndex, int scale) {
         Optional<BigDecimal> result = new ColumnValueParser<>(BigDecimal::new, BigDecimal.class)
             .parse(columnIndex);
@@ -367,7 +380,7 @@ public class CachedResultSet implements ResultSet, Serializable {
         return result.map(bigDecimal -> bigDecimal.setScale(scale, RoundingMode.HALF_EVEN)).orElse(null);
     }
 
-    @Deprecated(since="1.2")
+    @Deprecated(since = "1.2")
     public BigDecimal getBigDecimal(String columnName, int scale) {
         Optional<BigDecimal> result = new ColumnValueParser<>(BigDecimal::new, BigDecimal.class)
             .parse(columnName);
@@ -493,15 +506,25 @@ public class CachedResultSet implements ResultSet, Serializable {
     }
 
     public byte[] getBytes(int columnIndex) {
-        throw new UnsupportedOperationException("Not implemented yet.");
+        final String s = convertToString(getObject(columnIndex));
+        if (s != null) {
+            return s.getBytes();
+        }
+        return new byte[0];
     }
 
     public byte[] getBytes(String columnName) {
-        throw new UnsupportedOperationException("Not implemented yet.");
+        final String s = convertToString(getObject(columnName));
+        if (s != null) {
+            return s.getBytes();
+        }
+        return new byte[0];
     }
 
     public void beforeFirst() {
-        if (this.rowSupplier != null) throw new UnsupportedOperationException("Not implemented yet.");
+        if (this.rowSupplier != null) {
+            throw new UnsupportedOperationException("Not implemented yet.");
+        }
         if (!rows.isEmpty()) {
             this.index = -1;
         }
@@ -515,7 +538,6 @@ public class CachedResultSet implements ResultSet, Serializable {
     public int getType() {
         return ResultSet.TYPE_FORWARD_ONLY;
     }
-
 
     public int getConcurrency() {
         return ResultSet.CONCUR_READ_ONLY;
@@ -656,12 +678,12 @@ public class CachedResultSet implements ResultSet, Serializable {
         return null;
     }
 
-    @Deprecated(since="1.2")
+    @Deprecated(since = "1.2")
     public InputStream getUnicodeStream(int columnIndex) {
         return null;
     }
 
-    @Deprecated(since="1.2")
+    @Deprecated(since = "1.2")
     public InputStream getUnicodeStream(String columnName) {
         return null;
     }
