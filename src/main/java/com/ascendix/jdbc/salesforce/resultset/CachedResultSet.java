@@ -24,8 +24,12 @@ import java.sql.SQLXML;
 import java.sql.Statement;
 import java.sql.Time;
 import java.sql.Timestamp;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Calendar;
@@ -47,6 +51,11 @@ public class CachedResultSet implements ResultSet, Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
+
+    // Thread-safe DateTimeFormatters (immutable)
+    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    private static final DateTimeFormatter DATETIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSX");
+    private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm:ss.SSSX");
 
     private transient Integer index;
     private List<ColumnMap<String, Object>> rows;
@@ -259,15 +268,15 @@ public class CachedResultSet implements ResultSet, Serializable {
     }
 
     protected java.util.Date parseDate(String dateRepr) {
+        if (dateRepr == null) {
+            wasNull = true;
+            return null;
+        }
         try {
-            if (dateRepr == null) {
-                wasNull = true;
-                return null;
-            } else {
-                wasNull = false;
-                return new SimpleDateFormat("yyyy-MM-dd").parse(dateRepr);
-            }
-        } catch (ParseException e) {
+            wasNull = false;
+            LocalDate localDate = LocalDate.parse(dateRepr, DATE_FORMATTER);
+            return java.util.Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+        } catch (DateTimeParseException e) {
             return null;
         }
     }
@@ -287,15 +296,15 @@ public class CachedResultSet implements ResultSet, Serializable {
     }
 
     private java.util.Date parseDateTime(String dateRepr) {
+        if (dateRepr == null) {
+            wasNull = true;
+            return null;
+        }
         try {
-            if (dateRepr == null) {
-                wasNull = true;
-                return null;
-            } else {
-                wasNull = false;
-                return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSX").parse(dateRepr);
-            }
-        } catch (ParseException e) {
+            wasNull = false;
+            OffsetDateTime odt = OffsetDateTime.parse(dateRepr, DATETIME_FORMATTER);
+            return java.util.Date.from(odt.toInstant());
+        } catch (DateTimeParseException e) {
             return null;
         }
     }
@@ -345,15 +354,16 @@ public class CachedResultSet implements ResultSet, Serializable {
     }
 
     private java.util.Date parseTime(String dateRepr) {
+        if (dateRepr == null) {
+            wasNull = true;
+            return null;
+        }
         try {
-            if (dateRepr == null) {
-                wasNull = true;
-                return null;
-            } else {
-                wasNull = false;
-                return new SimpleDateFormat("HH:mm:ss.SSSX").parse(dateRepr);
-            }
-        } catch (ParseException e) {
+            wasNull = false;
+            java.time.OffsetTime offsetTime = java.time.OffsetTime.parse(dateRepr, TIME_FORMATTER);
+            LocalTime localTime = offsetTime.toLocalTime();
+            return java.util.Date.from(localTime.atDate(LocalDate.EPOCH).atZone(ZoneId.systemDefault()).toInstant());
+        } catch (DateTimeParseException e) {
             return null;
         }
     }
