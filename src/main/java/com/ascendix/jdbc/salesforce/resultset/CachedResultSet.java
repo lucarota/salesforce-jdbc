@@ -44,6 +44,20 @@ import javax.sql.rowset.RowSetMetaDataImpl;
 import javax.sql.rowset.serial.SerialBlob;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * In-memory implementation of {@link ResultSet} that caches all rows.
+ *
+ * <p><b>Thread Safety:</b> This class is <b>NOT thread-safe</b>, consistent with
+ * the JDBC specification which does not require ResultSet implementations to be
+ * thread-safe. If multiple threads need to access the same ResultSet, external
+ * synchronization must be provided by the application.
+ *
+ * <p>Specifically, the cursor position (row index) is shared mutable state that
+ * is not synchronized. Concurrent calls to navigation methods ({@code next()},
+ * {@code first()}, etc.) or data retrieval methods may result in undefined behavior.
+ *
+ * @see java.sql.ResultSet
+ */
 @Slf4j
 public class CachedResultSet implements ResultSet, Serializable {
 

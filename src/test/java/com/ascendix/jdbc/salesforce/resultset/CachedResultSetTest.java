@@ -529,4 +529,65 @@ class CachedResultSetTest {
             assertFalse(rs.wasNull());
         }
     }
+
+    @Nested
+    @DisplayName("Thread safety contract tests")
+    class ThreadSafetyContractTests {
+
+        @Test
+        @DisplayName("CachedResultSet is NOT thread-safe by design (JDBC spec compliant)")
+        void testNotThreadSafeByDesign() {
+            // This test documents that CachedResultSet is NOT thread-safe,
+            // which is consistent with the JDBC specification.
+            //
+            // The JDBC spec does not require ResultSet to be thread-safe.
+            // If concurrent access is needed, the application must provide
+            // external synchronization.
+            //
+            // Shared mutable state includes:
+            // - index (cursor position)
+            // - wasNull flag
+            // - rows list (when using rowSupplier)
+
+            ColumnMap<String, Object> row = new ColumnMap<>();
+            row.put("id", "1", TypeInfo.STRING_TYPE_INFO);
+            CachedResultSet rs = new CachedResultSet(List.of(row));
+
+            // Single-threaded usage works correctly
+            assertTrue(rs.next());
+            assertEquals("1", rs.getString("id"));
+            assertFalse(rs.wasNull());
+
+            // For multi-threaded scenarios, wrap with external synchronization:
+            // synchronized(rs) { rs.next(); value = rs.getString("id"); }
+        }
+
+        @Test
+        @DisplayName("Single thread sequential access is safe")
+        void testSingleThreadSequentialAccess() {
+            ColumnMap<String, Object> row1 = new ColumnMap<>();
+            row1.put("id", "1", TypeInfo.STRING_TYPE_INFO);
+            ColumnMap<String, Object> row2 = new ColumnMap<>();
+            row2.put("id", "2", TypeInfo.STRING_TYPE_INFO);
+            ColumnMap<String, Object> row3 = new ColumnMap<>();
+            row3.put("id", "3", TypeInfo.STRING_TYPE_INFO);
+
+            CachedResultSet rs = new CachedResultSet(List.of(row1, row2, row3));
+
+            // Sequential navigation and reads are safe in single thread
+            assertTrue(rs.next());
+            assertEquals("1", rs.getString("id"));
+
+            assertTrue(rs.next());
+            assertEquals("2", rs.getString("id"));
+
+            assertTrue(rs.next());
+            assertEquals("3", rs.getString("id"));
+
+            // Can reset and iterate again
+            rs.beforeFirst();
+            assertTrue(rs.next());
+            assertEquals("1", rs.getString("id"));
+        }
+    }
 }
