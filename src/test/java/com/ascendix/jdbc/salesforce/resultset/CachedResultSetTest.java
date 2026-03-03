@@ -5,8 +5,11 @@ import static org.junit.jupiter.api.Assertions.*;
 import com.ascendix.jdbc.salesforce.metadata.ColumnMap;
 import com.ascendix.jdbc.salesforce.metadata.TypeInfo;
 import java.sql.Date;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Time;
 import java.sql.Timestamp;
+import java.util.Base64;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -527,6 +530,550 @@ class CachedResultSetTest {
 
             rs.getString("column");
             assertFalse(rs.wasNull());
+        }
+    }
+
+    @Nested
+    @DisplayName("getObject() tests")
+    class GetObjectTests {
+
+        @Test
+        @DisplayName("should get object by column name")
+        void testGetObjectByColumnName() {
+            ColumnMap<String, Object> row = new ColumnMap<>();
+            row.put("col", "value", TypeInfo.STRING_TYPE_INFO);
+            CachedResultSet rs = new CachedResultSet(List.of(row));
+            rs.next();
+
+            assertEquals("value", rs.getObject("col"));
+        }
+
+        @Test
+        @DisplayName("should get object by column index")
+        void testGetObjectByIndex() {
+            ColumnMap<String, Object> row = new ColumnMap<>();
+            row.put("col", 123, TypeInfo.INT_TYPE_INFO);
+            CachedResultSet rs = new CachedResultSet(List.of(row));
+            rs.next();
+
+            assertEquals(123, rs.getObject(1));
+        }
+
+        @Test
+        @DisplayName("should return null for null value")
+        void testGetObjectNull() {
+            ColumnMap<String, Object> row = new ColumnMap<>();
+            row.put("col", null, TypeInfo.STRING_TYPE_INFO);
+            CachedResultSet rs = new CachedResultSet(List.of(row));
+            rs.next();
+
+            assertNull(rs.getObject("col"));
+        }
+    }
+
+    @Nested
+    @DisplayName("getFloat() tests")
+    class GetFloatTests {
+
+        @Test
+        @DisplayName("should get float by column name")
+        void testGetFloatByColumnName() {
+            ColumnMap<String, Object> row = new ColumnMap<>();
+            row.put("floatCol", "3.14", TypeInfo.DOUBLE_TYPE_INFO);
+            CachedResultSet rs = new CachedResultSet(List.of(row));
+            rs.next();
+
+            assertEquals(3.14f, rs.getFloat("floatCol"), 0.001f);
+        }
+
+        @Test
+        @DisplayName("should get float by column index")
+        void testGetFloatByIndex() {
+            ColumnMap<String, Object> row = new ColumnMap<>();
+            row.put("floatCol", "2.71", TypeInfo.DOUBLE_TYPE_INFO);
+            CachedResultSet rs = new CachedResultSet(List.of(row));
+            rs.next();
+
+            assertEquals(2.71f, rs.getFloat(1), 0.001f);
+        }
+
+        @Test
+        @DisplayName("should return 0 for null")
+        void testGetFloatNull() {
+            ColumnMap<String, Object> row = new ColumnMap<>();
+            row.put("floatCol", null, TypeInfo.DOUBLE_TYPE_INFO);
+            CachedResultSet rs = new CachedResultSet(List.of(row));
+            rs.next();
+
+            assertEquals(0f, rs.getFloat("floatCol"));
+        }
+    }
+
+    @Nested
+    @DisplayName("getShort() tests")
+    class GetShortTests {
+
+        @Test
+        @DisplayName("should get short by column name")
+        void testGetShortByColumnName() {
+            ColumnMap<String, Object> row = new ColumnMap<>();
+            row.put("shortCol", "100", TypeInfo.INT_TYPE_INFO);
+            CachedResultSet rs = new CachedResultSet(List.of(row));
+            rs.next();
+
+            assertEquals((short) 100, rs.getShort("shortCol"));
+        }
+
+        @Test
+        @DisplayName("should get short by column index")
+        void testGetShortByIndex() {
+            ColumnMap<String, Object> row = new ColumnMap<>();
+            row.put("shortCol", "200", TypeInfo.INT_TYPE_INFO);
+            CachedResultSet rs = new CachedResultSet(List.of(row));
+            rs.next();
+
+            assertEquals((short) 200, rs.getShort(1));
+        }
+
+        @Test
+        @DisplayName("should return 0 for null")
+        void testGetShortNull() {
+            ColumnMap<String, Object> row = new ColumnMap<>();
+            row.put("shortCol", null, TypeInfo.INT_TYPE_INFO);
+            CachedResultSet rs = new CachedResultSet(List.of(row));
+            rs.next();
+
+            assertEquals((short) 0, rs.getShort("shortCol"));
+        }
+    }
+
+    @Nested
+    @DisplayName("getByte() tests")
+    class GetByteTests {
+
+        @Test
+        @DisplayName("should get byte by column name")
+        void testGetByteByColumnName() {
+            ColumnMap<String, Object> row = new ColumnMap<>();
+            row.put("byteCol", "42", TypeInfo.INT_TYPE_INFO);
+            CachedResultSet rs = new CachedResultSet(List.of(row));
+            rs.next();
+
+            assertEquals((byte) 42, rs.getByte("byteCol"));
+        }
+
+        @Test
+        @DisplayName("should get byte by column index")
+        void testGetByteByIndex() {
+            ColumnMap<String, Object> row = new ColumnMap<>();
+            row.put("byteCol", "127", TypeInfo.INT_TYPE_INFO);
+            CachedResultSet rs = new CachedResultSet(List.of(row));
+            rs.next();
+
+            assertEquals((byte) 127, rs.getByte(1));
+        }
+
+        @Test
+        @DisplayName("should return 0 for null")
+        void testGetByteNull() {
+            ColumnMap<String, Object> row = new ColumnMap<>();
+            row.put("byteCol", null, TypeInfo.INT_TYPE_INFO);
+            CachedResultSet rs = new CachedResultSet(List.of(row));
+            rs.next();
+
+            assertEquals((byte) 0, rs.getByte("byteCol"));
+        }
+    }
+
+    @Nested
+    @DisplayName("getBytes() tests")
+    class GetBytesTests {
+
+        @Test
+        @DisplayName("should get bytes by column name")
+        void testGetBytesByColumnName() {
+            ColumnMap<String, Object> row = new ColumnMap<>();
+            row.put("bytesCol", "Hello", TypeInfo.STRING_TYPE_INFO);
+            CachedResultSet rs = new CachedResultSet(List.of(row));
+            rs.next();
+
+            assertArrayEquals("Hello".getBytes(), rs.getBytes("bytesCol"));
+        }
+
+        @Test
+        @DisplayName("should get bytes by column index")
+        void testGetBytesByIndex() {
+            ColumnMap<String, Object> row = new ColumnMap<>();
+            row.put("bytesCol", "World", TypeInfo.STRING_TYPE_INFO);
+            CachedResultSet rs = new CachedResultSet(List.of(row));
+            rs.next();
+
+            assertArrayEquals("World".getBytes(), rs.getBytes(1));
+        }
+
+        @Test
+        @DisplayName("should return empty array for null")
+        void testGetBytesNull() {
+            ColumnMap<String, Object> row = new ColumnMap<>();
+            row.put("bytesCol", null, TypeInfo.STRING_TYPE_INFO);
+            CachedResultSet rs = new CachedResultSet(List.of(row));
+            rs.next();
+
+            assertArrayEquals(new byte[0], rs.getBytes("bytesCol"));
+        }
+    }
+
+    @Nested
+    @DisplayName("getBlob() tests")
+    class GetBlobTests {
+
+        @Test
+        @DisplayName("should get blob from base64 string by column name")
+        void testGetBlobByColumnName() throws Exception {
+            String base64 = Base64.getEncoder().encodeToString("test data".getBytes());
+            ColumnMap<String, Object> row = new ColumnMap<>();
+            row.put("blobCol", base64, TypeInfo.STRING_TYPE_INFO);
+            CachedResultSet rs = new CachedResultSet(List.of(row));
+            rs.next();
+
+            java.sql.Blob blob = rs.getBlob("blobCol");
+            assertNotNull(blob);
+            assertArrayEquals("test data".getBytes(), blob.getBytes(1, (int) blob.length()));
+        }
+
+        @Test
+        @DisplayName("should get blob by column index")
+        void testGetBlobByIndex() throws Exception {
+            String base64 = Base64.getEncoder().encodeToString("blob content".getBytes());
+            ColumnMap<String, Object> row = new ColumnMap<>();
+            row.put("blobCol", base64, TypeInfo.STRING_TYPE_INFO);
+            CachedResultSet rs = new CachedResultSet(List.of(row));
+            rs.next();
+
+            java.sql.Blob blob = rs.getBlob(1);
+            assertNotNull(blob);
+        }
+
+        @Test
+        @DisplayName("should return null for null blob")
+        void testGetBlobNull() {
+            ColumnMap<String, Object> row = new ColumnMap<>();
+            row.put("blobCol", null, TypeInfo.STRING_TYPE_INFO);
+            CachedResultSet rs = new CachedResultSet(List.of(row));
+            rs.next();
+
+            assertNull(rs.getBlob("blobCol"));
+        }
+    }
+
+    @Nested
+    @DisplayName("Cursor position tests")
+    class CursorPositionTests {
+
+        @Test
+        @DisplayName("isFirst should return true when on first row")
+        void testIsFirst() {
+            ColumnMap<String, Object> row1 = new ColumnMap<>();
+            row1.put("id", "1", TypeInfo.STRING_TYPE_INFO);
+            ColumnMap<String, Object> row2 = new ColumnMap<>();
+            row2.put("id", "2", TypeInfo.STRING_TYPE_INFO);
+
+            CachedResultSet rs = new CachedResultSet(List.of(row1, row2));
+            rs.next();
+
+            assertTrue(rs.isFirst());
+        }
+
+        @Test
+        @DisplayName("isFirst should return false when not on first row")
+        void testIsFirstFalse() {
+            ColumnMap<String, Object> row1 = new ColumnMap<>();
+            row1.put("id", "1", TypeInfo.STRING_TYPE_INFO);
+            ColumnMap<String, Object> row2 = new ColumnMap<>();
+            row2.put("id", "2", TypeInfo.STRING_TYPE_INFO);
+
+            CachedResultSet rs = new CachedResultSet(List.of(row1, row2));
+            rs.next();
+            rs.next();
+
+            assertFalse(rs.isFirst());
+        }
+
+        @Test
+        @DisplayName("isLast should return true when on last row")
+        void testIsLast() {
+            ColumnMap<String, Object> row1 = new ColumnMap<>();
+            row1.put("id", "1", TypeInfo.STRING_TYPE_INFO);
+            ColumnMap<String, Object> row2 = new ColumnMap<>();
+            row2.put("id", "2", TypeInfo.STRING_TYPE_INFO);
+
+            CachedResultSet rs = new CachedResultSet(List.of(row1, row2));
+            rs.next();
+            rs.next();
+
+            assertTrue(rs.isLast());
+        }
+
+        @Test
+        @DisplayName("isLast should return false when not on last row")
+        void testIsLastFalse() {
+            ColumnMap<String, Object> row1 = new ColumnMap<>();
+            row1.put("id", "1", TypeInfo.STRING_TYPE_INFO);
+            ColumnMap<String, Object> row2 = new ColumnMap<>();
+            row2.put("id", "2", TypeInfo.STRING_TYPE_INFO);
+
+            CachedResultSet rs = new CachedResultSet(List.of(row1, row2));
+            rs.next();
+
+            assertFalse(rs.isLast());
+        }
+
+        @Test
+        @DisplayName("isAfterLast should return true after iterating past last row")
+        void testIsAfterLast() {
+            ColumnMap<String, Object> row = new ColumnMap<>();
+            row.put("id", "1", TypeInfo.STRING_TYPE_INFO);
+
+            CachedResultSet rs = new CachedResultSet(List.of(row));
+            rs.next();
+            rs.next(); // past last row
+
+            assertTrue(rs.isAfterLast());
+        }
+
+        @Test
+        @DisplayName("isAfterLast should return false when still on a row")
+        void testIsAfterLastFalse() {
+            ColumnMap<String, Object> row = new ColumnMap<>();
+            row.put("id", "1", TypeInfo.STRING_TYPE_INFO);
+
+            CachedResultSet rs = new CachedResultSet(List.of(row));
+            rs.next();
+
+            assertFalse(rs.isAfterLast());
+        }
+    }
+
+    @Nested
+    @DisplayName("ResultSet properties tests")
+    class ResultSetPropertiesTests {
+
+        @Test
+        @DisplayName("getType should return TYPE_FORWARD_ONLY")
+        void testGetType() {
+            CachedResultSet rs = new CachedResultSet(List.of());
+            assertEquals(ResultSet.TYPE_FORWARD_ONLY, rs.getType());
+        }
+
+        @Test
+        @DisplayName("getConcurrency should return CONCUR_READ_ONLY")
+        void testGetConcurrency() {
+            CachedResultSet rs = new CachedResultSet(List.of());
+            assertEquals(ResultSet.CONCUR_READ_ONLY, rs.getConcurrency());
+        }
+
+        @Test
+        @DisplayName("getFetchDirection should return FETCH_UNKNOWN")
+        void testGetFetchDirection() {
+            CachedResultSet rs = new CachedResultSet(List.of());
+            assertEquals(ResultSet.FETCH_UNKNOWN, rs.getFetchDirection());
+        }
+
+        @Test
+        @DisplayName("getHoldability should return CLOSE_CURSORS_AT_COMMIT")
+        void testGetHoldability() {
+            CachedResultSet rs = new CachedResultSet(List.of());
+            assertEquals(ResultSet.CLOSE_CURSORS_AT_COMMIT, rs.getHoldability());
+        }
+
+        @Test
+        @DisplayName("isClosed should return false")
+        void testIsClosed() {
+            CachedResultSet rs = new CachedResultSet(List.of());
+            assertFalse(rs.isClosed());
+        }
+    }
+
+    @Nested
+    @DisplayName("Warnings tests")
+    class WarningsTests {
+
+        @Test
+        @DisplayName("should return null warnings initially")
+        void testGetWarningsInitially() {
+            CachedResultSet rs = new CachedResultSet(List.of());
+            assertNull(rs.getWarnings());
+        }
+
+        @Test
+        @DisplayName("should add and retrieve warning")
+        void testAddWarning() {
+            CachedResultSet rs = new CachedResultSet(List.of());
+            rs.addWarning("Test warning");
+
+            assertNotNull(rs.getWarnings());
+            assertEquals("Test warning", rs.getWarnings().getMessage());
+        }
+
+        @Test
+        @DisplayName("should chain multiple warnings")
+        void testAddMultipleWarnings() {
+            CachedResultSet rs = new CachedResultSet(List.of());
+            rs.addWarning("Warning 1");
+            rs.addWarning("Warning 2");
+
+            assertNotNull(rs.getWarnings());
+            assertEquals("Warning 1", rs.getWarnings().getMessage());
+            assertNotNull(rs.getWarnings().getNextWarning());
+            assertEquals("Warning 2", rs.getWarnings().getNextWarning().getMessage());
+        }
+
+        @Test
+        @DisplayName("should clear warnings")
+        void testClearWarnings() {
+            CachedResultSet rs = new CachedResultSet(List.of());
+            rs.addWarning("Test warning");
+            rs.clearWarnings();
+
+            assertNull(rs.getWarnings());
+        }
+    }
+
+    @Nested
+    @DisplayName("EMPTY singleton tests")
+    class EmptySingletonTests {
+
+        @Test
+        @DisplayName("EMPTY should have no rows")
+        void testEmptyHasNoRows() {
+            assertFalse(CachedResultSet.EMPTY.next());
+        }
+
+        @Test
+        @DisplayName("EMPTY should return metadata")
+        void testEmptyHasMetadata() {
+            assertNotNull(CachedResultSet.EMPTY.getMetaData());
+        }
+
+        @Test
+        @DisplayName("EMPTY should be same instance")
+        void testEmptySameInstance() {
+            assertSame(CachedResultSet.EMPTY, CachedResultSet.EMPTY);
+        }
+    }
+
+    @Nested
+    @DisplayName("BigDecimal with scale tests")
+    class BigDecimalScaleTests {
+
+        @Test
+        @DisplayName("should get BigDecimal with scale by column index")
+        @SuppressWarnings("deprecation")
+        void testGetBigDecimalWithScaleByIndex() {
+            ColumnMap<String, Object> row = new ColumnMap<>();
+            row.put("amount", "123.456789", TypeInfo.DECIMAL_TYPE_INFO);
+            CachedResultSet rs = new CachedResultSet(List.of(row));
+            rs.next();
+
+            java.math.BigDecimal result = rs.getBigDecimal(1, 2);
+            assertEquals(new java.math.BigDecimal("123.46"), result);
+        }
+
+        @Test
+        @DisplayName("should get BigDecimal with scale by column name")
+        @SuppressWarnings("deprecation")
+        void testGetBigDecimalWithScaleByName() {
+            ColumnMap<String, Object> row = new ColumnMap<>();
+            row.put("amount", "99.999", TypeInfo.DECIMAL_TYPE_INFO);
+            CachedResultSet rs = new CachedResultSet(List.of(row));
+            rs.next();
+
+            java.math.BigDecimal result = rs.getBigDecimal("amount", 1);
+            assertEquals(new java.math.BigDecimal("100.0"), result);
+        }
+    }
+
+    @Nested
+    @DisplayName("insertRow() exception test")
+    class InsertRowTests {
+
+        @Test
+        @DisplayName("insertRow should throw SQLException")
+        void testInsertRowThrowsException() {
+            CachedResultSet rs = new CachedResultSet(List.of());
+
+            SQLException exception = assertThrows(SQLException.class, rs::insertRow);
+            assertEquals("Feature is not supported.", exception.getMessage());
+            assertEquals("HY000", exception.getSQLState());
+        }
+    }
+
+    @Nested
+    @DisplayName("getMetaData() tests")
+    class GetMetaDataTests {
+
+        @Test
+        @DisplayName("should return provided metadata")
+        void testGetMetaData() throws Exception {
+            javax.sql.rowset.RowSetMetaDataImpl meta = new javax.sql.rowset.RowSetMetaDataImpl();
+            meta.setColumnCount(1);
+            meta.setColumnName(1, "testCol");
+
+            CachedResultSet rs = new CachedResultSet(List.of(), meta);
+
+            assertNotNull(rs.getMetaData());
+            assertEquals(1, rs.getMetaData().getColumnCount());
+        }
+
+        @Test
+        @DisplayName("should return empty metadata when none provided")
+        void testGetMetaDataEmpty() {
+            ColumnMap<String, Object> row = new ColumnMap<>();
+            CachedResultSet rs = new CachedResultSet(row);
+
+            assertNotNull(rs.getMetaData());
+        }
+    }
+
+    @Nested
+    @DisplayName("Constructor tests")
+    class ConstructorTests {
+
+        @Test
+        @DisplayName("should create with list of rows")
+        void testConstructorWithList() {
+            ColumnMap<String, Object> row = new ColumnMap<>();
+            row.put("id", "1", TypeInfo.STRING_TYPE_INFO);
+
+            CachedResultSet rs = new CachedResultSet(List.of(row));
+
+            assertTrue(rs.next());
+            assertEquals("1", rs.getString("id"));
+        }
+
+        @Test
+        @DisplayName("should create with single row")
+        void testConstructorWithSingleRow() {
+            ColumnMap<String, Object> row = new ColumnMap<>();
+            row.put("id", "single", TypeInfo.STRING_TYPE_INFO);
+
+            CachedResultSet rs = new CachedResultSet(row);
+
+            assertTrue(rs.next());
+            assertEquals("single", rs.getString("id"));
+            assertFalse(rs.next());
+        }
+
+        @Test
+        @DisplayName("should create with metadata only")
+        void testConstructorWithMetadataOnly() throws Exception {
+            javax.sql.rowset.RowSetMetaDataImpl meta = new javax.sql.rowset.RowSetMetaDataImpl();
+            meta.setColumnCount(1);
+
+            CachedResultSet rs = new CachedResultSet(meta);
+
+            assertFalse(rs.next());
+            assertNotNull(rs.getMetaData());
         }
     }
 
