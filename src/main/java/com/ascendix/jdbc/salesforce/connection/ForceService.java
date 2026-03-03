@@ -15,8 +15,8 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
@@ -32,7 +32,8 @@ public class ForceService {
     private static final long OAUTH_READ_TIMEOUT = TimeUnit.SECONDS.toMillis(30);
     public static final String DEFAULT_API_VERSION = "61";
 
-    private static final Map<String, ForceUserInfo> userInfoCache = new HashMap<>();
+    // Thread-safe cache using ConcurrentHashMap
+    private static final Map<String, ForceUserInfo> userInfoCache = new ConcurrentHashMap<>();
     public static final String UNEXPECTED_ERROR = "Failed to connect, unexpected error:";
     public static final String CONNECT_FAILED = "Failed to connect to the host";
 
