@@ -24,7 +24,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Slf4j
-public class PartnerService {
+public class PartnerService implements IPartnerService {
 
     private static final int BATCH_SIZE = 100;
     private final PartnerConnection partnerConnection;
@@ -41,6 +41,7 @@ public class PartnerService {
         sObjectsCache.putIfAbsent(connectionId, new ConcurrentSkipListMap<>(CASE_INSENSITIVE_ORDER));
     }
 
+    @Override
     public List<Table> getTables() throws ConnectionException {
         Map<String, DescribeSObjectResult> sObjects = getSObjectsDescription();
         return sObjects.values().stream()
@@ -48,6 +49,7 @@ public class PartnerService {
             .toList();
     }
 
+    @Override
     public List<Table> getTables(String tablePattern) throws ConnectionException {
         final DescribeSObjectResult sObject = describeSObject(tablePattern);
         if (sObject != null) {
@@ -62,6 +64,7 @@ public class PartnerService {
         }
     }
 
+    @Override
     public DescribeSObjectResult describeSObject(String sObjectType) {
         try {
             final Map<String, DescribeSObjectResult> cache = sObjectsCache.get(getConnectionId());
@@ -79,6 +82,7 @@ public class PartnerService {
         }
     }
 
+    @Override
     public void cleanupGlobalCache() {
         resetSchemaCache();
         sObjectsCache.clear();
@@ -206,6 +210,7 @@ public class PartnerService {
         return removeServiceInfo(rows, null, (String) rootEntityName);
     }
 
+    @Override
     public List<List<ForceResultField>> query(String soql, FieldDefTree expectedSchema) throws ConnectionException {
         log.trace("[PartnerService] query {}", soql);
         List<TreeNode<ForceResultField>> resultRows = Collections.synchronizedList(new LinkedList<>());
@@ -221,6 +226,7 @@ public class PartnerService {
         return FieldDefTree.expand(resultRows, expectedSchema);
     }
 
+    @Override
     public Map.Entry<List<List<ForceResultField>>, String> queryStart(String soql, FieldDefTree expectedSchema)
         throws ConnectionException {
         log.trace("[PartnerService] queryStart {}", soql);
@@ -230,6 +236,7 @@ public class PartnerService {
         return new AbstractMap.SimpleEntry<>(FieldDefTree.expand(resultRows, expectedSchema), queryLocator);
     }
 
+    @Override
     public Map.Entry<List<List<ForceResultField>>, String> queryMore(String queryLocator, FieldDefTree expectedSchema)
         throws ConnectionException {
         log.trace("[PartnerService] queryMore {}", queryLocator);
@@ -313,6 +320,7 @@ public class PartnerService {
         return !SOAP_RESPONSE_SERVICE_OBJECT_TYPES.contains(obj.getName().getLocalPart());
     }
 
+    @Override
     public SaveResult[] createRecords(String entityName, List<Map<String, Object>> recordsDefinitions)
         throws ConnectionException {
         // Create a new sObject of type Contact
@@ -332,6 +340,7 @@ public class PartnerService {
         return partnerConnection.create(records);
     }
 
+    @Override
     public SaveResult[] saveRecords(String entityName, List<Map<String, Object>> recordsDefinitions)
         throws ConnectionException {
         // Create a new sObject of type Contact
@@ -355,6 +364,7 @@ public class PartnerService {
         return partnerConnection.update(records);
     }
 
+    @Override
     public DeleteResult[] deleteRecords(Collection<String> recordsIds) throws ConnectionException {
         return partnerConnection.delete(recordsIds.toArray(new String[]{}));
     }
