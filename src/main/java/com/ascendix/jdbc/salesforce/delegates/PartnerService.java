@@ -2,6 +2,7 @@ package com.ascendix.jdbc.salesforce.delegates;
 
 import static java.lang.String.CASE_INSENSITIVE_ORDER;
 
+import com.ascendix.jdbc.salesforce.DriverConfiguration;
 import com.ascendix.jdbc.salesforce.metadata.Column;
 import com.ascendix.jdbc.salesforce.metadata.Table;
 import com.ascendix.jdbc.salesforce.oauth.ForceClientException;
@@ -26,7 +27,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class PartnerService implements IPartnerService {
 
-    private static final int BATCH_SIZE = 100;
+
     private final PartnerConnection partnerConnection;
     private final String orgId;
 
@@ -191,9 +192,10 @@ public class PartnerService implements IPartnerService {
     }
 
     private <T> List<List<T>> toBatches(List<T> objects) {
+        int batchSize = DriverConfiguration.getBatchSize();
         List<List<T>> result = new ArrayList<>();
-        for (int fromIndex = 0; fromIndex < objects.size(); fromIndex += BATCH_SIZE) {
-            int toIndex = Math.min(fromIndex + BATCH_SIZE, objects.size());
+        for (int fromIndex = 0; fromIndex < objects.size(); fromIndex += batchSize) {
+            int toIndex = Math.min(fromIndex + batchSize, objects.size());
             result.add(objects.subList(fromIndex, toIndex));
         }
         return result;

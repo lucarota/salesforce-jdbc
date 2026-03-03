@@ -1,5 +1,6 @@
 package com.ascendix.jdbc.salesforce.cache;
 
+import com.ascendix.jdbc.salesforce.DriverConfiguration;
 import com.ascendix.jdbc.salesforce.resultset.CachedResultSet;
 import org.ehcache.Cache;
 import org.ehcache.CacheManager;
@@ -25,7 +26,7 @@ public class CacheConfig {
 
         cacheManager.createCache("DataCache",
                 CacheConfigurationBuilder.newCacheConfigurationBuilder(String.class, CachedResultSet.class,
-                        ResourcePoolsBuilder.heap(100)));
+                        ResourcePoolsBuilder.heap(DriverConfiguration.getCacheSize())));
     }
 
     public Cache<String, CachedResultSet> getDataCache() {

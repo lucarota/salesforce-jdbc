@@ -1,5 +1,6 @@
 package com.ascendix.jdbc.salesforce.connection;
 
+import com.ascendix.jdbc.salesforce.DriverConfiguration;
 import com.ascendix.jdbc.salesforce.oauth.BadOAuthTokenException;
 import com.ascendix.jdbc.salesforce.oauth.ForceOAuthClient;
 import com.ascendix.jdbc.salesforce.oauth.ForceUserInfo;
@@ -17,7 +18,6 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -28,9 +28,7 @@ public class ForceService {
 
     public static final String DEFAULT_LOGIN_DOMAIN = "login.salesforce.com";
     private static final String SANDBOX_LOGIN_DOMAIN = "test.salesforce.com";
-    private static final long OAUTH_CONNECTION_TIMEOUT = TimeUnit.SECONDS.toMillis(10);
-    private static final long OAUTH_READ_TIMEOUT = TimeUnit.SECONDS.toMillis(30);
-    public static final String DEFAULT_API_VERSION = "61";
+    public static String DEFAULT_API_VERSION = DriverConfiguration.getApiVersion();
 
     // Thread-safe cache using ConcurrentHashMap
     private static final Map<String, ForceUserInfo> userInfoCache = new ConcurrentHashMap<>();
@@ -159,6 +157,7 @@ public class ForceService {
     }
 
     private static ForceUserInfo getUserInfo(String accessToken, boolean sandbox) {
-        return new ForceOAuthClient(OAUTH_CONNECTION_TIMEOUT, OAUTH_READ_TIMEOUT).getUserInfo(accessToken, sandbox);
+        return new ForceOAuthClient(DriverConfiguration.getConnectTimeout(), DriverConfiguration.getReadTimeout())
+                .getUserInfo(accessToken, sandbox);
     }
 }

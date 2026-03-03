@@ -1,5 +1,6 @@
 package com.ascendix.jdbc.salesforce.oauth;
 
+import com.ascendix.jdbc.salesforce.DriverConfiguration;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
@@ -21,7 +22,7 @@ public class ForceOAuthClient {
     private static final String FORBIDDEN = "Forbidden";
     private static final String BAD_ID_SF_ERROR_CODE = "Bad_Id";
     private static final String INTERNAL_SERVER_ERROR_SF_ERROR_CODE = "Internal Error";
-    private static final int MAX_RETRIES = 5;
+    private static final int MAX_RETRIES = DriverConfiguration.getMaxRetries();
 
     private final long connectTimeout;
     private final long readTimeout;
