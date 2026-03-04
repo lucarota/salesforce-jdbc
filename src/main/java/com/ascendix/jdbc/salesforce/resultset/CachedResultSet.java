@@ -487,7 +487,8 @@ public class CachedResultSet implements ResultSet, Serializable {
         try {
             return new SerialBlob(data);
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new com.ascendix.jdbc.salesforce.exceptions.SalesforceRuntimeException(
+                    "Failed to create Blob from data", e);
         }
     }
 

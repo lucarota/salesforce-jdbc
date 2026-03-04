@@ -4,6 +4,7 @@ import com.ascendix.jdbc.salesforce.cache.CacheConfig;
 import com.ascendix.jdbc.salesforce.connection.ForceConnection;
 import com.ascendix.jdbc.salesforce.delegates.ForceResultField;
 import com.ascendix.jdbc.salesforce.delegates.PartnerService;
+import com.ascendix.jdbc.salesforce.exceptions.SalesforceRuntimeException;
 import com.ascendix.jdbc.salesforce.metadata.ColumnMap;
 import com.ascendix.jdbc.salesforce.metadata.ForceDatabaseMetaData;
 import com.ascendix.jdbc.salesforce.metadata.TypeInfo;
@@ -179,7 +180,7 @@ public class ForcePreparedStatement implements PreparedStatement, Iterator<List<
                     .forEach(rec -> result.add(convertToColumnMap(rec)));
             return result;
         } catch (ConnectionException e) {
-            throw new RuntimeException(new SQLException(e));
+            throw new SalesforceRuntimeException("Failed to fetch next batch of query results", e);
         }
     }
 

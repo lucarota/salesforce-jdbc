@@ -149,7 +149,7 @@ public class EvaluateExpressionVisitor extends ExpressionVisitorAdapter<Expressi
             result = LocalDate.now();
             return null;
         }
-        throw new RuntimeException("Function '" + function.getName() + "' is not implemented.");
+        throw new UnsupportedOperationException("Function '" + function.getName() + "' is not implemented.");
     }
 
     @Override

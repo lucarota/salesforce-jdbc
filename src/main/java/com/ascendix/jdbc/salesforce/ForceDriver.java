@@ -4,6 +4,7 @@ import com.ascendix.jdbc.salesforce.connection.ForceConnection;
 import com.ascendix.jdbc.salesforce.connection.ForceConnectionInfo;
 import com.ascendix.jdbc.salesforce.connection.ForceService;
 import com.ascendix.jdbc.salesforce.delegates.PartnerService;
+import com.ascendix.jdbc.salesforce.exceptions.SalesforceRuntimeException;
 import com.ascendix.jdbc.salesforce.utils.Constants;
 import com.sforce.soap.partner.PartnerConnection;
 import com.sforce.ws.ConnectionException;
@@ -55,7 +56,7 @@ public class ForceDriver implements Driver {
             log.info("[ForceDriver] registration");
             DriverManager.registerDriver(new ForceDriver());
         } catch (SQLException e) {
-            throw new RuntimeException("Failed register ForceDriver: " + e.getMessage(), e);
+            throw new SalesforceRuntimeException("Failed to register ForceDriver", e);
         }
     }
 
