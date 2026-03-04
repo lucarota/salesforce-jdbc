@@ -29,7 +29,7 @@
     <scm>
         <connection>scm:git:git://github.com/lucarota/salesforce-jdbc.git</connection>
         <developerConnection>scm:git:ssh://github.com:lucarota/salesforce-jdbc.git</developerConnection>
-        <url>https://github.com/lucarota/salesforce-jdbc</url>
+        <url>https://github.com/lucarota/salesforce-jdbc/tree/main</url>
     </scm>
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
