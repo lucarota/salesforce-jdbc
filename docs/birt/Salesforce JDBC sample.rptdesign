@@ -9,7 +9,7 @@
         <structure>
             <property name="name">odaURL</property>
             <property name="id">4</property>
-            <expression name="value" type="javascript">"jdbc:ascendix:salesforce://;sessionId=" + params["sessionId"].value;</expression>
+            <expression name="value" type="javascript">"jdbc:rotaliano:salesforce://;sessionId=" + params["sessionId"].value;</expression>
         </structure>
         <structure>
             <property name="name">odaUser</property>
@@ -92,8 +92,8 @@
                     <name>disabledContentBidiFormatStr</name>
                 </ex-property>
             </list-property>
-            <property name="odaDriverClass">com.ascendix.jdbc.salesforce.ForceDriver</property>
-            <property name="odaURL">jdbc:ascendix:salesforce://</property>
+            <property name="odaDriverClass">it.rotaliano.jdbc.salesforce.ForceDriver</property>
+            <property name="odaURL">jdbc:rotaliano:salesforce://</property>
         </oda-data-source>
     </data-sources>
     <data-sets>

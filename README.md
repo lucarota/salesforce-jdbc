@@ -107,7 +107,7 @@ Add the following dependency to your `pom.xml`:
 
 ```xml
 <dependency>
-    <groupId>com.ascendix.salesforce</groupId>
+    <groupId>it.rotaliano.salesforce</groupId>
     <artifactId>salesforce-jdbc</artifactId>
     <version>1.6.17-release</version>
 </dependency>
@@ -116,24 +116,24 @@ Add the following dependency to your `pom.xml`:
 ## Connection Configuration
 
 ### Driver Class Name
-`com.ascendix.jdbc.salesforce.ForceDriver`
+`it.rotaliano.jdbc.salesforce.ForceDriver`
 
 ### JDBC URL Format
 ```
-jdbc:ascendix:salesforce://[;propertyName1=propertyValue1[;propertyName2=propertyValue2]...]
+jdbc:rotaliano:salesforce://[;propertyName1=propertyValue1[;propertyName2=propertyValue2]...]
 ```
 
 You can connect using either **User/Password** or **Session ID**.
 
 **1. User and Password**
 ```
-jdbc:ascendix:salesforce://;user=myname@companyorg.com;password=passwordandsecretkey
+jdbc:rotaliano:salesforce://;user=myname@companyorg.com;password=passwordandsecretkey
 ```
 *Note: The password must be a concatenation of your Salesforce password and security token.*
 
 **2. Session ID**
 ```
-jdbc:ascendix:salesforce://;sessionId=uniqueIdAssociatedWithTheSession
+jdbc:rotaliano:salesforce://;sessionId=uniqueIdAssociatedWithTheSession
 ```
 *Note: User and password parameters are ignored if `sessionId` is provided.*
 
@@ -166,7 +166,7 @@ jdbc:ascendix:salesforce://;sessionId=uniqueIdAssociatedWithTheSession
    
    Example URL:
    ```
-   jdbc:ascendix:salesforce://dev@Local.org:123456@localorg.localhost.internal.salesforce.com:6109?https=false&api=61.0
+   jdbc:rotaliano:salesforce://dev@Local.org:123456@localorg.localhost.internal.salesforce.com:6109?https=false&api=61.0
    ```
    
    Ensure you verify your access type (HTTP/HTTPS) and API version.

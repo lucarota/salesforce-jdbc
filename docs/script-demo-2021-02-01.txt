@@ -12,7 +12,7 @@ And we need to register this driver in the IDE.
 Let's start with registration of the database datasoure
 admin@RecColl03.org
 test12345
-jdbc:ascendix:salesforce://ap1.stmpa.stm.salesforce.com
+jdbc:rotaliano:salesforce://ap1.stmpa.stm.salesforce.com
 
 Let's test the connectivity.
 Here we see the driver version reported and that connection is good.
@@ -47,7 +47,7 @@ And we can switch not only to another org on this server - we can switch to any 
  Let's test Locally running server:
  Please use the real host name - not the domain name generated for the particular org by MyDomain feature.
 
- CONNECT TO jdbc:ascendix:salesforce://dev@Local.org:123456@spuliaiev-wsm1.internal.salesforce.com:6109?https=false&api=51.0
+ CONNECT TO jdbc:rotaliano:salesforce://dev@Local.org:123456@spuliaiev-wsm1.internal.salesforce.com:6109?https=false&api=51.0
 
  Select id, name from Organization;
 

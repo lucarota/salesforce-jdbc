@@ -1,13 +1,13 @@
 2020-08-13 13:10:26,965 [4842581]   INFO - g.FileBasedIndexProjectHandler - Has changed files: false; project=Project (name=untitled, containerState=ACTIVE, componentStore=/Users/spuliaiev/IdeaProjects/untitled)
-2020-08-13 13:10:28,764 [4844380]   WARN - ution.rmi.RemoteProcessSupport - Aug 13, 2020 8:10:28 PM com.ascendix.jdbc.salesforce.connection.ForceConnection isValid
+2020-08-13 13:10:28,764 [4844380]   WARN - ution.rmi.RemoteProcessSupport - Aug 13, 2020 8:10:28 PM connection.it.rotaliano.jdbc.salesforce.ForceConnection isValid
 2020-08-13 13:10:28,764 [4844380]   WARN - ution.rmi.RemoteProcessSupport - INFO: isValid NOT_IMPLEMENTED
-2020-08-13 13:10:28,766 [4844382]   WARN - ution.rmi.RemoteProcessSupport - Aug 13, 2020 8:10:28 PM com.ascendix.jdbc.salesforce.connection.ForceConnection isValid
+2020-08-13 13:10:28,766 [4844382]   WARN - ution.rmi.RemoteProcessSupport - Aug 13, 2020 8:10:28 PM connection.it.rotaliano.jdbc.salesforce.ForceConnection isValid
 2020-08-13 13:10:28,766 [4844382]   WARN - ution.rmi.RemoteProcessSupport - INFO: isValid NOT_IMPLEMENTED
-2020-08-13 13:10:28,767 [4844383]   WARN - ution.rmi.RemoteProcessSupport - Aug 13, 2020 8:10:28 PM com.ascendix.jdbc.salesforce.connection.ForceConnection isValid
+2020-08-13 13:10:28,767 [4844383]   WARN - ution.rmi.RemoteProcessSupport - Aug 13, 2020 8:10:28 PM connection.it.rotaliano.jdbc.salesforce.ForceConnection isValid
 2020-08-13 13:10:28,767 [4844383]   WARN - ution.rmi.RemoteProcessSupport - INFO: isValid NOT_IMPLEMENTED
-2020-08-13 13:10:28,780 [4844396]   WARN - ution.rmi.RemoteProcessSupport - Aug 13, 2020 8:10:28 PM com.ascendix.jdbc.salesforce.connection.ForceConnection getCatalog
+2020-08-13 13:10:28,780 [4844396]   WARN - ution.rmi.RemoteProcessSupport - Aug 13, 2020 8:10:28 PM connection.it.rotaliano.jdbc.salesforce.ForceConnection getCatalog
 2020-08-13 13:10:28,781 [4844397]   WARN - ution.rmi.RemoteProcessSupport - INFO: getCatalog NOT_IMPLEMENTED
-2020-08-13 13:10:28,782 [4844398]   WARN - ution.rmi.RemoteProcessSupport - Aug 13, 2020 8:10:28 PM com.ascendix.jdbc.salesforce.connection.ForceConnection createStatement
+2020-08-13 13:10:28,782 [4844398]   WARN - ution.rmi.RemoteProcessSupport - Aug 13, 2020 8:10:28 PM connection.it.rotaliano.jdbc.salesforce.ForceConnection createStatement
 2020-08-13 13:10:28,782 [4844398]   WARN - ution.rmi.RemoteProcessSupport - INFO: createStatement
 2020-08-13 13:10:28,782 [4844398]  ERROR - ij.database.console.JdbcEngine - connection.remoteConnection.createStatement() must not be null
 java.lang.IllegalStateException: connection.remoteConnection.createStatement() must not be null
