@@ -26,28 +26,28 @@ public class ForcePreparedStatementTest {
 
     @Test
     public void testGetParamClass() {
-        assertEquals(String.class, ForcePreparedStatement.getParamClass("test"));
-        assertEquals(Long.class, ForcePreparedStatement.getParamClass(1L));
-        assertEquals(Object.class, ForcePreparedStatement.getParamClass(new SimpleDateFormat()));
-        assertNull(ForcePreparedStatement.getParamClass(null));
+        assertEquals(String.class, SoqlParameterConverter.getParamClass("test"));
+        assertEquals(Long.class, SoqlParameterConverter.getParamClass(1L));
+        assertEquals(Object.class, SoqlParameterConverter.getParamClass(new SimpleDateFormat()));
+        assertNull(SoqlParameterConverter.getParamClass(null));
     }
 
     @Test
     public void testToSoqlStringParam() {
-        assertEquals("'\\\\''", ForcePreparedStatement.toSoqlStringParam("'"));
-        assertEquals("'\\\\'", ForcePreparedStatement.toSoqlStringParam("\\"));
-        assertEquals("'\\\\';DELETE DATABASE \\\\a'", ForcePreparedStatement.toSoqlStringParam("';DELETE DATABASE \\a"));
+        assertEquals("'\\\\''", SoqlParameterConverter.toSoqlStringParam("'"));
+        assertEquals("'\\\\'", SoqlParameterConverter.toSoqlStringParam("\\"));
+        assertEquals("'\\\\';DELETE DATABASE \\\\a'", SoqlParameterConverter.toSoqlStringParam("';DELETE DATABASE \\a"));
     }
 
     @Test
     public void testConvertToSoqlParam() {
-        assertEquals("123.45", ForcePreparedStatement.convertToSoqlParam(123.45));
-        assertEquals("123.45", ForcePreparedStatement.convertToSoqlParam(123.45f));
-        assertEquals("123", ForcePreparedStatement.convertToSoqlParam(123L));
-        assertEquals("123.45", ForcePreparedStatement.convertToSoqlParam(new BigDecimal("123.45")));
-        assertEquals("2017-03-06T12:34:56+00:00", ForcePreparedStatement.convertToSoqlParam(new GregorianCalendar(2017, 2, 6, 12, 34, 56).getTime()));
-        assertEquals("'\\\\'test\\\\'\\\\'", ForcePreparedStatement.convertToSoqlParam("'test'\\"));
-        assertEquals("NULL", ForcePreparedStatement.convertToSoqlParam(null));
+        assertEquals("123.45", SoqlParameterConverter.convertToSoqlParam(123.45));
+        assertEquals("123.45", SoqlParameterConverter.convertToSoqlParam(123.45f));
+        assertEquals("123", SoqlParameterConverter.convertToSoqlParam(123L));
+        assertEquals("123.45", SoqlParameterConverter.convertToSoqlParam(new BigDecimal("123.45")));
+        assertEquals("2017-03-06T12:34:56+00:00", SoqlParameterConverter.convertToSoqlParam(new GregorianCalendar(2017, 2, 6, 12, 34, 56).getTime()));
+        assertEquals("'\\\\'test\\\\'\\\\'", SoqlParameterConverter.convertToSoqlParam("'test'\\"));
+        assertEquals("NULL", SoqlParameterConverter.convertToSoqlParam(null));
     }
 
     @Test
