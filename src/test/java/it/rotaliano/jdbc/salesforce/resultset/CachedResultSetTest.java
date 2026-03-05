@@ -960,6 +960,32 @@ class CachedResultSetTest {
         void testEmptySameInstance() {
             assertSame(CachedResultSet.EMPTY, CachedResultSet.EMPTY);
         }
+
+        @Test
+        @DisplayName("EMPTY next should always return false")
+        void testEmptyNextAlwaysReturnsFalse() {
+            // Call next() multiple times to verify state is not corrupted
+            assertFalse(CachedResultSet.EMPTY.next());
+            assertFalse(CachedResultSet.EMPTY.next());
+            assertFalse(CachedResultSet.EMPTY.next());
+        }
+
+        @Test
+        @DisplayName("EMPTY should reject addWarning")
+        void testEmptyRejectsAddWarning() {
+            assertThrows(UnsupportedOperationException.class,
+                () -> CachedResultSet.EMPTY.addWarning("test"));
+        }
+
+        @Test
+        @DisplayName("EMPTY should reject navigation mutations")
+        void testEmptyRejectsNavigationMutations() {
+            // first/last/beforeFirst should not throw on empty (they do nothing useful)
+            assertFalse(CachedResultSet.EMPTY.first());
+            assertFalse(CachedResultSet.EMPTY.last());
+            // clearWarnings is safe (no-op on null chain)
+            assertDoesNotThrow(() -> CachedResultSet.EMPTY.clearWarnings());
+        }
     }
 
     @Nested

@@ -50,7 +50,36 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class CachedResultSet extends AbstractResultSet implements Serializable {
 
-    public static final CachedResultSet EMPTY = new CachedResultSet(Collections.emptyList(), new RowSetMetaDataImpl());
+    public static final CachedResultSet EMPTY = new EmptyCachedResultSet();
+
+    private static class EmptyCachedResultSet extends CachedResultSet {
+        @Serial
+        private static final long serialVersionUID = 1L;
+
+        EmptyCachedResultSet() {
+            super(Collections.emptyList(), new RowSetMetaDataImpl());
+        }
+
+        @Override
+        public boolean next() {
+            return false;
+        }
+
+        @Override
+        protected void addRow(ColumnMap<String, Object> row) {
+            throw new UnsupportedOperationException("EMPTY ResultSet is immutable");
+        }
+
+        @Override
+        public void addWarning(String reason) {
+            throw new UnsupportedOperationException("EMPTY ResultSet is immutable");
+        }
+
+        @Override
+        public void clearWarnings() {
+            // no-op: immutable empty has no warnings to clear
+        }
+    }
 
     @Serial
     private static final long serialVersionUID = 1L;
