@@ -216,50 +216,46 @@ public class CachedResultSet implements ResultSet, Serializable {
         throw new UnsupportedOperationException("Not implemented yet.");
     }
 
-    private class ColumnValueParser<T> {
-
-        private final Function<String, T> conversion;
-        private final Class<T> clazz;
-
-        public ColumnValueParser(Function<String, T> parser, Class<T> clazz) {
-            this.conversion = parser;
-            this.clazz = clazz;
-        }
-
-        public Optional<T> parse(int columnIndex) {
-            Object value = getObject(columnIndex);
-            wasNull = (value == null);
-            return parse(value);
-        }
-
-        public Optional<T> parse(String columnName) {
-            Object value = getObject(columnName);
-            wasNull = (value == null);
-            return parse(value);
-        }
+    /**
+     * Static utility for parsing column values with type conversion.
+     * Converted from instance inner class to static to eliminate per-call object allocation.
+     */
+    private static class ColumnValueParser {
 
         @SuppressWarnings("unchecked")
-        private Optional<T> parse(Object o) {
-            if (o == null) {
+        static <T> Optional<T> parse(Object value, Function<String, T> conversion, Class<T> clazz) {
+            if (value == null) {
                 return Optional.empty();
             }
 
-            if (o instanceof String val) {
+            if (value instanceof String val) {
                 return Optional.ofNullable(conversion.apply(val));
             }
 
-            if (o.getClass().isAssignableFrom(clazz)) {
-                return (Optional<T>) Optional.of(o);
+            if (value.getClass().isAssignableFrom(clazz)) {
+                return (Optional<T>) Optional.of(value);
             }
 
             if (Boolean.class.isAssignableFrom(clazz)) {
-                if (o instanceof Number num) {
+                if (value instanceof Number num) {
                     return (Optional<T>) Optional.of(num.intValue() == 1);
                 }
             }
 
-            return Optional.ofNullable(conversion.apply(o.toString()));
+            return Optional.ofNullable(conversion.apply(value.toString()));
         }
+    }
+
+    private <T> Optional<T> parseColumn(int columnIndex, Function<String, T> conversion, Class<T> clazz) {
+        Object value = getObject(columnIndex);
+        wasNull = (value == null);
+        return ColumnValueParser.parse(value, conversion, clazz);
+    }
+
+    private <T> Optional<T> parseColumn(String columnName, Function<String, T> conversion, Class<T> clazz) {
+        Object value = getObject(columnName);
+        wasNull = (value == null);
+        return ColumnValueParser.parse(value, conversion, clazz);
     }
 
     public String getString(String columnName) {
@@ -271,14 +267,12 @@ public class CachedResultSet implements ResultSet, Serializable {
     }
 
     public BigDecimal getBigDecimal(int columnIndex) {
-        return new ColumnValueParser<>(BigDecimal::new, BigDecimal.class)
-            .parse(columnIndex)
+        return parseColumn(columnIndex, BigDecimal::new, BigDecimal.class)
             .orElse(null);
     }
 
     public BigDecimal getBigDecimal(String columnName) {
-        return new ColumnValueParser<>(BigDecimal::new, BigDecimal.class)
-            .parse(columnName)
+        return parseColumn(columnName, BigDecimal::new, BigDecimal.class)
             .orElse(null);
     }
 
@@ -297,15 +291,13 @@ public class CachedResultSet implements ResultSet, Serializable {
     }
 
     public Date getDate(int columnIndex) {
-        return new ColumnValueParser<>(this::parseDate, java.util.Date.class)
-            .parse(columnIndex)
+        return parseColumn(columnIndex, this::parseDate, java.util.Date.class)
             .map(d -> new java.sql.Date(d.getTime()))
             .orElse(null);
     }
 
     public Date getDate(String columnName) {
-        return new ColumnValueParser<>(this::parseDate, java.util.Date.class)
-            .parse(columnName)
+        return parseColumn(columnName, this::parseDate, java.util.Date.class)
             .map(d -> new java.sql.Date(d.getTime()))
             .orElse(null);
     }
@@ -330,13 +322,11 @@ public class CachedResultSet implements ResultSet, Serializable {
         if (value instanceof GregorianCalendar calendar) {
             return new java.sql.Timestamp(calendar.getTime().getTime());
         } else if (rows.get(index).getTypeInfoByIndex(columnIndex) == TypeInfo.DATE_TYPE_INFO) {
-            return new ColumnValueParser<>(this::parseDate, java.util.Date.class)
-                .parse(columnIndex)
+            return ColumnValueParser.parse(value, this::parseDate, java.util.Date.class)
                 .map(d -> new java.sql.Timestamp(d.getTime()))
                 .orElse(null);
         } else {
-            return new ColumnValueParser<>(this::parseDateTime, java.util.Date.class)
-                .parse(columnIndex)
+            return ColumnValueParser.parse(value, this::parseDateTime, java.util.Date.class)
                 .map(d -> new java.sql.Timestamp(d.getTime()))
                 .orElse(null);
         }
@@ -348,13 +338,11 @@ public class CachedResultSet implements ResultSet, Serializable {
         if (value instanceof GregorianCalendar cal) {
             return new java.sql.Timestamp(cal.getTime().getTime());
         } else if (rows.get(index).getTypeInfo(columnName) == TypeInfo.DATE_TYPE_INFO) {
-            return new ColumnValueParser<>(this::parseDate, java.util.Date.class)
-                .parse(columnName)
+            return ColumnValueParser.parse(value, this::parseDate, java.util.Date.class)
                 .map(d -> new java.sql.Timestamp(d.getTime()))
                 .orElse(null);
         } else {
-            return new ColumnValueParser<>(this::parseDateTime, java.util.Date.class)
-                .parse(columnName)
+            return ColumnValueParser.parse(value, this::parseDateTime, java.util.Date.class)
                 .map(d -> new java.sql.Timestamp(d.getTime()))
                 .orElse(null);
         }
@@ -384,94 +372,81 @@ public class CachedResultSet implements ResultSet, Serializable {
     }
 
     public Time getTime(String columnName) {
-        return new ColumnValueParser<>(this::parseTime, java.util.Date.class)
-            .parse(columnName)
+        return parseColumn(columnName, this::parseTime, java.util.Date.class)
             .map(d -> new Time(d.getTime()))
             .orElse(null);
     }
 
     public Time getTime(int columnIndex) {
-        return new ColumnValueParser<>(this::parseTime, java.util.Date.class)
-            .parse(columnIndex)
+        return parseColumn(columnIndex, this::parseTime, java.util.Date.class)
             .map(d -> new Time(d.getTime()))
             .orElse(null);
     }
 
     @Deprecated(since = "1.2")
     public BigDecimal getBigDecimal(int columnIndex, int scale) {
-        Optional<BigDecimal> result = new ColumnValueParser<>(BigDecimal::new, BigDecimal.class)
-            .parse(columnIndex);
-
-        return result.map(bigDecimal -> bigDecimal.setScale(scale, RoundingMode.HALF_EVEN)).orElse(null);
+        return parseColumn(columnIndex, BigDecimal::new, BigDecimal.class)
+            .map(bigDecimal -> bigDecimal.setScale(scale, RoundingMode.HALF_EVEN))
+            .orElse(null);
     }
 
     @Deprecated(since = "1.2")
     public BigDecimal getBigDecimal(String columnName, int scale) {
-        Optional<BigDecimal> result = new ColumnValueParser<>(BigDecimal::new, BigDecimal.class)
-            .parse(columnName);
-        return result.map(bigDecimal -> bigDecimal.setScale(scale, RoundingMode.HALF_EVEN)).orElse(null);
+        return parseColumn(columnName, BigDecimal::new, BigDecimal.class)
+            .map(bigDecimal -> bigDecimal.setScale(scale, RoundingMode.HALF_EVEN))
+            .orElse(null);
     }
 
     public float getFloat(int columnIndex) {
-        return new ColumnValueParser<>(Float::parseFloat, Float.class)
-            .parse(columnIndex)
+        return parseColumn(columnIndex, Float::parseFloat, Float.class)
             .orElse(0f);
     }
 
     public float getFloat(String columnName) {
-        return new ColumnValueParser<>(Float::parseFloat, Float.class)
-            .parse(columnName)
+        return parseColumn(columnName, Float::parseFloat, Float.class)
             .orElse(0f);
     }
 
     public double getDouble(int columnIndex) {
-        return new ColumnValueParser<>(Double::parseDouble, Double.class)
-            .parse(columnIndex)
+        return parseColumn(columnIndex, Double::parseDouble, Double.class)
             .orElse(0d);
     }
 
     public double getDouble(String columnName) {
-        return new ColumnValueParser<>(Double::parseDouble, Double.class)
-            .parse(columnName)
+        return parseColumn(columnName, Double::parseDouble, Double.class)
             .orElse(0d);
     }
 
     public long getLong(String columnName) {
-        return new ColumnValueParser<>(Long::parseLong, Long.class)
-            .parse(columnName)
+        return parseColumn(columnName, Long::parseLong, Long.class)
             .orElse(0L);
     }
 
     public long getLong(int columnIndex) {
-        return new ColumnValueParser<Long>(Long::parseLong, Long.class)
-            .parse(columnIndex)
+        return parseColumn(columnIndex, Long::parseLong, Long.class)
             .orElse(0L);
     }
 
     public int getInt(String columnName) {
-        return new ColumnValueParser<>(Double::parseDouble, Double.class)
-            .parse(columnName)
+        return parseColumn(columnName, Double::parseDouble, Double.class)
             .orElse(0d)
             .intValue();
     }
 
     public int getInt(int columnIndex) {
-        return new ColumnValueParser<>(Double::parseDouble, Double.class)
-            .parse(columnIndex)
+        return parseColumn(columnIndex, Double::parseDouble, Double.class)
             .orElse(0d)
             .intValue();
     }
 
     public short getShort(String columnName) {
-        return new ColumnValueParser<>(Double::parseDouble, Double.class)
-            .parse(columnName)
+        return parseColumn(columnName, Double::parseDouble, Double.class)
             .orElse(0d)
             .shortValue();
     }
 
     public short getShort(int columnIndex) {
-        return new ColumnValueParser<>(Double::parseDouble, Double.class)
-            .parse(columnIndex)
+        return parseColumn(columnIndex, Double::parseDouble, Double.class)
             .orElse(0d)
             .shortValue();
     }
@@ -494,40 +469,34 @@ public class CachedResultSet implements ResultSet, Serializable {
     }
 
     public Blob getBlob(int columnIndex) {
-        return new ColumnValueParser<>((v) -> Base64.getDecoder().decode(v), byte[].class)
-            .parse(columnIndex)
+        return parseColumn(columnIndex, (v) -> Base64.getDecoder().decode(v), byte[].class)
             .map(this::createBlob)
             .orElse(null);
     }
 
     public Blob getBlob(String columnName) {
-        return new ColumnValueParser<>((v) -> Base64.getDecoder().decode(v), byte[].class)
-            .parse(columnName)
+        return parseColumn(columnName, (v) -> Base64.getDecoder().decode(v), byte[].class)
             .map(this::createBlob)
             .orElse(null);
     }
 
     public boolean getBoolean(int columnIndex) {
-        return new ColumnValueParser<>(Boolean::parseBoolean, Boolean.class)
-            .parse(columnIndex)
+        return parseColumn(columnIndex, Boolean::parseBoolean, Boolean.class)
             .orElse(false);
     }
 
     public boolean getBoolean(String columnName) {
-        return new ColumnValueParser<>(Boolean::parseBoolean, Boolean.class)
-            .parse(columnName)
+        return parseColumn(columnName, Boolean::parseBoolean, Boolean.class)
             .orElse(false);
     }
 
     public byte getByte(int columnIndex) {
-        return new ColumnValueParser<>(Byte::parseByte, Byte.class)
-            .parse(columnIndex)
+        return parseColumn(columnIndex, Byte::parseByte, Byte.class)
             .orElse((byte) 0);
     }
 
     public byte getByte(String columnName) {
-        return new ColumnValueParser<>(Byte::parseByte, Byte.class)
-            .parse(columnName)
+        return parseColumn(columnName, Byte::parseByte, Byte.class)
             .orElse((byte) 0);
     }
 
