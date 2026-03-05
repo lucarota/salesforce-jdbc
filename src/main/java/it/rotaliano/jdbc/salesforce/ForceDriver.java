@@ -120,6 +120,8 @@ public class ForceDriver implements Driver {
         info.setHttps(resolveBooleanProperty(properties, HTTPS, true));
         info.setVerifyConnectivity(resolveBooleanProperty(properties, "verifyConnectivity", false));
         if (resolveBooleanProperty(properties, "insecurehttps", false)) {
+            log.warn("SSL certificate validation is DISABLED (insecurehttps=true). "
+                + "This is insecure and should only be used for testing.");
             HttpsTrustManager.allowAllSSL();
         }
         info.setReadTimeout(resolveIntProperty(properties, "readTimeout", info.getReadTimeout()));
