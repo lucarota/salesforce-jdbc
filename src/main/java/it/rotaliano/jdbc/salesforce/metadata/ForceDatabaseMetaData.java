@@ -903,7 +903,7 @@ public class ForceDatabaseMetaData implements DatabaseMetaData, Serializable {
 
     @Override
     public ResultSet getProcedures(String catalog, String schemaPattern, String procedureNamePattern) {
-        log.info("[Meta] getProcedures requested NOT_IMPLEMENTED catalog={} schema={} proc={}", catalog, schemaPattern,
+        log.trace("[Meta] getProcedures requested NOT_IMPLEMENTED catalog={} schema={} proc={}", catalog, schemaPattern,
             procedureNamePattern);
         return new CachedResultSet(CachedResultSetMetaData.EMPTY);
     }
@@ -911,7 +911,7 @@ public class ForceDatabaseMetaData implements DatabaseMetaData, Serializable {
     @Override
     public ResultSet getProcedureColumns(String catalog, String schemaPattern, String procedureNamePattern,
         String columnNamePattern) {
-        log.info("[Meta] getProcedureColumns requested NOT_IMPLEMENTED catalog={} schema={} proc={} col={}", catalog,
+        log.trace("[Meta] getProcedureColumns requested NOT_IMPLEMENTED catalog={} schema={} proc={} col={}", catalog,
             schemaPattern, procedureNamePattern, columnNamePattern);
         return new CachedResultSet(CachedResultSetMetaData.EMPTY);
     }
@@ -926,35 +926,35 @@ public class ForceDatabaseMetaData implements DatabaseMetaData, Serializable {
 
     @Override
     public ResultSet getColumnPrivileges(String catalog, String schema, String table, String columnNamePattern) {
-        log.info("[Meta] getColumnPrivileges requested NOT_IMPLEMENTED catalog={} schema={} table={} col={}", catalog,
+        log.trace("[Meta] getColumnPrivileges requested NOT_IMPLEMENTED catalog={} schema={} table={} col={}", catalog,
             schema, table, columnNamePattern);
         return new CachedResultSet(CachedResultSetMetaData.EMPTY);
     }
 
     @Override
     public ResultSet getTablePrivileges(String catalog, String schemaPattern, String tableNamePattern) {
-        log.info("[Meta] getTablePrivileges requested NOT_IMPLEMENTED catalog={} schema={} table={}", catalog,
+        log.trace("[Meta] getTablePrivileges requested NOT_IMPLEMENTED catalog={} schema={} table={}", catalog,
             schemaPattern, tableNamePattern);
         return new CachedResultSet(CachedResultSetMetaData.EMPTY);
     }
 
     @Override
     public ResultSet getBestRowIdentifier(String catalog, String schema, String table, int scope, boolean nullable) {
-        log.info("[Meta] getBestRowIdentifier requested NOT_IMPLEMENTED catalog={} schema={} table={}", catalog,
+        log.trace("[Meta] getBestRowIdentifier requested NOT_IMPLEMENTED catalog={} schema={} table={}", catalog,
             schema, table);
         return new CachedResultSet(CachedResultSetMetaData.EMPTY);
     }
 
     @Override
     public ResultSet getVersionColumns(String catalog, String schema, String table) {
-        log.info("[Meta] getVersionColumns requested NOT_IMPLEMENTED catalog={} schema={} table={}", catalog,
+        log.trace("[Meta] getVersionColumns requested NOT_IMPLEMENTED catalog={} schema={} table={}", catalog,
             schema, table);
         return new CachedResultSet(CachedResultSetMetaData.EMPTY);
     }
 
     @Override
     public ResultSet getExportedKeys(String catalog, String schema, String table) {
-        log.info("[Meta] getExportedKeys requested NOT_IMPLEMENTED catalog={} schema={} table={}", catalog,
+        log.trace("[Meta] getExportedKeys requested NOT_IMPLEMENTED catalog={} schema={} table={}", catalog,
             schema, table);
         return new CachedResultSet(CachedResultSetMetaData.EMPTY);
     }
@@ -1067,14 +1067,14 @@ public class ForceDatabaseMetaData implements DatabaseMetaData, Serializable {
 
     @Override
     public ResultSet getSuperTypes(String catalog, String schemaPattern, String typeNamePattern) {
-        log.info("[Meta] getSuperTypes requested NOT_IMPLEMENTED catalog={} schema={} type={}", catalog,
+        log.trace("[Meta] getSuperTypes requested NOT_IMPLEMENTED catalog={} schema={} type={}", catalog,
             schemaPattern, typeNamePattern);
         return new CachedResultSet(CachedResultSetMetaData.EMPTY);
     }
 
     @Override
     public ResultSet getSuperTables(String catalog, String schemaPattern, String tableNamePattern) {
-        log.info("[Meta] getSuperTables requested NOT_IMPLEMENTED catalog={} schema={} table={}",
+        log.trace("[Meta] getSuperTables requested NOT_IMPLEMENTED catalog={} schema={} table={}",
             catalog, schemaPattern, tableNamePattern);
         return new CachedResultSet(CachedResultSetMetaData.EMPTY);
     }
@@ -1082,7 +1082,7 @@ public class ForceDatabaseMetaData implements DatabaseMetaData, Serializable {
     @Override
     public ResultSet getAttributes(String catalog, String schemaPattern, String typeNamePattern,
         String attributeNamePattern) {
-        log.info("[Meta] getAttributes requested NOT_IMPLEMENTED catalog={} schema={} type={} attr={}", catalog,
+        log.trace("[Meta] getAttributes requested NOT_IMPLEMENTED catalog={} schema={} type={} attr={}", catalog,
             schemaPattern, typeNamePattern, attributeNamePattern);
         return new CachedResultSet(CachedResultSetMetaData.EMPTY);
     }
@@ -1195,7 +1195,7 @@ public class ForceDatabaseMetaData implements DatabaseMetaData, Serializable {
 
     @Override
     public ResultSet getFunctions(String catalog, String schemaPattern, String functionNamePattern) {
-        log.info("[Meta] getFunctions requested NOT_IMPLEMENTED catalog={} schema={} func={}", catalog,
+        log.trace("[Meta] getFunctions requested NOT_IMPLEMENTED catalog={} schema={} func={}", catalog,
             schemaPattern, functionNamePattern);
         return new CachedResultSet(CachedResultSetMetaData.EMPTY);
     }
@@ -1203,7 +1203,7 @@ public class ForceDatabaseMetaData implements DatabaseMetaData, Serializable {
     @Override
     public ResultSet getFunctionColumns(String catalog, String schemaPattern, String functionNamePattern,
         String columnNamePattern) {
-        log.info("[Meta] getFunctionColumns requested NOT_IMPLEMENTED catalog={} schema={} func={} col={}", catalog,
+        log.trace("[Meta] getFunctionColumns requested NOT_IMPLEMENTED catalog={} schema={} func={} col={}", catalog,
             schemaPattern, functionNamePattern, columnNamePattern);
         return new CachedResultSet(CachedResultSetMetaData.EMPTY);
     }
@@ -1211,7 +1211,7 @@ public class ForceDatabaseMetaData implements DatabaseMetaData, Serializable {
     @Override
     public ResultSet getPseudoColumns(String catalog, String schemaPattern, String tableNamePattern,
         String columnNamePattern) {
-        log.info("[Meta] getPseudoColumns requested NOT_IMPLEMENTED catalog={} schema={} table={}  column={}",
+        log.trace("[Meta] getPseudoColumns requested NOT_IMPLEMENTED catalog={} schema={} table={}  column={}",
             catalog, schemaPattern, tableNamePattern, columnNamePattern);
         return new CachedResultSet(CachedResultSetMetaData.EMPTY);
     }

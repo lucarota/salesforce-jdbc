@@ -65,24 +65,20 @@ public class ForceConnection implements Connection {
         try {
             currentUserName = partnerConnection.getUserInfo().getUserName();
             log.trace(
-            "[Conn] updatePartnerConnection IMPLEMENTED newUserName=" + userName + " oldUserName=" + currentUserName
-                + " newUrl=" + url);
+            "[Conn] updatePartnerConnection IMPLEMENTED newUserName={} oldUserName={} newUrl={}",
+                userName, currentUserName, ForceDriver.sanitizeUrl(url));
             ForceConnectionInfo forceConnectionInfo = ForceDriver.parseConnectionUrl(url);
             forceConnectionInfo.setUserName(userName);
             forceConnectionInfo.setPassword(userPass);
             partnerConnectionUpdated = ForceService.createPartnerConnection(forceConnectionInfo);
             log.info("[Conn] updatePartnerConnection UPDATED to newUserName={}", userName);
         } catch (IOException e) {
-            log.error(
-                    "[Conn] updatePartnerConnection UPDATE FAILED to newUserName=" + userName + " currentUserName="
-                            + currentUserName,
-                    e);
+            log.error("[Conn] updatePartnerConnection UPDATE FAILED to newUserName={} currentUserName={}",
+                    userName, currentUserName, e);
             throw new ConnectionException(e.getMessage());
         } catch (ConnectionException e) {
-            log.error(
-                "[Conn] updatePartnerConnection UPDATE FAILED to newUserName=" + userName + " currentUserName="
-                    + currentUserName,
-                e);
+            log.error("[Conn] updatePartnerConnection UPDATE FAILED to newUserName={} currentUserName={}",
+                    userName, currentUserName, e);
             throw e;
         }
 

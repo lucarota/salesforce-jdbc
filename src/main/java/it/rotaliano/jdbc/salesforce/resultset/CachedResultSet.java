@@ -526,7 +526,7 @@ public class CachedResultSet implements ResultSet, Serializable {
     }
 
     public void clearWarnings() {
-        log.info("clearWarnings");
+        log.trace("clearWarnings");
         this.warningsChain = null;
     }
 
@@ -547,7 +547,7 @@ public class CachedResultSet implements ResultSet, Serializable {
     }
 
     public void addWarning(String reason) {
-        log.info("Adding Warning: {}", reason);
+        log.debug("Adding Warning: {}", reason);
         if (warningsChain != null) {
             SQLWarning last = warningsChain;
             while (last != null && last.getNextWarning() != null) {
@@ -577,7 +577,7 @@ public class CachedResultSet implements ResultSet, Serializable {
     }
 
     public void afterLast() {
-        log.warn("after last check");
+        log.trace("after last check");
     }
 
     public void cancelRowUpdates() {

@@ -51,6 +51,20 @@ public class ForceDriver implements Driver {
     private static final String LOGIN_DOMAIN = "loginDomain";
     public static final String PROTOCOL = "protocol";
 
+    /**
+     * Masks credentials in JDBC URLs to prevent password leaks in logs.
+     * Replaces password portion in URLs like {@code jdbc:...://user:password@host} with {@code ****}.
+     */
+    public static String sanitizeUrl(String url) {
+        if (url == null) return null;
+        Matcher m = URL_HAS_AUTHORIZATION_SEGMENT.matcher(url);
+        if (m.matches()) {
+            return ACCEPTABLE_URL + "://" + m.group(1) + ":****@" + m.group(3)
+                + (m.group(4) != null ? m.group(4) : "");
+        }
+        return url;
+    }
+
     static {
         try {
             log.info("[ForceDriver] registration");
@@ -70,7 +84,7 @@ public class ForceDriver implements Driver {
              *
              * Source: https://docs.oracle.com/javase/8/docs/api/java/sql/Driver.html#connect-java.lang.String-java.util.Properties-
              */
-            log.error("The URL provided is not acceptable: {}", url);
+            log.error("The URL provided is not acceptable: {}", sanitizeUrl(url));
             return null;
         }
         try {

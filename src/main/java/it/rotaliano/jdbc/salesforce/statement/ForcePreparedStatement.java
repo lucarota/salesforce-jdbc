@@ -1,5 +1,6 @@
 package it.rotaliano.jdbc.salesforce.statement;
 
+import it.rotaliano.jdbc.salesforce.ForceDriver;
 import it.rotaliano.jdbc.salesforce.cache.CacheConfig;
 import it.rotaliano.jdbc.salesforce.connection.ForceConnection;
 import it.rotaliano.jdbc.salesforce.delegates.ForceResultField;
@@ -468,7 +469,7 @@ public class ForcePreparedStatement implements PreparedStatement, Iterator<List<
         log.trace("[PrepStat] getFieldDefinitions IMPLEMENTED ");
         if (fieldDefinitions == null) {
             fieldDefinitions = getSoqlQueryAnalyzer().getFieldDefinitions();
-            log.info("[PrepStat] getFieldDefinitions:\n {}", fieldDefinitions.toTree());
+            log.debug("[PrepStat] getFieldDefinitions:\n {}", fieldDefinitions.toTree());
         }
         return fieldDefinitions;
     }
@@ -488,7 +489,7 @@ public class ForcePreparedStatement implements PreparedStatement, Iterator<List<
             soqlQueryAnalyzer = new SoqlQueryAnalyzer(getQueryAnalyzer());
             if (soqlQueryAnalyzer.isExpandedStarSyntaxForFields()) {
                 this.soqlQuery = soqlQueryAnalyzer.getSoqlQueryString();
-                log.info("[PrepStat] Expanded Star Syntax to {}", soqlQuery);
+                log.debug("[PrepStat] Expanded Star Syntax to {}", soqlQuery);
             }
         }
         return soqlQueryAnalyzer;
@@ -496,7 +497,7 @@ public class ForcePreparedStatement implements PreparedStatement, Iterator<List<
 
     private List<Map<String, Object>> runResolveSubselect(String soql, List<Object> parameters) {
         List<Map<String, Object>> results = new ArrayList<>();
-        log.info("Resolving subselect \n{}", soql);
+        log.debug("Resolving subselect \n{}", soql);
         try {
             ForcePreparedStatement forcePreparedStatement = new ForcePreparedStatement(connection, soql);
             forcePreparedStatement.addParameters(parameters);
@@ -510,7 +511,7 @@ public class ForcePreparedStatement implements PreparedStatement, Iterator<List<
                     rec.put(rs.getMetaData().getColumnName(i + 1), rs.getString(i + 1));
                 }
             }
-            log.info("  {} records resolved with {} columns", results.size(), rs.getMetaData().getColumnCount());
+            log.debug("  {} records resolved with {} columns", results.size(), rs.getMetaData().getColumnCount());
         } catch (Exception e) {
             log.warn("Failed to resolve sub-select \n{}", soql, e);
             this.warnings.addSuppressed(new SQLWarning("Failed to resolve sub-select \n" + soql, e));
@@ -562,7 +563,7 @@ public class ForcePreparedStatement implements PreparedStatement, Iterator<List<
     }
 
     public boolean reconnect(String url, String userName, String userPass) throws ConnectionException {
-        log.trace("[PrepStat] RECONNECT IMPLEMENTED newUserName={} url={}", userName, url);
+        log.trace("[PrepStat] RECONNECT IMPLEMENTED newUserName={} url={}", userName, ForceDriver.sanitizeUrl(url));
         boolean updated = connection.updatePartnerConnection(url, userName, userPass);
         this.partnerService = connection.getPartnerService();
         return updated;
@@ -763,7 +764,8 @@ public class ForcePreparedStatement implements PreparedStatement, Iterator<List<
             return null;
         }
         this.resultSetReturned = true;
-        log.trace("[PrepStat] getResultSet IMPLEMENTED " + soqlQuery + "\n {}{}",
+        log.trace("[PrepStat] getResultSet IMPLEMENTED {}\n {}{}",
+                soqlQuery,
                 (resultSet == null ? " resultSet is NULL" : "resultSet is present"),
                 (toReturn == null ? " -> Not to be returned" : " -> Returning"));
         return toReturn;
@@ -772,10 +774,10 @@ public class ForcePreparedStatement implements PreparedStatement, Iterator<List<
     @Override
     public int getUpdateCount() {
         if (this.updateCountReturned) {
-            log.trace("[PrepStat] getUpdateCount Already Returned {}", updateCount + " IMPLEMENTED ");
+            log.trace("[PrepStat] getUpdateCount Already Returned {} IMPLEMENTED", updateCount);
             return -1;
         }
-        log.trace("[PrepStat] getUpdateCount {}", updateCount + " IMPLEMENTED ");
+        log.trace("[PrepStat] getUpdateCount {} IMPLEMENTED", updateCount);
         this.updateCountReturned = true;
         return updateCount;
     }
@@ -783,13 +785,11 @@ public class ForcePreparedStatement implements PreparedStatement, Iterator<List<
     @Override
     public boolean getMoreResults() throws SQLException {
         if (updateCount >= 0) {
-            log.trace(
-                    "[PrepStat] getMoreResults IMPLEMENTED (false) updateCount=" + updateCount + " sql=" + soqlQuery);
+            log.trace("[PrepStat] getMoreResults IMPLEMENTED (false) updateCount={} sql={}", updateCount, soqlQuery);
             return false;
         }
         boolean more = resultSet != null && resultSet.next();
-        log.trace(
-                "[PrepStat] getMoreResults IMPLEMENTED (" + more + ") updateCount=" + updateCount + " sql=" + soqlQuery);
+        log.trace("[PrepStat] getMoreResults IMPLEMENTED ({}) updateCount={} sql={}", more, updateCount, soqlQuery);
         return more;
     }
 

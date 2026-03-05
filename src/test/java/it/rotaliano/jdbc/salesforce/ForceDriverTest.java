@@ -1,10 +1,12 @@
 package it.rotaliano.jdbc.salesforce;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.util.Properties;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 class ForceDriverTest {
@@ -108,5 +110,35 @@ class ForceDriverTest {
         assertEquals("false", actual.getProperty("https"));
         assertEquals("48.0", actual.getProperty("api"));
         assertEquals("SfdcInternalQA/...", actual.getProperty("client"));
+    }
+
+    @Nested
+    class SanitizeUrlTests {
+
+        @Test
+        void testSanitizeUrl_withCredentials() {
+            String url = "jdbc:rotaliano:salesforce://admin:MyS3cretPass@login.salesforce.com";
+            String sanitized = ForceDriver.sanitizeUrl(url);
+            assertEquals("jdbc:rotaliano:salesforce://admin:****@login.salesforce.com", sanitized);
+        }
+
+        @Test
+        void testSanitizeUrl_withCredentialsAndParams() {
+            String url = "jdbc:rotaliano:salesforce://admin:password123@host.sf.com?https=false&api=61";
+            String sanitized = ForceDriver.sanitizeUrl(url);
+            assertEquals("jdbc:rotaliano:salesforce://admin:****@host.sf.com?https=false&api=61", sanitized);
+        }
+
+        @Test
+        void testSanitizeUrl_withoutCredentials() {
+            String url = "jdbc:rotaliano:salesforce://login.salesforce.com;user=admin;password=secret";
+            String sanitized = ForceDriver.sanitizeUrl(url);
+            assertEquals(url, sanitized);
+        }
+
+        @Test
+        void testSanitizeUrl_nullUrl() {
+            assertNull(ForceDriver.sanitizeUrl(null));
+        }
     }
 }

@@ -24,9 +24,9 @@ public class ColumnsFinderVisitor extends ExpressionVisitorAdapter<Expression> {
 
     private void addColumn(Column column) {
         if (columns.add(column.getColumnName())) {
-            log.info("New column found: {}", column.getColumnName());
+            log.trace("New column found: {}", column.getColumnName());
         } else {
-            log.info("Already detected column: {}", column.getColumnName());
+            log.trace("Already detected column: {}", column.getColumnName());
         }
     }
 
