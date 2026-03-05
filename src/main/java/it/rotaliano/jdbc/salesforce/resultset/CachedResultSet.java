@@ -3,26 +3,16 @@ package it.rotaliano.jdbc.salesforce.resultset;
 import it.rotaliano.jdbc.salesforce.metadata.ColumnMap;
 import it.rotaliano.jdbc.salesforce.metadata.TypeInfo;
 import it.rotaliano.jdbc.salesforce.exceptions.SalesforceRuntimeException;
-import java.io.InputStream;
-import java.io.Reader;
 import java.io.Serial;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.net.URL;
-import java.sql.Array;
 import java.sql.Blob;
-import java.sql.Clob;
 import java.sql.Date;
-import java.sql.NClob;
-import java.sql.Ref;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
-import java.sql.RowId;
 import java.sql.SQLException;
 import java.sql.SQLWarning;
-import java.sql.SQLXML;
-import java.sql.Statement;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.time.LocalDate;
@@ -33,12 +23,10 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Base64;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.GregorianCalendar;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 import javax.sql.rowset.RowSetMetaDataImpl;
@@ -60,7 +48,7 @@ import lombok.extern.slf4j.Slf4j;
  * @see java.sql.ResultSet
  */
 @Slf4j
-public class CachedResultSet implements ResultSet, Serializable {
+public class CachedResultSet extends AbstractResultSet implements Serializable {
 
     public static final CachedResultSet EMPTY = new CachedResultSet(Collections.emptyList(), new RowSetMetaDataImpl());
 
@@ -204,18 +192,6 @@ public class CachedResultSet implements ResultSet, Serializable {
         return metadata != null ? metadata : CachedResultSetMetaData.EMPTY;
     }
 
-    public void setFetchSize(int rows) {
-        // NOT Implemented
-    }
-
-    public Date getDate(int columnIndex, Calendar cal) {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    public Date getDate(String columnName, Calendar cal) {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
     /**
      * Static utility for parsing column values with type conversion.
      * Converted from instance inner class to static to eliminate per-call object allocation.
@@ -348,14 +324,6 @@ public class CachedResultSet implements ResultSet, Serializable {
         }
     }
 
-    public Timestamp getTimestamp(int columnIndex, Calendar cal) {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    public Timestamp getTimestamp(String columnName, Calendar cal) {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
     private java.util.Date parseTime(String dateRepr) {
         if (dateRepr == null) {
             wasNull = true;
@@ -449,14 +417,6 @@ public class CachedResultSet implements ResultSet, Serializable {
         return parseColumn(columnIndex, Double::parseDouble, Double.class)
             .orElse(0d)
             .shortValue();
-    }
-
-    public InputStream getBinaryStream(int columnIndex) {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    public InputStream getBinaryStream(String columnName) {
-        throw new UnsupportedOperationException("Not implemented yet.");
     }
 
     private Blob createBlob(byte[] data) {
@@ -568,467 +528,9 @@ public class CachedResultSet implements ResultSet, Serializable {
         return ResultSet.CLOSE_CURSORS_AT_COMMIT;
     }
 
-    //
-    // Not implemented below here
-    //
-
-    public boolean absolute(int row) {
-        return false;
-    }
-
+    @Override
     public void afterLast() {
         log.trace("after last check");
-    }
-
-    public void cancelRowUpdates() {
-    }
-
-    public void close() {
-    }
-
-    public void deleteRow() {
-    }
-
-    public int findColumn(String columnName) {
-        return 0;
-    }
-
-    public Array getArray(int i) {
-        return null;
-    }
-
-    public Array getArray(String colName) {
-        return null;
-    }
-
-    public InputStream getAsciiStream(int columnIndex) {
-        return null;
-    }
-
-    public InputStream getAsciiStream(String columnName) {
-        return null;
-    }
-
-    public Reader getCharacterStream(int columnIndex) {
-        return null;
-    }
-
-    public Reader getCharacterStream(String columnName) {
-        return null;
-    }
-
-    public Clob getClob(int i) {
-        return null;
-    }
-
-    public Clob getClob(String colName) {
-        return null;
-    }
-
-    public String getCursorName() {
-        return null;
-    }
-
-    public int getFetchSize() {
-        return 0;
-    }
-
-    public Object getObject(int i, Map<String, Class<?>> map) {
-        return null;
-    }
-
-    public Object getObject(String colName, Map<String, Class<?>> map) {
-        return null;
-    }
-
-    public Ref getRef(int i) {
-        return null;
-    }
-
-    public Ref getRef(String colName) {
-        return null;
-    }
-
-    public int getRow() {
-        return 0;
-    }
-
-    public Statement getStatement() {
-        return null;
-    }
-
-    public Time getTime(int columnIndex, Calendar cal) {
-        return null;
-    }
-
-    public Time getTime(String columnName, Calendar cal) {
-        return null;
-    }
-
-    public URL getURL(int columnIndex) {
-        return null;
-    }
-
-    public URL getURL(String columnName) {
-        return null;
-    }
-
-    @Deprecated(since = "1.2")
-    public InputStream getUnicodeStream(int columnIndex) {
-        return null;
-    }
-
-    @Deprecated(since = "1.2")
-    public InputStream getUnicodeStream(String columnName) {
-        return null;
-    }
-
-    public void insertRow() throws SQLException {
-        throw new SQLException("Feature is not supported.", "HY000", 1);
-    }
-
-    public void moveToCurrentRow() {
-    }
-
-    public void moveToInsertRow() {
-    }
-
-    public boolean previous() {
-        return false;
-    }
-
-    public void refreshRow() {
-    }
-
-    public boolean relative(int rows) {
-        return false;
-    }
-
-    public boolean rowDeleted() {
-        return false;
-    }
-
-    public boolean rowInserted() {
-        return false;
-    }
-
-    public boolean rowUpdated() {
-        return false;
-    }
-
-    public void setFetchDirection(int direction) {
-    }
-
-    public void updateArray(int columnIndex, Array x) {
-    }
-
-    public void updateArray(String columnName, Array x) {
-    }
-
-    public void updateAsciiStream(int columnIndex, InputStream x, int length) {
-    }
-
-    public void updateAsciiStream(String columnName, InputStream x, int length) {
-    }
-
-    public void updateBigDecimal(int columnIndex, BigDecimal x) {
-    }
-
-    public void updateBigDecimal(String columnName, BigDecimal x) {
-    }
-
-    public void updateBinaryStream(int columnIndex, InputStream x, int length) {
-    }
-
-    public void updateBinaryStream(String columnName, InputStream x, int length) {
-    }
-
-    public void updateBlob(int columnIndex, Blob x) {
-    }
-
-    public void updateBlob(String columnName, Blob x) {
-    }
-
-    public void updateBoolean(int columnIndex, boolean x) {
-    }
-
-    public void updateBoolean(String columnName, boolean x) {
-    }
-
-    public void updateByte(int columnIndex, byte x) {
-    }
-
-    public void updateByte(String columnName, byte x) {
-    }
-
-    public void updateBytes(int columnIndex, byte[] x) {
-    }
-
-    public void updateBytes(String columnName, byte[] x) {
-    }
-
-    public void updateCharacterStream(int columnIndex, Reader x, int length) {
-    }
-
-    public void updateCharacterStream(String columnName, Reader reader, int length) {
-    }
-
-    public void updateClob(int columnIndex, Clob x) {
-    }
-
-    public void updateClob(String columnName, Clob x) {
-    }
-
-    public void updateDate(int columnIndex, Date x) {
-    }
-
-    public void updateDate(String columnName, Date x) {
-    }
-
-    public void updateDouble(int columnIndex, double x) {
-    }
-
-    public void updateDouble(String columnName, double x) {
-    }
-
-    public void updateFloat(int columnIndex, float x) {
-    }
-
-    public void updateFloat(String columnName, float x) {
-    }
-
-    public void updateInt(int columnIndex, int x) {
-    }
-
-    public void updateInt(String columnName, int x) {
-    }
-
-    public void updateLong(int columnIndex, long x) {
-    }
-
-    public void updateLong(String columnName, long x) {
-    }
-
-    public void updateNull(int columnIndex) {
-    }
-
-    public void updateNull(String columnName) {
-    }
-
-    public void updateObject(int columnIndex, Object x) {
-    }
-
-    public void updateObject(String columnName, Object x) {
-    }
-
-    public void updateObject(int columnIndex, Object x, int scale) {
-    }
-
-    public void updateObject(String columnName, Object x, int scale) {
-    }
-
-    public void updateRef(int columnIndex, Ref x) {
-    }
-
-    public void updateRef(String columnName, Ref x) {
-    }
-
-    public void updateRow() {
-    }
-
-    public void updateShort(int columnIndex, short x) {
-    }
-
-    public void updateShort(String columnName, short x) {
-    }
-
-    public void updateString(int columnIndex, String x) {
-    }
-
-    public void updateString(String columnName, String x) {
-    }
-
-    public void updateTime(int columnIndex, Time x) {
-    }
-
-    public void updateTime(String columnName, Time x) {
-    }
-
-    public void updateTimestamp(int columnIndex, Timestamp x) {
-    }
-
-    public void updateTimestamp(String columnName, Timestamp x) {
-    }
-
-    public <T> T unwrap(Class<T> iface) {
-        return null;
-    }
-
-    public boolean isWrapperFor(Class<?> iface) {
-        return false;
-    }
-
-    public RowId getRowId(int columnIndex) {
-        return null;
-    }
-
-    public RowId getRowId(String columnLabel) {
-        return null;
-    }
-
-    public void updateRowId(int columnIndex, RowId x) {
-    }
-
-    public void updateRowId(String columnLabel, RowId x) {
-    }
-
-    public boolean isClosed() {
-        return false;
-    }
-
-    public void updateNString(int columnIndex, String nString) {
-    }
-
-    public void updateNString(String columnLabel, String nString) {
-    }
-
-    public void updateNClob(int columnIndex, NClob nClob) {
-    }
-
-    public void updateNClob(String columnLabel, NClob nClob) {
-    }
-
-    public NClob getNClob(int columnIndex) {
-        return null;
-    }
-
-    public NClob getNClob(String columnLabel) {
-        return null;
-    }
-
-    public SQLXML getSQLXML(int columnIndex) {
-
-        return null;
-    }
-
-    public SQLXML getSQLXML(String columnLabel) {
-        return null;
-    }
-
-    public void updateSQLXML(int columnIndex, SQLXML xmlObject) {
-    }
-
-    public void updateSQLXML(String columnLabel, SQLXML xmlObject) {
-    }
-
-    public String getNString(int columnIndex) {
-        return null;
-    }
-
-    public String getNString(String columnLabel) {
-        return null;
-    }
-
-    public Reader getNCharacterStream(int columnIndex) {
-        return null;
-    }
-
-    public Reader getNCharacterStream(String columnLabel) {
-        return null;
-    }
-
-    public void updateNCharacterStream(int columnIndex, Reader x, long length) {
-    }
-
-    public void updateNCharacterStream(String columnLabel, Reader reader, long length) {
-    }
-
-    public void updateAsciiStream(int columnIndex, InputStream x, long length) {
-    }
-
-    public void updateBinaryStream(int columnIndex, InputStream x, long length) {
-    }
-
-    public void updateCharacterStream(int columnIndex, Reader x, long length) {
-    }
-
-    public void updateAsciiStream(String columnLabel, InputStream x, long length) {
-    }
-
-    public void updateBinaryStream(String columnLabel, InputStream x, long length) {
-    }
-
-    public void updateCharacterStream(String columnLabel, Reader reader, long length) {
-    }
-
-    public void updateBlob(int columnIndex, InputStream inputStream, long length) {
-    }
-
-    public void updateBlob(String columnLabel, InputStream inputStream, long length) {
-    }
-
-    public void updateClob(int columnIndex, Reader reader, long length) {
-    }
-
-    public void updateClob(String columnLabel, Reader reader, long length) {
-    }
-
-    public void updateNClob(int columnIndex, Reader reader, long length) {
-    }
-
-    public void updateNClob(String columnLabel, Reader reader, long length) {
-    }
-
-    public void updateNCharacterStream(int columnIndex, Reader x) {
-    }
-
-    public void updateNCharacterStream(String columnLabel, Reader reader) {
-    }
-
-    public void updateAsciiStream(int columnIndex, InputStream x) {
-    }
-
-    public void updateBinaryStream(int columnIndex, InputStream x) {
-    }
-
-    public void updateCharacterStream(int columnIndex, Reader x) {
-    }
-
-    public void updateAsciiStream(String columnLabel, InputStream x) {
-    }
-
-    public void updateBinaryStream(String columnLabel, InputStream x) {
-    }
-
-    public void updateCharacterStream(String columnLabel, Reader reader) {
-    }
-
-    public void updateBlob(int columnIndex, InputStream inputStream) {
-    }
-
-    public void updateBlob(String columnLabel, InputStream inputStream) {
-    }
-
-    public void updateClob(int columnIndex, Reader reader) {
-    }
-
-    public void updateClob(String columnLabel, Reader reader) {
-    }
-
-    public void updateNClob(int columnIndex, Reader reader) {
-    }
-
-    public void updateNClob(String columnLabel, Reader reader) {
-    }
-
-    @Override
-    public <T> T getObject(int columnIndex, Class<T> type) {
-        return null;
-    }
-
-    @Override
-    public <T> T getObject(String columnLabel, Class<T> type) {
-        return null;
     }
 
     private String convertToString(Object o) {
