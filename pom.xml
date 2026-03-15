@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>it.rotaliano.salesforce</groupId>
     <artifactId>salesforce-jdbc</artifactId>
-    <version>${revision}</version>
+    <version>${revision}</version> <!-- Remember to also update Constants class -->
     <packaging>jar</packaging>
 
     <name>Salesforce JDBC Driver</name>
@@ -40,14 +40,14 @@
         <!-- Remember to also update ForceService.DEFAULT_API_VERSION -->
         <force-partner-api.version>65.0.0</force-partner-api.version>
         <lombok.version>1.18.30</lombok.version>
-        <slf4j.version>2.0.7</slf4j.version>
-        <commons-lang3.version>3.12.0</commons-lang3.version>
-        <jsqlparser.version>5.1</jsqlparser.version>
+        <slf4j.version>2.0.17</slf4j.version>
+        <commons-lang3.version>3.20.0</commons-lang3.version>
+        <jsqlparser.version>5.3</jsqlparser.version>
         <ehcache.version>3.10.8</ehcache.version>
-        <junit.version>5.9.3</junit.version>
-        <mockito.version>5.7.0</mockito.version>
-        <xstream.version>1.4.20</xstream.version>
-        <logback.version>1.4.12</logback.version>
+        <junit.version>5.12.2</junit.version>
+        <mockito.version>5.18.0</mockito.version>
+        <xstream.version>1.4.21</xstream.version>
+        <logback.version>1.5.20</logback.version>
 
         <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
         <versions-maven-plugin.version>2.8.1</versions-maven-plugin.version>
@@ -56,7 +56,7 @@
         <maven-jar-plugin.version>3.3.0</maven-jar-plugin.version>
         <maven-assembly-plugin.version>3.6.0</maven-assembly-plugin.version>
         <maven-deploy-plugin.version>3.1.1</maven-deploy-plugin.version>
-        <unit-platform-launcher.version>1.9.3</unit-platform-launcher.version>
+        <junit-platform.version>1.12.2</junit-platform.version>
     </properties>
     <dependencies>
         <dependency>
@@ -124,6 +124,18 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>com.thoughtworks.xstream</groupId>
             <artifactId>xstream</artifactId>
             <version>${xstream.version}</version>
@@ -138,7 +150,19 @@
         <dependency>
             <groupId>org.junit.platform</groupId>
             <artifactId>junit-platform-launcher</artifactId>
-            <version>${unit-platform-launcher.version}</version>
+            <version>${junit-platform.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.platform</groupId>
+            <artifactId>junit-platform-engine</artifactId>
+            <version>${junit-platform.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.platform</groupId>
+            <artifactId>junit-platform-commons</artifactId>
+            <version>${junit-platform.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
