@@ -30,9 +30,9 @@ class DriverConfigurationTest {
         }
 
         @Test
-        @DisplayName("apiVersion default is 61")
+        @DisplayName("apiVersion default is 65")
         void testApiVersionDefault() {
-            assertEquals("61", DriverConfiguration.getApiVersion());
+            assertEquals("65", DriverConfiguration.getApiVersion());
         }
 
         @Test
@@ -122,7 +122,7 @@ class DriverConfigurationTest {
         @DisplayName("empty apiVersion falls back to default")
         void testApiVersionEmpty() {
             System.setProperty(DriverConfiguration.PROP_API_VERSION, "   ");
-            assertEquals("61", DriverConfiguration.getApiVersion());
+            assertEquals("65", DriverConfiguration.getApiVersion());
         }
 
         @Test
