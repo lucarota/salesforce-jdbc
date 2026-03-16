@@ -1,0 +1,512 @@
+<list>
+  <list>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Id</name>
+      <value class="string">8019M00001S8QpVQAV</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Name</name>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Status</name>
+      <value class="string">Approved</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>CreatedDate</name>
+      <value class="string">2026-02-18T10:48:33.000Z</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>OrderNumber</name>
+      <value class="string">00014529</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Order_Id__c</name>
+      <value class="string">bf88c6a3</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Activation_Key__c</name>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Zuora_Quote__r.zqu__Status__c</name>
+      <value class="string">Sent to Z-Billing</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Zuora_Quote__r.Customer_Subscription__r.OSS_Technical_Account_ID__c</name>
+      <value class="string">154699</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Zuora_Quote__r.Customer_Subscription__r.Name</name>
+      <value class="string">A-S00008812</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Zuora_Quote__c</name>
+      <value class="string">a1c9M00000IEThJQAX</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>RecordTypeId</name>
+      <value class="string">0122o000000NxGPAA0</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Terminal_Class__c</name>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+  </list>
+  <list>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Id</name>
+      <value class="string">8019M00001S7aZXQAZ</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Name</name>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Status</name>
+      <value class="string">Approved</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>CreatedDate</name>
+      <value class="string">2026-02-18T11:00:01.000Z</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>OrderNumber</name>
+      <value class="string">00014531</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Order_Id__c</name>
+      <value class="string">58a47eb0</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Activation_Key__c</name>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Zuora_Quote__r.zqu__Status__c</name>
+      <value class="string">Sent to Z-Billing</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Zuora_Quote__r.Customer_Subscription__r.OSS_Technical_Account_ID__c</name>
+      <value class="string">154700</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Zuora_Quote__r.Customer_Subscription__r.Name</name>
+      <value class="string">A-S00008813</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Zuora_Quote__c</name>
+      <value class="string">a1c9M00000IEULdQAP</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>RecordTypeId</name>
+      <value class="string">0122o000000NxGPAA0</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Terminal_Class__c</name>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+  </list>
+  <list>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Id</name>
+      <value class="string">8019M00001S7YJPQA3</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Name</name>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Status</name>
+      <value class="string">Approved</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>CreatedDate</name>
+      <value class="string">2026-02-18T11:12:50.000Z</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>OrderNumber</name>
+      <value class="string">00014533</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Order_Id__c</name>
+      <value class="string">6f00072c</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Activation_Key__c</name>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Zuora_Quote__r.zqu__Status__c</name>
+      <value class="string">Sent to Z-Billing</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Zuora_Quote__r.Customer_Subscription__r.OSS_Technical_Account_ID__c</name>
+      <value class="string">154701</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Zuora_Quote__r.Customer_Subscription__r.Name</name>
+      <value class="string">A-S00008814</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Zuora_Quote__c</name>
+      <value class="string">a1c9M00000IEVeHQAX</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>RecordTypeId</name>
+      <value class="string">0122o000000NxGPAA0</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Terminal_Class__c</name>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+  </list>
+  <list>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Id</name>
+      <value class="string">8019M00001S7LgwQAF</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Name</name>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Status</name>
+      <value class="string">Approved</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>CreatedDate</name>
+      <value class="string">2026-02-18T11:20:43.000Z</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>OrderNumber</name>
+      <value class="string">00014535</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Order_Id__c</name>
+      <value class="string">02995800</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Activation_Key__c</name>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Zuora_Quote__r.zqu__Status__c</name>
+      <value class="string">Sent to Z-Billing</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Zuora_Quote__r.Customer_Subscription__r.OSS_Technical_Account_ID__c</name>
+      <value class="string">154702</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Zuora_Quote__r.Customer_Subscription__r.Name</name>
+      <value class="string">A-S00008815</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Zuora_Quote__c</name>
+      <value class="string">a1c9M00000IEVuPQAX</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>RecordTypeId</name>
+      <value class="string">0122o000000NxGPAA0</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Terminal_Class__c</name>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+  </list>
+  <list>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Id</name>
+      <value class="string">8019M00001S8MKfQAN</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Name</name>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Status</name>
+      <value class="string">Approved</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>CreatedDate</name>
+      <value class="string">2026-02-18T11:30:03.000Z</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>OrderNumber</name>
+      <value class="string">00014537</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Order_Id__c</name>
+      <value class="string">9f598110</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Activation_Key__c</name>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Zuora_Quote__r.zqu__Status__c</name>
+      <value class="string">Sent to Z-Billing</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Zuora_Quote__r.Customer_Subscription__r.OSS_Technical_Account_ID__c</name>
+      <value class="string">154703</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Zuora_Quote__r.Customer_Subscription__r.Name</name>
+      <value class="string">A-S00008816</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Zuora_Quote__c</name>
+      <value class="string">a1c9M00000IEWSHQA5</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>RecordTypeId</name>
+      <value class="string">0122o000000NxGPAA0</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Terminal_Class__c</name>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+  </list>
+  <list>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Id</name>
+      <value class="string">8019M00001S7oNJQAZ</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Name</name>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Status</name>
+      <value class="string">Approved</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>CreatedDate</name>
+      <value class="string">2026-02-18T11:34:47.000Z</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>OrderNumber</name>
+      <value class="string">00014539</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Order_Id__c</name>
+      <value class="string">ff07c5e5</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Activation_Key__c</name>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Zuora_Quote__r.zqu__Status__c</name>
+      <value class="string">Sent to Z-Billing</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Zuora_Quote__r.Customer_Subscription__r.OSS_Technical_Account_ID__c</name>
+      <value class="string">154704</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Zuora_Quote__r.Customer_Subscription__r.Name</name>
+      <value class="string">A-S00008817</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Zuora_Quote__c</name>
+      <value class="string">a1c9M00000IEHi6QAH</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>RecordTypeId</name>
+      <value class="string">0122o000000NxGPAA0</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Terminal_Class__c</name>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+  </list>
+  <list>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Id</name>
+      <value class="string">8019M00001S8OG0QAN</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Name</name>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Status</name>
+      <value class="string">Approved</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>CreatedDate</name>
+      <value class="string">2026-02-18T11:53:47.000Z</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>OrderNumber</name>
+      <value class="string">00014541</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Order_Id__c</name>
+      <value class="string">b6cdd1a3</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Activation_Key__c</name>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Zuora_Quote__r.zqu__Status__c</name>
+      <value class="string">Sent to Z-Billing</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Zuora_Quote__r.Customer_Subscription__r.OSS_Technical_Account_ID__c</name>
+      <value class="string">154705</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Zuora_Quote__r.Customer_Subscription__r.Name</name>
+      <value class="string">A-S00008818</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Zuora_Quote__c</name>
+      <value class="string">a1c9M00000IEXg5QAH</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>RecordTypeId</name>
+      <value class="string">0122o000000NxGPAA0</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Terminal_Class__c</name>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+  </list>
+  <list>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Id</name>
+      <value class="string">8019M00001S8PKBQA3</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Name</name>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Status</name>
+      <value class="string">Approved</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>CreatedDate</name>
+      <value class="string">2026-02-18T12:07:42.000Z</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>OrderNumber</name>
+      <value class="string">00014543</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Order_Id__c</name>
+      <value class="string">70f09856</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Activation_Key__c</name>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Zuora_Quote__r.zqu__Status__c</name>
+      <value class="string">Sent to Z-Billing</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Zuora_Quote__r.Customer_Subscription__r.OSS_Technical_Account_ID__c</name>
+      <value class="string">154706</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Zuora_Quote__r.Customer_Subscription__r.Name</name>
+      <value class="string">A-S00008819</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Zuora_Quote__c</name>
+      <value class="string">a1c9M00000IEYInQAP</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>RecordTypeId</name>
+      <value class="string">0122o000000NxGPAA0</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Terminal_Class__c</name>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+  </list>
+  <list>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Id</name>
+      <value class="string">8019M00001S8FhiQAF</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Name</name>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Status</name>
+      <value class="string">Approved</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>CreatedDate</name>
+      <value class="string">2026-02-18T13:13:02.000Z</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>OrderNumber</name>
+      <value class="string">00014545</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Order_Id__c</name>
+      <value class="string">e44ae3fa</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Activation_Key__c</name>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Zuora_Quote__r.zqu__Status__c</name>
+      <value class="string">Sent to Z-Billing</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Zuora_Quote__r.Customer_Subscription__r.OSS_Technical_Account_ID__c</name>
+      <value class="string">154707</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Zuora_Quote__r.Customer_Subscription__r.Name</name>
+      <value class="string">A-S00008820</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Zuora_Quote__c</name>
+      <value class="string">a1c9M00000IEg8HQAT</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>RecordTypeId</name>
+      <value class="string">0122o000000NxGPAA0</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Terminal_Class__c</name>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+  </list>
+  <list>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Id</name>
+      <value class="string">8019M00001SGZcjQAH</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Name</name>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Status</name>
+      <value class="string">Approved</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>CreatedDate</name>
+      <value class="string">2026-02-19T14:47:38.000Z</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>OrderNumber</name>
+      <value class="string">00014547</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Order_Id__c</name>
+      <value class="string">4f5cbf61</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Activation_Key__c</name>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Zuora_Quote__r.zqu__Status__c</name>
+      <value class="string">Sent to Z-Billing</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Zuora_Quote__r.Customer_Subscription__r.OSS_Technical_Account_ID__c</name>
+      <value class="string">154710</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Zuora_Quote__r.Customer_Subscription__r.Name</name>
+      <value class="string">A-S00008821</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Zuora_Quote__c</name>
+      <value class="string">a1c9M00000IGVjpQAH</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>RecordTypeId</name>
+      <value class="string">0122o000000NxGPAA0</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Terminal_Class__c</name>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+  </list>
+</list>

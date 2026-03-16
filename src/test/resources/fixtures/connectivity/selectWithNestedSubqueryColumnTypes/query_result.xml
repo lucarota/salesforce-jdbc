@@ -1,0 +1,45 @@
+<list>
+  <list>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Id</name>
+      <value class="string">a0p1l00000Rfxv6AAB</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Zuora__Payment_Parts__r.Zuora__Payment__r.Zuora__Effective_Date__c</name>
+      <value class="string">2023-05-02</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Zuora__Payment_Parts__r.Zuora__Payment__r.Zuora__GatewayResponse__c</name>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Zuora__Payment_Parts__r.Zuora__Payment__r.Zuora__Status__c</name>
+      <value class="string">Processed</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+  </list>
+  <list>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Id</name>
+      <value class="string">a0p1l00000RfxvBAAR</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Zuora__Payment_Parts__r.Zuora__Payment__r.Zuora__Effective_Date__c</name>
+      <value class="string">2023-05-02</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Zuora__Payment_Parts__r.Zuora__Payment__r.Zuora__GatewayResponse__c</name>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Zuora__Payment_Parts__r.Zuora__Payment__r.Zuora__Status__c</name>
+      <value class="string">Processed</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+  </list>
+  <list>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Id</name>
+      <value class="string">a0p1l00000RfySVAAZ</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <null/>
+    <null/>
+    <null/>
+  </list>
+</list>

@@ -1,0 +1,28 @@
+<list>
+  <list>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Id</name>
+      <value class="string">8011l000005SEa8AAG</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Zuora_Quote__r.zqu__Status__c</name>
+      <value class="string">Sent to Z-Billing</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Zuora_Quote__r.Customer_Subscription__r.OSS_Technical_Account_ID__c</name>
+      <value class="string">154290</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Zuora_Quote__r.Customer_Subscription__r.Name</name>
+      <value class="string">A-S00004506</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Zuora_Quote__c</name>
+      <value class="string">a1c1l0000010TrrAAE</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>RecordTypeId</name>
+      <value class="string">0122o000000NxGPAA0</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+  </list>
+</list>

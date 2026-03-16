@@ -224,7 +224,11 @@ public class SoqlQueryAnalyzerTest {
             xstream.addImmutableType(com.sforce.soap.partner.SoapType.class, true);
             xstream.addImmutableType(com.sforce.soap.partner.FieldType.class, true);
             xstream.allowTypesByRegExp(new String[]{".*"});
-            return (DescribeSObjectResult) xstream.fromXML(xml);
+            Object result = xstream.fromXML(xml);
+            if (result instanceof DescribeSObjectResult[]) {
+                return ((DescribeSObjectResult[]) result)[0];
+            }
+            return (DescribeSObjectResult) result;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

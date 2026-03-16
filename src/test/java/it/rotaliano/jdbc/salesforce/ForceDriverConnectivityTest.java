@@ -234,8 +234,7 @@ class ForceDriverConnectivityTest {
         ps.setString(1, "200135");
 
         ResultSet result = ps.executeQuery();
-        DBTablePrinter.printResultSet(result);
-        result.beforeFirst();
+
         while (result.next()) {
             assertEquals("402", result.getString("partnerId"));
             assertEquals("200135", result.getString("serviceId"));
@@ -302,7 +301,7 @@ class ForceDriverConnectivityTest {
     @Disabled("Live test - run manually to record fixtures")
     void selectStar_record() throws JSQLParserException, SQLException {
         String query = """
-                select * from zuora__subscription__c
+                select * from zuora__subscription__c limit 10
             """;
 
         Connection con = DriverManager.getConnection(url, userBugFix, passBugFix);
@@ -317,7 +316,7 @@ class ForceDriverConnectivityTest {
     @Disabled("Live test - run manually to record fixtures")
     void selectWithLiterals_record() throws JSQLParserException, SQLException {
         String query = """
-                select 2, true from account a
+                select 2, true from account a limit 1
             """;
 
         Connection con = DriverManager.getConnection(url, userBugFix, passBugFix);
@@ -503,7 +502,7 @@ class ForceDriverConnectivityTest {
         PartnerConnection connection = Connector.newConnection(partnerConfig);
         connection.getConfig()
             .setServiceEndpoint(
-                "https://eutelsat-bip-prod--bugfix.sandbox.my.salesforce.com/services/Soap/u/61.0/00D1l0000000RSj");
+                "https://eutelsat-bip-prod--sit.sandbox.my.salesforce.com/services/Soap/u/61.0/00D1l0000000RSj");
 
         DescribeSObjectResult[] records = connection.describeSObjects(new String[]{"Zuora__Subscription__c"});
 
@@ -678,7 +677,7 @@ class ForceDriverConnectivityTest {
             assertEquals(6, result.getMetaData().getColumnCount());
 
             int rowCount = 0;
-            result.beforeFirst();
+
             while (result.next()) {
                 assertEquals("402", result.getString("partnerId"));
                 assertEquals("200135", result.getString("serviceId"));
@@ -780,7 +779,7 @@ class ForceDriverConnectivityTest {
         }
 
         @Test
-        void selectWithAggregateFunction() throws SQLException {
+        void selectWithAggregateMax() throws SQLException {
             assumeFixturesExist("selectWithAggregateMax");
             String query = """
                 SELECT max(createdDate)

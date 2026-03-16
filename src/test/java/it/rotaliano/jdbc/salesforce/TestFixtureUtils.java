@@ -122,13 +122,14 @@ public class TestFixtureUtils {
         @Override
         public Map.Entry<List<List<ForceResultField>>, String> queryStart(String soql,
             FieldDefTree expectedSchema) throws ConnectionException {
-            return Map.entry(loadQueryResult(testName), "");
+            // Return full result in a single batch with null locator (= done)
+            return new java.util.AbstractMap.SimpleEntry<>(loadQueryResult(testName), null);
         }
 
         @Override
         public Map.Entry<List<List<ForceResultField>>, String> queryMore(String queryLocator,
             FieldDefTree expectedSchema) throws ConnectionException {
-            return Map.entry(Collections.emptyList(), "");
+            return new java.util.AbstractMap.SimpleEntry<>(Collections.emptyList(), null);
         }
     }
 
@@ -136,6 +137,10 @@ public class TestFixtureUtils {
      * PartnerService subclass that delegates to a real PartnerService but records
      * describeSObject() and query() results to fixture files.
      * Used during live test runs to capture data for offline testing.
+     *
+     * <p>For non-cached queries the driver uses the streaming path (queryStart/queryMore).
+     * This implementation intercepts queryStart() by calling delegate.query() to fetch
+     * the full result in one shot, saves it, and returns everything as a single batch.
      */
     public static class RecordingPartnerService extends PartnerService {
 
@@ -163,14 +168,19 @@ public class TestFixtureUtils {
             throws ConnectionException {
             List<List<ForceResultField>> result = delegate.query(soql, expectedSchema);
             saveQueryResult(testName, result);
-            log.info("[Recorder] Saved query result for test {} ({} rows)", testName, result.size());
+            log.info("[Recorder] Saved query result via query() for test {} ({} rows)", testName, result.size());
             return result;
         }
 
         @Override
         public Map.Entry<List<List<ForceResultField>>, String> queryStart(String soql,
             FieldDefTree expectedSchema) throws ConnectionException {
-            return delegate.queryStart(soql, expectedSchema);
+            // Fetch the full result via delegate.query() and save it.
+            // Return everything as a single batch (null locator = done).
+            List<List<ForceResultField>> fullResult = delegate.query(soql, expectedSchema);
+            saveQueryResult(testName, fullResult);
+            log.info("[Recorder] Saved query result via queryStart() for test {} ({} rows)", testName, fullResult.size());
+            return new java.util.AbstractMap.SimpleEntry<>(fullResult, null);
         }
 
         @Override

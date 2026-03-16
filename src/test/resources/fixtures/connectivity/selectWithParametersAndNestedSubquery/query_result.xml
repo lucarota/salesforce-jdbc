@@ -1,0 +1,141 @@
+<list>
+  <list>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Id</name>
+      <value class="string">a0p1l00000Rfx8vAAB</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Zuora__Zuora_Id__c</name>
+      <value class="string">8adcfb3187c350680187c83dfa4013a3</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Zuora__ZuoraId__c</name>
+      <value class="string">8adcfb3187c350680187c83dfa4013a3</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Name</name>
+      <value class="string">INV00006260</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Zuora__InvoiceDate__c</name>
+      <value class="string">2023-04-28</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Zuora__DueDate__c</name>
+      <value class="string">2023-04-28</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Zuora__Balance2__c</name>
+      <value class="string">0.0</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Zuora__TotalAmount__c</name>
+      <value class="string">100.0</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>CurrencyIsoCode</name>
+      <value class="string">USD</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Zuora__Payment_Parts__r.Zuora__Payment__r.Zuora__Effective_Date__c</name>
+      <value class="string">2023-04-28</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Zuora__Payment_Parts__r.Zuora__Payment__r.Zuora__GatewayResponse__c</name>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Zuora__Payment_Parts__r.Zuora__Payment__r.Zuora__Status__c</name>
+      <value class="string">Processed</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+  </list>
+  <list>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Id</name>
+      <value class="string">a0p1l00000Rfx90AAB</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Zuora__Zuora_Id__c</name>
+      <value class="string">8adc96cf87c341eb0187c8415a090fc6</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Zuora__ZuoraId__c</name>
+      <value class="string">8adc96cf87c341eb0187c8415a090fc6</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Name</name>
+      <value class="string">INV00006261</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Zuora__InvoiceDate__c</name>
+      <value class="string">2023-04-28</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Zuora__DueDate__c</name>
+      <value class="string">2023-04-28</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Zuora__Balance2__c</name>
+      <value class="string">0.0</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Zuora__TotalAmount__c</name>
+      <value class="string">240.0</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>CurrencyIsoCode</name>
+      <value class="string">USD</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Zuora__Payment_Parts__r.Zuora__Payment__r.Zuora__Effective_Date__c</name>
+      <value class="string">2023-04-28</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Zuora__Payment_Parts__r.Zuora__Payment__r.Zuora__GatewayResponse__c</name>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Zuora__Payment_Parts__r.Zuora__Payment__r.Zuora__Status__c</name>
+      <value class="string">Processed</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+  </list>
+  <list>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Id</name>
+      <value class="string">a0p1l00000RfyPbAAJ</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Zuora__Zuora_Id__c</name>
+      <value class="string">8adcb7b887e5985f0187e6f04e345f5f</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Zuora__ZuoraId__c</name>
+      <value class="string">8adcb7b887e5985f0187e6f04e345f5f</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Name</name>
+      <value class="string">INV00007026</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Zuora__InvoiceDate__c</name>
+      <value class="string">2023-05-04</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Zuora__DueDate__c</name>
+      <value class="string">2023-05-04</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Zuora__Balance2__c</name>
+      <value class="string">10993.9</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Zuora__TotalAmount__c</name>
+      <value class="string">10993.9</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>CurrencyIsoCode</name>
+      <value class="string">USD</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <null/>
+    <null/>
+    <null/>
+  </list>
+</list>
