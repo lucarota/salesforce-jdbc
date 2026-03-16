@@ -136,7 +136,7 @@ class ForceDriverConnectivityTest {
 
     @Test
     @Disabled("Live test - run manually to record fixtures")
-    void selectWithParametersAndNestedSubquery_record() throws JSQLParserException, SQLException {
+    void selectWithParametersAndNestedSubquery_record() throws SQLException {
         String query = """
             select id, Zuora__Zuora_Id__c firstPdfId, Zuora__ZuoraId__c secondPdfId, name name, Zuora__InvoiceDate__c invoiceDate,
                 Zuora__DueDate__c debitDate, Zuora__Balance2__c balance,
@@ -162,7 +162,7 @@ class ForceDriverConnectivityTest {
 
     @Test
     @Disabled("Live test - run manually to record fixtures")
-    void selectWithTwoLevelRelation_record() throws JSQLParserException, SQLException {
+    void selectWithTwoLevelRelation_record() throws SQLException {
         String query = """
             select
             	Id,
@@ -191,7 +191,7 @@ class ForceDriverConnectivityTest {
 
     @Test
     @Disabled("Live test - run manually to record fixtures")
-    void selectWithRelationTraversalOnBeam_record() throws JSQLParserException, SQLException {
+    void selectWithRelationTraversalOnBeam_record() throws SQLException {
         String query = """
             select Beam__r.Id as id, Beam__r.Name as name, Beam__r.Satellite__r.Name as satelliteName,
                                      Beam__r.Beam_Yearly_Service_Availability__c as beamYearlyServiceAvailability, Beam__r.Beam_Monthly_Service_Availability__c as beamMonthlyServiceAvailability,
@@ -211,7 +211,7 @@ class ForceDriverConnectivityTest {
 
     @Test
     @Disabled("Live test - run manually to record fixtures")
-    void selectWithMultiObjectRelation_record() throws JSQLParserException, SQLException {
+    void selectWithMultiObjectRelation_record() throws SQLException {
         String query = """
             select
               Zuora__Subscription__r.Partner_Subscription__r.Zuora__Account__r.OSS_Customer_Account_ID__c as partnerId,
@@ -221,7 +221,7 @@ class ForceDriverConnectivityTest {
               Product_Rate_Plan__r.zqu__Product__r.ProductCode as productCode,
               Product_Rate_Plan__r.zqu__Product__r.Product_Type_Id__c as planId
               from zuora__subscriptionrateplan__c
-              where Zuora__Subscription__r.OSS_Technical_Account_ID__c = '152846'
+              where Zuora__Subscription__r.OSS_Technical_Account_ID__c = '153163'
               and Zuora__Subscription__r.Partner_Subscription__r.oss_technical_service_id__c = ?
               and Zuora__Subscription__r.Id != NULL
               and Product_Rate_Plan__r.Id != NULL
@@ -231,23 +231,23 @@ class ForceDriverConnectivityTest {
         Connection con = DriverManager.getConnection(url, userSIT, passSIT);
         installRecordingPartnerService(con, "selectWithMultiObjectRelation");
         PreparedStatement ps = con.prepareStatement(query);
-        ps.setString(1, "200135");
+        ps.setString(1, "200089");
 
         ResultSet result = ps.executeQuery();
 
         while (result.next()) {
-            assertEquals("402", result.getString("partnerId"));
-            assertEquals("200135", result.getString("serviceId"));
-            assertEquals("152846", result.getString("subscriptionId"));
-            assertEquals("4169", result.getString("customerId"));
-            assertEquals("1247", result.getString("productCode"));
-            assertEquals("c0d34e55", result.getString("planId"));
+            assertEquals("399", result.getString("partnerId"));
+            assertEquals("200089", result.getString("serviceId"));
+            assertEquals("153163", result.getString("subscriptionId"));
+            assertEquals("4366", result.getString("customerId"));
+            assertEquals("188", result.getString("productCode"));
+            assertEquals("d1fb0b91", result.getString("planId"));
         }
     }
 
     @Test
     @Disabled("Live test - run manually to record fixtures")
-    void selectWithSelfPrefixedRelation_record() throws JSQLParserException, SQLException {
+    void selectWithSelfPrefixedRelation_record() throws SQLException {
         String query = """
                 select Id, Name, Status, CreatedDate, OrderNumber, Order_Id__c,
                 Activation_Key__c , Zuora_Quote__r.zqu__Status__c,
@@ -269,7 +269,7 @@ class ForceDriverConnectivityTest {
 
     @Test
     @Disabled("Live test - run manually to record fixtures")
-    void selectWithNestedSubqueryColumnTypes_record() throws JSQLParserException, SQLException {
+    void selectWithNestedSubqueryColumnTypes_record() throws SQLException {
         String query = """
             select
             	id,
@@ -299,7 +299,7 @@ class ForceDriverConnectivityTest {
 
     @Test
     @Disabled("Live test - run manually to record fixtures")
-    void selectStar_record() throws JSQLParserException, SQLException {
+    void selectStar_record() throws SQLException {
         String query = """
                 select * from zuora__subscription__c limit 10
             """;
@@ -314,7 +314,7 @@ class ForceDriverConnectivityTest {
 
     @Test
     @Disabled("Live test - run manually to record fixtures")
-    void selectWithLiterals_record() throws JSQLParserException, SQLException {
+    void selectWithLiterals_record() throws SQLException {
         String query = """
                 select 2, true from account a limit 1
             """;
@@ -329,7 +329,7 @@ class ForceDriverConnectivityTest {
 
     @Test
     @Disabled("Live test - run manually to record fixtures")
-    void selectWithEscapedQuoteInWhere_record() throws JSQLParserException, SQLException {
+    void selectWithEscapedQuoteInWhere_record() throws SQLException {
         String query = """
             select id, Account_Type__c as AccountType, ParentId, BillingEntity__c as BillingEntityId, installation_county__c as installationCountry,\s
             OSS_Customer_Account_ID__c as CustomerAccountId, Email_address__c from Account
@@ -346,7 +346,7 @@ class ForceDriverConnectivityTest {
 
     @Test
     @Disabled("Live test - run manually to record fixtures")
-    void selectWithEscapedQuoteInParameter_record() throws JSQLParserException, SQLException {
+    void selectWithEscapedQuoteInParameter_record() throws SQLException {
         String query = """
             select id, Account_Type__c as AccountType, ParentId, BillingEntity__c as BillingEntityId, installation_county__c as installationCountry,\s
             OSS_Customer_Account_ID__c as CustomerAccountId, Email_address__c from Account
@@ -364,7 +364,7 @@ class ForceDriverConnectivityTest {
 
     @Test
     @Disabled("Live test - run manually to record fixtures")
-    void selectWithDateParameter_record() throws JSQLParserException, SQLException {
+    void selectWithDateParameter_record() throws SQLException {
         String query = """
             select
                 Id,
@@ -402,7 +402,7 @@ class ForceDriverConnectivityTest {
 
     @Test
     @Disabled("Live test - run manually to record fixtures")
-    void selectWithTimestampFilter_record() throws JSQLParserException, SQLException {
+    void selectWithTimestampFilter_record() throws SQLException {
         String query = """
     select Beam__r.
     Id as id, Beam__r.Name as name, Beam__r.Satellite__r.Name as satelliteName,
@@ -423,7 +423,7 @@ class ForceDriverConnectivityTest {
 
     @Test
     @Disabled("Live test - run manually to record fixtures")
-    void selectWithAggregateMax_record() throws JSQLParserException, SQLException {
+    void selectWithAggregateMax_record() throws SQLException {
         String query = """
     SELECT max(createdDate)
     FROM Beam_Notification__c""";
@@ -646,6 +646,18 @@ class ForceDriverConnectivityTest {
             assertEquals("ZuoraQuoteId", rsmd.getColumnLabel(3));
             assertEquals("technicalAccountId", rsmd.getColumnLabel(5));
             assertEquals("SubscriptionCode", rsmd.getColumnLabel(6));
+
+            int rowCount = 0;
+
+            while (result.next()) {
+                assertEquals("Sent to Z-Billing", result.getString("quoteStatus"));
+                assertEquals("a1c1l0000010TrrAAE", result.getString("ZuoraQuoteId"));
+                assertEquals("0122o000000NxGPAA0", result.getString("RecordTypeId"));
+                assertEquals("154290", result.getString("technicalAccountId"));
+                assertEquals("A-S00004506", result.getString("SubscriptionCode"));
+                rowCount++;
+            }
+            assertEquals(1, rowCount, "Should return one row");
         }
 
         @Test
@@ -660,7 +672,7 @@ class ForceDriverConnectivityTest {
                   Product_Rate_Plan__r.zqu__Product__r.ProductCode as productCode,
                   Product_Rate_Plan__r.zqu__Product__r.Product_Type_Id__c as planId
                   from zuora__subscriptionrateplan__c
-                  where Zuora__Subscription__r.OSS_Technical_Account_ID__c = '152846'
+                  where Zuora__Subscription__r.OSS_Technical_Account_ID__c = '153163'
                   and Zuora__Subscription__r.Partner_Subscription__r.oss_technical_service_id__c = ?
                   and Zuora__Subscription__r.Id != NULL
                   and Product_Rate_Plan__r.Id != NULL
@@ -669,7 +681,7 @@ class ForceDriverConnectivityTest {
 
             ForceConnection conn = createOfflineConnection("selectWithMultiObjectRelation");
             PreparedStatement ps = conn.prepareStatement(query);
-            ps.setString(1, "200135");
+            ps.setString(1, "200089");
 
             ResultSet result = ps.executeQuery();
             assertNotNull(result, "ResultSet should not be null");
@@ -679,12 +691,12 @@ class ForceDriverConnectivityTest {
             int rowCount = 0;
 
             while (result.next()) {
-                assertEquals("402", result.getString("partnerId"));
-                assertEquals("200135", result.getString("serviceId"));
-                assertEquals("152846", result.getString("subscriptionId"));
-                assertEquals("4169", result.getString("customerId"));
-                assertEquals("1247", result.getString("productCode"));
-                assertEquals("c0d34e55", result.getString("planId"));
+                assertEquals("399", result.getString("partnerId"));
+                assertEquals("200089", result.getString("serviceId"));
+                assertEquals("153163", result.getString("subscriptionId"));
+                assertEquals("4366", result.getString("customerId"));
+                assertEquals("188", result.getString("productCode"));
+                assertEquals("d1fb0b91", result.getString("planId"));
                 rowCount++;
             }
             assertTrue(rowCount > 0, "Should return at least one row");
