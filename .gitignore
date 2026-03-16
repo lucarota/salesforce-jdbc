@@ -11,4 +11,5 @@ target
 .metadata
 /node_modules/
 /package-lock.json
-src/test/java/it/rotaliano/jdbc/salesforce/ForceDriverConnectivityTest.java
+.credentials
+
