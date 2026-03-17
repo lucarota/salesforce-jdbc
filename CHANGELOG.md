@@ -1,5 +1,28 @@
 # Changelog
 
+### 2.0.0
+
+- **Preserved SQL SELECT field order in flattened results**:
+  - Added tracking of fields in their original SQL `SELECT` order.
+  - Flattened field definitions now preserve the order written in the query, even when relationship fields are internally reorganized for Salesforce API compatibility.
+  - Untracked fields such as subqueries or computed fields are still appended correctly.
+
+- **Improved result expansion for missing relationship values**:
+  - Expanded result rows now handle missing relationship fields more safely.
+  - When Salesforce omits relation values, placeholder fields are inserted to keep the result structure aligned with the schema.
+
+- **Introduced a shared abstract base for prepared statements**:
+  - Added a new `AbstractPreparedStatement` class to centralize default stub implementations for unsupported JDBC `PreparedStatement` methods.
+  - This reduces duplication and makes statement implementations easier to maintain.
+
+- **Connection handling improvements**:
+  - Improved Salesforce connection lifecycle structure with clearer support for refreshed partner connections after reconnect or re-login operations.
+  - Added a unique internal identifier for each connection instance to better support session-scoped resources such as caches.
+
+- **Documentation and maintainability improvements**:
+  - Expanded inline documentation for connection and statement behavior.
+  - Clarified which JDBC features are intentionally unsupported or implemented as no-ops in the Salesforce driver.
+
 ### 1.6.6
  
 - **Support for JDBC date/timestamp literals**:

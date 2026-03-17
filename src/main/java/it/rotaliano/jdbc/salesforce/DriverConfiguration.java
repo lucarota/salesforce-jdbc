@@ -19,7 +19,7 @@ public class DriverConfiguration {
 
     // Default values
     private static final int    DEFAULT_BATCH_SIZE        = 100;
-    private static final String DEFAULT_API_VERSION       = "61";
+    private static final String DEFAULT_API_VERSION       = "64";
     private static final long   DEFAULT_CONNECT_TIMEOUT   = 10_000L;
     private static final long   DEFAULT_READ_TIMEOUT      = 30_000L;
     private static final int    DEFAULT_MAX_RETRIES       = 5;

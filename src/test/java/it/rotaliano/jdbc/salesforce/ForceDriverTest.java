@@ -124,9 +124,9 @@ class ForceDriverTest {
 
         @Test
         void testSanitizeUrl_withCredentialsAndParams() {
-            String url = "jdbc:rotaliano:salesforce://admin:password123@host.sf.com?https=false&api=61";
+            String url = "jdbc:rotaliano:salesforce://admin:password123@host.sf.com?https=false&api=64";
             String sanitized = ForceDriver.sanitizeUrl(url);
-            assertEquals("jdbc:rotaliano:salesforce://admin:****@host.sf.com?https=false&api=61", sanitized);
+            assertEquals("jdbc:rotaliano:salesforce://admin:****@host.sf.com?https=false&api=64", sanitized);
         }
 
         @Test

@@ -101,8 +101,8 @@ class ForceDriverConnectivityTest {
         PartnerService fileBacked = new TestFixtureUtils.FileBackedPartnerService(testName);
         ConnectorConfig config = new ConnectorConfig();
         config.setManualLogin(true);
-        config.setServiceEndpoint("https://offline.test/services/Soap/u/61.0");
-        config.setAuthEndpoint("https://offline.test/services/Soap/u/61.0");
+        config.setServiceEndpoint("https://offline.test/services/Soap/u/64.0");
+        config.setAuthEndpoint("https://offline.test/services/Soap/u/64.0");
         config.setSessionId("offline-session");
         try {
             PartnerConnection pc = Connector.newConnection(config);
@@ -498,11 +498,11 @@ class ForceDriverConnectivityTest {
         ConnectorConfig partnerConfig = new ConnectorConfig();
         partnerConfig.setUsername(userSIT);
         partnerConfig.setPassword(passSIT);
-        partnerConfig.setAuthEndpoint("https://test.salesforce.com/services/Soap/u/v61.0");
+        partnerConfig.setAuthEndpoint("https://test.salesforce.com/services/Soap/u/v64.0");
         PartnerConnection connection = Connector.newConnection(partnerConfig);
         connection.getConfig()
             .setServiceEndpoint(
-                "https://eutelsat-bip-prod--sit.sandbox.my.salesforce.com/services/Soap/u/61.0/00D1l0000000RSj");
+                "https://eutelsat-bip-prod--sit.sandbox.my.salesforce.com/services/Soap/u/64.0/00D1l0000000RSj");
 
         DescribeSObjectResult[] records = connection.describeSObjects(new String[]{"Zuora__Subscription__c"});
 

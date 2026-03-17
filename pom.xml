@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>it.rotaliano.salesforce</groupId>
     <artifactId>salesforce-jdbc</artifactId>
-    <version>${revision}</version>
+    <version>2.0.0-release</version>
     <packaging>jar</packaging>
 
     <name>Salesforce JDBC Driver</name>
@@ -35,10 +35,9 @@
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <revision>1.6.17-release</revision>
 
-        <!-- Remember to also update ForceService.DEFAULT_API_VERSION -->
-        <force-partner-api.version>61.1.0</force-partner-api.version>
+        <!-- Remember to also update DriverConfiguration.DEFAULT_API_VERSION -->
+        <force-partner-api.version>64.0.0</force-partner-api.version>
         <lombok.version>1.18.30</lombok.version>
         <slf4j.version>2.0.7</slf4j.version>
         <commons-lang3.version>3.12.0</commons-lang3.version>
@@ -160,6 +159,46 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.6.0</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <shadedArtifactAttached>true</shadedArtifactAttached>
+                            <shadedClassifierName>all</shadedClassifierName>
+                            <filters>
+                                <filter>
+                                    <artifact>*:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/module-info.class</exclude>
+                                        <exclude>META-INF/LICENSE</exclude>
+                                        <exclude>META-INF/NOTICE</exclude>
+                                        <exclude>META-INF/LICENSE.txt</exclude>
+                                        <exclude>META-INF/NOTICE.txt</exclude>
+                                        <exclude>META-INF/MANIFEST.MF</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
+                            <relocations>
+                                <relocation>
+                                    <pattern>net.sf</pattern>
+                                    <shadedPattern>sf.shaded.net.sf</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>org.apache</pattern>
+                                    <shadedPattern>sf.shaded.org.apache</shadedPattern>
+                                </relocation>
+                            </relocations>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-deploy-plugin</artifactId>
                 <version>${maven-deploy-plugin.version}</version>
             </plugin>
@@ -191,54 +230,5 @@
         </plugins>
     </build>
 
-    <profiles>
-        <profile>
-            <id>single-jar</id>
-            <properties>
-                <revision>1.6.17-fatjar-release</revision>
-            </properties>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-shade-plugin</artifactId>
-                        <version>3.6.0</version>
-                        <executions>
-                            <execution>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>shade</goal>
-                                </goals>
-                                <configuration>
-                                    <filters>
-                                        <filter>
-                                            <artifact>*:*</artifact>
-                                            <excludes>
-                                                <exclude>META-INF/module-info.class</exclude>
-                                                <exclude>META-INF/LICENSE</exclude>
-                                                <exclude>META-INF/NOTICE</exclude>
-                                                <exclude>META-INF/LICENSE.txt</exclude>
-                                                <exclude>META-INF/NOTICE.txt</exclude>
-                                                <exclude>META-INF/MANIFEST.MF</exclude>
-                                            </excludes>
-                                        </filter>
-                                    </filters>
-                                    <relocations>
-                                        <relocation>
-                                            <pattern>net.sf</pattern>
-                                            <shadedPattern>sf.shaded.net.sf</shadedPattern>
-                                        </relocation>
-                                        <relocation>
-                                            <pattern>org.apache</pattern>
-                                            <shadedPattern>sf.shaded.org.apache</shadedPattern>
-                                        </relocation>
-                                    </relocations>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
+
 </project>
