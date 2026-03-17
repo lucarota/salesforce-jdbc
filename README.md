@@ -84,7 +84,7 @@ Add the following dependency to your `pom.xml`:
 <dependency>
     <groupId>it.rotaliano.salesforce</groupId>
     <artifactId>salesforce-jdbc</artifactId>
-    <version>2.0.0-release</version>
+    <version>2.0.0</version>
 </dependency>
 ```
 
