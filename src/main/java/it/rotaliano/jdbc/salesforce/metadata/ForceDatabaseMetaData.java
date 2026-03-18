@@ -28,6 +28,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Properties;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import lombok.extern.slf4j.Slf4j;
@@ -42,6 +43,7 @@ public class ForceDatabaseMetaData extends AbstractDatabaseMetaData implements S
     private final transient PartnerService partnerService;
     private transient ForceConnection connection;
     private final Properties connInfo = new Properties();
+    private final transient ConcurrentHashMap<String, List<Table>> tableCache = new ConcurrentHashMap<>();
 
     public ForceDatabaseMetaData(ForceConnection connection, PartnerService partnerService) {
         this.connection = connection;
@@ -88,13 +90,34 @@ public class ForceDatabaseMetaData extends AbstractDatabaseMetaData implements S
     }
 
     private List<Table> getTables(String tablePattern) throws SQLException {
-        try {
-            log.trace("[Meta] getTables requested - fetching");
-            if (tablePattern == null || "%".equals(tablePattern)) {
-                return partnerService.getTables();
-            } else {
-                return partnerService.getTables(tablePattern);
+        String cacheKey = tablePattern == null ? "%" : tablePattern;
+        List<Table> cached = tableCache.get(cacheKey);
+        if (cached != null) {
+            return cached;
+        }
+        // For a specific table, check if the full catalog is already cached
+        if (!"%".equals(cacheKey)) {
+            List<Table> allTables = tableCache.get("%");
+            if (allTables != null) {
+                List<Table> filtered = allTables.stream()
+                    .filter(t -> t.getName().equalsIgnoreCase(cacheKey))
+                    .toList();
+                if (!filtered.isEmpty()) {
+                    tableCache.put(cacheKey, filtered);
+                    return filtered;
+                }
             }
+        }
+        try {
+            log.trace("[Meta] getTables requested - fetching pattern={}", tablePattern);
+            List<Table> result;
+            if (tablePattern == null || "%".equals(tablePattern)) {
+                result = partnerService.getTables();
+            } else {
+                result = partnerService.getTables(tablePattern);
+            }
+            tableCache.put(cacheKey, result);
+            return result;
         } catch (ConnectionException e) {
             throw new SQLException(e);
         }
@@ -571,6 +594,7 @@ public class ForceDatabaseMetaData extends AbstractDatabaseMetaData implements S
     }
 
     public void cleanupGlobalCache() throws ConnectionException {
+        this.tableCache.clear();
         this.partnerService.cleanupGlobalCache();
     }
 

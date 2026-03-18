@@ -14,7 +14,7 @@ This project is a fork of the [original repository](https://github.com/ascendix/
 [![Watch the demo video](docs/intelliJ.png)](docs/SOQL-JDBC-IntelliJ-demo-264.mp4)
 
 ## Supported Versions
-* **Salesforce Partner API:** Version 61.0 and higher
+* **Salesforce Partner API:** Version 64.0
 * **Java:** Java 17
 
 ## Getting the Driver
@@ -32,7 +32,7 @@ You can download the latest driver JAR file from the [Releases page](https://git
 
 2. **Nested Queries**
 
-3. **INSERT and UPDATE Statements** (Version >= 1.4.0)
+3. **INSERT and UPDATE Statements**
    Supported functions for value calculation:
    * `NOW()`
    * `GETDATE()`
@@ -54,7 +54,7 @@ You can download the latest driver JAR file from the [Releases page](https://git
       );
    ```
 
-4. **DELETE Statements** (Version >= 1.4.1)
+4. **DELETE Statements**
    ```sql
    DELETE FROM Opportunity WHERE Name LIKE 'Pushed Out Insightor Opp%';
    ```   
@@ -76,31 +76,6 @@ You can download the latest driver JAR file from the [Releases page](https://git
      CACHE SESSION SELECT Id, Name FROM Account
      ```
 
-6. **Reconnection to Other Organizations**
-   ```sql
-   -- Postgres Notation
-   CONNECT USER admin@OtherOrg.com IDENTIFIED BY "123456"
-
-   -- Oracle Notation
-   CONNECT admin@OtherOrg.com/123456
-
-   -- Postgres Notation to a different host using secure connection (default)
-   CONNECT 
-       TO ap1.stmpa.stm.salesforce.com
-       USER admin@OtherOrg.com IDENTIFIED BY "123456"
-
-   -- Postgres Notation to a different host (local) using insecure connection
-   CONNECT 
-       TO http://localhost:6109
-       USER admin@OtherOrg.com IDENTIFIED BY "123456"
-   ```
-   **Note:** Use the machine host name in the connection URL, not the MyDomain org host name.
-
-## Limitations
-* **Version < 1.4.0:** Read-only access. INSERT/UPDATE/DELETE are not supported.
-* **Version >= 1.4.0:** Limited support for INSERT/UPDATE operations.
-* **Version >= 1.4.1:** Limited support for DELETE operations.
-
 ## Maven Dependency
 
 Add the following dependency to your `pom.xml`:
@@ -109,7 +84,7 @@ Add the following dependency to your `pom.xml`:
 <dependency>
     <groupId>it.rotaliano.salesforce</groupId>
     <artifactId>salesforce-jdbc</artifactId>
-    <version>1.6.17-release</version>
+    <version>2.0.0</version>
 </dependency>
 ```
 
@@ -139,16 +114,16 @@ jdbc:rotaliano:salesforce://;sessionId=uniqueIdAssociatedWithTheSession
 
 ### Configuration Properties
 
-| Property | Description | Default Value |
-| --- | --- | --- |
-| `user` | Login username. | |
-| `password` | Login password concatenated with the security token. | |
-| `sessionId` | Unique ID associated with an active session. | |
-| `loginDomain` | Top-level domain for login requests. Set to `test.salesforce.com` for sandbox environments. | `login.salesforce.com` |
-| `https` | Use HTTP instead of HTTPS if set to `false`. | `true` |
-| `api` | API version to use. | `61` |
-| `client` | Client ID to use. | Empty |
-| `insecurehttps` | Allow invalid SSL certificates. | `false` |
+| Property        | Description                                          | Default Value |
+| --------------- | ---------------------------------------------------- | ------------- |
+| `user`          | Login username.                                      |               |
+| `password`      | Login password concatenated with the security token. |               |
+| `sessionId`     | Unique ID associated with an active session.         |               |
+| `loginDomain`   | Top-level domain for login requests. Set to `test.salesforce.com` for sandbox environments. | `login.salesforce.com` |
+| `https`         | Use HTTP instead of HTTPS if set to `false`.         | `true`        |
+| `api`           | API version to use.                                  | `64`          |
+| `client`        | Client ID to use.                                    | Empty         |
+| `insecurehttps` | Allow invalid SSL certificates.                      | `false`       |
 
 ## IDE Configuration
 

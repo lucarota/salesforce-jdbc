@@ -19,7 +19,7 @@ public class DriverConfiguration {
 
     // Default values
     private static final int    DEFAULT_BATCH_SIZE        = 100;
-    private static final String DEFAULT_API_VERSION       = "65";
+    private static final String DEFAULT_API_VERSION       = "64";
     private static final long   DEFAULT_CONNECT_TIMEOUT   = 10_000L;
     private static final long   DEFAULT_READ_TIMEOUT      = 30_000L;
     private static final int    DEFAULT_MAX_RETRIES       = 5;
@@ -35,7 +35,7 @@ public class DriverConfiguration {
     }
 
     /**
-     * Salesforce API version used for SOAP connections (e.g. "65").
+     * Salesforce API version used for SOAP connections (e.g. "64").
      */
     public static String getApiVersion() {
         return getString(PROP_API_VERSION, DEFAULT_API_VERSION);

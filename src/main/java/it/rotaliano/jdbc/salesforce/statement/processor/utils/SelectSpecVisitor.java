@@ -54,6 +54,7 @@ public class SelectSpecVisitor implements SelectItemVisitor<Expression> {
             // If Object Name specified - verify it is not the same as SOQL root entity
             alias = removeRootEntity(fieldSpec, column, objectPrefix, prefixNames, alias, name);
             FieldDef result = createFieldDef(name, alias, prefixNames);
+            fieldDefinitions.addSqlOrderField(result);
             if (!prefixNames.isEmpty()) {
                 int position = getPosition(prefixNames);
                 fieldDefinitions.addChild(result, position);

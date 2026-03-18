@@ -1,8 +1,9 @@
 package it.rotaliano.jdbc.salesforce.delegates;
 
 import it.rotaliano.jdbc.salesforce.utils.TreeNode;
-import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -11,8 +12,9 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@Slf4j
 public class PartnerResultToCartesianTableTest {
+
+    private static final Logger log = LoggerFactory.getLogger(PartnerResultToCartesianTableTest.class);
 
     @Test
     public void testExpandSimple() {

@@ -1,0 +1,68 @@
+<list>
+  <list>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Id</name>
+      <value class="string">0015E00000z3YaoQAE</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Name</name>
+      <value class="string">BENTLEY WALKER</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Contacts.Id</name>
+      <value class="string">0035E00001vsKZpQAM</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Contacts.Name</name>
+      <value class="string">BENTLEY WALKER Manage OwnerId</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+  </list>
+  <list>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField reference="../../list/it.rotaliano.jdbc.salesforce.delegates.ForceResultField"/>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField reference="../../list/it.rotaliano.jdbc.salesforce.delegates.ForceResultField[2]"/>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Contacts.Id</name>
+      <value class="string">0035E0000132OL7QAM</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Contacts.Name</name>
+      <value class="string">CRC Agent (Test)</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+  </list>
+  <list>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField reference="../../list/it.rotaliano.jdbc.salesforce.delegates.ForceResultField"/>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField reference="../../list/it.rotaliano.jdbc.salesforce.delegates.ForceResultField[2]"/>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Contacts.Id</name>
+      <value class="string">0035E000014gXCiQAM</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Contacts.Name</name>
+      <value class="string">Sub Distributor 1</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+  </list>
+  <list>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField reference="../../list/it.rotaliano.jdbc.salesforce.delegates.ForceResultField"/>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField reference="../../list/it.rotaliano.jdbc.salesforce.delegates.ForceResultField[2]"/>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Contacts.Id</name>
+      <value class="string">0035E000014gZQOQA2</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Contacts.Name</name>
+      <value class="string">Bentley Walker User Basic</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+  </list>
+  <list>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField reference="../../list/it.rotaliano.jdbc.salesforce.delegates.ForceResultField"/>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField reference="../../list/it.rotaliano.jdbc.salesforce.delegates.ForceResultField[2]"/>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Contacts.Id</name>
+      <value class="string">003Fg00000J7Zq2IAF</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Contacts.Name</name>
+      <value class="string">Test Full Operations</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+  </list>
+</list>

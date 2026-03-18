@@ -1,0 +1,28 @@
+<list>
+  <list>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Zuora__Subscription__r.Partner_Subscription__r.Zuora__Account__r.OSS_Customer_Account_ID__c</name>
+      <value class="string">399</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Zuora__Subscription__r.Partner_Subscription__r.oss_technical_service_id__c</name>
+      <value class="string">200089</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Zuora__Subscription__r.OSS_Technical_Account_ID__c</name>
+      <value class="string">153163</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Zuora__Subscription__r.Zuora__Account__r.OSS_Customer_Account_ID__c</name>
+      <value class="string">4366</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Product_Rate_Plan__r.zqu__Product__r.ProductCode</name>
+      <value class="string">188</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <name>Product_Rate_Plan__r.zqu__Product__r.Product_Type_Id__c</name>
+      <value class="string">d1fb0b91</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+  </list>
+</list>

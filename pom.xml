@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>it.rotaliano.salesforce</groupId>
     <artifactId>salesforce-jdbc</artifactId>
-    <version>${revision}</version> <!-- Remember to also update Constants class -->
+    <version>2.0.0</version>
     <packaging>jar</packaging>
 
     <name>Salesforce JDBC Driver</name>
@@ -31,14 +31,14 @@
         <developerConnection>scm:git:ssh://github.com:lucarota/salesforce-jdbc.git</developerConnection>
         <url>https://github.com/lucarota/salesforce-jdbc/tree/main</url>
     </scm>
+
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <revision>1.6.17-release</revision>
 
-        <!-- Remember to also update ForceService.DEFAULT_API_VERSION -->
-        <force-partner-api.version>65.0.0</force-partner-api.version>
+        <!-- Remember to also update DriverConfiguration.DEFAULT_API_VERSION -->
+        <force-partner-api.version>64.0.0</force-partner-api.version>
         <lombok.version>1.18.30</lombok.version>
         <slf4j.version>2.0.17</slf4j.version>
         <commons-lang3.version>3.20.0</commons-lang3.version>
@@ -47,22 +47,24 @@
         <junit.version>5.12.2</junit.version>
         <mockito.version>5.18.0</mockito.version>
         <xstream.version>1.4.21</xstream.version>
-        <logback.version>1.5.20</logback.version>
+        <junit-platform.version>1.12.2</junit-platform.version>
 
         <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
-        <versions-maven-plugin.version>2.8.1</versions-maven-plugin.version>
+        <maven-versions-plugin.version>2.8.1</maven-versions-plugin.version>
         <maven-surefire-plugin.version>3.3.1</maven-surefire-plugin.version>
         <maven-source-plugin.version>3.3.0</maven-source-plugin.version>
         <maven-jar-plugin.version>3.3.0</maven-jar-plugin.version>
         <maven-assembly-plugin.version>3.6.0</maven-assembly-plugin.version>
         <maven-deploy-plugin.version>3.1.1</maven-deploy-plugin.version>
-        <junit-platform.version>1.12.2</junit-platform.version>
+        <maven-gpg-plugin.version>3.1.0</maven-gpg-plugin.version>
+        <maven-javadoc-plugin.version>3.6.3</maven-javadoc-plugin.version>
     </properties>
     <dependencies>
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <version>${lombok.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -109,12 +111,6 @@
             <groupId>org.mockito</groupId>
             <artifactId>mockito-junit-jupiter</artifactId>
             <version>${mockito.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-            <version>${logback.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -182,12 +178,52 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>versions-maven-plugin</artifactId>
-                <version>${versions-maven-plugin.version}</version>
+                <version>${maven-versions-plugin.version}</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <version>${maven-assembly-plugin.version}</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.6.0</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <shadedArtifactAttached>true</shadedArtifactAttached>
+                            <shadedClassifierName>all</shadedClassifierName>
+                            <filters>
+                                <filter>
+                                    <artifact>*:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/module-info.class</exclude>
+                                        <exclude>META-INF/LICENSE</exclude>
+                                        <exclude>META-INF/NOTICE</exclude>
+                                        <exclude>META-INF/LICENSE.txt</exclude>
+                                        <exclude>META-INF/NOTICE.txt</exclude>
+                                        <exclude>META-INF/MANIFEST.MF</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
+                            <relocations>
+                                <relocation>
+                                    <pattern>net.sf</pattern>
+                                    <shadedPattern>sf.shaded.net.sf</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>org.apache</pattern>
+                                    <shadedPattern>sf.shaded.org.apache</shadedPattern>
+                                </relocation>
+                            </relocations>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -206,13 +242,47 @@
                     </dependency>
                 </dependencies>
             </plugin>
+
+            <!-- Sign -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <version>${maven-gpg-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>sign-artifacts</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>sign</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Sources -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
                 <version>${maven-source-plugin.version}</version>
                 <executions>
                     <execution>
-                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Javadoc -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>${maven-javadoc-plugin.version}</version>
+                <configuration>
+                    <doclint>all,-missing</doclint>
+                </configuration>
+                <executions>
+                    <execution>
                         <goals>
                             <goal>jar</goal>
                         </goals>
@@ -222,54 +292,5 @@
         </plugins>
     </build>
 
-    <profiles>
-        <profile>
-            <id>single-jar</id>
-            <properties>
-                <revision>1.6.17-fatjar-release</revision>
-            </properties>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-shade-plugin</artifactId>
-                        <version>3.6.0</version>
-                        <executions>
-                            <execution>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>shade</goal>
-                                </goals>
-                                <configuration>
-                                    <filters>
-                                        <filter>
-                                            <artifact>*:*</artifact>
-                                            <excludes>
-                                                <exclude>META-INF/module-info.class</exclude>
-                                                <exclude>META-INF/LICENSE</exclude>
-                                                <exclude>META-INF/NOTICE</exclude>
-                                                <exclude>META-INF/LICENSE.txt</exclude>
-                                                <exclude>META-INF/NOTICE.txt</exclude>
-                                                <exclude>META-INF/MANIFEST.MF</exclude>
-                                            </excludes>
-                                        </filter>
-                                    </filters>
-                                    <relocations>
-                                        <relocation>
-                                            <pattern>net.sf</pattern>
-                                            <shadedPattern>sf.shaded.net.sf</shadedPattern>
-                                        </relocation>
-                                        <relocation>
-                                            <pattern>org.apache</pattern>
-                                            <shadedPattern>sf.shaded.org.apache</shadedPattern>
-                                        </relocation>
-                                    </relocations>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
+
 </project>

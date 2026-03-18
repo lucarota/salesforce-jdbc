@@ -1,0 +1,12 @@
+<list>
+  <list>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>dateTime</fieldType>
+      <name>expr0</name>
+      <value class="gregorian-calendar">
+        <time>1715000857000</time>
+        <timezone>GMT</timezone>
+      </value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+  </list>
+</list>

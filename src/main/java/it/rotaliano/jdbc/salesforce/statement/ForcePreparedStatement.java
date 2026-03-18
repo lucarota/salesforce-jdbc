@@ -529,7 +529,7 @@ public class ForcePreparedStatement extends AbstractPreparedStatement implements
                 RowSetMetaDataImpl result = new RowSetMetaDataImpl();
                 SoqlQueryAnalyzer analyzer = getSoqlQueryAnalyzer();
                 FieldDefTree rootFieldDefinitions = getRootEntityFieldDefinitions();
-                List<FieldDef> resultFieldDefinitions = rootFieldDefinitions.flatten();
+                List<FieldDef> resultFieldDefinitions = rootFieldDefinitions.flattenInSqlOrder();
                 int columnsCount = resultFieldDefinitions.size();
                 result.setColumnCount(columnsCount);
                 for (int i = 1; i <= columnsCount; i++) {
