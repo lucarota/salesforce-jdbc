@@ -54,7 +54,7 @@
         <maven-source-plugin.version>3.3.0</maven-source-plugin.version>
         <maven-jar-plugin.version>3.3.0</maven-jar-plugin.version>
         <maven-assembly-plugin.version>3.6.0</maven-assembly-plugin.version>
-        <central-publishing-maven-plugin.version>0.6.0</central-publishing-maven-plugin.version>
+        <central-publishing-maven-plugin.version>0.9.0</central-publishing-maven-plugin.version>
         <maven-gpg-plugin.version>3.1.0</maven-gpg-plugin.version>
         <maven-javadoc-plugin.version>3.6.3</maven-javadoc-plugin.version>
         <maven-shade-plugin.version>3.6.0</maven-shade-plugin.version>
@@ -219,7 +219,7 @@
                 <extensions>true</extensions>
                 <configuration>
                     <publishingServerId>central</publishingServerId>
-                    <skipPublishing>true</skipPublishing>
+                    <autoPublish>true</autoPublish>
                 </configuration>
             </plugin>
             <plugin>
