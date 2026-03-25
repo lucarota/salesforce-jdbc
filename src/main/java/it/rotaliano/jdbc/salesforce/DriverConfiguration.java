@@ -35,7 +35,7 @@ public class DriverConfiguration {
     }
 
     /**
-     * Salesforce API version used for SOAP connections (e.g. "61").
+     * Salesforce API version used for SOAP connections (e.g. "64").
      */
     public static String getApiVersion() {
         return getString(PROP_API_VERSION, DEFAULT_API_VERSION);

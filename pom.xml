@@ -40,12 +40,12 @@
         <!-- Remember to also update DriverConfiguration.DEFAULT_API_VERSION -->
         <force-partner-api.version>64.0.0</force-partner-api.version>
         <lombok.version>1.18.30</lombok.version>
-        <slf4j.version>2.0.7</slf4j.version>
-        <commons-lang3.version>3.18.0</commons-lang3.version>
-        <jsqlparser.version>5.1</jsqlparser.version>
+        <slf4j.version>2.0.17</slf4j.version>
+        <commons-lang3.version>3.20.0</commons-lang3.version>
+        <jsqlparser.version>5.3</jsqlparser.version>
         <ehcache.version>3.10.8</ehcache.version>
-        <junit.version>5.9.3</junit.version>
-        <mockito.version>5.7.0</mockito.version>
+        <junit.version>5.12.2</junit.version>
+        <mockito.version>5.18.0</mockito.version>
         <xstream.version>1.4.21</xstream.version>
 
         <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
@@ -58,7 +58,6 @@
         <maven-gpg-plugin.version>3.1.0</maven-gpg-plugin.version>
         <maven-javadoc-plugin.version>3.6.3</maven-javadoc-plugin.version>
         <maven-shade-plugin.version>3.6.0</maven-shade-plugin.version>
-        <junit-platform-launcher.version>1.9.3</junit-platform-launcher.version>
     </properties>
 
     <dependencyManagement>
