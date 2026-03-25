@@ -422,6 +422,53 @@ class QueryAnalyzerTest {
     }
 
     @Nested
+    @DisplayName("count(*) to count(Id) replacement tests")
+    class CountStarReplacementTests {
+
+        @Test
+        @DisplayName("Should replace count(*) with count(Id)")
+        void testCountStarReplacedWithCountId() {
+            String soql = "SELECT count(*) FROM Account";
+            QueryAnalyzer analyzer = new QueryAnalyzer(soql, null, null);
+            String resultSoql = analyzer.getSoql();
+
+            assertTrue(resultSoql.contains("count(Id)"),
+                "Query should contain count(Id): " + resultSoql);
+            assertFalse(resultSoql.contains("count(*)"),
+                "Query should not contain count(*): " + resultSoql);
+        }
+
+        @Test
+        @DisplayName("Should preserve count(Id) as-is")
+        void testCountIdPreserved() {
+            String soql = "SELECT count(Id) FROM Account";
+            QueryAnalyzer analyzer = new QueryAnalyzer(soql, null, null);
+            assertEquals(soql, analyzer.getSoql());
+        }
+
+        @Test
+        @DisplayName("Should preserve count with other fields")
+        void testCountOtherFieldsPreserved() {
+            String soql = "SELECT count(Name) FROM Account";
+            QueryAnalyzer analyzer = new QueryAnalyzer(soql, null, null);
+            assertEquals(soql, analyzer.getSoql());
+        }
+
+        @Test
+        @DisplayName("Should replace count(*) in query with WHERE clause")
+        void testCountStarWithWhereClause() {
+            String soql = "SELECT count(*) FROM Account WHERE Name != null";
+            QueryAnalyzer analyzer = new QueryAnalyzer(soql, null, null);
+            String resultSoql = analyzer.getSoql();
+
+            assertTrue(resultSoql.contains("count(Id)"),
+                "Query should contain count(Id): " + resultSoql);
+            assertTrue(resultSoql.contains("WHERE"),
+                "Query should preserve WHERE clause: " + resultSoql);
+        }
+    }
+
+    @Nested
     @DisplayName("Parameter handling tests")
     class ParameterHandlingTests {
 

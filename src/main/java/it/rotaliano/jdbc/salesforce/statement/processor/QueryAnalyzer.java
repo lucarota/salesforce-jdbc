@@ -10,6 +10,7 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.expression.Expression;
+import net.sf.jsqlparser.expression.Function;
 import net.sf.jsqlparser.expression.JdbcParameter;
 import net.sf.jsqlparser.expression.StringValue;
 import net.sf.jsqlparser.expression.operators.relational.EqualsTo;
@@ -20,6 +21,7 @@ import net.sf.jsqlparser.statement.delete.Delete;
 import net.sf.jsqlparser.statement.insert.Insert;
 import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.Select;
+import net.sf.jsqlparser.statement.select.SelectItem;
 import net.sf.jsqlparser.statement.update.Update;
 
 @Slf4j
@@ -83,6 +85,8 @@ public class QueryAnalyzer {
                         Arrays.stream(describeSObjectResult.getFields())
                             .forEach(f -> select.addSelectItem(new Column(null, f.getName())));
                     }
+                    // Replace count(*) with count(Id) as SOQL doesn't support count(*)
+                    replaceCountStarWithCountId(select);
                     this.soql = select.toString();
                     return select;
                 }
@@ -98,6 +102,32 @@ public class QueryAnalyzer {
 
     private DescribeSObjectResult describeObject(String fromObjectName) {
         return partnerService.describeSObject(fromObjectName);
+    }
+
+    /**
+     * Replaces count(*) with count(Id) in the query since SOQL doesn't support count(*).
+     * SOQL requires an explicit field name in count() function.
+     */
+    private void replaceCountStarWithCountId(PlainSelect select) {
+        for (int i = 0; i < select.getSelectItems().size(); i++) {
+            SelectItem<?> item = select.getSelectItems().get(i);
+            Expression expr = item.getExpression();
+
+            if (expr instanceof Function func && "count".equalsIgnoreCase(func.getName())) {
+                // Check if it's count(*)
+                if (func.getParameters() != null && !func.getParameters().isEmpty()) {
+                    String param = func.getParameters().get(0).toString();
+                    if ("*".equals(param)) {
+                        // Replace count(*) with count(Id)
+                        Function newFunc = new Function();
+                        newFunc.setName("count");
+                        newFunc.setParameters(new Column("Id"));
+                        select.getSelectItems().set(i, new SelectItem<>(newFunc));
+                        log.debug("Replaced count(*) with count(Id) for SOQL compatibility");
+                    }
+                }
+            }
+        }
     }
 
     public StatementTypeEnum getType() {
