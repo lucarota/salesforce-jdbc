@@ -3,13 +3,22 @@ package it.rotaliano.jdbc.salesforce.statement;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
+import com.sforce.soap.partner.DescribeSObjectResult;
+import com.sforce.ws.ConnectionException;
 import it.rotaliano.jdbc.salesforce.connection.ForceConnection;
+import it.rotaliano.jdbc.salesforce.delegates.PartnerService;
+import it.rotaliano.jdbc.salesforce.exceptions.SalesforceRuntimeException;
 import it.rotaliano.jdbc.salesforce.statement.ForcePreparedStatement.CacheMode;
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.GregorianCalendar;
@@ -102,7 +111,7 @@ public class ForcePreparedStatementTest {
         setCacheMode.setAccessible(true);
         setCacheMode.invoke(statement, query);
 
-        Field field = stClass.getDeclaredField("cacheMode");
+        java.lang.reflect.Field field = stClass.getDeclaredField("cacheMode");
         field.setAccessible(true);
         return (CacheMode) field.get(statement);
     }
@@ -113,8 +122,51 @@ public class ForcePreparedStatementTest {
         setCacheMode.setAccessible(true);
         setCacheMode.invoke(statement, query);
 
-        Field field = stClass.getDeclaredField("soqlQuery");
+        java.lang.reflect.Field field = stClass.getDeclaredField("soqlQuery");
         field.setAccessible(true);
         return (String) field.get(statement);
+    }
+
+    @Test
+    public void testQueryErrorMessageIncludesSalesforceErrorAndQuery() throws Exception {
+        // Setup
+        String testQuery = "SELECT Id, Name FROM Kafka_Job__c WHERE Ip_Addressing_Request__c != null";
+        String salesforceError = "field 'Ip_Addressing_Request__c' can not be filtered in a query call";
+
+        ForceConnection mockConnection = mock(ForceConnection.class);
+        PartnerService mockPartnerService = mock(PartnerService.class);
+        when(mockConnection.getPartnerService()).thenReturn(mockPartnerService);
+
+        // Mock describeSObject to return minimal field metadata
+        DescribeSObjectResult mockDescribe = mock(DescribeSObjectResult.class);
+        com.sforce.soap.partner.Field idField = new com.sforce.soap.partner.Field();
+        idField.setName("Id");
+        idField.setType(com.sforce.soap.partner.FieldType.id);
+        com.sforce.soap.partner.Field nameField = new com.sforce.soap.partner.Field();
+        nameField.setName("Name");
+        nameField.setType(com.sforce.soap.partner.FieldType.string);
+        when(mockDescribe.getFields()).thenReturn(new com.sforce.soap.partner.Field[]{idField, nameField});
+        when(mockPartnerService.describeSObject(anyString())).thenReturn(mockDescribe);
+
+        // Mock PartnerService to throw ConnectionException on query
+        ConnectionException connectionException = new ConnectionException(salesforceError);
+        when(mockPartnerService.queryStart(anyString(), any())).thenThrow(connectionException);
+
+        ForcePreparedStatement statement = new ForcePreparedStatement(mockConnection, testQuery);
+
+        // Execute and verify
+        ResultSet rs = statement.executeQuery();
+        SalesforceRuntimeException exception = assertThrows(SalesforceRuntimeException.class, () -> {
+            rs.next(); // This triggers the actual query execution
+        });
+
+        // Verify error message includes both Salesforce error and the query
+        String errorMessage = exception.getMessage();
+        assertTrue(errorMessage.contains(salesforceError),
+            "Error message should contain Salesforce error: " + errorMessage);
+        assertTrue(errorMessage.contains("Kafka_Job__c"),
+            "Error message should contain the table name: " + errorMessage);
+        assertTrue(errorMessage.contains("Query execution failed"),
+            "Error message should contain 'Query execution failed': " + errorMessage);
     }
 }

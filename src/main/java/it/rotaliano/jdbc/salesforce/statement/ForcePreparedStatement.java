@@ -280,7 +280,9 @@ public class ForcePreparedStatement extends AbstractPreparedStatement implements
                     .forEach(rec -> result.add(convertToColumnMap(rec)));
             return result;
         } catch (ConnectionException e) {
-            throw new SalesforceRuntimeException("Failed to fetch next batch of query results", e);
+            String errorMsg = String.format("Query execution failed: %s. Query: %s",
+                e.getMessage(), soqlQuery);
+            throw new SalesforceRuntimeException(errorMsg, e);
         }
     }
 
