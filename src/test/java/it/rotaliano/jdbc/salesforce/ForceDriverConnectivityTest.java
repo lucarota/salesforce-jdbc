@@ -435,6 +435,37 @@ class ForceDriverConnectivityTest {
         DBTablePrinter.printResultSet(result);
     }
 
+    @Test
+    @Disabled("Live test - run manually to record fixtures")
+    void selectWithNotNullFilter_record() throws SQLException {
+        String query = """
+    SELECT *
+    FROM Kafka_Job__c
+    WHERE Job_Status__c != null""";
+
+        Connection con = DriverManager.getConnection(url, userSIT, passSIT);
+        installRecordingPartnerService(con, "selectWithNotNullFilter");
+        ForcePreparedStatement select = (ForcePreparedStatement) con.prepareStatement(query);
+
+        ResultSet result = select.executeQuery();
+        DBTablePrinter.printResultSet(result);
+    }
+
+    @Test
+    @Disabled("Live test - run manually to record fixtures")
+    void selectWithCountStar_record() throws SQLException {
+        String query = """
+    SELECT count(*)
+    FROM Kafka_Job__c""";
+
+        Connection con = DriverManager.getConnection(url, userSIT, passSIT);
+        installRecordingPartnerService(con, "selectWithCountStar");
+        ForcePreparedStatement select = (ForcePreparedStatement) con.prepareStatement(query);
+
+        ResultSet result = select.executeQuery();
+        DBTablePrinter.printResultSet(result);
+    }
+
     // ==================== DML LIVE TESTS (cannot run offline) ====================
 
     @Test
@@ -804,6 +835,38 @@ class ForceDriverConnectivityTest {
 
             ResultSetMetaData rsmd = result.getMetaData();
             assertEquals(1, rsmd.getColumnCount(), "Aggregate query should return exactly 1 column");
+        }
+
+        @Test
+        void selectWithNotNullFilter() throws SQLException {
+            assumeFixturesExist("selectWithNotNullFilter");
+            String query = """
+                SELECT *
+                FROM Kafka_Job__c
+                WHERE Job_Status__c != null""";
+
+            ForceConnection conn = createOfflineConnection("selectWithNotNullFilter");
+            ForcePreparedStatement select = (ForcePreparedStatement) conn.prepareStatement(query);
+
+            ResultSet result = select.executeQuery();
+            assertNotNull(result, "ResultSet should not be null");
+        }
+
+        @Test
+        void selectWithCountStar() throws SQLException {
+            assumeFixturesExist("selectWithCountStar");
+            String query = """
+                SELECT count(*)
+                FROM Kafka_Job__c""";
+
+            ForceConnection conn = createOfflineConnection("selectWithCountStar");
+            ForcePreparedStatement select = (ForcePreparedStatement) conn.prepareStatement(query);
+
+            ResultSet result = select.executeQuery();
+            assertNotNull(result, "ResultSet should not be null");
+
+            ResultSetMetaData rsmd = result.getMetaData();
+            assertEquals(1, rsmd.getColumnCount(), "Count query should return exactly 1 column");
         }
     }
 }

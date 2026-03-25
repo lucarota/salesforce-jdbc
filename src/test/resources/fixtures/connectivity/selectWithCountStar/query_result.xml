@@ -1,0 +1,9 @@
+<list>
+  <list>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>int</fieldType>
+      <name>expr0</name>
+      <value>5</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+  </list>
+</list>
