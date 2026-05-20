@@ -19,4 +19,6 @@ public class ForceConnectionInfo {
     private String logfile;
     private int connectionTimeout = 10 * 1000;
     private int readTimeout = 30 * 1000;
+    private String clientId;
+    private String clientSecret;
 }

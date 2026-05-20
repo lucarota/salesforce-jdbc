@@ -27,7 +27,6 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.sql.Types;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Date;
@@ -54,6 +53,9 @@ class ForceDriverConnectivityTest {
     private final String passSIT;
     private final String userBugFix;
     private final String passBugFix;
+    private final String loginDomainPreprod;
+    private final String clientIdPreprod;
+    private final String clientSecretPreprod;
 
     ForceDriverConnectivityTest() {
         Properties props = new Properties();
@@ -69,6 +71,9 @@ class ForceDriverConnectivityTest {
         passSIT = props.getProperty("passSIT", "");
         userBugFix = props.getProperty("userBugFix", "");
         passBugFix = props.getProperty("passBugFix", "");
+        loginDomainPreprod = props.getProperty("loginDomainPreprod", "");
+        clientIdPreprod = props.getProperty("clientIdPreprod", "");
+        clientSecretPreprod = props.getProperty("clientSecretPreprod", "");
     }
 
     // ==================== RECORDING INFRASTRUCTURE ====================
@@ -531,6 +536,84 @@ class ForceDriverConnectivityTest {
 
         ResultSet result = select.executeQuery();
         DBTablePrinter.printResultSet(result);
+    }    @Test
+    @Disabled("Live test - run manually to record fixtures")
+    void selectOAuthPreprod_record() throws SQLException {
+        String oauthUrl = "jdbc:rotaliano:salesforce://" + loginDomainPreprod;
+        Properties props = new Properties();
+        props.setProperty("clientId", clientIdPreprod);
+        props.setProperty("clientSecret", clientSecretPreprod);
+
+        Connection con = DriverManager.getConnection(oauthUrl, props);
+        installRecordingPartnerService(con, "selectOAuthPreprod");
+        
+        String query = "SELECT Id, Name FROM Account LIMIT 5";
+        PreparedStatement ps = con.prepareStatement(query);
+        ResultSet result = ps.executeQuery();
+        DBTablePrinter.printResultSet(result);
+        result.beforeFirst();
+        
+        int rowCount = 0;
+        while (result.next()) {
+            assertNotNull(result.getString("Id"));
+            rowCount++;
+        }
+        assertTrue(rowCount > 0);
+    }
+
+    @Test
+    @Disabled("Live test - run manually to record fixtures")
+    void insertOAuthPreprod_record() throws SQLException {
+        String oauthUrl = "jdbc:rotaliano:salesforce://" + loginDomainPreprod;
+        Properties props = new Properties();
+        props.setProperty("clientId", clientIdPreprod);
+        props.setProperty("clientSecret", clientSecretPreprod);
+
+        Connection con = DriverManager.getConnection(oauthUrl, props);
+        installRecordingPartnerService(con, "insertOAuthPreprod");
+        
+        String query = "INSERT INTO Account (Name) VALUES (?)";
+        PreparedStatement ps = con.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+        ps.setString(1, "OAuth Test Account " + System.currentTimeMillis());
+        int affected = ps.executeUpdate();
+        assertEquals(1, affected);
+        
+        ResultSet keys = ps.getGeneratedKeys();
+        assertTrue(keys.next());
+        String generatedId = keys.getString(1);
+        assertNotNull(generatedId);
+        log.info("Inserted Account with Id: {}", generatedId);
+    }
+
+    @Test
+    @Disabled("Live test - run manually to record fixtures")
+    void updateOAuthPreprod_record() throws SQLException {
+        String oauthUrl = "jdbc:rotaliano:salesforce://" + loginDomainPreprod;
+        Properties props = new Properties();
+        props.setProperty("clientId", clientIdPreprod);
+        props.setProperty("clientSecret", clientSecretPreprod);
+
+        Connection con = DriverManager.getConnection(oauthUrl, props);
+        installRecordingPartnerService(con, "updateOAuthPreprod");
+        
+        String selectQuery = "SELECT Id, Name FROM Account LIMIT 1";
+        Statement selectStmt = con.createStatement();
+        ResultSet selectRes = selectStmt.executeQuery(selectQuery);
+        assertTrue(selectRes.next(), "No accounts found to update");
+        String accountId = selectRes.getString("Id");
+        String originalName = selectRes.getString("Name");
+        
+        String updateQuery = "UPDATE Account SET Name = ? WHERE Id = ?";
+        PreparedStatement ps = con.prepareStatement(updateQuery);
+        ps.setString(1, originalName + " (Updated)");
+        ps.setString(2, accountId);
+        int affected = ps.executeUpdate();
+        assertEquals(1, affected);
+        
+        // Revert it back to original name to avoid dirtying preprod data
+        ps.setString(1, originalName);
+        ps.setString(2, accountId);
+        ps.executeUpdate();
     }
 
     // ==================== DML LIVE TESTS (cannot run offline) ====================

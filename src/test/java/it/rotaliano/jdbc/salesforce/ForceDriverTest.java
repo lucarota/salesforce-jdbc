@@ -137,6 +137,20 @@ class ForceDriverTest {
         }
 
         @Test
+        void testSanitizeUrl_withClientSecret() {
+            String url = "jdbc:rotaliano:salesforce://my-company.my.salesforce.com?clientId=myid&clientSecret=mysecret123&api=65.0";
+            String sanitized = ForceDriver.sanitizeUrl(url);
+            assertEquals("jdbc:rotaliano:salesforce://my-company.my.salesforce.com?clientId=myid&clientSecret=****&api=65.0", sanitized);
+        }
+
+        @Test
+        void testSanitizeUrl_withClientSecretUnderscore() {
+            String url = "jdbc:rotaliano:salesforce://my-company.my.salesforce.com?client_id=myid&client_secret=mysecret123&api=65.0";
+            String sanitized = ForceDriver.sanitizeUrl(url);
+            assertEquals("jdbc:rotaliano:salesforce://my-company.my.salesforce.com?client_id=myid&client_secret=****&api=65.0", sanitized);
+        }
+
+        @Test
         void testSanitizeUrl_nullUrl() {
             assertNull(ForceDriver.sanitizeUrl(null));
         }

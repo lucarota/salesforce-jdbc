@@ -39,7 +39,7 @@
 
         <!-- Remember to also update DriverConfiguration.DEFAULT_API_VERSION -->
         <force-partner-api.version>64.0.0</force-partner-api.version>
-        <lombok.version>1.18.30</lombok.version>
+        <lombok.version>1.18.36</lombok.version>
         <slf4j.version>2.0.17</slf4j.version>
         <commons-lang3.version>3.20.0</commons-lang3.version>
         <jsqlparser.version>5.3</jsqlparser.version>
@@ -156,6 +156,15 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>${maven-compiler-plugin.version}</version>
+                <configuration>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>${lombok.version}</version>
+                        </path>
+                    </annotationProcessorPaths>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

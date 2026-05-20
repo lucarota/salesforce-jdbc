@@ -32,6 +32,12 @@ public class ForceService {
 
     // Thread-safe cache using ConcurrentHashMap
     private static final Map<String, ForceUserInfo> userInfoCache = new ConcurrentHashMap<>();
+
+    public static void cacheUserInfo(String accessToken, ForceUserInfo userInfo) {
+        if (accessToken != null && userInfo != null) {
+            userInfoCache.put(accessToken, userInfo);
+        }
+    }
     public static final String UNEXPECTED_ERROR = "Failed to connect, unexpected error:";
     public static final String CONNECT_FAILED = "Failed to connect to the host";
 
@@ -44,6 +50,29 @@ public class ForceService {
     }
 
     public static PartnerConnection createPartnerConnection(ForceConnectionInfo info) throws ConnectionException {
+        if (StringUtils.isNotBlank(info.getClientId()) && StringUtils.isNotBlank(info.getClientSecret())) {
+            String domain = info.getLoginDomain();
+            if (StringUtils.isBlank(domain) || 
+                domain.equalsIgnoreCase("login.salesforce.com") || 
+                domain.equalsIgnoreCase("test.salesforce.com")) {
+                throw new it.rotaliano.jdbc.salesforce.exceptions.SalesforceRuntimeException(
+                    "Salesforce OAuth 2.0 Client Credentials flow requires a custom login domain (e.g. mycompany.my.salesforce.com). Generic domains like login.salesforce.com and test.salesforce.com are not supported by Salesforce for this flow."
+                );
+            }
+
+            if (StringUtils.isBlank(info.getSessionId())) {
+                ForceOAuthClient oauthClient = new ForceOAuthClient(info.getConnectionTimeout(), info.getReadTimeout());
+                ForceOAuthClient.TokenResponse tokenRes = oauthClient.getClientCredentialsToken(
+                    info.getClientId(), info.getClientSecret(), domain
+                );
+                
+                info.setSessionId(tokenRes.getAccessToken());
+                
+                ForceUserInfo userInfo = oauthClient.getUserInfoWithCustomDomain(tokenRes.getAccessToken(), tokenRes.getInstanceUrl());
+                cacheUserInfo(tokenRes.getAccessToken(), userInfo);
+            }
+        }
+
         PartnerConnection partnerConnection = createConnection(info);
         SessionHeader_element sessionHeader = partnerConnection.getSessionHeader();
         if (sessionHeader != null && sessionHeader.getSessionId() != null) {
@@ -91,7 +120,7 @@ public class ForceService {
         ConnectorConfig partnerConfig = new ConnectorConfig();
         partnerConfig.setReadTimeout(info.getReadTimeout());
         partnerConfig.setConnectionTimeout(info.getConnectionTimeout());
-        partnerConfig.setSessionRenewer(new ForceSessionRenewal());
+        partnerConfig.setSessionRenewer(new ForceSessionRenewal(info));
         partnerConfig.setUsername(info.getUserName());
         partnerConfig.setPassword(info.getPassword());
         String sessionId = info.getSessionId();

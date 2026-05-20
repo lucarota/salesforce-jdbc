@@ -57,12 +57,14 @@ public class ForceDriver implements Driver {
      */
     public static String sanitizeUrl(String url) {
         if (url == null) return null;
-        Matcher m = URL_HAS_AUTHORIZATION_SEGMENT.matcher(url);
+        String sanitized = url;
+        Matcher m = URL_HAS_AUTHORIZATION_SEGMENT.matcher(sanitized);
         if (m.matches()) {
-            return ACCEPTABLE_URL + "://" + m.group(1) + ":****@" + m.group(3)
+            sanitized = ACCEPTABLE_URL + "://" + m.group(1) + ":****@" + m.group(3)
                 + (m.group(4) != null ? m.group(4) : "");
         }
-        return url;
+        sanitized = sanitized.replaceAll("(?i)(clientSecret|client_secret)=[^&]*", "$1=****");
+        return sanitized;
     }
 
     static {
@@ -128,6 +130,13 @@ public class ForceDriver implements Driver {
         info.setConnectionTimeout(resolveIntProperty(properties, "connectionTimeout", info.getConnectionTimeout()));
         info.setApiVersion(resolveStringProperty(properties, "api", ForceService.DEFAULT_API_VERSION));
         info.setLoginDomain(resolveStringProperty(properties, LOGIN_DOMAIN, ForceService.DEFAULT_LOGIN_DOMAIN));
+        info.setClientId(resolveStringProperty(properties, "clientId", resolveStringProperty(properties, "client_id", null)));
+        info.setClientSecret(resolveStringProperty(properties, "clientSecret", resolveStringProperty(properties, "client_secret", null)));
+        if (org.apache.commons.lang3.StringUtils.isNotBlank(info.getClientId()) &&
+            org.apache.commons.lang3.StringUtils.isNotBlank(info.getClientSecret()) &&
+            properties.containsKey("sandbox")) {
+            log.warn("The 'sandbox' parameter is ignored for login domain resolution when using OAuth 2.0 Client Credentials authentication. Please ensure a custom 'loginDomain' is configured.");
+        }
         return info;
     }
 
