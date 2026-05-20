@@ -1,5 +1,24 @@
 # Changelog
 
+### 2.0.1
+
+- **Support for OAuth 2.0 Client Credentials Authentication**:
+  - Implemented client credentials flow using `clientId` and `clientSecret` parameters.
+  - Automatically fetches OAuth 2.0 access tokens and resolves organization metadata without modifying the core `force-partner-api` library.
+  - Handles automatic session renewal and retry on expired/invalidated tokens.
+  - Added caching for user info and access tokens to avoid redundant token requests.
+- **Enhanced Configuration & Validation**:
+  - Requires a custom `loginDomain` for Client Credentials authentication, raising an error for unsupported generic domains (`login.salesforce.com` or `test.salesforce.com`).
+  - Added warning logs when using the legacy `sandbox` parameter along with OAuth parameters.
+- **Security & Logging Improvements**:
+  - Added masking of `clientSecret` / `client_secret` parameter values in JDBC URLs, connection info logs, and error messages.
+- **Build Infrastructure & Tooling**:
+  - Upgraded Project Lombok to `1.18.36` for complete compatibility with JDK 21+ and JDK 25.
+  - Configured explicit annotation processor paths in Maven compiler plugin.
+- **Testing Improvements**:
+  - Added unit tests for OAuth token handling and error retries.
+  - Added pre-production integration tests (`selectOAuthPreprod_record`, `insertOAuthPreprod_record`, `updateOAuthPreprod_record`) in `ForceDriverConnectivityTest` using live Preprod credentials.
+
 ### 2.0.0
 
 - **Preserved SQL SELECT field order in flattened results**:

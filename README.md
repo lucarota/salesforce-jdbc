@@ -84,7 +84,7 @@ Add the following dependency to your `pom.xml`:
 <dependency>
     <groupId>it.rotaliano.salesforce</groupId>
     <artifactId>salesforce-jdbc</artifactId>
-    <version>2.0.0</version>
+    <version>2.0.1</version>
 </dependency>
 ```
 
@@ -98,7 +98,7 @@ Add the following dependency to your `pom.xml`:
 jdbc:rotaliano:salesforce://[;propertyName1=propertyValue1[;propertyName2=propertyValue2]...]
 ```
 
-You can connect using either **User/Password** or **Session ID**.
+You can connect using **User/Password**, **Session ID**, or **OAuth 2.0 Client Credentials**.
 
 **1. User and Password**
 ```
@@ -112,6 +112,12 @@ jdbc:rotaliano:salesforce://;sessionId=uniqueIdAssociatedWithTheSession
 ```
 *Note: User and password parameters are ignored if `sessionId` is provided.*
 
+**3. OAuth 2.0 Client Credentials**
+```
+jdbc:rotaliano:salesforce://mycompany.my.salesforce.com;clientId=yourClientId;clientSecret=yourClientSecret
+```
+*Note: A custom `loginDomain` is required for this authentication flow (e.g. `mycompany.my.salesforce.com`). Generic domains like `login.salesforce.com` and `test.salesforce.com` are not supported by Salesforce for the Client Credentials flow. User/password parameters and session ID are ignored when `clientId` and `clientSecret` are provided.*
+
 ### Configuration Properties
 
 | Property        | Description                                          | Default Value |
@@ -119,10 +125,12 @@ jdbc:rotaliano:salesforce://;sessionId=uniqueIdAssociatedWithTheSession
 | `user`          | Login username.                                      |               |
 | `password`      | Login password concatenated with the security token. |               |
 | `sessionId`     | Unique ID associated with an active session.         |               |
-| `loginDomain`   | Top-level domain for login requests. Set to `test.salesforce.com` for sandbox environments. | `login.salesforce.com` |
+| `clientId` / `client_id` | OAuth 2.0 Client ID (Consumer Key) for Client Credentials flow. | |
+| `clientSecret` / `client_secret` | OAuth 2.0 Client Secret (Consumer Secret) for Client Credentials flow. | |
+| `loginDomain`   | Top-level domain for login requests. Set to `test.salesforce.com` for legacy sandbox login, or custom domain (e.g. `mycompany.my.salesforce.com`) for OAuth. | `login.salesforce.com` |
 | `https`         | Use HTTP instead of HTTPS if set to `false`.         | `true`        |
 | `api`           | API version to use.                                  | `64`          |
-| `client`        | Client ID to use.                                    | Empty         |
+| `client`        | Legacy client identifier parameter.                  | Empty         |
 | `insecurehttps` | Allow invalid SSL certificates.                      | `false`       |
 
 ## IDE Configuration
