@@ -355,4 +355,100 @@ public class SoqlQueryAnalyzerTest {
         assertEquals("picklist", fieldDef.getType());
 
     }
+
+    @Test
+    public void testAggregateFunctions_SUM() {
+        String soql = "SELECT SUM(NumberOfEmployees) FROM Account";
+        final QueryAnalyzer queryAnalyzer = new QueryAnalyzer(soql, null, partnerService);
+        SoqlQueryAnalyzer analyzer = new SoqlQueryAnalyzer(queryAnalyzer);
+
+        List<FieldDef> actual = analyzer.getFieldDefinitions().flatten();
+        assertEquals(1, actual.size());
+        assertEquals("SUM", actual.get(0).getAlias());
+        assertEquals("_int", actual.get(0).getType());
+    }
+
+    @Test
+    public void testAggregateFunctions_AVG() {
+        String soql = "SELECT AVG(NumberOfEmployees) FROM Account";
+        final QueryAnalyzer queryAnalyzer = new QueryAnalyzer(soql, null, partnerService);
+        SoqlQueryAnalyzer analyzer = new SoqlQueryAnalyzer(queryAnalyzer);
+
+        List<FieldDef> actual = analyzer.getFieldDefinitions().flatten();
+        assertEquals(1, actual.size());
+        assertEquals("AVG", actual.get(0).getAlias());
+        assertEquals("_int", actual.get(0).getType());
+    }
+
+    @Test
+    public void testAggregateFunctions_MAX() {
+        String soql = "SELECT MAX(CreatedDate) FROM Account";
+        final QueryAnalyzer queryAnalyzer = new QueryAnalyzer(soql, null, partnerService);
+        SoqlQueryAnalyzer analyzer = new SoqlQueryAnalyzer(queryAnalyzer);
+
+        List<FieldDef> actual = analyzer.getFieldDefinitions().flatten();
+        assertEquals(1, actual.size());
+        assertEquals("MAX", actual.get(0).getAlias());
+        assertEquals("datetime", actual.get(0).getType());
+    }
+
+    @Test
+    public void testDateFunctions_CALENDAR_MONTH() {
+        String soql = "SELECT CALENDAR_MONTH(CreatedDate) FROM Account";
+        final QueryAnalyzer queryAnalyzer = new QueryAnalyzer(soql, null, partnerService);
+        SoqlQueryAnalyzer analyzer = new SoqlQueryAnalyzer(queryAnalyzer);
+
+        List<FieldDef> actual = analyzer.getFieldDefinitions().flatten();
+        assertEquals(1, actual.size());
+        assertEquals("CALENDAR_MONTH", actual.get(0).getAlias());
+        assertEquals("int", actual.get(0).getType());
+    }
+
+    @Test
+    public void testDateFunctions_DAY_IN_MONTH() {
+        String soql = "SELECT DAY_IN_MONTH(CreatedDate) FROM Account";
+        final QueryAnalyzer queryAnalyzer = new QueryAnalyzer(soql, null, partnerService);
+        SoqlQueryAnalyzer analyzer = new SoqlQueryAnalyzer(queryAnalyzer);
+
+        List<FieldDef> actual = analyzer.getFieldDefinitions().flatten();
+        assertEquals(1, actual.size());
+        assertEquals("DAY_IN_MONTH", actual.get(0).getAlias());
+        assertEquals("int", actual.get(0).getType());
+    }
+
+    @Test
+    public void testDateFunctions_FISCAL_QUARTER() {
+        String soql = "SELECT FISCAL_QUARTER(CreatedDate) FROM Account";
+        final QueryAnalyzer queryAnalyzer = new QueryAnalyzer(soql, null, partnerService);
+        SoqlQueryAnalyzer analyzer = new SoqlQueryAnalyzer(queryAnalyzer);
+
+        List<FieldDef> actual = analyzer.getFieldDefinitions().flatten();
+        assertEquals(1, actual.size());
+        assertEquals("FISCAL_QUARTER", actual.get(0).getAlias());
+        assertEquals("int", actual.get(0).getType());
+    }
+
+    @Test
+    public void testDateFunctions_HOUR_IN_DAY() {
+        String soql = "SELECT HOUR_IN_DAY(CreatedDate) FROM Account";
+        final QueryAnalyzer queryAnalyzer = new QueryAnalyzer(soql, null, partnerService);
+        SoqlQueryAnalyzer analyzer = new SoqlQueryAnalyzer(queryAnalyzer);
+
+        List<FieldDef> actual = analyzer.getFieldDefinitions().flatten();
+        assertEquals(1, actual.size());
+        assertEquals("HOUR_IN_DAY", actual.get(0).getAlias());
+        assertEquals("int", actual.get(0).getType());
+    }
+
+    @Test
+    public void testAggregateFunctions_COUNT_DISTINCT() {
+        String soql = "SELECT COUNT_DISTINCT(Name) FROM Account";
+        final QueryAnalyzer queryAnalyzer = new QueryAnalyzer(soql, null, partnerService);
+        SoqlQueryAnalyzer analyzer = new SoqlQueryAnalyzer(queryAnalyzer);
+
+        List<FieldDef> actual = analyzer.getFieldDefinitions().flatten();
+        assertEquals(1, actual.size());
+        assertEquals("COUNT_DISTINCT", actual.get(0).getAlias());
+        assertEquals("int", actual.get(0).getType());
+    }
 }

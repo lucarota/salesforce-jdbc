@@ -27,6 +27,7 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Types;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Date;
@@ -466,6 +467,72 @@ class ForceDriverConnectivityTest {
         DBTablePrinter.printResultSet(result);
     }
 
+    @Test
+    @Disabled("Live test - run manually to record fixtures")
+    void selectWithSUM_record() throws SQLException {
+        String query = """
+    SELECT SUM(NumberOfEmployees)
+    FROM Account
+    WHERE NumberOfEmployees != null""";
+
+        Connection con = DriverManager.getConnection(url, userSIT, passSIT);
+        installRecordingPartnerService(con, "selectWithSUM");
+        ForcePreparedStatement select = (ForcePreparedStatement) con.prepareStatement(query);
+
+        ResultSet result = select.executeQuery();
+        DBTablePrinter.printResultSet(result);
+    }
+
+    @Test
+    @Disabled("Live test - run manually to record fixtures")
+    void selectWithAVG_record() throws SQLException {
+        String query = """
+    SELECT AVG(NumberOfEmployees)
+    FROM Account
+    WHERE NumberOfEmployees != null""";
+
+        Connection con = DriverManager.getConnection(url, userSIT, passSIT);
+        installRecordingPartnerService(con, "selectWithAVG");
+        ForcePreparedStatement select = (ForcePreparedStatement) con.prepareStatement(query);
+
+        ResultSet result = select.executeQuery();
+        DBTablePrinter.printResultSet(result);
+    }
+
+    @Test
+    @Disabled("Live test - run manually to record fixtures")
+    void selectWithCalendarMonth_record() throws SQLException {
+        String query = """
+    SELECT CALENDAR_MONTH(CreatedDate), COUNT(Id)
+    FROM Account
+    GROUP BY CALENDAR_MONTH(CreatedDate)
+    LIMIT 5""";
+
+        Connection con = DriverManager.getConnection(url, userSIT, passSIT);
+        installRecordingPartnerService(con, "selectWithCalendarMonth");
+        ForcePreparedStatement select = (ForcePreparedStatement) con.prepareStatement(query);
+
+        ResultSet result = select.executeQuery();
+        DBTablePrinter.printResultSet(result);
+    }
+
+    @Test
+    @Disabled("Live test - run manually to record fixtures")
+    void selectWithFiscalQuarter_record() throws SQLException {
+        String query = """
+    SELECT FISCAL_QUARTER(CreatedDate), COUNT(Id)
+    FROM Account
+    GROUP BY FISCAL_QUARTER(CreatedDate)
+    LIMIT 5""";
+
+        Connection con = DriverManager.getConnection(url, userSIT, passSIT);
+        installRecordingPartnerService(con, "selectWithFiscalQuarter");
+        ForcePreparedStatement select = (ForcePreparedStatement) con.prepareStatement(query);
+
+        ResultSet result = select.executeQuery();
+        DBTablePrinter.printResultSet(result);
+    }
+
     // ==================== DML LIVE TESTS (cannot run offline) ====================
 
     @Test
@@ -867,6 +934,90 @@ class ForceDriverConnectivityTest {
 
             ResultSetMetaData rsmd = result.getMetaData();
             assertEquals(1, rsmd.getColumnCount(), "Count query should return exactly 1 column");
+        }
+
+        @Test
+        void selectWithSUM() throws SQLException {
+            assumeFixturesExist("selectWithSUM");
+            String query = """
+                SELECT SUM(NumberOfEmployees)
+                FROM Account
+                WHERE NumberOfEmployees != null""";
+
+            ForceConnection conn = createOfflineConnection("selectWithSUM");
+            ForcePreparedStatement select = (ForcePreparedStatement) conn.prepareStatement(query);
+
+            ResultSet result = select.executeQuery();
+            assertNotNull(result, "ResultSet should not be null");
+
+            ResultSetMetaData rsmd = result.getMetaData();
+            assertEquals(1, rsmd.getColumnCount(), "SUM aggregate should return exactly 1 column");
+        }
+
+        @Test
+        void selectWithAVG() throws SQLException {
+            assumeFixturesExist("selectWithAVG");
+            String query = """
+                SELECT AVG(NumberOfEmployees)
+                FROM Account
+                WHERE NumberOfEmployees != null""";
+
+            ForceConnection conn = createOfflineConnection("selectWithAVG");
+            ForcePreparedStatement select = (ForcePreparedStatement) conn.prepareStatement(query);
+
+            ResultSet result = select.executeQuery();
+            assertNotNull(result, "ResultSet should not be null");
+
+            ResultSetMetaData rsmd = result.getMetaData();
+            assertEquals(1, rsmd.getColumnCount(), "AVG aggregate should return exactly 1 column");
+        }
+
+        @Test
+        void selectWithCalendarMonth() throws SQLException {
+            assumeFixturesExist("selectWithCalendarMonth");
+            String query = """
+                SELECT CALENDAR_MONTH(CreatedDate), COUNT(Id)
+                FROM Account
+                GROUP BY CALENDAR_MONTH(CreatedDate)
+                LIMIT 5""";
+
+            ForceConnection conn = createOfflineConnection("selectWithCalendarMonth");
+            ForcePreparedStatement select = (ForcePreparedStatement) conn.prepareStatement(query);
+
+            ResultSet result = select.executeQuery();
+            assertNotNull(result, "ResultSet should not be null");
+
+            ResultSetMetaData rsmd = result.getMetaData();
+            assertEquals(2, rsmd.getColumnCount(), "CALENDAR_MONTH query should return 2 columns");
+
+            // Verify we can read the data
+            assertTrue(result.next(), "Should have at least one row");
+            assertNotNull(result.getObject(1), "CALENDAR_MONTH value should not be null");
+            assertNotNull(result.getObject(2), "COUNT value should not be null");
+        }
+
+        @Test
+        void selectWithFiscalQuarter() throws SQLException {
+            assumeFixturesExist("selectWithFiscalQuarter");
+            String query = """
+                SELECT FISCAL_QUARTER(CreatedDate), COUNT(Id)
+                FROM Account
+                GROUP BY FISCAL_QUARTER(CreatedDate)
+                LIMIT 5""";
+
+            ForceConnection conn = createOfflineConnection("selectWithFiscalQuarter");
+            ForcePreparedStatement select = (ForcePreparedStatement) conn.prepareStatement(query);
+
+            ResultSet result = select.executeQuery();
+            assertNotNull(result, "ResultSet should not be null");
+
+            ResultSetMetaData rsmd = result.getMetaData();
+            assertEquals(2, rsmd.getColumnCount(), "FISCAL_QUARTER query should return 2 columns");
+
+            // Verify we can read the data
+            assertTrue(result.next(), "Should have at least one row");
+            assertNotNull(result.getObject(1), "FISCAL_QUARTER value should not be null");
+            assertNotNull(result.getObject(2), "COUNT value should not be null");
         }
     }
 }
