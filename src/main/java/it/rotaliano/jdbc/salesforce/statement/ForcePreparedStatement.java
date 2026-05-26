@@ -48,6 +48,12 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.ehcache.Cache;
+import net.sf.jsqlparser.statement.select.PlainSelect;
+import net.sf.jsqlparser.statement.select.SelectItem;
+import net.sf.jsqlparser.expression.Function;
+import net.sf.jsqlparser.expression.Expression;
+import it.rotaliano.jdbc.salesforce.statement.processor.utils.EvaluateExpressionVisitor;
+
 
 /**
  * Salesforce-specific {@link PreparedStatement} implementation.
@@ -349,7 +355,68 @@ public class ForcePreparedStatement extends AbstractPreparedStatement implements
                     String columnLabel = findColumnLabel(field.getName());
                     columnMap.put(field.getFullName(), columnLabel, field.getValue(), typeInfo);
                 });
+
+        evaluateCoalesceFunctions(columnMap);
         return columnMap;
+    }
+
+    private void evaluateCoalesceFunctions(ColumnMap<String, Object> columnMap) {
+        try {
+            net.sf.jsqlparser.statement.Statement stmt = getSoqlQueryAnalyzer().getSoqlQuery();
+            if (stmt instanceof PlainSelect select) {
+                for (SelectItem<?> item : select.getSelectItems()) {
+                    if (item.getExpression() instanceof Function func && "coalesce".equalsIgnoreCase(func.getName())) {
+                        String alias = item.getAlias() != null ? item.getAlias().getName() : func.toString();
+
+                        // Build a map of column names/labels to values
+                        Map<String, Object> fieldsMap = new java.util.HashMap<>();
+                        for (int i = 0; i < columnMap.size(); i++) {
+                            fieldsMap.put(columnMap.getColumnNames().get(i), columnMap.getValues().get(i));
+                            String name = columnMap.getColumnNames().get(i);
+                            String[] parts = StringUtils.split(name, '.');
+                            if (parts.length > 0) {
+                                fieldsMap.put(parts[parts.length - 1], columnMap.getValues().get(i));
+                            }
+                        }
+
+                        // Evaluate the coalesce parameters
+                        Object coalescedValue = null;
+                        if (func.getParameters() != null) {
+                            for (Expression param : func.getParameters()) {
+                                EvaluateExpressionVisitor visitor = new EvaluateExpressionVisitor(fieldsMap);
+                                param.accept(visitor);
+                                Object val = visitor.getResult();
+                                if (val != null) {
+                                    coalescedValue = val;
+                                    break;
+                                }
+                            }
+                        }
+
+                        // Update the value in columnMap
+                        int idx = -1;
+                        for (int i = 0; i < columnMap.size(); i++) {
+                            String name = columnMap.getColumnNames().get(i);
+                            if (name.equalsIgnoreCase(alias)
+                                    || name.endsWith("." + alias)
+                                    || name.equalsIgnoreCase(func.toString())
+                                    || name.endsWith("." + func.toString())
+                                    || name.equalsIgnoreCase(func.getName())
+                                    || name.endsWith("." + func.getName())) {
+                                idx = i;
+                                break;
+                            }
+                        }
+
+                        if (idx != -1) {
+                            columnMap.getValues().set(idx, coalescedValue);
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            log.warn("Failed to evaluate COALESCE functions client-side", e);
+        }
     }
 
     private TypeInfo findColumnType(String name) {
@@ -357,17 +424,19 @@ public class ForcePreparedStatement extends AbstractPreparedStatement implements
             return TypeInfo.OTHER_TYPE_INFO;
         }
         try {
-            for (int i = 1; i <= metadata.getColumnCount(); i++) {
-                if (name.equalsIgnoreCase(metadata.getColumnName(i))) {
-                    return TypeInfo.lookupTypeInfo(metadata.getColumnTypeName(i));
-                }
-            }
-            String[] prefix = StringUtils.split(name, '.');
-            if (prefix.length > 0) {
-                name = String.join(".", List.of(prefix).subList(1, prefix.length));
+            if (metadata != null) {
                 for (int i = 1; i <= metadata.getColumnCount(); i++) {
                     if (name.equalsIgnoreCase(metadata.getColumnName(i))) {
                         return TypeInfo.lookupTypeInfo(metadata.getColumnTypeName(i));
+                    }
+                }
+                String[] prefix = StringUtils.split(name, '.');
+                if (prefix.length > 0) {
+                    name = String.join(".", List.of(prefix).subList(1, prefix.length));
+                    for (int i = 1; i <= metadata.getColumnCount(); i++) {
+                        if (name.equalsIgnoreCase(metadata.getColumnName(i))) {
+                            return TypeInfo.lookupTypeInfo(metadata.getColumnTypeName(i));
+                        }
                     }
                 }
             }
@@ -382,9 +451,11 @@ public class ForcePreparedStatement extends AbstractPreparedStatement implements
             return null;
         }
         try {
-            for (int i = 1; i <= metadata.getColumnCount(); i++) {
-                if (name.equalsIgnoreCase(metadata.getColumnName(i))) {
-                    return metadata.getColumnLabel(i);
+            if (metadata != null) {
+                for (int i = 1; i <= metadata.getColumnCount(); i++) {
+                    if (name.equalsIgnoreCase(metadata.getColumnName(i))) {
+                        return metadata.getColumnLabel(i);
+                    }
                 }
             }
         } catch (SQLException e) {

@@ -149,6 +149,20 @@ public class EvaluateExpressionVisitor extends ExpressionVisitorAdapter<Expressi
             result = LocalDate.now();
             return null;
         }
+        if ("coalesce".equalsIgnoreCase(function.getName())) {
+            if (function.getParameters() != null) {
+                for (Expression expr : function.getParameters()) {
+                    EvaluateExpressionVisitor subEvaluator = subVisitor();
+                    expr.accept(subEvaluator);
+                    if (subEvaluator.getResult() != null) {
+                        result = subEvaluator.getResult();
+                        return null;
+                    }
+                }
+            }
+            result = null;
+            return null;
+        }
         throw new UnsupportedOperationException("Function '" + function.getName() + "' is not implemented.");
     }
 

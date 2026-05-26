@@ -13,6 +13,8 @@ import static org.mockito.Mockito.when;
 import com.sforce.soap.partner.DescribeSObjectResult;
 import com.sforce.ws.ConnectionException;
 import it.rotaliano.jdbc.salesforce.connection.ForceConnection;
+import it.rotaliano.jdbc.salesforce.delegates.ForceResultField;
+import it.rotaliano.jdbc.salesforce.metadata.ColumnMap;
 import it.rotaliano.jdbc.salesforce.delegates.PartnerService;
 import it.rotaliano.jdbc.salesforce.exceptions.SalesforceRuntimeException;
 import it.rotaliano.jdbc.salesforce.statement.ForcePreparedStatement.CacheMode;
@@ -168,5 +170,46 @@ public class ForcePreparedStatementTest {
             "Error message should contain the table name: " + errorMessage);
         assertTrue(errorMessage.contains("Query execution failed"),
             "Error message should contain 'Query execution failed': " + errorMessage);
+    }
+
+    @Test
+    public void testCoalesceEvaluation() throws SQLException {
+        String sql = "SELECT COALESCE(Phone, Fax, 'N/A') AS contact_info FROM Account";
+        ForcePreparedStatement statement = new ForcePreparedStatement(connection, sql);
+
+        // 1. Test first parameter not null
+        List<ForceResultField> fields1 = List.of(
+            new ForceResultField("Account", "string", "Phone", "12345"),
+            new ForceResultField("Account", "string", "Fax", "67890"),
+            new ForceResultField("Account", "string", "contact_info", null)
+        );
+        ColumnMap<String, Object> map1 = statement.convertToColumnMap(fields1);
+        assertEquals("12345", map1.get("contact_info"));
+
+        // 2. Test first parameter null, second not null
+        List<ForceResultField> fields2 = List.of(
+            new ForceResultField("Account", "string", "Phone", null),
+            new ForceResultField("Account", "string", "Fax", "67890"),
+            new ForceResultField("Account", "string", "contact_info", null)
+        );
+        ColumnMap<String, Object> map2 = statement.convertToColumnMap(fields2);
+        assertEquals("67890", map2.get("contact_info"));
+
+        // 3. Test both parameters null, literal returned
+        List<ForceResultField> fields3 = List.of(
+            new ForceResultField("Account", "string", "Phone", null),
+            new ForceResultField("Account", "string", "Fax", null),
+            new ForceResultField("Account", "string", "contact_info", null)
+        );
+        ColumnMap<String, Object> map3 = statement.convertToColumnMap(fields3);
+        assertEquals("N/A", map3.get("contact_info"));
+    }
+
+    @Test
+    public void testCoalesceQueryRewriting() throws SQLException {
+        String sql = "SELECT COALESCE(Phone, Fax, 'N/A') AS contact_info FROM Account";
+        ForcePreparedStatement statement = new ForcePreparedStatement(connection, sql);
+        String rewritten = statement.prepareQueryForExecution();
+        assertEquals("SELECT Phone, Fax FROM Account", rewritten);
     }
 }

@@ -8,7 +8,9 @@ import it.rotaliano.jdbc.salesforce.utils.FieldDefTree;
 import com.sforce.soap.partner.ChildRelationship;
 import com.sforce.soap.partner.DescribeSObjectResult;
 import com.sforce.soap.partner.Field;
+import net.sf.jsqlparser.expression.BinaryExpression;
 import net.sf.jsqlparser.expression.Expression;
+import net.sf.jsqlparser.expression.operators.relational.ParenthesedExpressionList;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.select.*;
@@ -73,7 +75,7 @@ public class SelectSpecVisitor implements SelectItemVisitor<Expression> {
 
     private String removeRootEntity(final SelectItem<Expression> fieldSpec, final Column column, final String objectPrefix,
         final List<String> prefixNames, String alias, final String name) {
-        if (fieldSpec.getAlias() == null && objectPrefix != null && !objectPrefix.equals(rootEntityName)) {
+        if ((fieldSpec == null || fieldSpec.getAlias() == null) && objectPrefix != null && !objectPrefix.equals(rootEntityName)) {
             if (prefixNames.size() > 1 && prefixNames.get(0).equals(rootEntityName)) {
                 prefixNames.remove(rootEntityName);
                 alias = String.join(".", prefixNames) + "." + name;
@@ -134,6 +136,39 @@ public class SelectSpecVisitor implements SelectItemVisitor<Expression> {
         "WEEK_IN_YEAR");
 
     private void visitFunctionCallSpec(net.sf.jsqlparser.expression.Function functionCallSpec, String alias) {
+        if ("COALESCE".equalsIgnoreCase(functionCallSpec.getName())) {
+            FieldDef coalesceField = new FieldDef(alias, alias, alias, "string");
+            fieldDefinitions.addSqlOrderField(coalesceField);
+            fieldDefinitions.addChild(coalesceField);
+
+            if (functionCallSpec.getParameters() != null) {
+                for (Expression expr : functionCallSpec.getParameters()) {
+                    List<Column> cols = new ArrayList<>();
+                    findColumns(expr, cols);
+                    for (Column column : cols) {
+                        String name = column.getColumnName();
+                        String colAlias = name;
+                        String objectPrefix = null;
+                        List<String> prefixNames = new ArrayList<>();
+                        if (column.getTable() != null) {
+                            objectPrefix = column.getTable().getName();
+                            String[] prefix = StringUtils.split(column.getTable().getFullyQualifiedName(), '.');
+                            prefixNames.addAll(List.of(prefix));
+                        }
+                        colAlias = removeRootEntity(null, column, objectPrefix, prefixNames, colAlias, name);
+                        FieldDef result = createFieldDef(name, colAlias, prefixNames);
+                        if (!prefixNames.isEmpty()) {
+                            int position = getPosition(prefixNames);
+                            fieldDefinitions.addChild(result, position);
+                        } else {
+                            fieldDefinitions.addChild(result);
+                        }
+                    }
+                }
+            }
+            return;
+        }
+
         if (FUNCTIONS_HAS_INT_RESULT.contains(functionCallSpec.getName().toUpperCase())) {
             fieldDefinitions.addChild(new FieldDef(alias, alias, alias, "int"));
         } else {
@@ -142,6 +177,25 @@ public class SelectSpecVisitor implements SelectItemVisitor<Expression> {
             List<String> prefixNames = List.of(ArrayUtils.remove(prefix, prefix.length - 1));
             FieldDef result = createFieldDef(param.toString(), alias, prefixNames);
             fieldDefinitions.addChild(result);
+        }
+    }
+
+    private void findColumns(Expression expr, List<Column> result) {
+        if (expr instanceof Column col) {
+            result.add(col);
+        } else if (expr instanceof BinaryExpression binary) {
+            findColumns(binary.getLeftExpression(), result);
+            findColumns(binary.getRightExpression(), result);
+        } else if (expr instanceof net.sf.jsqlparser.expression.Function func) {
+            if (func.getParameters() != null) {
+                for (Expression param : func.getParameters()) {
+                    findColumns(param, result);
+                }
+            }
+        } else if (expr instanceof ParenthesedExpressionList parenthesis) {
+            for (Object innerExpr : parenthesis) {
+                findColumns((Expression) innerExpr, result);
+            }
         }
     }
 

@@ -76,6 +76,19 @@ You can download the latest driver JAR file from the [Releases page](https://git
      CACHE SESSION SELECT Id, Name FROM Account
      ```
 
+6. **Custom Functions**
+   The driver implements client-side functions that are not natively supported by Salesforce SOQL:
+   * **`COALESCE(expression1, expression2, ...)`**
+     Evaluates the arguments in order and returns the first non-NULL value.
+     
+     > [!WARNING]
+     > Since SOQL does not natively support `COALESCE`, the driver rewrites the query to request all underlying columns, then evaluates the function in-memory on the client side. This may impact query performance and increase network traffic.
+     
+     Example:
+     ```sql
+     SELECT COALESCE(Phone, Fax, 'N/A') AS contact_info FROM Account;
+     ```
+
 ## Maven Dependency
 
 Add the following dependency to your `pom.xml`:
