@@ -1,5 +1,15 @@
 # Changelog
 
+### 2.0.2
+
+- **Support for Client-Side COALESCE Function**:
+  - Implemented the client-side `COALESCE` function in select queries to evaluate the first non-null argument locally.
+  - Automatically rewrites incoming queries to request all underlying fields, resolving the first non-null value in-memory.
+- **Dependency Refactoring**:
+  - Migrated from the deprecated `Parenthesis` class to `ParenthesedExpressionList` in JSQLParser.
+- **Documentation**:
+  - Added details on custom functions and potential performance implications to the README.
+
 ### 2.0.1
 
 - **Support for OAuth 2.0 Client Credentials Authentication**:
