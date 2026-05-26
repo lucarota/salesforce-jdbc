@@ -536,7 +536,28 @@ class ForceDriverConnectivityTest {
 
         ResultSet result = select.executeQuery();
         DBTablePrinter.printResultSet(result);
-    }    @Test
+    }
+
+    @Test
+    @Disabled("Live test - run manually to record fixtures")
+    void selectWithCoalesce_record() throws SQLException {
+        String query = "SELECT COALESCE(Phone, Fax, 'N/A') FROM Account WHERE Phone != NULL LIMIT 5";
+
+        Connection con = DriverManager.getConnection(url, userSIT, passSIT);
+        installRecordingPartnerService(con, "selectWithCoalesce");
+        ForcePreparedStatement select = (ForcePreparedStatement) con.prepareStatement(query);
+
+        ResultSet result = select.executeQuery();
+        int rowCount = 0;
+        while (result.next()) {
+            rowCount++;
+            Object val = result.getObject(1);
+            assertNotNull(val);
+        }
+        assertTrue(rowCount > 0);
+    }
+
+    @Test
     @Disabled("Live test - run manually to record fixtures")
     void selectOAuthPreprod_record() throws SQLException {
         String oauthUrl = "jdbc:rotaliano:salesforce://" + loginDomainPreprod;
@@ -1101,6 +1122,27 @@ class ForceDriverConnectivityTest {
             assertTrue(result.next(), "Should have at least one row");
             assertNotNull(result.getObject(1), "FISCAL_QUARTER value should not be null");
             assertNotNull(result.getObject(2), "COUNT value should not be null");
+        }
+
+        @Test
+        void selectWithCoalesce() throws SQLException {
+            assumeFixturesExist("selectWithCoalesce");
+            String query = "SELECT COALESCE(Phone, Fax, 'N/A') FROM Account WHERE Phone != NULL LIMIT 5";
+
+            ForceConnection conn = createOfflineConnection("selectWithCoalesce");
+            ForcePreparedStatement select = (ForcePreparedStatement) conn.prepareStatement(query);
+
+            ResultSet result = select.executeQuery();
+            assertNotNull(result, "ResultSet should not be null");
+
+            ResultSetMetaData rsmd = result.getMetaData();
+            assertEquals(3, rsmd.getColumnCount(), "Coalesce query should return 3 columns (including parameter columns)");
+            assertEquals("COALESCE", rsmd.getColumnLabel(1));
+            assertEquals("Phone", rsmd.getColumnLabel(2));
+            assertEquals("Fax", rsmd.getColumnLabel(3));
+
+            assertTrue(result.next(), "Should have at least one row");
+            assertNotNull(result.getObject(1), "Coalesced value should not be null");
         }
     }
 }

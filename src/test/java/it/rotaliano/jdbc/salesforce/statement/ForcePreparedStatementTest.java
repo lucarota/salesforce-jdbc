@@ -207,9 +207,9 @@ public class ForcePreparedStatementTest {
 
     @Test
     public void testCoalesceQueryRewriting() throws SQLException {
-        String sql = "SELECT COALESCE(Phone, Fax, 'N/A') AS contact_info FROM Account";
+        String sql = "SELECT Name, COALESCE(Phone, Fax, 'N/A') AS contact_info, Surname FROM Account";
         ForcePreparedStatement statement = new ForcePreparedStatement(connection, sql);
         String rewritten = statement.prepareQueryForExecution();
-        assertEquals("SELECT Phone, Fax FROM Account", rewritten);
+        assertEquals("SELECT Name, Phone, Fax, Surname FROM Account", rewritten);
     }
 }
