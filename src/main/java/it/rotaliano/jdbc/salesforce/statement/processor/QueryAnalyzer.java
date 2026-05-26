@@ -104,27 +104,24 @@ public class QueryAnalyzer {
         return partnerService.describeSObject(fromObjectName);
     }
 
-    /**
-     * Replaces count(*) with count(Id) in the query since SOQL doesn't support count(*).
-     * SOQL requires an explicit field name in count() function.
-     */
     private void replaceCountStarWithCountId(PlainSelect select) {
         for (int i = 0; i < select.getSelectItems().size(); i++) {
             SelectItem<?> item = select.getSelectItems().get(i);
             Expression expr = item.getExpression();
 
             if (expr instanceof Function func && "count".equalsIgnoreCase(func.getName())) {
-                // Check if it's count(*)
-                if (func.getParameters() != null && !func.getParameters().isEmpty()) {
-                    String param = func.getParameters().get(0).toString();
-                    if ("*".equals(param)) {
-                        // Replace count(*) with count(Id)
-                        Function newFunc = new Function();
-                        newFunc.setName("count");
-                        newFunc.setParameters(new Column("Id"));
-                        select.getSelectItems().set(i, new SelectItem<>(newFunc));
-                        log.debug("Replaced count(*) with count(Id) for SOQL compatibility");
+                boolean isCountStar = func.isAllColumns();
+                if (!isCountStar && func.getParameters() != null && !func.getParameters().isEmpty()) {
+                    String param = func.getParameters().get(0).toString().trim();
+                    if ("*".equals(param) || "1".equals(param)) {
+                        isCountStar = true;
                     }
+                }
+
+                if (isCountStar) {
+                    func.setAllColumns(false);
+                    func.setParameters(new Column("Id"));
+                    log.debug("Replaced count(*) with count(Id) for SOQL compatibility");
                 }
             }
         }

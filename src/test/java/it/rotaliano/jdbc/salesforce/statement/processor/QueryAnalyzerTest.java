@@ -466,6 +466,42 @@ class QueryAnalyzerTest {
             assertTrue(resultSoql.contains("WHERE"),
                 "Query should preserve WHERE clause: " + resultSoql);
         }
+
+        @Test
+        @DisplayName("Should replace COUNT(*) (uppercase) with count(Id)")
+        void testCountStarUppercase() {
+            String soql = "SELECT COUNT(*) FROM Account";
+            QueryAnalyzer analyzer = new QueryAnalyzer(soql, null, null);
+            String resultSoql = analyzer.getSoql();
+            assertTrue(resultSoql.contains("count(Id)") || resultSoql.contains("COUNT(Id)"));
+        }
+
+        @Test
+        @DisplayName("Should replace count( * ) (with spaces) with count(Id)")
+        void testCountStarWithSpaces() {
+            String soql = "SELECT count( * ) FROM Account";
+            QueryAnalyzer analyzer = new QueryAnalyzer(soql, null, null);
+            String resultSoql = analyzer.getSoql();
+            assertTrue(resultSoql.contains("count(Id)"));
+        }
+
+        @Test
+        @DisplayName("Should replace count(1) with count(Id)")
+        void testCountOne() {
+            String soql = "SELECT count(1) FROM Account";
+            QueryAnalyzer analyzer = new QueryAnalyzer(soql, null, null);
+            String resultSoql = analyzer.getSoql();
+            assertTrue(resultSoql.contains("count(Id)"));
+        }
+
+        @Test
+        @DisplayName("Should replace COUNT(1) with count(Id)")
+        void testCountOneUppercase() {
+            String soql = "SELECT COUNT(1) FROM Account";
+            QueryAnalyzer analyzer = new QueryAnalyzer(soql, null, null);
+            String resultSoql = analyzer.getSoql();
+            assertTrue(resultSoql.contains("count(Id)") || resultSoql.contains("COUNT(Id)"));
+        }
     }
 
     @Nested
@@ -529,6 +565,29 @@ class QueryAnalyzerTest {
             String soql = "SELECT Id, Name FROM Account";
             QueryAnalyzer analyzer = new QueryAnalyzer(soql, null, null);
             assertFalse(analyzer.isExpandedStarSyntaxForFields());
+        }
+
+        @Test
+        @DisplayName("Should replace count(*) with count(Id)")
+        void testReplaceCountStarWithCountId() {
+            String soql = "SELECT COUNT(*) FROM Account";
+            QueryAnalyzer analyzer = new QueryAnalyzer(soql, null, null);
+            assertEquals("SELECT COUNT(Id) FROM Account", analyzer.getSoql());
+        }
+
+        @Test
+        void testCountStarStructure() {
+            String soql = "SELECT COUNT(*) FROM Account";
+            try {
+                net.sf.jsqlparser.statement.Statement stmt = net.sf.jsqlparser.parser.CCJSqlParserUtil.parse(soql);
+                net.sf.jsqlparser.statement.select.PlainSelect select = (net.sf.jsqlparser.statement.select.PlainSelect) stmt;
+                net.sf.jsqlparser.expression.Function func = (net.sf.jsqlparser.expression.Function) select.getSelectItems().get(0).getExpression();
+                System.out.println("DEBUG_COUNT_STAR_NAME: " + func.getName());
+                System.out.println("DEBUG_COUNT_STAR_ALL_COLUMNS: " + func.isAllColumns());
+                System.out.println("DEBUG_COUNT_STAR_PARAMS: " + func.getParameters());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 }
