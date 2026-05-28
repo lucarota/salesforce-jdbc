@@ -32,8 +32,8 @@ public class FieldDef {
     public String getEntity() {
         int dot = fullName.lastIndexOf(".");
         if (dot == -1) {
-            return "";
+            return null;
         }
-        return fullName.substring(dot + 1);
+        return fullName.substring(0, dot);
     }
 }

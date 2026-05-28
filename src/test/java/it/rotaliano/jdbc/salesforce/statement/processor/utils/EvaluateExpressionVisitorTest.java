@@ -9,7 +9,11 @@ import java.util.Map;
 import net.sf.jsqlparser.expression.*;
 import net.sf.jsqlparser.expression.operators.arithmetic.Addition;
 import net.sf.jsqlparser.expression.operators.arithmetic.Subtraction;
+import net.sf.jsqlparser.expression.operators.relational.*;
+import net.sf.jsqlparser.expression.operators.conditional.*;
 import org.junit.jupiter.api.Test;
+import java.util.List;
+import net.sf.jsqlparser.schema.Column;
 
 
 public class EvaluateExpressionVisitorTest {
@@ -321,5 +325,67 @@ public class EvaluateExpressionVisitorTest {
         func.setName("now");
         func.accept(visitorS1);
         assertEquals("2021-Test-Day 12:12:12", visitorS1.getResult());
+    }
+
+    @Test
+    public void testResolveCaseExpressions() {
+        // Simple CASE: switch on Amount
+        CaseExpression simpleCase = new CaseExpression()
+                .withSwitchExpression(new Column("Amount"))
+                .withWhenClauses(List.of(
+                        new WhenClause()
+                                .withWhenExpression(new LongValue(1000))
+                                .withThenExpression(new StringValue("THOUSAND")),
+                        new WhenClause()
+                                .withWhenExpression(new LongValue(2000))
+                                .withThenExpression(new StringValue("TWO_THOUSAND"))
+                ))
+                .withElseExpression(new StringValue("OTHER"));
+
+        // Match 1000
+        Map<String, Object> dbFields1 = RecordFieldsBuilder.setId("1").build();
+        dbFields1.put("Amount", 1000);
+        EvaluateExpressionVisitor visitor1 = new EvaluateExpressionVisitor(dbFields1);
+        simpleCase.accept(visitor1);
+        assertEquals("THOUSAND", visitor1.getResult());
+
+        // Match 2000
+        Map<String, Object> dbFields2 = RecordFieldsBuilder.setId("2").build();
+        dbFields2.put("Amount", 2000.0); // as double
+        EvaluateExpressionVisitor visitor2 = new EvaluateExpressionVisitor(dbFields2);
+        simpleCase.accept(visitor2);
+        assertEquals("TWO_THOUSAND", visitor2.getResult());
+
+        // Match else
+        Map<String, Object> dbFields3 = RecordFieldsBuilder.setId("3").build();
+        dbFields3.put("Amount", 3000);
+        EvaluateExpressionVisitor visitor3 = new EvaluateExpressionVisitor(dbFields3);
+        simpleCase.accept(visitor3);
+        assertEquals("OTHER", visitor3.getResult());
+
+        // Searched CASE: WHEN Amount > 1000 THEN 'BIG' ELSE 'SMALL'
+        CaseExpression searchedCase = new CaseExpression()
+                .withWhenClauses(List.of(
+                        new WhenClause()
+                                .withWhenExpression(new GreaterThan()
+                                        .withLeftExpression(new Column("Amount"))
+                                        .withRightExpression(new LongValue(1000)))
+                                .withThenExpression(new StringValue("BIG"))
+                ))
+                .withElseExpression(new StringValue("SMALL"));
+
+        // Greater than 1000
+        Map<String, Object> dbFields4 = RecordFieldsBuilder.setId("4").build();
+        dbFields4.put("Amount", 1500);
+        EvaluateExpressionVisitor visitor4 = new EvaluateExpressionVisitor(dbFields4);
+        searchedCase.accept(visitor4);
+        assertEquals("BIG", visitor4.getResult());
+
+        // Less than 1000
+        Map<String, Object> dbFields5 = RecordFieldsBuilder.setId("5").build();
+        dbFields5.put("Amount", 500);
+        EvaluateExpressionVisitor visitor5 = new EvaluateExpressionVisitor(dbFields5);
+        searchedCase.accept(visitor5);
+        assertEquals("SMALL", visitor5.getResult());
     }
 }

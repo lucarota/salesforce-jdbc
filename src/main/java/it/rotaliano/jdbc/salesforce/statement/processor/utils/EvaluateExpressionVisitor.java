@@ -13,6 +13,9 @@ import java.sql.Time;
 import java.time.*;
 import java.util.Date;
 import java.util.Map;
+import java.util.Objects;
+import net.sf.jsqlparser.expression.operators.relational.*;
+import net.sf.jsqlparser.expression.operators.conditional.*;
 
 @Slf4j
 public class EvaluateExpressionVisitor extends ExpressionVisitorAdapter<Expression> {
@@ -471,11 +474,246 @@ public class EvaluateExpressionVisitor extends ExpressionVisitorAdapter<Expressi
         return null;
     }
 
+    private int compareValues(Object left, Object right) {
+        if (left == null && right == null) {
+            return 0;
+        }
+        if (left == null) {
+            return -1;
+        }
+        if (right == null) {
+            return 1;
+        }
+        if (left instanceof Number numL && right instanceof Number numR) {
+            double dL = numL.doubleValue();
+            double dR = numR.doubleValue();
+            return Double.compare(dL, dR);
+        }
+        if (left instanceof String || right instanceof String) {
+            return left.toString().compareTo(right.toString());
+        }
+        if (left instanceof Comparable compL && left.getClass().isInstance(right)) {
+            @SuppressWarnings("unchecked")
+            int cmp = compL.compareTo(right);
+            return cmp;
+        }
+        return left.toString().compareTo(right.toString());
+    }
+
+    @Override
+    public <S> Expression visit(EqualsTo equalsTo, S context) {
+        EvaluateExpressionVisitor leftEval = subVisitor();
+        equalsTo.getLeftExpression().accept(leftEval);
+        EvaluateExpressionVisitor rightEval = subVisitor();
+        equalsTo.getRightExpression().accept(rightEval);
+        result = Objects.equals(leftEval.getResult(), rightEval.getResult());
+        return null;
+    }
+
+    @Override
+    public <S> Expression visit(NotEqualsTo notEqualsTo, S context) {
+        EvaluateExpressionVisitor leftEval = subVisitor();
+        notEqualsTo.getLeftExpression().accept(leftEval);
+        EvaluateExpressionVisitor rightEval = subVisitor();
+        notEqualsTo.getRightExpression().accept(rightEval);
+        result = !Objects.equals(leftEval.getResult(), rightEval.getResult());
+        return null;
+    }
+
+    @Override
+    public <S> Expression visit(GreaterThan gt, S context) {
+        EvaluateExpressionVisitor leftEval = subVisitor();
+        gt.getLeftExpression().accept(leftEval);
+        EvaluateExpressionVisitor rightEval = subVisitor();
+        gt.getRightExpression().accept(rightEval);
+        if (leftEval.getResult() == null || rightEval.getResult() == null) {
+            result = false;
+        } else {
+            result = compareValues(leftEval.getResult(), rightEval.getResult()) > 0;
+        }
+        return null;
+    }
+
+    @Override
+    public <S> Expression visit(GreaterThanEquals gte, S context) {
+        EvaluateExpressionVisitor leftEval = subVisitor();
+        gte.getLeftExpression().accept(leftEval);
+        EvaluateExpressionVisitor rightEval = subVisitor();
+        gte.getRightExpression().accept(rightEval);
+        if (leftEval.getResult() == null || rightEval.getResult() == null) {
+            result = false;
+        } else {
+            result = compareValues(leftEval.getResult(), rightEval.getResult()) >= 0;
+        }
+        return null;
+    }
+
+    @Override
+    public <S> Expression visit(MinorThan lt, S context) {
+        EvaluateExpressionVisitor leftEval = subVisitor();
+        lt.getLeftExpression().accept(leftEval);
+        EvaluateExpressionVisitor rightEval = subVisitor();
+        lt.getRightExpression().accept(rightEval);
+        if (leftEval.getResult() == null || rightEval.getResult() == null) {
+            result = false;
+        } else {
+            result = compareValues(leftEval.getResult(), rightEval.getResult()) < 0;
+        }
+        return null;
+    }
+
+    @Override
+    public <S> Expression visit(MinorThanEquals lte, S context) {
+        EvaluateExpressionVisitor leftEval = subVisitor();
+        lte.getLeftExpression().accept(leftEval);
+        EvaluateExpressionVisitor rightEval = subVisitor();
+        lte.getRightExpression().accept(rightEval);
+        if (leftEval.getResult() == null || rightEval.getResult() == null) {
+            result = false;
+        } else {
+            result = compareValues(leftEval.getResult(), rightEval.getResult()) <= 0;
+        }
+        return null;
+    }
+
+    @Override
+    public <S> Expression visit(IsNullExpression isNull, S context) {
+        EvaluateExpressionVisitor leftEval = subVisitor();
+        isNull.getLeftExpression().accept(leftEval);
+        boolean isNullVal = leftEval.getResult() == null;
+        result = isNull.isNot() ? !isNullVal : isNullVal;
+        return null;
+    }
+
+    @Override
+    public <S> Expression visit(AndExpression and, S context) {
+        EvaluateExpressionVisitor leftEval = subVisitor();
+        and.getLeftExpression().accept(leftEval);
+        Object leftResult = leftEval.getResult();
+        if (Boolean.FALSE.equals(leftResult) || leftResult == null) {
+            result = false;
+            return null;
+        }
+        EvaluateExpressionVisitor rightEval = subVisitor();
+        and.getRightExpression().accept(rightEval);
+        result = Boolean.TRUE.equals(rightEval.getResult());
+        return null;
+    }
+
+    @Override
+    public <S> Expression visit(OrExpression or, S context) {
+        EvaluateExpressionVisitor leftEval = subVisitor();
+        or.getLeftExpression().accept(leftEval);
+        if (Boolean.TRUE.equals(leftEval.getResult())) {
+            result = true;
+            return null;
+        }
+        EvaluateExpressionVisitor rightEval = subVisitor();
+        or.getRightExpression().accept(rightEval);
+        result = Boolean.TRUE.equals(rightEval.getResult());
+        return null;
+    }
+
+    @Override
+    public <S> Expression visit(NotExpression not, S context) {
+        EvaluateExpressionVisitor subEval = subVisitor();
+        not.getExpression().accept(subEval);
+        Object subResult = subEval.getResult();
+        if (subResult instanceof Boolean b) {
+            result = !b;
+        } else {
+            result = false;
+        }
+        return null;
+    }
+
+    @Override
+    public <S> Expression visit(LikeExpression like, S context) {
+        EvaluateExpressionVisitor leftEval = subVisitor();
+        like.getLeftExpression().accept(leftEval);
+        EvaluateExpressionVisitor rightEval = subVisitor();
+        like.getRightExpression().accept(rightEval);
+        Object leftVal = leftEval.getResult();
+        Object rightVal = rightEval.getResult();
+        if (leftVal == null || rightVal == null) {
+            result = false;
+            return null;
+        }
+        String pattern = rightVal.toString();
+        String regex = pattern
+                .replace("\\", "\\\\")
+                .replace(".", "\\.")
+                .replace("^", "\\^")
+                .replace("$", "\\$")
+                .replace("+", "\\+")
+                .replace("*", "\\*")
+                .replace("?", "\\?")
+                .replace("(", "\\(")
+                .replace(")", "\\)")
+                .replace("[", "\\[")
+                .replace("]", "\\]")
+                .replace("{", "\\{")
+                .replace("}", "\\}")
+                .replace("%", ".*")
+                .replace("_", ".");
+        result = leftVal.toString().matches("(?i)" + regex);
+        return null;
+    }
+
     @Override
     public <S> Expression visit(CaseExpression caseExpression, S context) {
         log.trace("[EvaluateExpressionVisitor] CaseExpression");
-        EvaluateExpressionVisitor caseEvaluatorLeft = subVisitor();
-        caseExpression.getSwitchExpression().accept(caseEvaluatorLeft);
+        Object switchVal = null;
+        if (caseExpression.getSwitchExpression() != null) {
+            EvaluateExpressionVisitor caseEvaluatorLeft = subVisitor();
+            caseExpression.getSwitchExpression().accept(caseEvaluatorLeft);
+            switchVal = caseEvaluatorLeft.getResult();
+        }
+
+        boolean matched = false;
+        if (caseExpression.getWhenClauses() != null) {
+            for (Expression whenExpr : caseExpression.getWhenClauses()) {
+                if (whenExpr instanceof WhenClause when) {
+                    if (switchVal != null) {
+                        EvaluateExpressionVisitor whenEvaluator = subVisitor();
+                        when.getWhenExpression().accept(whenEvaluator);
+                        Object whenVal = whenEvaluator.getResult();
+                        boolean equals = false;
+                        if (switchVal instanceof Number numS && whenVal instanceof Number numW) {
+                            equals = Double.compare(numS.doubleValue(), numW.doubleValue()) == 0;
+                        } else {
+                            equals = Objects.equals(switchVal, whenVal);
+                        }
+                        if (equals) {
+                            EvaluateExpressionVisitor thenEvaluator = subVisitor();
+                            when.getThenExpression().accept(thenEvaluator);
+                            result = thenEvaluator.getResult();
+                            matched = true;
+                            break;
+                        }
+                    } else {
+                        EvaluateExpressionVisitor whenEvaluator = subVisitor();
+                        when.getWhenExpression().accept(whenEvaluator);
+                        Object whenVal = whenEvaluator.getResult();
+                        if (Boolean.TRUE.equals(whenVal)) {
+                            EvaluateExpressionVisitor thenEvaluator = subVisitor();
+                            when.getThenExpression().accept(thenEvaluator);
+                            result = thenEvaluator.getResult();
+                            matched = true;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        if (!matched && caseExpression.getElseExpression() != null) {
+            EvaluateExpressionVisitor elseEvaluator = subVisitor();
+            caseExpression.getElseExpression().accept(elseEvaluator);
+            result = elseEvaluator.getResult();
+        } else if (!matched) {
+            result = null;
+        }
         return null;
     }
 

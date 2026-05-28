@@ -549,4 +549,15 @@ public class SoqlQueryAnalyzerTest {
         assertTrue(result.contains("WHERE Phone <> NULL"), 
             "Query should rewrite IS NOT NULL to <> NULL: " + result);
     }
+
+    @Test
+    public void testCaseExpressionInSelect() {
+        String soql = "SELECT CASE WHEN Amount > 1000 THEN 'BIG' ELSE 'SMALL' END AS val FROM Opportunity";
+        final QueryAnalyzer queryAnalyzer = new QueryAnalyzer(soql, null, partnerService);
+        SoqlQueryAnalyzer analyzer = new SoqlQueryAnalyzer(queryAnalyzer);
+
+        String result = analyzer.getSoqlQueryString();
+        assertTrue(result.contains("SELECT Amount FROM Opportunity"), 
+            "Query should rewrite CASE select to retrieve physical columns: " + result);
+    }
 }

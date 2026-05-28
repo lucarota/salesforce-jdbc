@@ -12,6 +12,11 @@
   - Migrated from the deprecated `Parenthesis` class to `ParenthesedExpressionList` in JSQLParser.
 - **Documentation**:
   - Added details on custom functions, performance implications, and `WHERE` clause behavior to the README.
+- **Client-Side `CASE WHEN` Expression in SELECT**:
+  - Implemented support for SQL `CASE WHEN THEN ELSE END` constructs in `SELECT` projections.
+  - Since Salesforce SOQL does not natively support `CASE` expressions, the driver rewrites the query to fetch all underlying columns referenced in the `CASE` statement, evaluates the expression in-memory row-by-row, and returns the computed value in the `ResultSet` under the specified alias.
+  - Both **searched** (`WHEN <condition> THEN`) and **simple** (`CASE <field> WHEN <value> THEN`) forms are supported.
+  - Supported condition operators include comparisons (`=`, `!=`, `<`, `>`, `<=`, `>=`, `LIKE`), nullity checks (`IS NULL`, `IS NOT NULL`), and logical connectives (`AND`, `OR`, `NOT`).
 
 ### 2.0.1
 

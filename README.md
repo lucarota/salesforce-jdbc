@@ -101,15 +101,43 @@ You can download the latest driver JAR file from the [Releases page](https://git
        
      * **In WHERE clause:**
        When used in a `WHERE` clause, the driver automatically rewrites the condition into equivalent standard SOQL boolean logic (`AND` / `OR` expressions). This allows Salesforce to perform the filtering database-side.
-       
-       Example:
-       ```sql
-       SELECT Id, Name FROM Account WHERE COALESCE(Phone, Fax) = '555-123-1111';
-       -- Rewritten internally to:
-       -- SELECT Id, Name FROM Account WHERE ((Phone = '555-123-1111') OR (Phone = NULL AND Fax = '555-123-1111'))
-       ```
-       
+      
+      Example:
+      ```sql
+      SELECT Id, Name FROM Account WHERE COALESCE(Phone, Fax) = '555-123-1111';
+      -- Rewritten internally to:
+      -- SELECT Id, Name FROM Account WHERE ((Phone = '555-123-1111') OR (Phone = NULL AND Fax = '555-123-1111'))
+      ```
+      
        Supported operators in the `WHERE` clause include standard comparisons (`=`, `!=`, `<`, `>`, `LIKE`, etc.) as well as nullity checks (`IS NULL` / `IS NOT NULL`). The rewriter also performs client-side constant folding to simplify logic and prevent illegal SOQL comparisons.
+
+8. **Client-Side `CASE WHEN` Expression in SELECT**
+   Since Salesforce SOQL does not natively support `CASE WHEN` expressions, the driver evaluates them in-memory on the client side. The underlying columns referenced in the `CASE` expression are automatically fetched from Salesforce, and the result is computed row-by-row before being returned in the `ResultSet`.
+
+   Both **simple** and **searched** forms are supported:
+
+   * **Searched `CASE` (with `WHEN <condition>`):**
+     ```sql
+     SELECT
+       CASE
+         WHEN Amount > 1000 THEN 'BIG'
+         ELSE 'SMALL'
+       END AS size_label
+     FROM Opportunity;
+     ```
+
+   * **Simple `CASE` (with `WHEN <value>`):**
+     ```sql
+     SELECT
+       CASE Status
+         WHEN 'Open' THEN 'Active'
+         WHEN 'Closed' THEN 'Done'
+         ELSE 'Unknown'
+       END AS status_label
+     FROM Opportunity;
+     ```
+
+   > **Note:** Since evaluation is client-side, all columns referenced in the `CASE` expression are fetched from Salesforce before filtering. This may impact performance and increase network traffic for large result sets.
 
 ## Maven Dependency
 

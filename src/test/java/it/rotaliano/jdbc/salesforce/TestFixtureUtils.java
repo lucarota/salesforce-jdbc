@@ -9,6 +9,7 @@ import com.thoughtworks.xstream.security.PrimitiveTypePermission;
 import it.rotaliano.jdbc.salesforce.delegates.ForceResultField;
 import it.rotaliano.jdbc.salesforce.delegates.PartnerService;
 import it.rotaliano.jdbc.salesforce.utils.FieldDefTree;
+import it.rotaliano.jdbc.salesforce.utils.TreeNode;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -113,17 +114,33 @@ public class TestFixtureUtils {
             return loadDescribe(testName, sObjectType);
         }
 
+        private List<List<ForceResultField>> getExpandedQueryResult(FieldDefTree expectedSchema) {
+            List<List<ForceResultField>> rawRows = loadQueryResult(testName);
+            if (expectedSchema == null) {
+                return rawRows;
+            }
+            java.util.List<TreeNode<ForceResultField>> treeRows = new java.util.ArrayList<>();
+            for (java.util.List<ForceResultField> row : rawRows) {
+                TreeNode<ForceResultField> rowNode = new TreeNode<>();
+                for (ForceResultField f : row) {
+                    rowNode.addChild(f);
+                }
+                treeRows.add(rowNode);
+            }
+            return FieldDefTree.expand(treeRows, expectedSchema);
+        }
+
         @Override
         public List<List<ForceResultField>> query(String soql, FieldDefTree expectedSchema)
             throws ConnectionException {
-            return loadQueryResult(testName);
+            return getExpandedQueryResult(expectedSchema);
         }
 
         @Override
         public Map.Entry<List<List<ForceResultField>>, String> queryStart(String soql,
             FieldDefTree expectedSchema) throws ConnectionException {
             // Return full result in a single batch with null locator (= done)
-            return new java.util.AbstractMap.SimpleEntry<>(loadQueryResult(testName), null);
+            return new java.util.AbstractMap.SimpleEntry<>(getExpandedQueryResult(expectedSchema), null);
         }
 
         @Override

@@ -36,7 +36,7 @@ public class SoqlQueryAnalyzer {
         try {
             Statement stmt = net.sf.jsqlparser.parser.CCJSqlParserUtil.parse(queryAnalyzer.getSoql());
             if (stmt instanceof PlainSelect select) {
-                rewriteCoalesceInSelect(select);
+                rewriteSelectItems(select);
                 rewriteCoalesceInWhere(select, parameters);
                 return select.toString();
             }
@@ -328,7 +328,7 @@ public class SoqlQueryAnalyzer {
     }
 
 
-    private void rewriteCoalesceInSelect(PlainSelect select) {
+    private void rewriteSelectItems(PlainSelect select) {
         List<SelectItem<?>> newSelectItems = new ArrayList<>();
         for (SelectItem<?> item : select.getSelectItems()) {
             Expression expr = item.getExpression();
@@ -342,6 +342,12 @@ public class SoqlQueryAnalyzer {
                         }
                     }
                 }
+            } else if (expr instanceof CaseExpression caseExpr) {
+                List<Column> cols = new ArrayList<>();
+                findColumns(caseExpr, cols);
+                for (Column col : cols) {
+                    newSelectItems.add(new SelectItem<>(col));
+                }
             } else {
                 newSelectItems.add(item);
             }
@@ -350,6 +356,9 @@ public class SoqlQueryAnalyzer {
     }
 
     private void findColumns(Expression expr, List<Column> result) {
+        if (expr == null) {
+            return;
+        }
         if (expr instanceof Column col) {
             result.add(col);
         } else if (expr instanceof BinaryExpression binary) {
@@ -365,6 +374,17 @@ public class SoqlQueryAnalyzer {
             for (Object innerExpr : parenthesis) {
                 findColumns((Expression) innerExpr, result);
             }
+        } else if (expr instanceof CaseExpression caseExpr) {
+            findColumns(caseExpr.getSwitchExpression(), result);
+            if (caseExpr.getWhenClauses() != null) {
+                for (Expression when : caseExpr.getWhenClauses()) {
+                    findColumns(when, result);
+                }
+            }
+            findColumns(caseExpr.getElseExpression(), result);
+        } else if (expr instanceof WhenClause whenClause) {
+            findColumns(whenClause.getWhenExpression(), result);
+            findColumns(whenClause.getThenExpression(), result);
         }
     }
 

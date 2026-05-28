@@ -48,38 +48,64 @@ public class FieldDefTree extends TreeNode<FieldDef> {
         return result;
     }
 
+    private static final java.util.Set<String> FUNCTION_NAMES = new java.util.HashSet<>(java.util.Arrays.asList(
+        "AVG", "COUNT", "COUNT_DISTINCT", "MIN", "MAX", "SUM",
+        "CALENDAR_MONTH", "CALENDAR_QUARTER", "CALENDAR_YEAR",
+        "DAY_IN_MONTH", "DAY_IN_WEEK", "DAY_IN_YEAR", "DAY_ONLY",
+        "FISCAL_MONTH", "FISCAL_QUARTER", "FISCAL_YEAR",
+        "HOUR_IN_DAY", "WEEK_IN_MONTH", "WEEK_IN_YEAR"
+    ));
+
+    private static boolean isFieldNameMatch(String schemaName, String rowName) {
+        if (schemaName == null || rowName == null) {
+            return false;
+        }
+        if (schemaName.equalsIgnoreCase(rowName)) {
+            return true;
+        }
+        // If rowName is expr0, expr1, etc., it matches any function/aggregate field
+        if (rowName.toLowerCase().startsWith("expr")) {
+            String upperSchema = schemaName.toUpperCase();
+            if (upperSchema.contains("(") || FUNCTION_NAMES.contains(upperSchema)) {
+                return true;
+            }
+            for (String func : FUNCTION_NAMES) {
+                if (upperSchema.startsWith(func)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     public static List<List<ForceResultField>> expand(List<TreeNode<ForceResultField>> rows, FieldDefTree schema) {
         PartnerResultToCartesianTable<FieldDef, ForceResultField> expander = new PartnerResultToCartesianTable<>(schema,
             (s, row) -> {
-                int schemaSize = s.getChildrenCount();
-                int rowSize = row.size();
-                if (schemaSize > rowSize) {
-                    /* Remove relation with missing values */
-                    Iterator<ForceResultField> ii = row.iterator();
-                    while (ii.hasNext()) {
-                        String filedName = ii.next().getFullName();
-                        boolean found = false;
-                        for (int i = 0; i < schemaSize; i++) {
-                            TreeNode<FieldDef> child = schema.getChild(i);
-                            FieldDef field = child.getData();
-                            if (field != null && field.getFullName() != null && field.getFullName().equalsIgnoreCase(filedName)) {
-                                found = true;
-                                break;
-                            }
+                List<FieldDef> flatSchema = s.flatten();
+                int schemaSize = flatSchema.size();
+                java.util.List<ForceResultField> alignedRow = new java.util.ArrayList<>();
+                java.util.Set<Integer> matchedIndices = new java.util.HashSet<>();
+                for (FieldDef field : flatSchema) {
+                    ForceResultField matched = null;
+                    for (int j = 0; j < row.size(); j++) {
+                        if (matchedIndices.contains(j)) {
+                            continue;
                         }
-                        if (!found) {
-                            ii.remove();
+                        ForceResultField rf = row.get(j);
+                        if (rf != null && isFieldNameMatch(field.getFullName(), rf.getFullName())) {
+                            matched = rf;
+                            matchedIndices.add(j);
+                            break;
                         }
                     }
-                    for (int i = 0; i < schemaSize; i++) {
-                        FieldDef field = schema.getChild(i).getData();
-                        if (row.size() == i) {
-                            row.add(new ForceResultField(field.getEntity(), field.getType(), field.getName(), null));
-                        } else if (!field.getFullName().equalsIgnoreCase(row.get(i).getFullName())) {
-                            row.add(i, new ForceResultField(field.getEntity(), field.getType(), field.getName(), null));
-                        }
+                    if (matched != null) {
+                        alignedRow.add(new ForceResultField(null, field.getType(), field.getFullName(), matched.getValue()));
+                    } else {
+                        alignedRow.add(new ForceResultField(null, field.getType(), field.getFullName(), null));
                     }
                 }
+                row.clear();
+                row.addAll(alignedRow);
                 return row;
             });
         return expander.expandOn(rows);

@@ -10,6 +10,8 @@ import com.sforce.soap.partner.DescribeSObjectResult;
 import com.sforce.soap.partner.Field;
 import net.sf.jsqlparser.expression.BinaryExpression;
 import net.sf.jsqlparser.expression.Expression;
+import net.sf.jsqlparser.expression.CaseExpression;
+import net.sf.jsqlparser.expression.WhenClause;
 import net.sf.jsqlparser.expression.operators.relational.ParenthesedExpressionList;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.schema.Table;
@@ -68,6 +70,9 @@ public class SelectSpecVisitor implements SelectItemVisitor<Expression> {
         } else if (fieldSpec.getExpression() instanceof net.sf.jsqlparser.expression.Function func) {
             String alias = fieldSpec.getAlias() != null ? fieldSpec.getAlias().getName() : func.getName();
             visitFunctionCallSpec(func, alias);
+        } else if (fieldSpec.getExpression() instanceof CaseExpression caseExpr) {
+            String alias = fieldSpec.getAlias() != null ? fieldSpec.getAlias().getName() : "case_expression";
+            visitCaseExpressionSpec(caseExpr, alias);
         } else if (fieldSpec.getExpression() instanceof ParenthesedSelect subQuery) {
             fieldSpec.setExpression(visitSubQuery(subQuery));
         }
@@ -180,7 +185,38 @@ public class SelectSpecVisitor implements SelectItemVisitor<Expression> {
         }
     }
 
+    private void visitCaseExpressionSpec(CaseExpression caseExpr, String alias) {
+        FieldDef caseField = new FieldDef(alias, alias, alias, "string");
+        fieldDefinitions.addSqlOrderField(caseField);
+        fieldDefinitions.addChild(caseField);
+
+        List<Column> cols = new ArrayList<>();
+        findColumns(caseExpr, cols);
+        for (Column column : cols) {
+            String name = column.getColumnName();
+            String colAlias = name;
+            String objectPrefix = null;
+            List<String> prefixNames = new ArrayList<>();
+            if (column.getTable() != null) {
+                objectPrefix = column.getTable().getName();
+                String[] prefix = StringUtils.split(column.getTable().getFullyQualifiedName(), '.');
+                prefixNames.addAll(List.of(prefix));
+            }
+            colAlias = removeRootEntity(null, column, objectPrefix, prefixNames, colAlias, name);
+            FieldDef result = createFieldDef(name, colAlias, prefixNames);
+            if (!prefixNames.isEmpty()) {
+                int position = getPosition(prefixNames);
+                fieldDefinitions.addChild(result, position);
+            } else {
+                fieldDefinitions.addChild(result);
+            }
+        }
+    }
+
     private void findColumns(Expression expr, List<Column> result) {
+        if (expr == null) {
+            return;
+        }
         if (expr instanceof Column col) {
             result.add(col);
         } else if (expr instanceof BinaryExpression binary) {
@@ -196,6 +232,17 @@ public class SelectSpecVisitor implements SelectItemVisitor<Expression> {
             for (Object innerExpr : parenthesis) {
                 findColumns((Expression) innerExpr, result);
             }
+        } else if (expr instanceof CaseExpression caseExpr) {
+            findColumns(caseExpr.getSwitchExpression(), result);
+            if (caseExpr.getWhenClauses() != null) {
+                for (Expression when : caseExpr.getWhenClauses()) {
+                    findColumns(when, result);
+                }
+            }
+            findColumns(caseExpr.getElseExpression(), result);
+        } else if (expr instanceof WhenClause whenClause) {
+            findColumns(whenClause.getWhenExpression(), result);
+            findColumns(whenClause.getThenExpression(), result);
         }
     }
 

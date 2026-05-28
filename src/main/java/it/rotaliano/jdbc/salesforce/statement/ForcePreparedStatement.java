@@ -52,6 +52,7 @@ import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.SelectItem;
 import net.sf.jsqlparser.expression.Function;
 import net.sf.jsqlparser.expression.Expression;
+import net.sf.jsqlparser.expression.CaseExpression;
 import it.rotaliano.jdbc.salesforce.statement.processor.utils.EvaluateExpressionVisitor;
 
 
@@ -356,16 +357,17 @@ public class ForcePreparedStatement extends AbstractPreparedStatement implements
                     columnMap.put(field.getFullName(), columnLabel, field.getValue(), typeInfo);
                 });
 
-        evaluateCoalesceFunctions(columnMap);
+        evaluateClientSideExpressions(columnMap);
         return columnMap;
     }
 
-    private void evaluateCoalesceFunctions(ColumnMap<String, Object> columnMap) {
+    private void evaluateClientSideExpressions(ColumnMap<String, Object> columnMap) {
         try {
             net.sf.jsqlparser.statement.Statement stmt = getSoqlQueryAnalyzer().getSoqlQuery();
             if (stmt instanceof PlainSelect select) {
                 for (SelectItem<?> item : select.getSelectItems()) {
-                    if (item.getExpression() instanceof Function func && "coalesce".equalsIgnoreCase(func.getName())) {
+                    Expression expr = item.getExpression();
+                    if (expr instanceof Function func && "coalesce".equalsIgnoreCase(func.getName())) {
                         String alias = item.getAlias() != null ? item.getAlias().getName() : func.toString();
 
                         // Build a map of column names/labels to values
@@ -411,11 +413,46 @@ public class ForcePreparedStatement extends AbstractPreparedStatement implements
                         if (idx != -1) {
                             columnMap.getValues().set(idx, coalescedValue);
                         }
+                    } else if (expr instanceof CaseExpression caseExpr) {
+                        String alias = item.getAlias() != null ? item.getAlias().getName() : "case_expression";
+
+                        // Build a map of column names/labels to values
+                        Map<String, Object> fieldsMap = new java.util.HashMap<>();
+                        for (int i = 0; i < columnMap.size(); i++) {
+                            fieldsMap.put(columnMap.getColumnNames().get(i), columnMap.getValues().get(i));
+                            String name = columnMap.getColumnNames().get(i);
+                            String[] parts = StringUtils.split(name, '.');
+                            if (parts.length > 0) {
+                                fieldsMap.put(parts[parts.length - 1], columnMap.getValues().get(i));
+                            }
+                        }
+
+                        // Evaluate the case expression
+                        EvaluateExpressionVisitor visitor = new EvaluateExpressionVisitor(fieldsMap);
+                        caseExpr.accept(visitor);
+                        Object caseValue = visitor.getResult();
+
+                        // Update the value in columnMap
+                        int idx = -1;
+                        for (int i = 0; i < columnMap.size(); i++) {
+                            String name = columnMap.getColumnNames().get(i);
+                            if (name.equalsIgnoreCase(alias)
+                                    || name.endsWith("." + alias)
+                                    || name.equalsIgnoreCase(caseExpr.toString())
+                                    || name.endsWith("." + caseExpr.toString())) {
+                                idx = i;
+                                break;
+                            }
+                        }
+
+                        if (idx != -1) {
+                            columnMap.getValues().set(idx, caseValue);
+                        }
                     }
                 }
             }
         } catch (Exception e) {
-            log.warn("Failed to evaluate COALESCE functions client-side", e);
+            log.warn("Failed to evaluate client-side expressions", e);
         }
     }
 

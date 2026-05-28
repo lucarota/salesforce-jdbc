@@ -1180,5 +1180,32 @@ class ForceDriverConnectivityTest {
             assertEquals("Id", rsmd.getColumnLabel(1));
             assertEquals("Name", rsmd.getColumnLabel(2));
         }
+
+        @Test
+        void selectWithCaseExpression() throws SQLException {
+            assumeFixturesExist("selectWithCoalesceInWhere");
+            String query = "SELECT CASE WHEN Name = 'Account01' THEN 'ONE' ELSE 'OTHER' END AS label, Id FROM Account LIMIT 5";
+
+            ForceConnection conn = createOfflineConnection("selectWithCoalesceInWhere");
+            ForcePreparedStatement select = (ForcePreparedStatement) conn.prepareStatement(query);
+
+            ResultSet result = select.executeQuery();
+            assertNotNull(result, "ResultSet should not be null");
+
+            ResultSetMetaData rsmd = result.getMetaData();
+            assertEquals(3, rsmd.getColumnCount(), "Should have exactly 3 columns (including condition columns)");
+            assertEquals("label", rsmd.getColumnLabel(1));
+            assertEquals("Id", rsmd.getColumnLabel(2));
+            assertEquals("Name", rsmd.getColumnLabel(3));
+
+            int rowCount = 0;
+            while (result.next()) {
+                rowCount++;
+                String labelVal = result.getString("label");
+                assertNotNull(labelVal);
+                assertTrue("ONE".equals(labelVal) || "OTHER".equals(labelVal));
+            }
+            assertTrue(rowCount > 0, "Should return at least one row");
+        }
     }
 }
