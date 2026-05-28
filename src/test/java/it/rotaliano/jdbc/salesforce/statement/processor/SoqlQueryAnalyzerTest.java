@@ -1,6 +1,8 @@
 package it.rotaliano.jdbc.salesforce.statement.processor;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -450,5 +452,79 @@ public class SoqlQueryAnalyzerTest {
         assertEquals(1, actual.size());
         assertEquals("COUNT_DISTINCT", actual.get(0).getAlias());
         assertEquals("int", actual.get(0).getType());
+    }
+
+    @Test
+    public void testCoalesceInWhere_BasicComparison() {
+        String soql = "SELECT Name FROM Account WHERE COALESCE(Phone, Fax) = '12345'";
+        final QueryAnalyzer queryAnalyzer = new QueryAnalyzer(soql, null, partnerService);
+        SoqlQueryAnalyzer analyzer = new SoqlQueryAnalyzer(queryAnalyzer);
+
+        String result = analyzer.getSoqlQueryString();
+        assertTrue(result.contains("WHERE ((Phone = '12345') OR (Phone = NULL AND Fax = '12345'))"), 
+            "Query should be rewritten: " + result);
+    }
+
+    @Test
+    public void testCoalesceInWhere_WithLiteralTrue() {
+        String soql = "SELECT Name FROM Account WHERE COALESCE(Phone, Fax, '12345') = '12345'";
+        final QueryAnalyzer queryAnalyzer = new QueryAnalyzer(soql, null, partnerService);
+        SoqlQueryAnalyzer analyzer = new SoqlQueryAnalyzer(queryAnalyzer);
+
+        String result = analyzer.getSoqlQueryString();
+        assertTrue(result.contains("WHERE ((Phone = '12345') OR (Phone = NULL AND Fax = '12345') OR (Phone = NULL AND Fax = NULL))"), 
+            "Query should be rewritten: " + result);
+    }
+
+    @Test
+    public void testCoalesceInWhere_WithLiteralFalse() {
+        String soql = "SELECT Name FROM Account WHERE COALESCE(Phone, Fax, 'N/A') = '12345'";
+        final QueryAnalyzer queryAnalyzer = new QueryAnalyzer(soql, null, partnerService);
+        SoqlQueryAnalyzer analyzer = new SoqlQueryAnalyzer(queryAnalyzer);
+
+        String result = analyzer.getSoqlQueryString();
+        assertTrue(result.contains("WHERE ((Phone = '12345') OR (Phone = NULL AND Fax = '12345'))"), 
+            "Query should be rewritten: " + result);
+        assertFalse(result.contains("N/A"), "Falsy constant branch should be omitted: " + result);
+    }
+
+    @Test
+    public void testCoalesceInWhere_IsNull() {
+        String soql = "SELECT Name FROM Account WHERE COALESCE(Phone, Fax) IS NULL";
+        final QueryAnalyzer queryAnalyzer = new QueryAnalyzer(soql, null, partnerService);
+        SoqlQueryAnalyzer analyzer = new SoqlQueryAnalyzer(queryAnalyzer);
+
+        String result = analyzer.getSoqlQueryString();
+        assertTrue(result.contains("WHERE (Phone = NULL AND Fax = NULL)"), 
+            "Query should be rewritten: " + result);
+    }
+
+    @Test
+    public void testCoalesceInWhere_IsNotNull() {
+        String soql = "SELECT Name FROM Account WHERE COALESCE(Phone, Fax) IS NOT NULL";
+        final QueryAnalyzer queryAnalyzer = new QueryAnalyzer(soql, null, partnerService);
+        SoqlQueryAnalyzer analyzer = new SoqlQueryAnalyzer(queryAnalyzer);
+
+        String result = analyzer.getSoqlQueryString();
+        assertTrue(result.contains("WHERE (Phone <> NULL OR Fax <> NULL)"), 
+            "Query should be rewritten: " + result);
+    }
+
+    @Test
+    public void testCoalesceInWhere_WithParameters() {
+        String soql = "SELECT Name FROM Account WHERE COALESCE(Phone, Fax, '12345') = ?";
+        final QueryAnalyzer queryAnalyzer = new QueryAnalyzer(soql, null, partnerService);
+        SoqlQueryAnalyzer analyzer = new SoqlQueryAnalyzer(queryAnalyzer);
+
+        // Test with parameter matching the literal '12345'
+        String resultTrue = analyzer.getSoqlQueryString(List.of("12345"));
+        assertTrue(resultTrue.contains("WHERE ((Phone = ?) OR (Phone = NULL AND Fax = ?) OR (Phone = NULL AND Fax = NULL))"), 
+            "Query should include the true literal branch: " + resultTrue);
+
+        // Test with parameter NOT matching the literal '12345' (e.g. '99999')
+        String resultFalse = analyzer.getSoqlQueryString(List.of("99999"));
+        assertTrue(resultFalse.contains("WHERE ((Phone = ?) OR (Phone = NULL AND Fax = ?))"), 
+            "Query should omit the falsy literal branch: " + resultFalse);
+        assertFalse(resultFalse.contains("NULL AND NULL"), "Should not contain null-fallback branch: " + resultFalse);
     }
 }

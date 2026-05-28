@@ -559,6 +559,25 @@ class ForceDriverConnectivityTest {
 
     @Test
     @Disabled("Live test - run manually to record fixtures")
+    void selectWithCoalesceInWhere_record() throws SQLException {
+        String query = "SELECT Id, Name, Phone, Fax FROM Account WHERE Name != NULL AND COALESCE(Phone, Fax) = '+41 0011223344' LIMIT 5";
+
+        Connection con = DriverManager.getConnection(url, userSIT, passSIT);
+        installRecordingPartnerService(con, "selectWithCoalesceInWhere");
+        ForcePreparedStatement select = (ForcePreparedStatement) con.prepareStatement(query);
+
+        ResultSet result = select.executeQuery();
+        int rowCount = 0;
+        while (result.next()) {
+            rowCount++;
+            assertNotNull(result.getString("Id"));
+        }
+        log.info("selectWithCoalesceInWhere rows returned: {}", rowCount);
+        assertTrue(rowCount > 0);
+    }
+
+    @Test
+    @Disabled("Live test - run manually to record fixtures")
     void selectOAuthPreprod_record() throws SQLException {
         String oauthUrl = "jdbc:rotaliano:salesforce://" + loginDomainPreprod;
         Properties props = new Properties();
@@ -1143,6 +1162,23 @@ class ForceDriverConnectivityTest {
 
             assertTrue(result.next(), "Should have at least one row");
             assertNotNull(result.getObject(1), "Coalesced value should not be null");
+        }
+
+        @Test
+        void selectWithCoalesceInWhere() throws SQLException {
+            assumeFixturesExist("selectWithCoalesceInWhere");
+            String query = "SELECT Id, Name FROM Account WHERE COALESCE(Phone, Fax) = '+41 0011223344' LIMIT 5";
+
+            ForceConnection conn = createOfflineConnection("selectWithCoalesceInWhere");
+            ForcePreparedStatement select = (ForcePreparedStatement) conn.prepareStatement(query);
+
+            ResultSet result = select.executeQuery();
+            assertNotNull(result, "ResultSet should not be null");
+
+            ResultSetMetaData rsmd = result.getMetaData();
+            assertEquals(2, rsmd.getColumnCount(), "Should have exactly 2 columns");
+            assertEquals("Id", rsmd.getColumnLabel(1));
+            assertEquals("Name", rsmd.getColumnLabel(2));
         }
     }
 }

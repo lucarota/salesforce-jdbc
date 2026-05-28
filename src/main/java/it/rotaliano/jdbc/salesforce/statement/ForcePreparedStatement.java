@@ -244,7 +244,7 @@ public class ForcePreparedStatement extends AbstractPreparedStatement implements
      * @return the SOQL string ready for execution
      */
     public String prepareQueryForExecution() {
-        soqlQuery = prepareQuery(getSoqlQueryAnalyzer().getSoqlQueryString());
+        soqlQuery = prepareQuery(getSoqlQueryAnalyzer().getSoqlQueryString(getParameters()));
         return soqlQuery;
     }
 

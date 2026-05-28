@@ -3,12 +3,13 @@
 ### 2.0.2
 
 - **Support for Client-Side COALESCE Function**:
-  - Implemented the client-side `COALESCE` function in select queries to evaluate the first non-null argument locally.
-  - Automatically rewrites incoming queries to request all underlying fields, resolving the first non-null value in-memory.
+  - Implemented the client-side `COALESCE` function in both `SELECT` projections and `WHERE` clauses.
+  - In `SELECT` projections, it automatically rewrites incoming queries to request all underlying fields, resolving the first non-null value in-memory.
+  - In `WHERE` clauses, it recursively rewrites comparisons containing `COALESCE` into standard SOQL boolean logic (using `AND`/`OR` chains) so filtering runs database-side, performing client-side constant folding to simplify logic and prune false literal comparison branches.
 - **Dependency Refactoring**:
   - Migrated from the deprecated `Parenthesis` class to `ParenthesedExpressionList` in JSQLParser.
 - **Documentation**:
-  - Added details on custom functions and potential performance implications to the README.
+  - Added details on custom functions, performance implications, and `WHERE` clause behavior to the README.
 
 ### 2.0.1
 

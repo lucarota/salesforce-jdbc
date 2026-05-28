@@ -81,13 +81,25 @@ You can download the latest driver JAR file from the [Releases page](https://git
    * **`COALESCE(expression1, expression2, ...)`**
      Evaluates the arguments in order and returns the first non-NULL value.
      
-     > [!WARNING]
-     > Since SOQL does not natively support `COALESCE`, the driver rewrites the query to request all underlying columns, then evaluates the function in-memory on the client side. This may impact query performance and increase network traffic.
-     
-     Example:
-     ```sql
-     SELECT COALESCE(Phone, Fax, 'N/A') AS contact_info FROM Account;
-     ```
+     * **In SELECT projection:**
+       Since SOQL does not natively support `COALESCE` in projection, the driver rewrites the query to request all underlying columns, then evaluates the function in-memory on the client side. This may impact query performance and increase network traffic.
+       
+       Example:
+       ```sql
+       SELECT COALESCE(Phone, Fax, 'N/A') AS contact_info FROM Account;
+       ```
+       
+     * **In WHERE clause:**
+       When used in a `WHERE` clause, the driver automatically rewrites the condition into equivalent standard SOQL boolean logic (`AND` / `OR` expressions). This allows Salesforce to perform the filtering database-side.
+       
+       Example:
+       ```sql
+       SELECT Id, Name FROM Account WHERE COALESCE(Phone, Fax) = '555-123-1111';
+       -- Rewritten internally to:
+       -- SELECT Id, Name FROM Account WHERE ((Phone = '555-123-1111') OR (Phone = NULL AND Fax = '555-123-1111'))
+       ```
+       
+       Supported operators in the `WHERE` clause include standard comparisons (`=`, `!=`, `<`, `>`, `LIKE`, etc.) as well as nullity checks (`IS NULL` / `IS NOT NULL`). The rewriter also performs client-side constant folding to simplify logic and prevent illegal SOQL comparisons.
 
 ## Maven Dependency
 
