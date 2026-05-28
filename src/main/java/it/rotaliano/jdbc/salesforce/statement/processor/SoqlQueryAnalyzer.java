@@ -75,10 +75,26 @@ public class SoqlQueryAnalyzer {
         }
 
         if (expr instanceof IsNullExpression isNull) {
-            Expression left = isNull.getLeftExpression();
+            Expression left = rewriteExpression(isNull.getLeftExpression(), parameters);
             if (left instanceof Function func && "coalesce".equalsIgnoreCase(func.getName())) {
                 return expandCoalesceNullity(func, isNull.isNot());
             }
+            if (isNull.isNot()) {
+                return new NotEqualsTo(left, new NullValue());
+            } else {
+                return new EqualsTo(left, new NullValue());
+            }
+        }
+
+        if (expr instanceof InExpression in) {
+            in.setLeftExpression(rewriteExpression(in.getLeftExpression(), parameters));
+            in.setRightExpression(rewriteExpression(in.getRightExpression(), parameters));
+            return in;
+        }
+
+        if (expr instanceof NotExpression not) {
+            not.setExpression(rewriteExpression(not.getExpression(), parameters));
+            return not;
         }
 
         if (expr instanceof BinaryExpression binary) {

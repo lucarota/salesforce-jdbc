@@ -527,4 +527,26 @@ public class SoqlQueryAnalyzerTest {
             "Query should omit the falsy literal branch: " + resultFalse);
         assertFalse(resultFalse.contains("NULL AND NULL"), "Should not contain null-fallback branch: " + resultFalse);
     }
+
+    @Test
+    public void testStandardIsNullInWhere() {
+        String soql = "SELECT Name FROM Account WHERE Phone IS NULL";
+        final QueryAnalyzer queryAnalyzer = new QueryAnalyzer(soql, null, partnerService);
+        SoqlQueryAnalyzer analyzer = new SoqlQueryAnalyzer(queryAnalyzer);
+
+        String result = analyzer.getSoqlQueryString();
+        assertTrue(result.contains("WHERE Phone = NULL"), 
+            "Query should rewrite IS NULL to = NULL: " + result);
+    }
+
+    @Test
+    public void testStandardIsNotNullInWhere() {
+        String soql = "SELECT Name FROM Account WHERE Phone IS NOT NULL";
+        final QueryAnalyzer queryAnalyzer = new QueryAnalyzer(soql, null, partnerService);
+        SoqlQueryAnalyzer analyzer = new SoqlQueryAnalyzer(queryAnalyzer);
+
+        String result = analyzer.getSoqlQueryString();
+        assertTrue(result.contains("WHERE Phone <> NULL"), 
+            "Query should rewrite IS NOT NULL to <> NULL: " + result);
+    }
 }

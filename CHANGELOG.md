@@ -2,6 +2,8 @@
 
 ### 2.0.2
 
+- **Standard Nullity Expression Rewriting**:
+  - Added rewriting support for standard `IS NULL` and `IS NOT NULL` expressions in SOQL queries, translating them to `= NULL` and `<> NULL` to comply with Salesforce SOQL syntax constraints.
 - **Support for Client-Side COALESCE Function**:
   - Implemented the client-side `COALESCE` function in both `SELECT` projections and `WHERE` clauses.
   - In `SELECT` projections, it automatically rewrites incoming queries to request all underlying fields, resolving the first non-null value in-memory.

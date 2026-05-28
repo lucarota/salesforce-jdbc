@@ -560,7 +560,7 @@ class ForceDriverConnectivityTest {
     @Test
     @Disabled("Live test - run manually to record fixtures")
     void selectWithCoalesceInWhere_record() throws SQLException {
-        String query = "SELECT Id, Name, Phone, Fax FROM Account WHERE Name != NULL AND COALESCE(Phone, Fax) = '+41 0011223344' LIMIT 5";
+        String query = "SELECT Id, Name, Phone, Fax FROM Account WHERE COALESCE(Phone, Fax) = '+41 0011223344' LIMIT 5";
 
         Connection con = DriverManager.getConnection(url, userSIT, passSIT);
         installRecordingPartnerService(con, "selectWithCoalesceInWhere");

@@ -76,7 +76,17 @@ You can download the latest driver JAR file from the [Releases page](https://git
      CACHE SESSION SELECT Id, Name FROM Account
      ```
 
-6. **Custom Functions**
+6. **Nullity Comparison Rewriting**
+   Standard SQL uses `IS NULL` and `IS NOT NULL` to check for nullity, which Salesforce SOQL does not natively support (it requires `= NULL` and `<> NULL` / `!= NULL`). The driver automatically rewrites standard `IS NULL` and `IS NOT NULL` comparisons to their SOQL-compatible equivalents.
+
+   Example:
+   ```sql
+   SELECT Id FROM Account WHERE Phone IS NULL;
+   -- Rewritten internally to:
+   -- SELECT Id FROM Account WHERE Phone = NULL
+   ```
+ 
+7. **Custom Functions**
    The driver implements client-side functions that are not natively supported by Salesforce SOQL:
    * **`COALESCE(expression1, expression2, ...)`**
      Evaluates the arguments in order and returns the first non-NULL value.
