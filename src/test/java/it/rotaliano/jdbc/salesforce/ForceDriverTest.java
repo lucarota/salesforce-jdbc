@@ -1,6 +1,7 @@
 package it.rotaliano.jdbc.salesforce;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -10,6 +11,24 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 class ForceDriverTest {
+
+    @Test
+    void testAcceptsURL() {
+        ForceDriver driver = new ForceDriver();
+        assertTrue(driver.acceptsURL("jdbc:rotaliano:salesforce://login.salesforce.com"));
+        assertTrue(driver.acceptsURL("jdbc:ascendix:salesforce://login.salesforce.com"));
+        assertFalse(driver.acceptsURL("jdbc:other:salesforce://login.salesforce.com"));
+        assertFalse(driver.acceptsURL(null));
+    }
+
+    @Test
+    void testGetConnStringProperties_LegacyListNoHost() throws IOException {
+        Properties actual = ForceDriver.getConnStringProperties("jdbc:ascendix:salesforce://prop1=val1;prop2=val2");
+
+        assertEquals(2, actual.size());
+        assertEquals("val1", actual.getProperty("prop1"));
+        assertEquals("val2", actual.getProperty("prop2"));
+    }
 
     @Test
     void testGetConnStringProperties_ListNoHost() throws IOException {
@@ -114,6 +133,13 @@ class ForceDriverTest {
 
     @Nested
     class SanitizeUrlTests {
+
+        @Test
+        void testSanitizeUrl_legacyWithCredentials() {
+            String url = "jdbc:ascendix:salesforce://admin:MyS3cretPass@login.salesforce.com";
+            String sanitized = ForceDriver.sanitizeUrl(url);
+            assertEquals("jdbc:ascendix:salesforce://admin:****@login.salesforce.com", sanitized);
+        }
 
         @Test
         void testSanitizeUrl_withCredentials() {

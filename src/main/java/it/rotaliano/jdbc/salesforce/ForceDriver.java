@@ -37,9 +37,10 @@ import lombok.extern.slf4j.Slf4j;
 public class ForceDriver implements Driver {
 
     private static final String ACCEPTABLE_URL = "jdbc:rotaliano:salesforce";
-    private static final Pattern URL_PATTERN = Pattern.compile("\\A" + ACCEPTABLE_URL + "://(.*)");
+    private static final String LEGACY_URL = "jdbc:ascendix:salesforce";
+    private static final Pattern URL_PATTERN = Pattern.compile("\\A(?:" + ACCEPTABLE_URL + "|" + LEGACY_URL + ")://(.*)");
     private static final Pattern URL_HAS_AUTHORIZATION_SEGMENT = Pattern.compile(
-        "\\A" + ACCEPTABLE_URL + "://([^:]+):([^@]+)@([^?]*)([?](.*))?");
+        "\\A(?:" + ACCEPTABLE_URL + "|" + LEGACY_URL + ")://([^:]+):([^@]+)@([^?]*)([?](.*))?");
     private static final Pattern PARAM_STANDARD_PATTERN = Pattern.compile("(([^=]+)=([^&]*)&?)");
 
     private static final Pattern VALID_IP_ADDRESS_REGEX = Pattern.compile(
@@ -60,7 +61,8 @@ public class ForceDriver implements Driver {
         String sanitized = url;
         Matcher m = URL_HAS_AUTHORIZATION_SEGMENT.matcher(sanitized);
         if (m.matches()) {
-            sanitized = ACCEPTABLE_URL + "://" + m.group(1) + ":****@" + m.group(3)
+            String prefix = sanitized.startsWith(LEGACY_URL) ? LEGACY_URL : ACCEPTABLE_URL;
+            sanitized = prefix + "://" + m.group(1) + ":****@" + m.group(3)
                 + (m.group(4) != null ? m.group(4) : "");
         }
         sanitized = sanitized.replaceAll("(?i)(clientSecret|client_secret)=[^&]*", "$1=****");
@@ -88,6 +90,9 @@ public class ForceDriver implements Driver {
              */
             log.error("The URL provided is not acceptable: {}", sanitizeUrl(url));
             return null;
+        }
+        if (url != null && url.startsWith(LEGACY_URL)) {
+            log.warn("The JDBC URL prefix '{}' is deprecated. Please use '{}' instead.", LEGACY_URL, ACCEPTABLE_URL);
         }
         try {
             ForceConnectionInfo connectionInfo = ForceDriver.parseConnectionUrl(url, properties);
@@ -250,7 +255,7 @@ public class ForceDriver implements Driver {
 
     @Override
     public boolean acceptsURL(String url) {
-        return url != null && url.startsWith(ACCEPTABLE_URL);
+        return url != null && (url.startsWith(ACCEPTABLE_URL) || url.startsWith(LEGACY_URL));
     }
 
     @Override
