@@ -161,6 +161,9 @@ Add the following dependency to your `pom.xml`:
 jdbc:rotaliano:salesforce://[;propertyName1=propertyValue1[;propertyName2=propertyValue2]...]
 ```
 
+> [!NOTE]
+> The legacy URL prefix `jdbc:ascendix:salesforce` is also supported for backward compatibility but is considered deprecated. When used, the driver will output a warning log urging migration to the standard prefix.
+
 You can connect using **User/Password**, **Session ID**, or **OAuth 2.0 Client Credentials**.
 
 **1. User and Password**

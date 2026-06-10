@@ -2,6 +2,9 @@
 
 ### 2.0.2
 
+- **Legacy URL Support**:
+  - Added support for the legacy `jdbc:ascendix:salesforce` URL prefix in addition to `jdbc:rotaliano:salesforce`.
+  - Added warning logs when the deprecated `jdbc:ascendix:salesforce` prefix is used, urging users to migrate to the standard prefix.
 - **Standard Nullity Expression Rewriting**:
   - Added rewriting support for standard `IS NULL` and `IS NOT NULL` expressions in SOQL queries, translating them to `= NULL` and `<> NULL` to comply with Salesforce SOQL syntax constraints.
 - **Support for Client-Side COALESCE Function**:
