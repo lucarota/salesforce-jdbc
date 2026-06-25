@@ -560,4 +560,66 @@ public class SoqlQueryAnalyzerTest {
         assertTrue(result.contains("SELECT Amount FROM Opportunity"), 
             "Query should rewrite CASE select to retrieve physical columns: " + result);
     }
+
+    @Test
+    public void testEmulatedFunctionInSelect() {
+        String soql = "SELECT UPPER(Name) FROM Account";
+        final QueryAnalyzer queryAnalyzer = new QueryAnalyzer(soql, null, partnerService);
+        SoqlQueryAnalyzer analyzer = new SoqlQueryAnalyzer(queryAnalyzer);
+
+        String result = analyzer.getSoqlQueryString();
+        assertTrue(result.contains("SELECT Name FROM Account"),
+            "Query should rewrite UPPER(Name) to Name: " + result);
+
+        List<FieldDef> actual = analyzer.getFieldDefinitions().flatten();
+        assertEquals(2, actual.size());
+        assertEquals("UPPER", actual.get(0).getAlias());
+        assertEquals("string", actual.get(0).getType());
+        assertEquals("Name", actual.get(1).getName());
+        assertEquals("string", actual.get(1).getType());
+    }
+
+    @Test
+    public void testTrimFunctionInSelect() {
+        String soql = "SELECT TRIM(Name) FROM Account";
+        final QueryAnalyzer queryAnalyzer = new QueryAnalyzer(soql, null, partnerService);
+        SoqlQueryAnalyzer analyzer = new SoqlQueryAnalyzer(queryAnalyzer);
+
+        String result = analyzer.getSoqlQueryString();
+        assertTrue(result.contains("SELECT Name FROM Account"),
+            "Query should rewrite TRIM(Name) to Name: " + result);
+
+        List<FieldDef> actual = analyzer.getFieldDefinitions().flatten();
+        assertEquals(2, actual.size());
+        assertEquals("trim", actual.get(0).getAlias());
+        assertEquals("string", actual.get(0).getType());
+        assertEquals("Name", actual.get(1).getName());
+        assertEquals("string", actual.get(1).getType());
+    }
+
+    @Test
+    public void testEmulatedFunctionInWhere() {
+        String soql = "SELECT Id FROM Account WHERE UPPER(Name) = 'TEST'";
+        final QueryAnalyzer queryAnalyzer = new QueryAnalyzer(soql, null, partnerService);
+        SoqlQueryAnalyzer analyzer = new SoqlQueryAnalyzer(queryAnalyzer);
+
+        String result = analyzer.getSoqlQueryString();
+        assertFalse(result.toUpperCase().contains("WHERE"), "Query should clear WHERE clause: " + result);
+        assertTrue(result.contains("Name"), "Query should add Name to SELECT list: " + result);
+        assertTrue(result.contains("Id"), "Query should keep Id in SELECT list: " + result);
+
+        it.rotaliano.jdbc.salesforce.expression.Expression clientSideExpr = analyzer.getClientSideWhereExpression();
+        
+        it.rotaliano.jdbc.salesforce.expression.RowContext trueContext = columnName -> {
+            if ("Name".equalsIgnoreCase(columnName)) return "test";
+            return null;
+        };
+        assertEquals(true, clientSideExpr.evaluate(trueContext));
+
+        it.rotaliano.jdbc.salesforce.expression.RowContext falseContext = columnName -> {
+            if ("Name".equalsIgnoreCase(columnName)) return "other";
+            return null;
+        };
+        assertEquals(false, clientSideExpr.evaluate(falseContext));
+    }
 }

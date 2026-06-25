@@ -70,6 +70,9 @@ public class SelectSpecVisitor implements SelectItemVisitor<Expression> {
         } else if (fieldSpec.getExpression() instanceof net.sf.jsqlparser.expression.Function func) {
             String alias = fieldSpec.getAlias() != null ? fieldSpec.getAlias().getName() : func.getName();
             visitFunctionCallSpec(func, alias);
+        } else if (fieldSpec.getExpression() instanceof net.sf.jsqlparser.expression.TrimFunction trimFunc) {
+            String alias = fieldSpec.getAlias() != null ? fieldSpec.getAlias().getName() : "trim";
+            visitEmulatedFunctionCallSpec(trimFunc, alias);
         } else if (fieldSpec.getExpression() instanceof CaseExpression caseExpr) {
             String alias = fieldSpec.getAlias() != null ? fieldSpec.getAlias().getName() : "case_expression";
             visitCaseExpressionSpec(caseExpr, alias);
@@ -174,6 +177,11 @@ public class SelectSpecVisitor implements SelectItemVisitor<Expression> {
             return;
         }
 
+        if (SoqlQueryAnalyzer.containsEmulatedFunctions(functionCallSpec)) {
+            visitEmulatedFunctionCallSpec(functionCallSpec, alias);
+            return;
+        }
+
         if (FUNCTIONS_HAS_INT_RESULT.contains(functionCallSpec.getName().toUpperCase())) {
             fieldDefinitions.addChild(new FieldDef(alias, alias, alias, "int"));
         } else {
@@ -182,6 +190,34 @@ public class SelectSpecVisitor implements SelectItemVisitor<Expression> {
             List<String> prefixNames = List.of(ArrayUtils.remove(prefix, prefix.length - 1));
             FieldDef result = createFieldDef(param.toString(), alias, prefixNames);
             fieldDefinitions.addChild(result);
+        }
+    }
+
+    private void visitEmulatedFunctionCallSpec(Expression functionCallSpec, String alias) {
+        FieldDef funcField = new FieldDef(alias, alias, alias, "string");
+        fieldDefinitions.addSqlOrderField(funcField);
+        fieldDefinitions.addChild(funcField);
+
+        List<Column> cols = new ArrayList<>();
+        findColumns(functionCallSpec, cols);
+        for (Column column : cols) {
+            String name = column.getColumnName();
+            String colAlias = name;
+            String objectPrefix = null;
+            List<String> prefixNames = new ArrayList<>();
+            if (column.getTable() != null) {
+                objectPrefix = column.getTable().getName();
+                String[] prefix = StringUtils.split(column.getTable().getFullyQualifiedName(), '.');
+                prefixNames.addAll(List.of(prefix));
+            }
+            colAlias = removeRootEntity(null, column, objectPrefix, prefixNames, colAlias, name);
+            FieldDef result = createFieldDef(name, colAlias, prefixNames);
+            if (!prefixNames.isEmpty()) {
+                int position = getPosition(prefixNames);
+                fieldDefinitions.addChild(result, position);
+            } else {
+                fieldDefinitions.addChild(result);
+            }
         }
     }
 
@@ -222,6 +258,9 @@ public class SelectSpecVisitor implements SelectItemVisitor<Expression> {
         } else if (expr instanceof BinaryExpression binary) {
             findColumns(binary.getLeftExpression(), result);
             findColumns(binary.getRightExpression(), result);
+        } else if (expr instanceof net.sf.jsqlparser.expression.TrimFunction tf) {
+            findColumns(tf.getFromExpression(), result);
+            findColumns(tf.getExpression(), result);
         } else if (expr instanceof net.sf.jsqlparser.expression.Function func) {
             if (func.getParameters() != null) {
                 for (Expression param : func.getParameters()) {

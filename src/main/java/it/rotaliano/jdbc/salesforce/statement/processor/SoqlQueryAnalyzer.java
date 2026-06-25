@@ -23,9 +23,14 @@ public class SoqlQueryAnalyzer {
 
     private final QueryAnalyzer queryAnalyzer;
     private FieldDefTree fieldDefinitions;
+    private it.rotaliano.jdbc.salesforce.expression.Expression clientSideWhereExpression;
 
     public SoqlQueryAnalyzer(QueryAnalyzer queryAnalyzer) {
         this.queryAnalyzer = queryAnalyzer;
+    }
+
+    public it.rotaliano.jdbc.salesforce.expression.Expression getClientSideWhereExpression() {
+        return clientSideWhereExpression;
     }
 
     public String getSoqlQueryString() {
@@ -37,11 +42,29 @@ public class SoqlQueryAnalyzer {
             Statement stmt = net.sf.jsqlparser.parser.CCJSqlParserUtil.parse(queryAnalyzer.getSoql());
             if (stmt instanceof PlainSelect select) {
                 rewriteSelectItems(select);
-                rewriteCoalesceInWhere(select, parameters);
+                if (select.getWhere() != null && containsEmulatedFunctions(select.getWhere())) {
+                    // Extract columns from WHERE clause to select list
+                    List<Column> cols = new ArrayList<>();
+                    findColumns(select.getWhere(), cols);
+                    for (Column col : cols) {
+                        // Make sure they are not already in SELECT
+                        boolean exists = select.getSelectItems().stream()
+                            .anyMatch(item -> item.getExpression().toString().equalsIgnoreCase(col.toString()));
+                        if (!exists) {
+                            select.addSelectItem(col);
+                        }
+                    }
+                    // Build client-side WHERE expression
+                    this.clientSideWhereExpression = it.rotaliano.jdbc.salesforce.expression.AstBuilder.build(select.getWhere());
+                    // Clear from SOQL
+                    select.setWhere(null);
+                } else {
+                    rewriteCoalesceInWhere(select, parameters);
+                }
                 return select.toString();
             }
         } catch (Exception e) {
-            log.warn("Failed to rewrite COALESCE in SOQL query, using original query", e);
+            log.warn("Failed to rewrite query, using original", e);
         }
         return queryAnalyzer.getQueryData().toString();
     }
@@ -348,6 +371,12 @@ public class SoqlQueryAnalyzer {
                 for (Column col : cols) {
                     newSelectItems.add(new SelectItem<>(col));
                 }
+            } else if (containsEmulatedFunctions(expr)) {
+                List<Column> cols = new ArrayList<>();
+                findColumns(expr, cols);
+                for (Column col : cols) {
+                    newSelectItems.add(new SelectItem<>(col));
+                }
             } else {
                 newSelectItems.add(item);
             }
@@ -364,6 +393,9 @@ public class SoqlQueryAnalyzer {
         } else if (expr instanceof BinaryExpression binary) {
             findColumns(binary.getLeftExpression(), result);
             findColumns(binary.getRightExpression(), result);
+        } else if (expr instanceof net.sf.jsqlparser.expression.TrimFunction tf) {
+            findColumns(tf.getFromExpression(), result);
+            findColumns(tf.getExpression(), result);
         } else if (expr instanceof Function func) {
             if (func.getParameters() != null) {
                 for (Expression param : func.getParameters()) {
@@ -386,6 +418,48 @@ public class SoqlQueryAnalyzer {
             findColumns(whenClause.getWhenExpression(), result);
             findColumns(whenClause.getThenExpression(), result);
         }
+    }
+
+    public static boolean containsEmulatedFunctions(net.sf.jsqlparser.expression.Expression expr) {
+        if (expr == null) return false;
+        if (expr instanceof net.sf.jsqlparser.expression.TrimFunction tf) {
+            return true;
+        }
+        if (expr instanceof net.sf.jsqlparser.expression.Function func) {
+            String name = func.getName().toUpperCase();
+            if (name.equals("UPPER") || name.equals("LOWER") || name.equals("TRIM") || name.equals("SUBSTRING") || name.equals("REPLACE")) {
+                return true;
+            }
+            if (func.getParameters() != null) {
+                for (net.sf.jsqlparser.expression.Expression p : func.getParameters()) {
+                    if (containsEmulatedFunctions(p)) return true;
+                }
+            }
+        }
+        if (expr instanceof net.sf.jsqlparser.expression.BinaryExpression binary) {
+            return containsEmulatedFunctions(binary.getLeftExpression()) || containsEmulatedFunctions(binary.getRightExpression());
+        }
+        if (expr instanceof net.sf.jsqlparser.expression.NotExpression not) {
+            return containsEmulatedFunctions(not.getExpression());
+        }
+        if (expr instanceof ParenthesedExpressionList paren) {
+            for (Object inner : paren) {
+                if (containsEmulatedFunctions((Expression) inner)) return true;
+            }
+        }
+        if (expr instanceof net.sf.jsqlparser.expression.CaseExpression caseExpr) {
+            if (containsEmulatedFunctions(caseExpr.getSwitchExpression())) return true;
+            if (caseExpr.getWhenClauses() != null) {
+                for (net.sf.jsqlparser.expression.Expression when : caseExpr.getWhenClauses()) {
+                    if (containsEmulatedFunctions(when)) return true;
+                }
+            }
+            if (containsEmulatedFunctions(caseExpr.getElseExpression())) return true;
+        }
+        if (expr instanceof net.sf.jsqlparser.expression.WhenClause whenClause) {
+            return containsEmulatedFunctions(whenClause.getWhenExpression()) || containsEmulatedFunctions(whenClause.getThenExpression());
+        }
+        return false;
     }
 
     public Statement getSoqlQuery() {
