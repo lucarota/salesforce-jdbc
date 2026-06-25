@@ -13,9 +13,6 @@ public class NotExpression implements Expression {
         if (val == null) {
             return null;
         }
-        if (val instanceof Boolean b) {
-            return !b;
-        }
-        return false;
+        return !LogicalExpression.isTruthy(val);
     }
 }

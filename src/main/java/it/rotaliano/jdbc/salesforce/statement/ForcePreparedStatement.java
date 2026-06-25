@@ -115,6 +115,7 @@ public class ForcePreparedStatement extends AbstractPreparedStatement implements
     private FieldDefTree fieldDefinitions;
     private QueryAnalyzer queryAnalyzer;
     private SoqlQueryAnalyzer soqlQueryAnalyzer;
+    private final Map<SelectItem<?>, it.rotaliano.jdbc.salesforce.expression.Expression> compiledSelectExpressions = new java.util.concurrent.ConcurrentHashMap<>();
 
     private static final CacheConfig cacheDb = CacheConfig.getInstance();
     private static final Cache<String, CachedResultSet> dataCache = cacheDb.getDataCache();
@@ -187,6 +188,7 @@ public class ForcePreparedStatement extends AbstractPreparedStatement implements
         this.updateCount = -1;
         this.updateCountReturned = false;
         this.resultSetReturned = false;
+        this.compiledSelectExpressions.clear();
         setCacheMode(soql);
         this.resultSet = cacheMode == CacheMode.NO_CACHE
                 ? query()
@@ -470,7 +472,7 @@ public class ForcePreparedStatement extends AbstractPreparedStatement implements
                         };
 
                         try {
-                            it.rotaliano.jdbc.salesforce.expression.Expression customExpr = it.rotaliano.jdbc.salesforce.expression.AstBuilder.build(expr);
+                            it.rotaliano.jdbc.salesforce.expression.Expression customExpr = compiledSelectExpressions.computeIfAbsent(item, i -> it.rotaliano.jdbc.salesforce.expression.AstBuilder.build(expr));
                             Object evaluatedValue = customExpr.evaluate(ctx);
 
                             // Update in columnMap
