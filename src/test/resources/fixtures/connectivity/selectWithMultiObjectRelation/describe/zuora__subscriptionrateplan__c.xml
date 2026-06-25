@@ -39,6 +39,42 @@
     </com.sforce.soap.partner.ChildRelationship>
     <com.sforce.soap.partner.ChildRelationship>
       <cascadeDelete____is__set>true</cascadeDelete____is__set>
+      <cascadeDelete>false</cascadeDelete>
+      <childSObject____is__set>true</childSObject____is__set>
+      <childSObject>ApprovalSubmission</childSObject>
+      <deprecatedAndHidden____is__set>true</deprecatedAndHidden____is__set>
+      <deprecatedAndHidden>false</deprecatedAndHidden>
+      <field____is__set>true</field____is__set>
+      <field>RelatedRecordId</field>
+      <junctionIdListNames____is__set>false</junctionIdListNames____is__set>
+      <junctionIdListNames/>
+      <junctionReferenceTo____is__set>false</junctionReferenceTo____is__set>
+      <junctionReferenceTo/>
+      <relationshipName____is__set>true</relationshipName____is__set>
+      <relationshipName>ApprovalSubmissions</relationshipName>
+      <restrictedDelete____is__set>false</restrictedDelete____is__set>
+      <restrictedDelete>false</restrictedDelete>
+    </com.sforce.soap.partner.ChildRelationship>
+    <com.sforce.soap.partner.ChildRelationship>
+      <cascadeDelete____is__set>true</cascadeDelete____is__set>
+      <cascadeDelete>false</cascadeDelete>
+      <childSObject____is__set>true</childSObject____is__set>
+      <childSObject>ApprovalWorkItem</childSObject>
+      <deprecatedAndHidden____is__set>true</deprecatedAndHidden____is__set>
+      <deprecatedAndHidden>false</deprecatedAndHidden>
+      <field____is__set>true</field____is__set>
+      <field>RelatedRecordId</field>
+      <junctionIdListNames____is__set>false</junctionIdListNames____is__set>
+      <junctionIdListNames/>
+      <junctionReferenceTo____is__set>false</junctionReferenceTo____is__set>
+      <junctionReferenceTo/>
+      <relationshipName____is__set>true</relationshipName____is__set>
+      <relationshipName>ApprovalWorkItems</relationshipName>
+      <restrictedDelete____is__set>false</restrictedDelete____is__set>
+      <restrictedDelete>false</restrictedDelete>
+    </com.sforce.soap.partner.ChildRelationship>
+    <com.sforce.soap.partner.ChildRelationship>
+      <cascadeDelete____is__set>true</cascadeDelete____is__set>
       <cascadeDelete>true</cascadeDelete>
       <childSObject____is__set>true</childSObject____is__set>
       <childSObject>AttachedContentDocument</childSObject>
@@ -106,6 +142,23 @@
       <junctionReferenceTo/>
       <relationshipName____is__set>true</relationshipName____is__set>
       <relationshipName>RecordAssociatedGroups</relationshipName>
+      <restrictedDelete____is__set>false</restrictedDelete____is__set>
+      <restrictedDelete>false</restrictedDelete>
+    </com.sforce.soap.partner.ChildRelationship>
+    <com.sforce.soap.partner.ChildRelationship>
+      <cascadeDelete____is__set>true</cascadeDelete____is__set>
+      <cascadeDelete>false</cascadeDelete>
+      <childSObject____is__set>true</childSObject____is__set>
+      <childSObject>CollaborationGroupRecordChangeEvent</childSObject>
+      <deprecatedAndHidden____is__set>true</deprecatedAndHidden____is__set>
+      <deprecatedAndHidden>false</deprecatedAndHidden>
+      <field____is__set>true</field____is__set>
+      <field>RecordId</field>
+      <junctionIdListNames____is__set>false</junctionIdListNames____is__set>
+      <junctionIdListNames/>
+      <junctionReferenceTo____is__set>false</junctionReferenceTo____is__set>
+      <junctionReferenceTo/>
+      <relationshipName____is__set>false</relationshipName____is__set>
       <restrictedDelete____is__set>false</restrictedDelete____is__set>
       <restrictedDelete>false</restrictedDelete>
     </com.sforce.soap.partner.ChildRelationship>
@@ -513,6 +566,23 @@
     </com.sforce.soap.partner.ChildRelationship>
     <com.sforce.soap.partner.ChildRelationship>
       <cascadeDelete____is__set>true</cascadeDelete____is__set>
+      <cascadeDelete>false</cascadeDelete>
+      <childSObject____is__set>true</childSObject____is__set>
+      <childSObject>ObjectRelatedUrlChangeEvent</childSObject>
+      <deprecatedAndHidden____is__set>true</deprecatedAndHidden____is__set>
+      <deprecatedAndHidden>false</deprecatedAndHidden>
+      <field____is__set>true</field____is__set>
+      <field>ParentId</field>
+      <junctionIdListNames____is__set>false</junctionIdListNames____is__set>
+      <junctionIdListNames/>
+      <junctionReferenceTo____is__set>false</junctionReferenceTo____is__set>
+      <junctionReferenceTo/>
+      <relationshipName____is__set>false</relationshipName____is__set>
+      <restrictedDelete____is__set>false</restrictedDelete____is__set>
+      <restrictedDelete>false</restrictedDelete>
+    </com.sforce.soap.partner.ChildRelationship>
+    <com.sforce.soap.partner.ChildRelationship>
+      <cascadeDelete____is__set>true</cascadeDelete____is__set>
       <cascadeDelete>true</cascadeDelete>
       <childSObject____is__set>true</childSObject____is__set>
       <childSObject>OpenActivity</childSObject>
@@ -561,6 +631,23 @@
       <junctionReferenceTo/>
       <relationshipName____is__set>true</relationshipName____is__set>
       <relationshipName>ProcessExceptions</relationshipName>
+      <restrictedDelete____is__set>false</restrictedDelete____is__set>
+      <restrictedDelete>false</restrictedDelete>
+    </com.sforce.soap.partner.ChildRelationship>
+    <com.sforce.soap.partner.ChildRelationship>
+      <cascadeDelete____is__set>true</cascadeDelete____is__set>
+      <cascadeDelete>false</cascadeDelete>
+      <childSObject____is__set>true</childSObject____is__set>
+      <childSObject>ProcessExceptionChangeEvent</childSObject>
+      <deprecatedAndHidden____is__set>true</deprecatedAndHidden____is__set>
+      <deprecatedAndHidden>false</deprecatedAndHidden>
+      <field____is__set>true</field____is__set>
+      <field>AttachedToId</field>
+      <junctionIdListNames____is__set>false</junctionIdListNames____is__set>
+      <junctionIdListNames/>
+      <junctionReferenceTo____is__set>false</junctionReferenceTo____is__set>
+      <junctionReferenceTo/>
+      <relationshipName____is__set>false</relationshipName____is__set>
       <restrictedDelete____is__set>false</restrictedDelete____is__set>
       <restrictedDelete>false</restrictedDelete>
     </com.sforce.soap.partner.ChildRelationship>

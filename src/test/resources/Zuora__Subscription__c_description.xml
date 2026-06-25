@@ -76,6 +76,24 @@
       </com.sforce.soap.partner.ChildRelationship>
       <com.sforce.soap.partner.ChildRelationship>
         <cascadeDelete____is__set>true</cascadeDelete____is__set>
+        <cascadeDelete>true</cascadeDelete>
+        <childSObject____is__set>true</childSObject____is__set>
+        <childSObject>Additional_Condition__c</childSObject>
+        <deprecatedAndHidden____is__set>true</deprecatedAndHidden____is__set>
+        <deprecatedAndHidden>false</deprecatedAndHidden>
+        <field____is__set>true</field____is__set>
+        <field>Subscription_Reference__c</field>
+        <junctionIdListNames____is__set>false</junctionIdListNames____is__set>
+        <junctionIdListNames/>
+        <junctionReferenceTo____is__set>false</junctionReferenceTo____is__set>
+        <junctionReferenceTo/>
+        <relationshipName____is__set>true</relationshipName____is__set>
+        <relationshipName>Additional_Conditions__r</relationshipName>
+        <restrictedDelete____is__set>false</restrictedDelete____is__set>
+        <restrictedDelete>false</restrictedDelete>
+      </com.sforce.soap.partner.ChildRelationship>
+      <com.sforce.soap.partner.ChildRelationship>
+        <cascadeDelete____is__set>true</cascadeDelete____is__set>
         <cascadeDelete>false</cascadeDelete>
         <childSObject____is__set>true</childSObject____is__set>
         <childSObject>Agent_Settings__c</childSObject>
@@ -89,6 +107,42 @@
         <junctionReferenceTo/>
         <relationshipName____is__set>true</relationshipName____is__set>
         <relationshipName>Billing_Entity_Subscription__r</relationshipName>
+        <restrictedDelete____is__set>false</restrictedDelete____is__set>
+        <restrictedDelete>false</restrictedDelete>
+      </com.sforce.soap.partner.ChildRelationship>
+      <com.sforce.soap.partner.ChildRelationship>
+        <cascadeDelete____is__set>true</cascadeDelete____is__set>
+        <cascadeDelete>false</cascadeDelete>
+        <childSObject____is__set>true</childSObject____is__set>
+        <childSObject>ApprovalSubmission</childSObject>
+        <deprecatedAndHidden____is__set>true</deprecatedAndHidden____is__set>
+        <deprecatedAndHidden>false</deprecatedAndHidden>
+        <field____is__set>true</field____is__set>
+        <field>RelatedRecordId</field>
+        <junctionIdListNames____is__set>false</junctionIdListNames____is__set>
+        <junctionIdListNames/>
+        <junctionReferenceTo____is__set>false</junctionReferenceTo____is__set>
+        <junctionReferenceTo/>
+        <relationshipName____is__set>true</relationshipName____is__set>
+        <relationshipName>ApprovalSubmissions</relationshipName>
+        <restrictedDelete____is__set>false</restrictedDelete____is__set>
+        <restrictedDelete>false</restrictedDelete>
+      </com.sforce.soap.partner.ChildRelationship>
+      <com.sforce.soap.partner.ChildRelationship>
+        <cascadeDelete____is__set>true</cascadeDelete____is__set>
+        <cascadeDelete>false</cascadeDelete>
+        <childSObject____is__set>true</childSObject____is__set>
+        <childSObject>ApprovalWorkItem</childSObject>
+        <deprecatedAndHidden____is__set>true</deprecatedAndHidden____is__set>
+        <deprecatedAndHidden>false</deprecatedAndHidden>
+        <field____is__set>true</field____is__set>
+        <field>RelatedRecordId</field>
+        <junctionIdListNames____is__set>false</junctionIdListNames____is__set>
+        <junctionIdListNames/>
+        <junctionReferenceTo____is__set>false</junctionReferenceTo____is__set>
+        <junctionReferenceTo/>
+        <relationshipName____is__set>true</relationshipName____is__set>
+        <relationshipName>ApprovalWorkItems</relationshipName>
         <restrictedDelete____is__set>false</restrictedDelete____is__set>
         <restrictedDelete>false</restrictedDelete>
       </com.sforce.soap.partner.ChildRelationship>
@@ -197,6 +251,23 @@
         <junctionReferenceTo/>
         <relationshipName____is__set>true</relationshipName____is__set>
         <relationshipName>RecordAssociatedGroups</relationshipName>
+        <restrictedDelete____is__set>false</restrictedDelete____is__set>
+        <restrictedDelete>false</restrictedDelete>
+      </com.sforce.soap.partner.ChildRelationship>
+      <com.sforce.soap.partner.ChildRelationship>
+        <cascadeDelete____is__set>true</cascadeDelete____is__set>
+        <cascadeDelete>false</cascadeDelete>
+        <childSObject____is__set>true</childSObject____is__set>
+        <childSObject>CollaborationGroupRecordChangeEvent</childSObject>
+        <deprecatedAndHidden____is__set>true</deprecatedAndHidden____is__set>
+        <deprecatedAndHidden>false</deprecatedAndHidden>
+        <field____is__set>true</field____is__set>
+        <field>RecordId</field>
+        <junctionIdListNames____is__set>false</junctionIdListNames____is__set>
+        <junctionIdListNames/>
+        <junctionReferenceTo____is__set>false</junctionReferenceTo____is__set>
+        <junctionReferenceTo/>
+        <relationshipName____is__set>false</relationshipName____is__set>
         <restrictedDelete____is__set>false</restrictedDelete____is__set>
         <restrictedDelete>false</restrictedDelete>
       </com.sforce.soap.partner.ChildRelationship>
@@ -572,6 +643,42 @@
         <cascadeDelete____is__set>true</cascadeDelete____is__set>
         <cascadeDelete>true</cascadeDelete>
         <childSObject____is__set>true</childSObject____is__set>
+        <childSObject>Junction_PS_CountryList__c</childSObject>
+        <deprecatedAndHidden____is__set>true</deprecatedAndHidden____is__set>
+        <deprecatedAndHidden>false</deprecatedAndHidden>
+        <field____is__set>true</field____is__set>
+        <field>Subscription__c</field>
+        <junctionIdListNames____is__set>false</junctionIdListNames____is__set>
+        <junctionIdListNames/>
+        <junctionReferenceTo____is__set>false</junctionReferenceTo____is__set>
+        <junctionReferenceTo/>
+        <relationshipName____is__set>true</relationshipName____is__set>
+        <relationshipName>Elibile_Partner_Subscription_Countries__r</relationshipName>
+        <restrictedDelete____is__set>false</restrictedDelete____is__set>
+        <restrictedDelete>false</restrictedDelete>
+      </com.sforce.soap.partner.ChildRelationship>
+      <com.sforce.soap.partner.ChildRelationship>
+        <cascadeDelete____is__set>true</cascadeDelete____is__set>
+        <cascadeDelete>false</cascadeDelete>
+        <childSObject____is__set>true</childSObject____is__set>
+        <childSObject>Lead</childSObject>
+        <deprecatedAndHidden____is__set>true</deprecatedAndHidden____is__set>
+        <deprecatedAndHidden>false</deprecatedAndHidden>
+        <field____is__set>true</field____is__set>
+        <field>Partner_Subscription__c</field>
+        <junctionIdListNames____is__set>false</junctionIdListNames____is__set>
+        <junctionIdListNames/>
+        <junctionReferenceTo____is__set>false</junctionReferenceTo____is__set>
+        <junctionReferenceTo/>
+        <relationshipName____is__set>true</relationshipName____is__set>
+        <relationshipName>Leads__r</relationshipName>
+        <restrictedDelete____is__set>false</restrictedDelete____is__set>
+        <restrictedDelete>false</restrictedDelete>
+      </com.sforce.soap.partner.ChildRelationship>
+      <com.sforce.soap.partner.ChildRelationship>
+        <cascadeDelete____is__set>true</cascadeDelete____is__set>
+        <cascadeDelete>true</cascadeDelete>
+        <childSObject____is__set>true</childSObject____is__set>
         <childSObject>MultiCastInfo__c</childSObject>
         <deprecatedAndHidden____is__set>true</deprecatedAndHidden____is__set>
         <deprecatedAndHidden>false</deprecatedAndHidden>
@@ -644,6 +751,23 @@
         <cascadeDelete>true</cascadeDelete>
         <childSObject____is__set>true</childSObject____is__set>
         <childSObject>ObjectRelatedUrl</childSObject>
+        <deprecatedAndHidden____is__set>true</deprecatedAndHidden____is__set>
+        <deprecatedAndHidden>false</deprecatedAndHidden>
+        <field____is__set>true</field____is__set>
+        <field>ParentId</field>
+        <junctionIdListNames____is__set>false</junctionIdListNames____is__set>
+        <junctionIdListNames/>
+        <junctionReferenceTo____is__set>false</junctionReferenceTo____is__set>
+        <junctionReferenceTo/>
+        <relationshipName____is__set>false</relationshipName____is__set>
+        <restrictedDelete____is__set>false</restrictedDelete____is__set>
+        <restrictedDelete>false</restrictedDelete>
+      </com.sforce.soap.partner.ChildRelationship>
+      <com.sforce.soap.partner.ChildRelationship>
+        <cascadeDelete____is__set>true</cascadeDelete____is__set>
+        <cascadeDelete>false</cascadeDelete>
+        <childSObject____is__set>true</childSObject____is__set>
+        <childSObject>ObjectRelatedUrlChangeEvent</childSObject>
         <deprecatedAndHidden____is__set>true</deprecatedAndHidden____is__set>
         <deprecatedAndHidden>false</deprecatedAndHidden>
         <field____is__set>true</field____is__set>
@@ -760,6 +884,23 @@
         <junctionReferenceTo/>
         <relationshipName____is__set>true</relationshipName____is__set>
         <relationshipName>ProcessExceptions</relationshipName>
+        <restrictedDelete____is__set>false</restrictedDelete____is__set>
+        <restrictedDelete>false</restrictedDelete>
+      </com.sforce.soap.partner.ChildRelationship>
+      <com.sforce.soap.partner.ChildRelationship>
+        <cascadeDelete____is__set>true</cascadeDelete____is__set>
+        <cascadeDelete>false</cascadeDelete>
+        <childSObject____is__set>true</childSObject____is__set>
+        <childSObject>ProcessExceptionChangeEvent</childSObject>
+        <deprecatedAndHidden____is__set>true</deprecatedAndHidden____is__set>
+        <deprecatedAndHidden>false</deprecatedAndHidden>
+        <field____is__set>true</field____is__set>
+        <field>AttachedToId</field>
+        <junctionIdListNames____is__set>false</junctionIdListNames____is__set>
+        <junctionIdListNames/>
+        <junctionReferenceTo____is__set>false</junctionReferenceTo____is__set>
+        <junctionReferenceTo/>
+        <relationshipName____is__set>false</relationshipName____is__set>
         <restrictedDelete____is__set>false</restrictedDelete____is__set>
         <restrictedDelete>false</restrictedDelete>
       </com.sforce.soap.partner.ChildRelationship>
@@ -1294,6 +1435,24 @@
         <junctionReferenceTo/>
         <relationshipName____is__set>true</relationshipName____is__set>
         <relationshipName>Debit_Memos__r</relationshipName>
+        <restrictedDelete____is__set>false</restrictedDelete____is__set>
+        <restrictedDelete>false</restrictedDelete>
+      </com.sforce.soap.partner.ChildRelationship>
+      <com.sforce.soap.partner.ChildRelationship>
+        <cascadeDelete____is__set>true</cascadeDelete____is__set>
+        <cascadeDelete>false</cascadeDelete>
+        <childSObject____is__set>true</childSObject____is__set>
+        <childSObject>Zuora__InvoiceItem__c</childSObject>
+        <deprecatedAndHidden____is__set>true</deprecatedAndHidden____is__set>
+        <deprecatedAndHidden>false</deprecatedAndHidden>
+        <field____is__set>true</field____is__set>
+        <field>Zuora__Subscription__c</field>
+        <junctionIdListNames____is__set>false</junctionIdListNames____is__set>
+        <junctionIdListNames/>
+        <junctionReferenceTo____is__set>false</junctionReferenceTo____is__set>
+        <junctionReferenceTo/>
+        <relationshipName____is__set>true</relationshipName____is__set>
+        <relationshipName>Zuora__Invoice_Items__r</relationshipName>
         <restrictedDelete____is__set>false</restrictedDelete____is__set>
         <restrictedDelete>false</restrictedDelete>
       </com.sforce.soap.partner.ChildRelationship>
@@ -15739,6 +15898,28 @@ This value is required to sync this Subscription with OSS</inlineHelpText>
             <value____is__set>true</value____is__set>
             <value>Enhanced Web Filtering</value>
           </com.sforce.soap.partner.PicklistEntry>
+          <com.sforce.soap.partner.PicklistEntry>
+            <active____is__set>true</active____is__set>
+            <active>true</active>
+            <defaultValue____is__set>true</defaultValue____is__set>
+            <defaultValue>false</defaultValue>
+            <label____is__set>true</label____is__set>
+            <label>Interconnect</label>
+            <validFor____is__set>false</validFor____is__set>
+            <value____is__set>true</value____is__set>
+            <value>Interconnect</value>
+          </com.sforce.soap.partner.PicklistEntry>
+          <com.sforce.soap.partner.PicklistEntry>
+            <active____is__set>true</active____is__set>
+            <active>true</active>
+            <defaultValue____is__set>true</defaultValue____is__set>
+            <defaultValue>false</defaultValue>
+            <label____is__set>true</label____is__set>
+            <label>Internet Access</label>
+            <validFor____is__set>false</validFor____is__set>
+            <value____is__set>true</value____is__set>
+            <value>Internet Access</value>
+          </com.sforce.soap.partner.PicklistEntry>
         </picklistValues>
         <polymorphicForeignKey____is__set>true</polymorphicForeignKey____is__set>
         <polymorphicForeignKey>false</polymorphicForeignKey>
@@ -21015,9 +21196,9 @@ NOTE: After changing this value, it is necessary to click on &apos;Sync Subscrip
             <defaultValue____is__set>true</defaultValue____is__set>
             <defaultValue>false</defaultValue>
             <label____is__set>true</label____is__set>
-            <label>PrePaid</label>
+            <label>Prepaid / In Advance</label>
             <validFor____is__set>true</validFor____is__set>
-            <validFor>gAAA</validFor>
+            <validFor>oAAA</validFor>
             <value____is__set>true</value____is__set>
             <value>PrePaid</value>
           </com.sforce.soap.partner.PicklistEntry>
@@ -21027,7 +21208,7 @@ NOTE: After changing this value, it is necessary to click on &apos;Sync Subscrip
             <defaultValue____is__set>true</defaultValue____is__set>
             <defaultValue>true</defaultValue>
             <label____is__set>true</label____is__set>
-            <label>PostPaid</label>
+            <label>Postpaid / In Arrears</label>
             <validFor____is__set>true</validFor____is__set>
             <validFor>4AAA</validFor>
             <value____is__set>true</value____is__set>
@@ -25633,7 +25814,7 @@ NOTE: After changing this value, it is necessary to click on &apos;Sync Subscrip
             <label____is__set>true</label____is__set>
             <label>E8WB</label>
             <validFor____is__set>true</validFor____is__set>
-            <validFor>gAAA</validFor>
+            <validFor>ggAA</validFor>
             <value____is__set>true</value____is__set>
             <value>61</value>
           </com.sforce.soap.partner.PicklistEntry>
@@ -25645,7 +25826,7 @@ NOTE: After changing this value, it is necessary to click on &apos;Sync Subscrip
             <label____is__set>true</label____is__set>
             <label>E65WA</label>
             <validFor____is__set>true</validFor____is__set>
-            <validFor>mAAA</validFor>
+            <validFor>mgAA</validFor>
             <value____is__set>true</value____is__set>
             <value>62</value>
           </com.sforce.soap.partner.PicklistEntry>
@@ -25657,7 +25838,7 @@ NOTE: After changing this value, it is necessary to click on &apos;Sync Subscrip
             <label____is__set>true</label____is__set>
             <label>E70B</label>
             <validFor____is__set>true</validFor____is__set>
-            <validFor>gAAA</validFor>
+            <validFor>ggAA</validFor>
             <value____is__set>true</value____is__set>
             <value>51</value>
           </com.sforce.soap.partner.PicklistEntry>
@@ -25669,7 +25850,7 @@ NOTE: After changing this value, it is necessary to click on &apos;Sync Subscrip
             <label____is__set>true</label____is__set>
             <label>E33F</label>
             <validFor____is__set>true</validFor____is__set>
-            <validFor>gAAA</validFor>
+            <validFor>ggAA</validFor>
             <value____is__set>true</value____is__set>
             <value>59</value>
           </com.sforce.soap.partner.PicklistEntry>
@@ -25681,7 +25862,7 @@ NOTE: After changing this value, it is necessary to click on &apos;Sync Subscrip
             <label____is__set>true</label____is__set>
             <label>E21B</label>
             <validFor____is__set>true</validFor____is__set>
-            <validFor>gAAA</validFor>
+            <validFor>ggAA</validFor>
             <value____is__set>true</value____is__set>
             <value>47</value>
           </com.sforce.soap.partner.PicklistEntry>
@@ -25693,7 +25874,7 @@ NOTE: After changing this value, it is necessary to click on &apos;Sync Subscrip
             <label____is__set>true</label____is__set>
             <label>E36B</label>
             <validFor____is__set>true</validFor____is__set>
-            <validFor>gAAA</validFor>
+            <validFor>ggAA</validFor>
             <value____is__set>true</value____is__set>
             <value>31</value>
           </com.sforce.soap.partner.PicklistEntry>
@@ -25705,7 +25886,7 @@ NOTE: After changing this value, it is necessary to click on &apos;Sync Subscrip
             <label____is__set>true</label____is__set>
             <label>E172B</label>
             <validFor____is__set>true</validFor____is__set>
-            <validFor>gAAA</validFor>
+            <validFor>ggAA</validFor>
             <value____is__set>true</value____is__set>
             <value>E172B</value>
           </com.sforce.soap.partner.PicklistEntry>
@@ -25717,7 +25898,7 @@ NOTE: After changing this value, it is necessary to click on &apos;Sync Subscrip
             <label____is__set>true</label____is__set>
             <label>E37WA</label>
             <validFor____is__set>true</validFor____is__set>
-            <validFor>gAAA</validFor>
+            <validFor>ggAA</validFor>
             <value____is__set>true</value____is__set>
             <value>E37WA</value>
           </com.sforce.soap.partner.PicklistEntry>
@@ -25729,7 +25910,7 @@ NOTE: After changing this value, it is necessary to click on &apos;Sync Subscrip
             <label____is__set>true</label____is__set>
             <label>E117WB</label>
             <validFor____is__set>true</validFor____is__set>
-            <validFor>gAAA</validFor>
+            <validFor>ggAA</validFor>
             <value____is__set>true</value____is__set>
             <value>E117WB</value>
           </com.sforce.soap.partner.PicklistEntry>
@@ -25741,7 +25922,7 @@ NOTE: After changing this value, it is necessary to click on &apos;Sync Subscrip
             <label____is__set>true</label____is__set>
             <label>E113WA</label>
             <validFor____is__set>true</validFor____is__set>
-            <validFor>gAAA</validFor>
+            <validFor>ggAA</validFor>
             <value____is__set>true</value____is__set>
             <value>E113WA</value>
           </com.sforce.soap.partner.PicklistEntry>
@@ -25753,7 +25934,7 @@ NOTE: After changing this value, it is necessary to click on &apos;Sync Subscrip
             <label____is__set>true</label____is__set>
             <label>E117WA</label>
             <validFor____is__set>true</validFor____is__set>
-            <validFor>gAAA</validFor>
+            <validFor>ggAA</validFor>
             <value____is__set>true</value____is__set>
             <value>E117WA</value>
           </com.sforce.soap.partner.PicklistEntry>
@@ -25765,7 +25946,7 @@ NOTE: After changing this value, it is necessary to click on &apos;Sync Subscrip
             <label____is__set>true</label____is__set>
             <label>E110A</label>
             <validFor____is__set>true</validFor____is__set>
-            <validFor>gAAA</validFor>
+            <validFor>ggAA</validFor>
             <value____is__set>true</value____is__set>
             <value>E110A</value>
           </com.sforce.soap.partner.PicklistEntry>
@@ -25777,7 +25958,7 @@ NOTE: After changing this value, it is necessary to click on &apos;Sync Subscrip
             <label____is__set>true</label____is__set>
             <label>E21N</label>
             <validFor____is__set>true</validFor____is__set>
-            <validFor>gAAA</validFor>
+            <validFor>ggAA</validFor>
             <value____is__set>true</value____is__set>
             <value>63</value>
           </com.sforce.soap.partner.PicklistEntry>
@@ -25789,7 +25970,7 @@ NOTE: After changing this value, it is necessary to click on &apos;Sync Subscrip
             <label____is__set>true</label____is__set>
             <label>E113A</label>
             <validFor____is__set>true</validFor____is__set>
-            <validFor>gAAA</validFor>
+            <validFor>ggAA</validFor>
             <value____is__set>true</value____is__set>
             <value>69</value>
           </com.sforce.soap.partner.PicklistEntry>
@@ -25801,7 +25982,7 @@ NOTE: After changing this value, it is necessary to click on &apos;Sync Subscrip
             <label____is__set>true</label____is__set>
             <label>E3B</label>
             <validFor____is__set>true</validFor____is__set>
-            <validFor>gAAA</validFor>
+            <validFor>ggAA</validFor>
             <value____is__set>true</value____is__set>
             <value>55</value>
           </com.sforce.soap.partner.PicklistEntry>
@@ -25813,7 +25994,7 @@ NOTE: After changing this value, it is necessary to click on &apos;Sync Subscrip
             <label____is__set>true</label____is__set>
             <label>KONNECT</label>
             <validFor____is__set>true</validFor____is__set>
-            <validFor>mAAA</validFor>
+            <validFor>mgAA</validFor>
             <value____is__set>true</value____is__set>
             <value>1000</value>
           </com.sforce.soap.partner.PicklistEntry>
@@ -25825,7 +26006,7 @@ NOTE: After changing this value, it is necessary to click on &apos;Sync Subscrip
             <label____is__set>true</label____is__set>
             <label>OneWeb LEO fleet</label>
             <validFor____is__set>true</validFor____is__set>
-            <validFor>mAAA</validFor>
+            <validFor>mgAA</validFor>
             <value____is__set>true</value____is__set>
             <value>OneWeb LEO fleet</value>
           </com.sforce.soap.partner.PicklistEntry>
@@ -25837,7 +26018,7 @@ NOTE: After changing this value, it is necessary to click on &apos;Sync Subscrip
             <label____is__set>true</label____is__set>
             <label>Konnect VHTS</label>
             <validFor____is__set>true</validFor____is__set>
-            <validFor>3AAA</validFor>
+            <validFor>3gAA</validFor>
             <value____is__set>true</value____is__set>
             <value>Konnect VHTS</value>
           </com.sforce.soap.partner.PicklistEntry>
@@ -25849,7 +26030,7 @@ NOTE: After changing this value, it is necessary to click on &apos;Sync Subscrip
             <label____is__set>true</label____is__set>
             <label>E7C</label>
             <validFor____is__set>true</validFor____is__set>
-            <validFor>gAAA</validFor>
+            <validFor>ggAA</validFor>
             <value____is__set>true</value____is__set>
             <value>72</value>
           </com.sforce.soap.partner.PicklistEntry>
@@ -25861,7 +26042,7 @@ NOTE: After changing this value, it is necessary to click on &apos;Sync Subscrip
             <label____is__set>true</label____is__set>
             <label>E10B</label>
             <validFor____is__set>true</validFor____is__set>
-            <validFor>gAAA</validFor>
+            <validFor>ggAA</validFor>
             <value____is__set>true</value____is__set>
             <value>3000</value>
           </com.sforce.soap.partner.PicklistEntry>
@@ -25873,7 +26054,7 @@ NOTE: After changing this value, it is necessary to click on &apos;Sync Subscrip
             <label____is__set>true</label____is__set>
             <label>E7B</label>
             <validFor____is__set>true</validFor____is__set>
-            <validFor>gAAA</validFor>
+            <validFor>ggAA</validFor>
             <value____is__set>true</value____is__set>
             <value>53</value>
           </com.sforce.soap.partner.PicklistEntry>
@@ -25885,7 +26066,7 @@ NOTE: After changing this value, it is necessary to click on &apos;Sync Subscrip
             <label____is__set>true</label____is__set>
             <label>E12WG</label>
             <validFor____is__set>true</validFor____is__set>
-            <validFor>gAAA</validFor>
+            <validFor>ggAA</validFor>
             <value____is__set>true</value____is__set>
             <value>73</value>
           </com.sforce.soap.partner.PicklistEntry>
@@ -25897,7 +26078,7 @@ NOTE: After changing this value, it is necessary to click on &apos;Sync Subscrip
             <label____is__set>true</label____is__set>
             <label>J85E</label>
             <validFor____is__set>true</validFor____is__set>
-            <validFor>gAAA</validFor>
+            <validFor>ggAA</validFor>
             <value____is__set>true</value____is__set>
             <value>74</value>
           </com.sforce.soap.partner.PicklistEntry>
@@ -25909,7 +26090,7 @@ NOTE: After changing this value, it is necessary to click on &apos;Sync Subscrip
             <label____is__set>true</label____is__set>
             <label>E127W</label>
             <validFor____is__set>true</validFor____is__set>
-            <validFor>gAAA</validFor>
+            <validFor>ggAA</validFor>
             <value____is__set>true</value____is__set>
             <value>75</value>
           </com.sforce.soap.partner.PicklistEntry>
@@ -25921,7 +26102,7 @@ NOTE: After changing this value, it is necessary to click on &apos;Sync Subscrip
             <label____is__set>true</label____is__set>
             <label>DIALOG LAB Satellite</label>
             <validFor____is__set>true</validFor____is__set>
-            <validFor>wAAA</validFor>
+            <validFor>wgAA</validFor>
             <value____is__set>true</value____is__set>
             <value>400</value>
           </com.sforce.soap.partner.PicklistEntry>
@@ -26138,7 +26319,7 @@ NOTE: After changing this value, it is necessary to click on &apos;Sync Subscrip
             <label____is__set>true</label____is__set>
             <label>Advance LEO</label>
             <validFor____is__set>true</validFor____is__set>
-            <validFor>IAAA</validFor>
+            <validFor></validFor>
             <value____is__set>true</value____is__set>
             <value>Advance LEO</value>
           </com.sforce.soap.partner.PicklistEntry>
@@ -26165,6 +26346,78 @@ NOTE: After changing this value, it is necessary to click on &apos;Sync Subscrip
             <validFor>gAAA</validFor>
             <value____is__set>true</value____is__set>
             <value>Advance Ka Aviation</value>
+          </com.sforce.soap.partner.PicklistEntry>
+          <com.sforce.soap.partner.PicklistEntry>
+            <active____is__set>true</active____is__set>
+            <active>true</active>
+            <defaultValue____is__set>true</defaultValue____is__set>
+            <defaultValue>false</defaultValue>
+            <label____is__set>true</label____is__set>
+            <label>Commercial Maritime</label>
+            <validFor____is__set>true</validFor____is__set>
+            <validFor>IAAA</validFor>
+            <value____is__set>true</value____is__set>
+            <value>Commercial Maritime</value>
+          </com.sforce.soap.partner.PicklistEntry>
+          <com.sforce.soap.partner.PicklistEntry>
+            <active____is__set>true</active____is__set>
+            <active>true</active>
+            <defaultValue____is__set>true</defaultValue____is__set>
+            <defaultValue>false</defaultValue>
+            <label____is__set>true</label____is__set>
+            <label>Commercial Land / Enterprise</label>
+            <validFor____is__set>true</validFor____is__set>
+            <validFor>IAAA</validFor>
+            <value____is__set>true</value____is__set>
+            <value>Commercial Land / Enterprise</value>
+          </com.sforce.soap.partner.PicklistEntry>
+          <com.sforce.soap.partner.PicklistEntry>
+            <active____is__set>true</active____is__set>
+            <active>true</active>
+            <defaultValue____is__set>true</defaultValue____is__set>
+            <defaultValue>false</defaultValue>
+            <label____is__set>true</label____is__set>
+            <label>Civil Government</label>
+            <validFor____is__set>true</validFor____is__set>
+            <validFor>IAAA</validFor>
+            <value____is__set>true</value____is__set>
+            <value>Civil Government</value>
+          </com.sforce.soap.partner.PicklistEntry>
+          <com.sforce.soap.partner.PicklistEntry>
+            <active____is__set>true</active____is__set>
+            <active>true</active>
+            <defaultValue____is__set>true</defaultValue____is__set>
+            <defaultValue>false</defaultValue>
+            <label____is__set>true</label____is__set>
+            <label>Military Government</label>
+            <validFor____is__set>true</validFor____is__set>
+            <validFor>IAAA</validFor>
+            <value____is__set>true</value____is__set>
+            <value>Military Government</value>
+          </com.sforce.soap.partner.PicklistEntry>
+          <com.sforce.soap.partner.PicklistEntry>
+            <active____is__set>true</active____is__set>
+            <active>true</active>
+            <defaultValue____is__set>true</defaultValue____is__set>
+            <defaultValue>false</defaultValue>
+            <label____is__set>true</label____is__set>
+            <label>Commercial Aviation</label>
+            <validFor____is__set>true</validFor____is__set>
+            <validFor>IAAA</validFor>
+            <value____is__set>true</value____is__set>
+            <value>Commercial Aviation</value>
+          </com.sforce.soap.partner.PicklistEntry>
+          <com.sforce.soap.partner.PicklistEntry>
+            <active____is__set>true</active____is__set>
+            <active>true</active>
+            <defaultValue____is__set>true</defaultValue____is__set>
+            <defaultValue>false</defaultValue>
+            <label____is__set>true</label____is__set>
+            <label>Business Aviation</label>
+            <validFor____is__set>true</validFor____is__set>
+            <validFor>IAAA</validFor>
+            <value____is__set>true</value____is__set>
+            <value>Business Aviation</value>
           </com.sforce.soap.partner.PicklistEntry>
         </picklistValues>
         <polymorphicForeignKey____is__set>true</polymorphicForeignKey____is__set>
@@ -28222,18 +28475,6 @@ IF(MONTH(TODAY())==12,1,MONTH(TODAY()) + 1),
             <defaultValue____is__set>true</defaultValue____is__set>
             <defaultValue>false</defaultValue>
             <label____is__set>true</label____is__set>
-            <label>NEWTEC E3B GLOBAL C BAND 08C</label>
-            <validFor____is__set>true</validFor____is__set>
-            <validFor>gAAA</validFor>
-            <value____is__set>true</value____is__set>
-            <value>335</value>
-          </com.sforce.soap.partner.PicklistEntry>
-          <com.sforce.soap.partner.PicklistEntry>
-            <active____is__set>true</active____is__set>
-            <active>true</active>
-            <defaultValue____is__set>true</defaultValue____is__set>
-            <defaultValue>false</defaultValue>
-            <label____is__set>true</label____is__set>
             <label>E65WA-B19</label>
             <validFor____is__set>true</validFor____is__set>
             <validFor>gAAA</validFor>
@@ -28359,18 +28600,6 @@ IF(MONTH(TODAY())==12,1,MONTH(TODAY()) + 1),
             <validFor></validFor>
             <value____is__set>true</value____is__set>
             <value>340</value>
-          </com.sforce.soap.partner.PicklistEntry>
-          <com.sforce.soap.partner.PicklistEntry>
-            <active____is__set>true</active____is__set>
-            <active>true</active>
-            <defaultValue____is__set>true</defaultValue____is__set>
-            <defaultValue>false</defaultValue>
-            <label____is__set>true</label____is__set>
-            <label>NEWTEC E70B AFRICA GEA03</label>
-            <validFor____is__set>true</validFor____is__set>
-            <validFor>gAAA</validFor>
-            <value____is__set>true</value____is__set>
-            <value>342</value>
           </com.sforce.soap.partner.PicklistEntry>
           <com.sforce.soap.partner.PicklistEntry>
             <active____is__set>true</active____is__set>
@@ -30177,18 +30406,6 @@ IF(MONTH(TODAY())==12,1,MONTH(TODAY()) + 1),
             <defaultValue____is__set>true</defaultValue____is__set>
             <defaultValue>false</defaultValue>
             <label____is__set>true</label____is__set>
-            <label>SR NEWTEC E3B GLOBAL C BAND 08C</label>
-            <validFor____is__set>true</validFor____is__set>
-            <validFor>QAAA</validFor>
-            <value____is__set>true</value____is__set>
-            <value>SR NEWTEC E3B GLOBAL C BAND 08C</value>
-          </com.sforce.soap.partner.PicklistEntry>
-          <com.sforce.soap.partner.PicklistEntry>
-            <active____is__set>true</active____is__set>
-            <active>true</active>
-            <defaultValue____is__set>true</defaultValue____is__set>
-            <defaultValue>false</defaultValue>
-            <label____is__set>true</label____is__set>
             <label>SR NEWTEC E113WA NORTH AMERICA K07</label>
             <validFor____is__set>true</validFor____is__set>
             <validFor>QAAA</validFor>
@@ -30218,18 +30435,6 @@ IF(MONTH(TODAY())==12,1,MONTH(TODAY()) + 1),
             <validFor>QAAA</validFor>
             <value____is__set>true</value____is__set>
             <value>SR NEWTEC E3B GLOBAL C BAND 13C</value>
-          </com.sforce.soap.partner.PicklistEntry>
-          <com.sforce.soap.partner.PicklistEntry>
-            <active____is__set>true</active____is__set>
-            <active>true</active>
-            <defaultValue____is__set>true</defaultValue____is__set>
-            <defaultValue>false</defaultValue>
-            <label____is__set>true</label____is__set>
-            <label>SR NEWTEC E70B AFRICA GEA03</label>
-            <validFor____is__set>true</validFor____is__set>
-            <validFor>QAAA</validFor>
-            <value____is__set>true</value____is__set>
-            <value>SR NEWTEC E70B AFRICA GEA03</value>
           </com.sforce.soap.partner.PicklistEntry>
           <com.sforce.soap.partner.PicklistEntry>
             <active____is__set>true</active____is__set>
@@ -30431,7 +30636,7 @@ IF(MONTH(TODAY())==12,1,MONTH(TODAY()) + 1),
             <label____is__set>true</label____is__set>
             <label>Global</label>
             <validFor____is__set>true</validFor____is__set>
-            <validFor>aAAA</validFor>
+            <validFor>bAAA</validFor>
             <value____is__set>true</value____is__set>
             <value>Global</value>
           </com.sforce.soap.partner.PicklistEntry>
@@ -34479,6 +34684,18 @@ IF(MONTH(TODAY())==12,1,MONTH(TODAY()) + 1),
             <value____is__set>true</value____is__set>
             <value>Mobility Aviation</value>
           </com.sforce.soap.partner.PicklistEntry>
+          <com.sforce.soap.partner.PicklistEntry>
+            <active____is__set>true</active____is__set>
+            <active>true</active>
+            <defaultValue____is__set>true</defaultValue____is__set>
+            <defaultValue>false</defaultValue>
+            <label____is__set>true</label____is__set>
+            <label>Land</label>
+            <validFor____is__set>true</validFor____is__set>
+            <validFor>gAAA</validFor>
+            <value____is__set>true</value____is__set>
+            <value>Land</value>
+          </com.sforce.soap.partner.PicklistEntry>
         </picklistValues>
         <polymorphicForeignKey____is__set>true</polymorphicForeignKey____is__set>
         <polymorphicForeignKey>false</polymorphicForeignKey>
@@ -34913,7 +35130,7 @@ IF(MONTH(TODAY())==12,1,MONTH(TODAY()) + 1),
             <label____is__set>true</label____is__set>
             <label>Terminal 1</label>
             <validFor____is__set>true</validFor____is__set>
-            <validFor>+AAA</validFor>
+            <validFor>+gAA</validFor>
             <value____is__set>true</value____is__set>
             <value>Terminal 1</value>
           </com.sforce.soap.partner.PicklistEntry>
@@ -34925,7 +35142,7 @@ IF(MONTH(TODAY())==12,1,MONTH(TODAY()) + 1),
             <label____is__set>true</label____is__set>
             <label>Terminal 2</label>
             <validFor____is__set>true</validFor____is__set>
-            <validFor>+AAA</validFor>
+            <validFor>+gAA</validFor>
             <value____is__set>true</value____is__set>
             <value>Terminal 2</value>
           </com.sforce.soap.partner.PicklistEntry>
@@ -34997,7 +35214,7 @@ IF(MONTH(TODAY())==12,1,MONTH(TODAY()) + 1),
             <label____is__set>true</label____is__set>
             <label>Standard (OW70L, OW130L, etc)</label>
             <validFor____is__set>true</validFor____is__set>
-            <validFor>+AAA</validFor>
+            <validFor>+gAA</validFor>
             <value____is__set>true</value____is__set>
             <value>Standard (OW70L, OW130L, etc)</value>
           </com.sforce.soap.partner.PicklistEntry>
@@ -35009,7 +35226,7 @@ IF(MONTH(TODAY())==12,1,MONTH(TODAY()) + 1),
             <label____is__set>true</label____is__set>
             <label>Entry (OW50SL, Kymeta Hawk u8, etc)</label>
             <validFor____is__set>true</validFor____is__set>
-            <validFor>+AAA</validFor>
+            <validFor>+gAA</validFor>
             <value____is__set>true</value____is__set>
             <value>Entry (OW50SL, Kymeta Hawk u8, etc)</value>
           </com.sforce.soap.partner.PicklistEntry>
@@ -35033,7 +35250,7 @@ IF(MONTH(TODAY())==12,1,MONTH(TODAY()) + 1),
             <label____is__set>true</label____is__set>
             <label>Class 12a Land Fixed (1,2m + 3W)​</label>
             <validFor____is__set>true</validFor____is__set>
-            <validFor>mAAA</validFor>
+            <validFor>mgAA</validFor>
             <value____is__set>true</value____is__set>
             <value>7</value>
           </com.sforce.soap.partner.PicklistEntry>
@@ -35045,7 +35262,7 @@ IF(MONTH(TODAY())==12,1,MONTH(TODAY()) + 1),
             <label____is__set>true</label____is__set>
             <label>Class 12b Land Fixed (1,2m + 6W)</label>
             <validFor____is__set>true</validFor____is__set>
-            <validFor>mAAA</validFor>
+            <validFor>mgAA</validFor>
             <value____is__set>true</value____is__set>
             <value>8</value>
           </com.sforce.soap.partner.PicklistEntry>
@@ -35057,7 +35274,7 @@ IF(MONTH(TODAY())==12,1,MONTH(TODAY()) + 1),
             <label____is__set>true</label____is__set>
             <label>Class 18a C-band Land Fixed (1,8m + 3W)</label>
             <validFor____is__set>true</validFor____is__set>
-            <validFor>mAAA</validFor>
+            <validFor>mgAA</validFor>
             <value____is__set>true</value____is__set>
             <value>9</value>
           </com.sforce.soap.partner.PicklistEntry>
@@ -35069,7 +35286,7 @@ IF(MONTH(TODAY())==12,1,MONTH(TODAY()) + 1),
             <label____is__set>true</label____is__set>
             <label>Class 18b C-band Land Fixed (1,8m + 6W)</label>
             <validFor____is__set>true</validFor____is__set>
-            <validFor>mAAA</validFor>
+            <validFor>mgAA</validFor>
             <value____is__set>true</value____is__set>
             <value>10</value>
           </com.sforce.soap.partner.PicklistEntry>
@@ -35081,7 +35298,7 @@ IF(MONTH(TODAY())==12,1,MONTH(TODAY()) + 1),
             <label____is__set>true</label____is__set>
             <label>Class 24 C-band Land Fixed  (2,4m + 20W)</label>
             <validFor____is__set>true</validFor____is__set>
-            <validFor>mAAA</validFor>
+            <validFor>mgAA</validFor>
             <value____is__set>true</value____is__set>
             <value>11</value>
           </com.sforce.soap.partner.PicklistEntry>
@@ -35093,7 +35310,7 @@ IF(MONTH(TODAY())==12,1,MONTH(TODAY()) + 1),
             <label____is__set>true</label____is__set>
             <label>Class 12c Land Fixed (1,2m + 16W)</label>
             <validFor____is__set>true</validFor____is__set>
-            <validFor>mAAA</validFor>
+            <validFor>mgAA</validFor>
             <value____is__set>true</value____is__set>
             <value>12</value>
           </com.sforce.soap.partner.PicklistEntry>
@@ -35105,7 +35322,7 @@ IF(MONTH(TODAY())==12,1,MONTH(TODAY()) + 1),
             <label____is__set>true</label____is__set>
             <label>Class 18 Land Fixed (1,8m + 16W)​</label>
             <validFor____is__set>true</validFor____is__set>
-            <validFor>mAAA</validFor>
+            <validFor>mgAA</validFor>
             <value____is__set>true</value____is__set>
             <value>13</value>
           </com.sforce.soap.partner.PicklistEntry>
@@ -35117,7 +35334,7 @@ IF(MONTH(TODAY())==12,1,MONTH(TODAY()) + 1),
             <label____is__set>true</label____is__set>
             <label>Class 12b Maritime (1,2m + 25W)​</label>
             <validFor____is__set>true</validFor____is__set>
-            <validFor>2AAA</validFor>
+            <validFor>2gAA</validFor>
             <value____is__set>true</value____is__set>
             <value>14</value>
           </com.sforce.soap.partner.PicklistEntry>
@@ -35261,7 +35478,7 @@ IF(MONTH(TODAY())==12,1,MONTH(TODAY()) + 1),
             <label____is__set>true</label____is__set>
             <label>Non-Standard Fixed Terminal Class C-band</label>
             <validFor____is__set>true</validFor____is__set>
-            <validFor>gAAA</validFor>
+            <validFor>ggAA</validFor>
             <value____is__set>true</value____is__set>
             <value>95</value>
           </com.sforce.soap.partner.PicklistEntry>
@@ -35273,7 +35490,7 @@ IF(MONTH(TODAY())==12,1,MONTH(TODAY()) + 1),
             <label____is__set>true</label____is__set>
             <label>Non-Standard Fixed Terminal Class KU-band</label>
             <validFor____is__set>true</validFor____is__set>
-            <validFor>gAAA</validFor>
+            <validFor>ggAA</validFor>
             <value____is__set>true</value____is__set>
             <value>94</value>
           </com.sforce.soap.partner.PicklistEntry>
@@ -35297,7 +35514,7 @@ IF(MONTH(TODAY())==12,1,MONTH(TODAY()) + 1),
             <label____is__set>true</label____is__set>
             <label>Land Fixed Class 8-2W-J3-KVHTS (0.74m+2W)</label>
             <validFor____is__set>true</validFor____is__set>
-            <validFor>gAAA</validFor>
+            <validFor>ggAA</validFor>
             <value____is__set>true</value____is__set>
             <value>115</value>
           </com.sforce.soap.partner.PicklistEntry>
@@ -35309,7 +35526,7 @@ IF(MONTH(TODAY())==12,1,MONTH(TODAY()) + 1),
             <label____is__set>true</label____is__set>
             <label>Land Fixed Class 8-1W-J2-KONNECT (0.74m+1W)</label>
             <validFor____is__set>true</validFor____is__set>
-            <validFor>gAAA</validFor>
+            <validFor>ggAA</validFor>
             <value____is__set>true</value____is__set>
             <value>107</value>
           </com.sforce.soap.partner.PicklistEntry>
@@ -35321,7 +35538,7 @@ IF(MONTH(TODAY())==12,1,MONTH(TODAY()) + 1),
             <label____is__set>true</label____is__set>
             <label>Land Fixed Class 8-3W-J2-KONNECT (0.74m+3W)</label>
             <validFor____is__set>true</validFor____is__set>
-            <validFor>gAAA</validFor>
+            <validFor>ggAA</validFor>
             <value____is__set>true</value____is__set>
             <value>108</value>
           </com.sforce.soap.partner.PicklistEntry>
@@ -35333,7 +35550,7 @@ IF(MONTH(TODAY())==12,1,MONTH(TODAY()) + 1),
             <label____is__set>true</label____is__set>
             <label>Land Fixed Class 9-2W-J2-KONNECT (0.90m+2W)</label>
             <validFor____is__set>true</validFor____is__set>
-            <validFor>gAAA</validFor>
+            <validFor>ggAA</validFor>
             <value____is__set>true</value____is__set>
             <value>109</value>
           </com.sforce.soap.partner.PicklistEntry>
@@ -35345,7 +35562,7 @@ IF(MONTH(TODAY())==12,1,MONTH(TODAY()) + 1),
             <label____is__set>true</label____is__set>
             <label>Land Fixed Class 12-1W-J2-KONNECT (1.2m+1W)</label>
             <validFor____is__set>true</validFor____is__set>
-            <validFor>gAAA</validFor>
+            <validFor>ggAA</validFor>
             <value____is__set>true</value____is__set>
             <value>110</value>
           </com.sforce.soap.partner.PicklistEntry>
@@ -35357,7 +35574,7 @@ IF(MONTH(TODAY())==12,1,MONTH(TODAY()) + 1),
             <label____is__set>true</label____is__set>
             <label>Land Fixed Class 12-2W-J2-KONNECT (1.2m+2W)</label>
             <validFor____is__set>true</validFor____is__set>
-            <validFor>gAAA</validFor>
+            <validFor>ggAA</validFor>
             <value____is__set>true</value____is__set>
             <value>111</value>
           </com.sforce.soap.partner.PicklistEntry>
@@ -35369,7 +35586,7 @@ IF(MONTH(TODAY())==12,1,MONTH(TODAY()) + 1),
             <label____is__set>true</label____is__set>
             <label>Land Fixed Class 8-2W-J2-KONNECT (0.74m+2W)</label>
             <validFor____is__set>true</validFor____is__set>
-            <validFor>gAAA</validFor>
+            <validFor>ggAA</validFor>
             <value____is__set>true</value____is__set>
             <value>112</value>
           </com.sforce.soap.partner.PicklistEntry>
@@ -35381,7 +35598,7 @@ IF(MONTH(TODAY())==12,1,MONTH(TODAY()) + 1),
             <label____is__set>true</label____is__set>
             <label>Land Fixed Class 12-3W-J2-KONNECT (1.2m+3W)</label>
             <validFor____is__set>true</validFor____is__set>
-            <validFor>gAAA</validFor>
+            <validFor>ggAA</validFor>
             <value____is__set>true</value____is__set>
             <value>113</value>
           </com.sforce.soap.partner.PicklistEntry>
@@ -35393,7 +35610,7 @@ IF(MONTH(TODAY())==12,1,MONTH(TODAY()) + 1),
             <label____is__set>true</label____is__set>
             <label>Land Fixed Class 9-2W-J3-KVHTS (0.90m+2W)</label>
             <validFor____is__set>true</validFor____is__set>
-            <validFor>gAAA</validFor>
+            <validFor>ggAA</validFor>
             <value____is__set>true</value____is__set>
             <value>116</value>
           </com.sforce.soap.partner.PicklistEntry>
@@ -35405,7 +35622,7 @@ IF(MONTH(TODAY())==12,1,MONTH(TODAY()) + 1),
             <label____is__set>true</label____is__set>
             <label>Land Fixed Class 9-3W-J3-KVHTS (0.90m+3W)</label>
             <validFor____is__set>true</validFor____is__set>
-            <validFor>gAAA</validFor>
+            <validFor>ggAA</validFor>
             <value____is__set>true</value____is__set>
             <value>117</value>
           </com.sforce.soap.partner.PicklistEntry>
@@ -35417,7 +35634,7 @@ IF(MONTH(TODAY())==12,1,MONTH(TODAY()) + 1),
             <label____is__set>true</label____is__set>
             <label>Land Fixed Class 12-2W-J3-KVHTS (1.2m+2W)</label>
             <validFor____is__set>true</validFor____is__set>
-            <validFor>gAAA</validFor>
+            <validFor>ggAA</validFor>
             <value____is__set>true</value____is__set>
             <value>118</value>
           </com.sforce.soap.partner.PicklistEntry>
@@ -35429,7 +35646,7 @@ IF(MONTH(TODAY())==12,1,MONTH(TODAY()) + 1),
             <label____is__set>true</label____is__set>
             <label>Land Fixed Class 12-3W-J3-KVHTS (1.2m+3W)</label>
             <validFor____is__set>true</validFor____is__set>
-            <validFor>gAAA</validFor>
+            <validFor>ggAA</validFor>
             <value____is__set>true</value____is__set>
             <value>119</value>
           </com.sforce.soap.partner.PicklistEntry>
@@ -35441,7 +35658,7 @@ IF(MONTH(TODAY())==12,1,MONTH(TODAY()) + 1),
             <label____is__set>true</label____is__set>
             <label>Land Fixed Class 12-5W-J3-KVHTS-PF (1.2m+5W)</label>
             <validFor____is__set>true</validFor____is__set>
-            <validFor>gAAA</validFor>
+            <validFor>ggAA</validFor>
             <value____is__set>true</value____is__set>
             <value>120</value>
           </com.sforce.soap.partner.PicklistEntry>
@@ -35477,7 +35694,7 @@ IF(MONTH(TODAY())==12,1,MONTH(TODAY()) + 1),
             <label____is__set>true</label____is__set>
             <label>Non-standard Land fixed Konnect</label>
             <validFor____is__set>true</validFor____is__set>
-            <validFor>gAAA</validFor>
+            <validFor>ggAA</validFor>
             <value____is__set>true</value____is__set>
             <value>150</value>
           </com.sforce.soap.partner.PicklistEntry>
@@ -35489,7 +35706,7 @@ IF(MONTH(TODAY())==12,1,MONTH(TODAY()) + 1),
             <label____is__set>true</label____is__set>
             <label>Non-standard Land fixed KVHTS</label>
             <validFor____is__set>true</validFor____is__set>
-            <validFor>gAAA</validFor>
+            <validFor>ggAA</validFor>
             <value____is__set>true</value____is__set>
             <value>151</value>
           </com.sforce.soap.partner.PicklistEntry>
@@ -35501,7 +35718,7 @@ IF(MONTH(TODAY())==12,1,MONTH(TODAY()) + 1),
             <label____is__set>true</label____is__set>
             <label>Non-standard Land fixed E65WA</label>
             <validFor____is__set>true</validFor____is__set>
-            <validFor>gAAA</validFor>
+            <validFor>ggAA</validFor>
             <value____is__set>true</value____is__set>
             <value>152</value>
           </com.sforce.soap.partner.PicklistEntry>
@@ -35549,7 +35766,7 @@ IF(MONTH(TODAY())==12,1,MONTH(TODAY()) + 1),
             <label____is__set>true</label____is__set>
             <label>Land Fixed Class 12-10W-J3-KVHTS-PF (1.2m+10W)</label>
             <validFor____is__set>true</validFor____is__set>
-            <validFor>gAAA</validFor>
+            <validFor>ggAA</validFor>
             <value____is__set>true</value____is__set>
             <value>121</value>
           </com.sforce.soap.partner.PicklistEntry>
@@ -35573,7 +35790,7 @@ IF(MONTH(TODAY())==12,1,MONTH(TODAY()) + 1),
             <label____is__set>true</label____is__set>
             <label>Land Fixed Class 8-2W Saturated-J2-E65WA (0.74m+2W)</label>
             <validFor____is__set>true</validFor____is__set>
-            <validFor>gAAA</validFor>
+            <validFor>ggAA</validFor>
             <value____is__set>true</value____is__set>
             <value>123</value>
           </com.sforce.soap.partner.PicklistEntry>
@@ -35585,7 +35802,7 @@ IF(MONTH(TODAY())==12,1,MONTH(TODAY()) + 1),
             <label____is__set>true</label____is__set>
             <label>Land Fixed Class 9-2W Saturated-J2-E65WA (0.98m+2W)</label>
             <validFor____is__set>true</validFor____is__set>
-            <validFor>gAAA</validFor>
+            <validFor>ggAA</validFor>
             <value____is__set>true</value____is__set>
             <value>124</value>
           </com.sforce.soap.partner.PicklistEntry>
@@ -35597,7 +35814,7 @@ IF(MONTH(TODAY())==12,1,MONTH(TODAY()) + 1),
             <label____is__set>true</label____is__set>
             <label>Land Fixed Class 12-2W Saturated-J2-E65WA (1.2m+2W)</label>
             <validFor____is__set>true</validFor____is__set>
-            <validFor>gAAA</validFor>
+            <validFor>ggAA</validFor>
             <value____is__set>true</value____is__set>
             <value>125</value>
           </com.sforce.soap.partner.PicklistEntry>
@@ -35609,7 +35826,7 @@ IF(MONTH(TODAY())==12,1,MONTH(TODAY()) + 1),
             <label____is__set>true</label____is__set>
             <label>Land Fixed Class 8-3W Linear-J2-E65WA (0.74m+3W)</label>
             <validFor____is__set>true</validFor____is__set>
-            <validFor>gAAA</validFor>
+            <validFor>ggAA</validFor>
             <value____is__set>true</value____is__set>
             <value>126</value>
           </com.sforce.soap.partner.PicklistEntry>
@@ -35648,6 +35865,30 @@ IF(MONTH(TODAY())==12,1,MONTH(TODAY()) + 1),
             <validFor>CAAA</validFor>
             <value____is__set>true</value____is__set>
             <value>114</value>
+          </com.sforce.soap.partner.PicklistEntry>
+          <com.sforce.soap.partner.PicklistEntry>
+            <active____is__set>true</active____is__set>
+            <active>true</active>
+            <defaultValue____is__set>true</defaultValue____is__set>
+            <defaultValue>false</defaultValue>
+            <label____is__set>true</label____is__set>
+            <label>FD-Entry</label>
+            <validFor____is__set>true</validFor____is__set>
+            <validFor></validFor>
+            <value____is__set>true</value____is__set>
+            <value>FD-Entry</value>
+          </com.sforce.soap.partner.PicklistEntry>
+          <com.sforce.soap.partner.PicklistEntry>
+            <active____is__set>true</active____is__set>
+            <active>true</active>
+            <defaultValue____is__set>true</defaultValue____is__set>
+            <defaultValue>false</defaultValue>
+            <label____is__set>true</label____is__set>
+            <label>FD-Standard</label>
+            <validFor____is__set>true</validFor____is__set>
+            <validFor></validFor>
+            <value____is__set>true</value____is__set>
+            <value>FD-Standard</value>
           </com.sforce.soap.partner.PicklistEntry>
         </picklistValues>
         <polymorphicForeignKey____is__set>true</polymorphicForeignKey____is__set>
@@ -37765,6 +38006,146 @@ IF(MONTH(TODAY())==12,1,MONTH(TODAY()) + 1),
         <sortable>true</sortable>
         <type____is__set>true</type____is__set>
         <type>_boolean</type>
+        <unique____is__set>true</unique____is__set>
+        <unique>false</unique>
+        <updateable____is__set>true</updateable____is__set>
+        <updateable>true</updateable>
+        <writeRequiresMasterRead____is__set>false</writeRequiresMasterRead____is__set>
+        <writeRequiresMasterRead>false</writeRequiresMasterRead>
+      </com.sforce.soap.partner.Field>
+      <com.sforce.soap.partner.Field>
+        <aggregatable____is__set>true</aggregatable____is__set>
+        <aggregatable>true</aggregatable>
+        <aiPredictionField____is__set>true</aiPredictionField____is__set>
+        <aiPredictionField>false</aiPredictionField>
+        <autoNumber____is__set>true</autoNumber____is__set>
+        <autoNumber>false</autoNumber>
+        <byteLength____is__set>true</byteLength____is__set>
+        <byteLength>765</byteLength>
+        <calculated____is__set>true</calculated____is__set>
+        <calculated>false</calculated>
+        <calculatedFormula____is__set>false</calculatedFormula____is__set>
+        <cascadeDelete____is__set>false</cascadeDelete____is__set>
+        <cascadeDelete>false</cascadeDelete>
+        <caseSensitive____is__set>true</caseSensitive____is__set>
+        <caseSensitive>false</caseSensitive>
+        <compoundFieldName____is__set>false</compoundFieldName____is__set>
+        <controllerName____is__set>false</controllerName____is__set>
+        <createable____is__set>true</createable____is__set>
+        <createable>true</createable>
+        <custom____is__set>true</custom____is__set>
+        <custom>true</custom>
+        <dataTranslationEnabled____is__set>false</dataTranslationEnabled____is__set>
+        <dataTranslationEnabled>false</dataTranslationEnabled>
+        <defaultValue____is__set>false</defaultValue____is__set>
+        <defaultValueFormula____is__set>false</defaultValueFormula____is__set>
+        <defaultedOnCreate____is__set>true</defaultedOnCreate____is__set>
+        <defaultedOnCreate>false</defaultedOnCreate>
+        <dependentPicklist____is__set>false</dependentPicklist____is__set>
+        <dependentPicklist>false</dependentPicklist>
+        <deprecatedAndHidden____is__set>true</deprecatedAndHidden____is__set>
+        <deprecatedAndHidden>false</deprecatedAndHidden>
+        <digits____is__set>true</digits____is__set>
+        <digits>0</digits>
+        <displayLocationInDecimal____is__set>false</displayLocationInDecimal____is__set>
+        <displayLocationInDecimal>false</displayLocationInDecimal>
+        <encrypted____is__set>false</encrypted____is__set>
+        <encrypted>false</encrypted>
+        <externalId____is__set>false</externalId____is__set>
+        <externalId>false</externalId>
+        <extraTypeInfo____is__set>false</extraTypeInfo____is__set>
+        <filterable____is__set>true</filterable____is__set>
+        <filterable>true</filterable>
+        <filteredLookupInfo____is__set>false</filteredLookupInfo____is__set>
+        <formulaTreatNullNumberAsZero____is__set>false</formulaTreatNullNumberAsZero____is__set>
+        <formulaTreatNullNumberAsZero>false</formulaTreatNullNumberAsZero>
+        <groupable____is__set>true</groupable____is__set>
+        <groupable>true</groupable>
+        <highScaleNumber____is__set>false</highScaleNumber____is__set>
+        <highScaleNumber>false</highScaleNumber>
+        <htmlFormatted____is__set>false</htmlFormatted____is__set>
+        <htmlFormatted>false</htmlFormatted>
+        <idLookup____is__set>true</idLookup____is__set>
+        <idLookup>false</idLookup>
+        <inlineHelpText____is__set>false</inlineHelpText____is__set>
+        <label____is__set>true</label____is__set>
+        <label>Monetization Model</label>
+        <length____is__set>true</length____is__set>
+        <length>255</length>
+        <mask____is__set>false</mask____is__set>
+        <maskType____is__set>false</maskType____is__set>
+        <name____is__set>true</name____is__set>
+        <name>Monetization_Model__c</name>
+        <nameField____is__set>true</nameField____is__set>
+        <nameField>false</nameField>
+        <namePointing____is__set>true</namePointing____is__set>
+        <namePointing>false</namePointing>
+        <nillable____is__set>true</nillable____is__set>
+        <nillable>true</nillable>
+        <permissionable____is__set>true</permissionable____is__set>
+        <permissionable>true</permissionable>
+        <picklistValues____is__set>true</picklistValues____is__set>
+        <picklistValues>
+          <com.sforce.soap.partner.PicklistEntry>
+            <active____is__set>true</active____is__set>
+            <active>true</active>
+            <defaultValue____is__set>true</defaultValue____is__set>
+            <defaultValue>false</defaultValue>
+            <label____is__set>true</label____is__set>
+            <label>No Commitment</label>
+            <validFor____is__set>false</validFor____is__set>
+            <value____is__set>true</value____is__set>
+            <value>No Commitment</value>
+          </com.sforce.soap.partner.PicklistEntry>
+          <com.sforce.soap.partner.PicklistEntry>
+            <active____is__set>true</active____is__set>
+            <active>true</active>
+            <defaultValue____is__set>true</defaultValue____is__set>
+            <defaultValue>false</defaultValue>
+            <label____is__set>true</label____is__set>
+            <label>Revenue Commitment</label>
+            <validFor____is__set>false</validFor____is__set>
+            <value____is__set>true</value____is__set>
+            <value>Revenue Commitment</value>
+          </com.sforce.soap.partner.PicklistEntry>
+          <com.sforce.soap.partner.PicklistEntry>
+            <active____is__set>true</active____is__set>
+            <active>true</active>
+            <defaultValue____is__set>true</defaultValue____is__set>
+            <defaultValue>false</defaultValue>
+            <label____is__set>true</label____is__set>
+            <label>Revenue Commitment with Capacity Commitment</label>
+            <validFor____is__set>false</validFor____is__set>
+            <value____is__set>true</value____is__set>
+            <value>Revenue Commitment with Capacity Commitment</value>
+          </com.sforce.soap.partner.PicklistEntry>
+        </picklistValues>
+        <polymorphicForeignKey____is__set>true</polymorphicForeignKey____is__set>
+        <polymorphicForeignKey>false</polymorphicForeignKey>
+        <precision____is__set>true</precision____is__set>
+        <precision>0</precision>
+        <queryByDistance____is__set>true</queryByDistance____is__set>
+        <queryByDistance>false</queryByDistance>
+        <referenceTargetField____is__set>false</referenceTargetField____is__set>
+        <referenceTo____is__set>false</referenceTo____is__set>
+        <referenceTo/>
+        <relationshipName____is__set>false</relationshipName____is__set>
+        <relationshipOrder____is__set>false</relationshipOrder____is__set>
+        <relationshipOrder>0</relationshipOrder>
+        <restrictedDelete____is__set>false</restrictedDelete____is__set>
+        <restrictedDelete>false</restrictedDelete>
+        <restrictedPicklist____is__set>true</restrictedPicklist____is__set>
+        <restrictedPicklist>true</restrictedPicklist>
+        <scale____is__set>true</scale____is__set>
+        <scale>0</scale>
+        <searchPrefilterable____is__set>true</searchPrefilterable____is__set>
+        <searchPrefilterable>false</searchPrefilterable>
+        <soapType____is__set>true</soapType____is__set>
+        <soapType>string</soapType>
+        <sortable____is__set>true</sortable____is__set>
+        <sortable>true</sortable>
+        <type____is__set>true</type____is__set>
+        <type>picklist</type>
         <unique____is__set>true</unique____is__set>
         <unique>false</unique>
         <updateable____is__set>true</updateable____is__set>
@@ -45126,6 +45507,114 @@ IF(MONTH(TODAY())==12,1,MONTH(TODAY()) + 1),
             <value____is__set>true</value____is__set>
             <value>Region RoW LATAM</value>
           </com.sforce.soap.partner.PicklistEntry>
+          <com.sforce.soap.partner.PicklistEntry>
+            <active____is__set>true</active____is__set>
+            <active>true</active>
+            <defaultValue____is__set>true</defaultValue____is__set>
+            <defaultValue>false</defaultValue>
+            <label____is__set>true</label____is__set>
+            <label>Europe</label>
+            <validFor____is__set>true</validFor____is__set>
+            <validFor>IAAA</validFor>
+            <value____is__set>true</value____is__set>
+            <value>Europe</value>
+          </com.sforce.soap.partner.PicklistEntry>
+          <com.sforce.soap.partner.PicklistEntry>
+            <active____is__set>true</active____is__set>
+            <active>true</active>
+            <defaultValue____is__set>true</defaultValue____is__set>
+            <defaultValue>false</defaultValue>
+            <label____is__set>true</label____is__set>
+            <label>Central Asia</label>
+            <validFor____is__set>true</validFor____is__set>
+            <validFor>IAAA</validFor>
+            <value____is__set>true</value____is__set>
+            <value>Central Asia</value>
+          </com.sforce.soap.partner.PicklistEntry>
+          <com.sforce.soap.partner.PicklistEntry>
+            <active____is__set>true</active____is__set>
+            <active>true</active>
+            <defaultValue____is__set>true</defaultValue____is__set>
+            <defaultValue>false</defaultValue>
+            <label____is__set>true</label____is__set>
+            <label>Middle East &amp; North Africa</label>
+            <validFor____is__set>true</validFor____is__set>
+            <validFor>IAAA</validFor>
+            <value____is__set>true</value____is__set>
+            <value>Middle East &amp; North Africa</value>
+          </com.sforce.soap.partner.PicklistEntry>
+          <com.sforce.soap.partner.PicklistEntry>
+            <active____is__set>true</active____is__set>
+            <active>true</active>
+            <defaultValue____is__set>true</defaultValue____is__set>
+            <defaultValue>false</defaultValue>
+            <label____is__set>true</label____is__set>
+            <label>Oceania and Pacific</label>
+            <validFor____is__set>true</validFor____is__set>
+            <validFor>IAAA</validFor>
+            <value____is__set>true</value____is__set>
+            <value>Oceania and Pacific</value>
+          </com.sforce.soap.partner.PicklistEntry>
+          <com.sforce.soap.partner.PicklistEntry>
+            <active____is__set>true</active____is__set>
+            <active>true</active>
+            <defaultValue____is__set>true</defaultValue____is__set>
+            <defaultValue>false</defaultValue>
+            <label____is__set>true</label____is__set>
+            <label>North East Asia &amp; South East Asia</label>
+            <validFor____is__set>true</validFor____is__set>
+            <validFor>IAAA</validFor>
+            <value____is__set>true</value____is__set>
+            <value>North East Asia &amp; South East Asia</value>
+          </com.sforce.soap.partner.PicklistEntry>
+          <com.sforce.soap.partner.PicklistEntry>
+            <active____is__set>true</active____is__set>
+            <active>true</active>
+            <defaultValue____is__set>true</defaultValue____is__set>
+            <defaultValue>false</defaultValue>
+            <label____is__set>true</label____is__set>
+            <label>Sub-Saharan Africa</label>
+            <validFor____is__set>true</validFor____is__set>
+            <validFor>IAAA</validFor>
+            <value____is__set>true</value____is__set>
+            <value>Sub-Saharan Africa</value>
+          </com.sforce.soap.partner.PicklistEntry>
+          <com.sforce.soap.partner.PicklistEntry>
+            <active____is__set>true</active____is__set>
+            <active>true</active>
+            <defaultValue____is__set>true</defaultValue____is__set>
+            <defaultValue>false</defaultValue>
+            <label____is__set>true</label____is__set>
+            <label>South Asia</label>
+            <validFor____is__set>true</validFor____is__set>
+            <validFor>IAAA</validFor>
+            <value____is__set>true</value____is__set>
+            <value>South Asia</value>
+          </com.sforce.soap.partner.PicklistEntry>
+          <com.sforce.soap.partner.PicklistEntry>
+            <active____is__set>true</active____is__set>
+            <active>true</active>
+            <defaultValue____is__set>true</defaultValue____is__set>
+            <defaultValue>false</defaultValue>
+            <label____is__set>true</label____is__set>
+            <label>Latin America</label>
+            <validFor____is__set>true</validFor____is__set>
+            <validFor>IAAA</validFor>
+            <value____is__set>true</value____is__set>
+            <value>Latin America</value>
+          </com.sforce.soap.partner.PicklistEntry>
+          <com.sforce.soap.partner.PicklistEntry>
+            <active____is__set>true</active____is__set>
+            <active>true</active>
+            <defaultValue____is__set>true</defaultValue____is__set>
+            <defaultValue>false</defaultValue>
+            <label____is__set>true</label____is__set>
+            <label>Americas</label>
+            <validFor____is__set>true</validFor____is__set>
+            <validFor>IAAA</validFor>
+            <value____is__set>true</value____is__set>
+            <value>Americas</value>
+          </com.sforce.soap.partner.PicklistEntry>
         </picklistValues>
         <polymorphicForeignKey____is__set>true</polymorphicForeignKey____is__set>
         <polymorphicForeignKey>false</polymorphicForeignKey>
@@ -48395,6 +48884,112 @@ IF(RecordType.Name= &apos;Virtual Subscription&apos;, &quot;Virtual Subscription
         <sortable>true</sortable>
         <type____is__set>true</type____is__set>
         <type>date</type>
+        <unique____is__set>true</unique____is__set>
+        <unique>false</unique>
+        <updateable____is__set>true</updateable____is__set>
+        <updateable>true</updateable>
+        <writeRequiresMasterRead____is__set>false</writeRequiresMasterRead____is__set>
+        <writeRequiresMasterRead>false</writeRequiresMasterRead>
+      </com.sforce.soap.partner.Field>
+      <com.sforce.soap.partner.Field>
+        <aggregatable____is__set>true</aggregatable____is__set>
+        <aggregatable>true</aggregatable>
+        <aiPredictionField____is__set>true</aiPredictionField____is__set>
+        <aiPredictionField>false</aiPredictionField>
+        <autoNumber____is__set>true</autoNumber____is__set>
+        <autoNumber>false</autoNumber>
+        <byteLength____is__set>true</byteLength____is__set>
+        <byteLength>0</byteLength>
+        <calculated____is__set>true</calculated____is__set>
+        <calculated>false</calculated>
+        <calculatedFormula____is__set>false</calculatedFormula____is__set>
+        <cascadeDelete____is__set>false</cascadeDelete____is__set>
+        <cascadeDelete>false</cascadeDelete>
+        <caseSensitive____is__set>true</caseSensitive____is__set>
+        <caseSensitive>false</caseSensitive>
+        <compoundFieldName____is__set>false</compoundFieldName____is__set>
+        <controllerName____is__set>false</controllerName____is__set>
+        <createable____is__set>true</createable____is__set>
+        <createable>true</createable>
+        <custom____is__set>true</custom____is__set>
+        <custom>true</custom>
+        <dataTranslationEnabled____is__set>false</dataTranslationEnabled____is__set>
+        <dataTranslationEnabled>false</dataTranslationEnabled>
+        <defaultValue____is__set>false</defaultValue____is__set>
+        <defaultValueFormula____is__set>false</defaultValueFormula____is__set>
+        <defaultedOnCreate____is__set>true</defaultedOnCreate____is__set>
+        <defaultedOnCreate>false</defaultedOnCreate>
+        <dependentPicklist____is__set>false</dependentPicklist____is__set>
+        <dependentPicklist>false</dependentPicklist>
+        <deprecatedAndHidden____is__set>true</deprecatedAndHidden____is__set>
+        <deprecatedAndHidden>false</deprecatedAndHidden>
+        <digits____is__set>true</digits____is__set>
+        <digits>0</digits>
+        <displayLocationInDecimal____is__set>false</displayLocationInDecimal____is__set>
+        <displayLocationInDecimal>false</displayLocationInDecimal>
+        <encrypted____is__set>false</encrypted____is__set>
+        <encrypted>false</encrypted>
+        <externalId____is__set>false</externalId____is__set>
+        <externalId>false</externalId>
+        <extraTypeInfo____is__set>false</extraTypeInfo____is__set>
+        <filterable____is__set>true</filterable____is__set>
+        <filterable>true</filterable>
+        <filteredLookupInfo____is__set>false</filteredLookupInfo____is__set>
+        <formulaTreatNullNumberAsZero____is__set>false</formulaTreatNullNumberAsZero____is__set>
+        <formulaTreatNullNumberAsZero>false</formulaTreatNullNumberAsZero>
+        <groupable____is__set>true</groupable____is__set>
+        <groupable>false</groupable>
+        <highScaleNumber____is__set>false</highScaleNumber____is__set>
+        <highScaleNumber>false</highScaleNumber>
+        <htmlFormatted____is__set>false</htmlFormatted____is__set>
+        <htmlFormatted>false</htmlFormatted>
+        <idLookup____is__set>true</idLookup____is__set>
+        <idLookup>false</idLookup>
+        <inlineHelpText____is__set>false</inlineHelpText____is__set>
+        <label____is__set>true</label____is__set>
+        <label>Revenue Committed</label>
+        <length____is__set>true</length____is__set>
+        <length>0</length>
+        <mask____is__set>false</mask____is__set>
+        <maskType____is__set>false</maskType____is__set>
+        <name____is__set>true</name____is__set>
+        <name>Revenue_Committed__c</name>
+        <nameField____is__set>true</nameField____is__set>
+        <nameField>false</nameField>
+        <namePointing____is__set>true</namePointing____is__set>
+        <namePointing>false</namePointing>
+        <nillable____is__set>true</nillable____is__set>
+        <nillable>true</nillable>
+        <permissionable____is__set>true</permissionable____is__set>
+        <permissionable>true</permissionable>
+        <picklistValues____is__set>false</picklistValues____is__set>
+        <picklistValues/>
+        <polymorphicForeignKey____is__set>true</polymorphicForeignKey____is__set>
+        <polymorphicForeignKey>false</polymorphicForeignKey>
+        <precision____is__set>true</precision____is__set>
+        <precision>18</precision>
+        <queryByDistance____is__set>true</queryByDistance____is__set>
+        <queryByDistance>false</queryByDistance>
+        <referenceTargetField____is__set>false</referenceTargetField____is__set>
+        <referenceTo____is__set>false</referenceTo____is__set>
+        <referenceTo/>
+        <relationshipName____is__set>false</relationshipName____is__set>
+        <relationshipOrder____is__set>false</relationshipOrder____is__set>
+        <relationshipOrder>0</relationshipOrder>
+        <restrictedDelete____is__set>false</restrictedDelete____is__set>
+        <restrictedDelete>false</restrictedDelete>
+        <restrictedPicklist____is__set>true</restrictedPicklist____is__set>
+        <restrictedPicklist>false</restrictedPicklist>
+        <scale____is__set>true</scale____is__set>
+        <scale>2</scale>
+        <searchPrefilterable____is__set>true</searchPrefilterable____is__set>
+        <searchPrefilterable>false</searchPrefilterable>
+        <soapType____is__set>true</soapType____is__set>
+        <soapType>_double</soapType>
+        <sortable____is__set>true</sortable____is__set>
+        <sortable>true</sortable>
+        <type____is__set>true</type____is__set>
+        <type>currency</type>
         <unique____is__set>true</unique____is__set>
         <unique>false</unique>
         <updateable____is__set>true</updateable____is__set>
@@ -52543,6 +53138,1574 @@ IF(RecordType.Name= &apos;Virtual Subscription&apos;, &quot;Virtual Subscription
         <writeRequiresMasterRead____is__set>false</writeRequiresMasterRead____is__set>
         <writeRequiresMasterRead>false</writeRequiresMasterRead>
       </com.sforce.soap.partner.Field>
+      <com.sforce.soap.partner.Field>
+        <aggregatable____is__set>true</aggregatable____is__set>
+        <aggregatable>true</aggregatable>
+        <aiPredictionField____is__set>true</aiPredictionField____is__set>
+        <aiPredictionField>false</aiPredictionField>
+        <autoNumber____is__set>true</autoNumber____is__set>
+        <autoNumber>false</autoNumber>
+        <byteLength____is__set>true</byteLength____is__set>
+        <byteLength>0</byteLength>
+        <calculated____is__set>true</calculated____is__set>
+        <calculated>false</calculated>
+        <calculatedFormula____is__set>false</calculatedFormula____is__set>
+        <cascadeDelete____is__set>false</cascadeDelete____is__set>
+        <cascadeDelete>false</cascadeDelete>
+        <caseSensitive____is__set>true</caseSensitive____is__set>
+        <caseSensitive>false</caseSensitive>
+        <compoundFieldName____is__set>false</compoundFieldName____is__set>
+        <controllerName____is__set>false</controllerName____is__set>
+        <createable____is__set>true</createable____is__set>
+        <createable>true</createable>
+        <custom____is__set>true</custom____is__set>
+        <custom>true</custom>
+        <dataTranslationEnabled____is__set>false</dataTranslationEnabled____is__set>
+        <dataTranslationEnabled>false</dataTranslationEnabled>
+        <defaultValue____is__set>false</defaultValue____is__set>
+        <defaultValueFormula____is__set>false</defaultValueFormula____is__set>
+        <defaultedOnCreate____is__set>true</defaultedOnCreate____is__set>
+        <defaultedOnCreate>false</defaultedOnCreate>
+        <dependentPicklist____is__set>false</dependentPicklist____is__set>
+        <dependentPicklist>false</dependentPicklist>
+        <deprecatedAndHidden____is__set>true</deprecatedAndHidden____is__set>
+        <deprecatedAndHidden>false</deprecatedAndHidden>
+        <digits____is__set>true</digits____is__set>
+        <digits>0</digits>
+        <displayLocationInDecimal____is__set>false</displayLocationInDecimal____is__set>
+        <displayLocationInDecimal>false</displayLocationInDecimal>
+        <encrypted____is__set>false</encrypted____is__set>
+        <encrypted>false</encrypted>
+        <externalId____is__set>false</externalId____is__set>
+        <externalId>false</externalId>
+        <extraTypeInfo____is__set>false</extraTypeInfo____is__set>
+        <filterable____is__set>true</filterable____is__set>
+        <filterable>true</filterable>
+        <filteredLookupInfo____is__set>false</filteredLookupInfo____is__set>
+        <formulaTreatNullNumberAsZero____is__set>false</formulaTreatNullNumberAsZero____is__set>
+        <formulaTreatNullNumberAsZero>false</formulaTreatNullNumberAsZero>
+        <groupable____is__set>true</groupable____is__set>
+        <groupable>false</groupable>
+        <highScaleNumber____is__set>false</highScaleNumber____is__set>
+        <highScaleNumber>false</highScaleNumber>
+        <htmlFormatted____is__set>false</htmlFormatted____is__set>
+        <htmlFormatted>false</htmlFormatted>
+        <idLookup____is__set>true</idLookup____is__set>
+        <idLookup>false</idLookup>
+        <inlineHelpText____is__set>false</inlineHelpText____is__set>
+        <label____is__set>true</label____is__set>
+        <label>Capacity Committed</label>
+        <length____is__set>true</length____is__set>
+        <length>0</length>
+        <mask____is__set>false</mask____is__set>
+        <maskType____is__set>false</maskType____is__set>
+        <name____is__set>true</name____is__set>
+        <name>Capacity_Committed_Mbps__c</name>
+        <nameField____is__set>true</nameField____is__set>
+        <nameField>false</nameField>
+        <namePointing____is__set>true</namePointing____is__set>
+        <namePointing>false</namePointing>
+        <nillable____is__set>true</nillable____is__set>
+        <nillable>true</nillable>
+        <permissionable____is__set>true</permissionable____is__set>
+        <permissionable>true</permissionable>
+        <picklistValues____is__set>false</picklistValues____is__set>
+        <picklistValues/>
+        <polymorphicForeignKey____is__set>true</polymorphicForeignKey____is__set>
+        <polymorphicForeignKey>false</polymorphicForeignKey>
+        <precision____is__set>true</precision____is__set>
+        <precision>18</precision>
+        <queryByDistance____is__set>true</queryByDistance____is__set>
+        <queryByDistance>false</queryByDistance>
+        <referenceTargetField____is__set>false</referenceTargetField____is__set>
+        <referenceTo____is__set>false</referenceTo____is__set>
+        <referenceTo/>
+        <relationshipName____is__set>false</relationshipName____is__set>
+        <relationshipOrder____is__set>false</relationshipOrder____is__set>
+        <relationshipOrder>0</relationshipOrder>
+        <restrictedDelete____is__set>false</restrictedDelete____is__set>
+        <restrictedDelete>false</restrictedDelete>
+        <restrictedPicklist____is__set>true</restrictedPicklist____is__set>
+        <restrictedPicklist>false</restrictedPicklist>
+        <scale____is__set>true</scale____is__set>
+        <scale>0</scale>
+        <searchPrefilterable____is__set>true</searchPrefilterable____is__set>
+        <searchPrefilterable>false</searchPrefilterable>
+        <soapType____is__set>true</soapType____is__set>
+        <soapType>_double</soapType>
+        <sortable____is__set>true</sortable____is__set>
+        <sortable>true</sortable>
+        <type____is__set>true</type____is__set>
+        <type>_double</type>
+        <unique____is__set>true</unique____is__set>
+        <unique>false</unique>
+        <updateable____is__set>true</updateable____is__set>
+        <updateable>true</updateable>
+        <writeRequiresMasterRead____is__set>false</writeRequiresMasterRead____is__set>
+        <writeRequiresMasterRead>false</writeRequiresMasterRead>
+      </com.sforce.soap.partner.Field>
+      <com.sforce.soap.partner.Field>
+        <aggregatable____is__set>true</aggregatable____is__set>
+        <aggregatable>true</aggregatable>
+        <aiPredictionField____is__set>true</aiPredictionField____is__set>
+        <aiPredictionField>false</aiPredictionField>
+        <autoNumber____is__set>true</autoNumber____is__set>
+        <autoNumber>false</autoNumber>
+        <byteLength____is__set>true</byteLength____is__set>
+        <byteLength>765</byteLength>
+        <calculated____is__set>true</calculated____is__set>
+        <calculated>false</calculated>
+        <calculatedFormula____is__set>false</calculatedFormula____is__set>
+        <cascadeDelete____is__set>false</cascadeDelete____is__set>
+        <cascadeDelete>false</cascadeDelete>
+        <caseSensitive____is__set>true</caseSensitive____is__set>
+        <caseSensitive>false</caseSensitive>
+        <compoundFieldName____is__set>false</compoundFieldName____is__set>
+        <controllerName____is__set>false</controllerName____is__set>
+        <createable____is__set>true</createable____is__set>
+        <createable>true</createable>
+        <custom____is__set>true</custom____is__set>
+        <custom>true</custom>
+        <dataTranslationEnabled____is__set>false</dataTranslationEnabled____is__set>
+        <dataTranslationEnabled>false</dataTranslationEnabled>
+        <defaultValue____is__set>false</defaultValue____is__set>
+        <defaultValueFormula____is__set>false</defaultValueFormula____is__set>
+        <defaultedOnCreate____is__set>true</defaultedOnCreate____is__set>
+        <defaultedOnCreate>false</defaultedOnCreate>
+        <dependentPicklist____is__set>false</dependentPicklist____is__set>
+        <dependentPicklist>false</dependentPicklist>
+        <deprecatedAndHidden____is__set>true</deprecatedAndHidden____is__set>
+        <deprecatedAndHidden>false</deprecatedAndHidden>
+        <digits____is__set>true</digits____is__set>
+        <digits>0</digits>
+        <displayLocationInDecimal____is__set>false</displayLocationInDecimal____is__set>
+        <displayLocationInDecimal>false</displayLocationInDecimal>
+        <encrypted____is__set>false</encrypted____is__set>
+        <encrypted>false</encrypted>
+        <externalId____is__set>false</externalId____is__set>
+        <externalId>false</externalId>
+        <extraTypeInfo____is__set>false</extraTypeInfo____is__set>
+        <filterable____is__set>true</filterable____is__set>
+        <filterable>true</filterable>
+        <filteredLookupInfo____is__set>false</filteredLookupInfo____is__set>
+        <formulaTreatNullNumberAsZero____is__set>false</formulaTreatNullNumberAsZero____is__set>
+        <formulaTreatNullNumberAsZero>false</formulaTreatNullNumberAsZero>
+        <groupable____is__set>true</groupable____is__set>
+        <groupable>true</groupable>
+        <highScaleNumber____is__set>false</highScaleNumber____is__set>
+        <highScaleNumber>false</highScaleNumber>
+        <htmlFormatted____is__set>false</htmlFormatted____is__set>
+        <htmlFormatted>false</htmlFormatted>
+        <idLookup____is__set>true</idLookup____is__set>
+        <idLookup>false</idLookup>
+        <inlineHelpText____is__set>false</inlineHelpText____is__set>
+        <label____is__set>true</label____is__set>
+        <label>Business Chapter Id</label>
+        <length____is__set>true</length____is__set>
+        <length>255</length>
+        <mask____is__set>false</mask____is__set>
+        <maskType____is__set>false</maskType____is__set>
+        <name____is__set>true</name____is__set>
+        <name>Business_Chapter_Id__c</name>
+        <nameField____is__set>true</nameField____is__set>
+        <nameField>false</nameField>
+        <namePointing____is__set>true</namePointing____is__set>
+        <namePointing>false</namePointing>
+        <nillable____is__set>true</nillable____is__set>
+        <nillable>true</nillable>
+        <permissionable____is__set>true</permissionable____is__set>
+        <permissionable>true</permissionable>
+        <picklistValues____is__set>false</picklistValues____is__set>
+        <picklistValues/>
+        <polymorphicForeignKey____is__set>true</polymorphicForeignKey____is__set>
+        <polymorphicForeignKey>false</polymorphicForeignKey>
+        <precision____is__set>true</precision____is__set>
+        <precision>0</precision>
+        <queryByDistance____is__set>true</queryByDistance____is__set>
+        <queryByDistance>false</queryByDistance>
+        <referenceTargetField____is__set>false</referenceTargetField____is__set>
+        <referenceTo____is__set>false</referenceTo____is__set>
+        <referenceTo/>
+        <relationshipName____is__set>false</relationshipName____is__set>
+        <relationshipOrder____is__set>false</relationshipOrder____is__set>
+        <relationshipOrder>0</relationshipOrder>
+        <restrictedDelete____is__set>false</restrictedDelete____is__set>
+        <restrictedDelete>false</restrictedDelete>
+        <restrictedPicklist____is__set>true</restrictedPicklist____is__set>
+        <restrictedPicklist>false</restrictedPicklist>
+        <scale____is__set>true</scale____is__set>
+        <scale>0</scale>
+        <searchPrefilterable____is__set>true</searchPrefilterable____is__set>
+        <searchPrefilterable>false</searchPrefilterable>
+        <soapType____is__set>true</soapType____is__set>
+        <soapType>string</soapType>
+        <sortable____is__set>true</sortable____is__set>
+        <sortable>true</sortable>
+        <type____is__set>true</type____is__set>
+        <type>string</type>
+        <unique____is__set>true</unique____is__set>
+        <unique>false</unique>
+        <updateable____is__set>true</updateable____is__set>
+        <updateable>true</updateable>
+        <writeRequiresMasterRead____is__set>false</writeRequiresMasterRead____is__set>
+        <writeRequiresMasterRead>false</writeRequiresMasterRead>
+      </com.sforce.soap.partner.Field>
+      <com.sforce.soap.partner.Field>
+        <aggregatable____is__set>true</aggregatable____is__set>
+        <aggregatable>false</aggregatable>
+        <aiPredictionField____is__set>true</aiPredictionField____is__set>
+        <aiPredictionField>false</aiPredictionField>
+        <autoNumber____is__set>true</autoNumber____is__set>
+        <autoNumber>false</autoNumber>
+        <byteLength____is__set>true</byteLength____is__set>
+        <byteLength>4099</byteLength>
+        <calculated____is__set>true</calculated____is__set>
+        <calculated>false</calculated>
+        <calculatedFormula____is__set>false</calculatedFormula____is__set>
+        <cascadeDelete____is__set>false</cascadeDelete____is__set>
+        <cascadeDelete>false</cascadeDelete>
+        <caseSensitive____is__set>true</caseSensitive____is__set>
+        <caseSensitive>false</caseSensitive>
+        <compoundFieldName____is__set>false</compoundFieldName____is__set>
+        <controllerName____is__set>false</controllerName____is__set>
+        <createable____is__set>true</createable____is__set>
+        <createable>true</createable>
+        <custom____is__set>true</custom____is__set>
+        <custom>true</custom>
+        <dataTranslationEnabled____is__set>false</dataTranslationEnabled____is__set>
+        <dataTranslationEnabled>false</dataTranslationEnabled>
+        <defaultValue____is__set>false</defaultValue____is__set>
+        <defaultValueFormula____is__set>false</defaultValueFormula____is__set>
+        <defaultedOnCreate____is__set>true</defaultedOnCreate____is__set>
+        <defaultedOnCreate>false</defaultedOnCreate>
+        <dependentPicklist____is__set>false</dependentPicklist____is__set>
+        <dependentPicklist>false</dependentPicklist>
+        <deprecatedAndHidden____is__set>true</deprecatedAndHidden____is__set>
+        <deprecatedAndHidden>false</deprecatedAndHidden>
+        <digits____is__set>true</digits____is__set>
+        <digits>0</digits>
+        <displayLocationInDecimal____is__set>false</displayLocationInDecimal____is__set>
+        <displayLocationInDecimal>false</displayLocationInDecimal>
+        <encrypted____is__set>false</encrypted____is__set>
+        <encrypted>false</encrypted>
+        <externalId____is__set>false</externalId____is__set>
+        <externalId>false</externalId>
+        <extraTypeInfo____is__set>false</extraTypeInfo____is__set>
+        <filterable____is__set>true</filterable____is__set>
+        <filterable>true</filterable>
+        <filteredLookupInfo____is__set>false</filteredLookupInfo____is__set>
+        <formulaTreatNullNumberAsZero____is__set>false</formulaTreatNullNumberAsZero____is__set>
+        <formulaTreatNullNumberAsZero>false</formulaTreatNullNumberAsZero>
+        <groupable____is__set>true</groupable____is__set>
+        <groupable>false</groupable>
+        <highScaleNumber____is__set>false</highScaleNumber____is__set>
+        <highScaleNumber>false</highScaleNumber>
+        <htmlFormatted____is__set>false</htmlFormatted____is__set>
+        <htmlFormatted>false</htmlFormatted>
+        <idLookup____is__set>true</idLookup____is__set>
+        <idLookup>false</idLookup>
+        <inlineHelpText____is__set>false</inlineHelpText____is__set>
+        <label____is__set>true</label____is__set>
+        <label>Sub Vertical Market</label>
+        <length____is__set>true</length____is__set>
+        <length>4099</length>
+        <mask____is__set>false</mask____is__set>
+        <maskType____is__set>false</maskType____is__set>
+        <name____is__set>true</name____is__set>
+        <name>Sub_Vertical_Market__c</name>
+        <nameField____is__set>true</nameField____is__set>
+        <nameField>false</nameField>
+        <namePointing____is__set>true</namePointing____is__set>
+        <namePointing>false</namePointing>
+        <nillable____is__set>true</nillable____is__set>
+        <nillable>true</nillable>
+        <permissionable____is__set>true</permissionable____is__set>
+        <permissionable>true</permissionable>
+        <picklistValues____is__set>true</picklistValues____is__set>
+        <picklistValues>
+          <com.sforce.soap.partner.PicklistEntry>
+            <active____is__set>true</active____is__set>
+            <active>true</active>
+            <defaultValue____is__set>true</defaultValue____is__set>
+            <defaultValue>false</defaultValue>
+            <label____is__set>true</label____is__set>
+            <label>Merchant Shipping</label>
+            <validFor____is__set>false</validFor____is__set>
+            <value____is__set>true</value____is__set>
+            <value>Merchant Shipping</value>
+          </com.sforce.soap.partner.PicklistEntry>
+          <com.sforce.soap.partner.PicklistEntry>
+            <active____is__set>true</active____is__set>
+            <active>true</active>
+            <defaultValue____is__set>true</defaultValue____is__set>
+            <defaultValue>false</defaultValue>
+            <label____is__set>true</label____is__set>
+            <label>Offshore Energy</label>
+            <validFor____is__set>false</validFor____is__set>
+            <value____is__set>true</value____is__set>
+            <value>Offshore Energy</value>
+          </com.sforce.soap.partner.PicklistEntry>
+          <com.sforce.soap.partner.PicklistEntry>
+            <active____is__set>true</active____is__set>
+            <active>true</active>
+            <defaultValue____is__set>true</defaultValue____is__set>
+            <defaultValue>false</defaultValue>
+            <label____is__set>true</label____is__set>
+            <label>Fishing</label>
+            <validFor____is__set>false</validFor____is__set>
+            <value____is__set>true</value____is__set>
+            <value>Fishing</value>
+          </com.sforce.soap.partner.PicklistEntry>
+          <com.sforce.soap.partner.PicklistEntry>
+            <active____is__set>true</active____is__set>
+            <active>true</active>
+            <defaultValue____is__set>true</defaultValue____is__set>
+            <defaultValue>false</defaultValue>
+            <label____is__set>true</label____is__set>
+            <label>Passenger Transport (Cruise / Ferries)</label>
+            <validFor____is__set>false</validFor____is__set>
+            <value____is__set>true</value____is__set>
+            <value>Passenger Transport (Cruise / Ferries)</value>
+          </com.sforce.soap.partner.PicklistEntry>
+          <com.sforce.soap.partner.PicklistEntry>
+            <active____is__set>true</active____is__set>
+            <active>true</active>
+            <defaultValue____is__set>true</defaultValue____is__set>
+            <defaultValue>false</defaultValue>
+            <label____is__set>true</label____is__set>
+            <label>Leisure &amp; Yachting</label>
+            <validFor____is__set>false</validFor____is__set>
+            <value____is__set>true</value____is__set>
+            <value>Leisure &amp; Yachting</value>
+          </com.sforce.soap.partner.PicklistEntry>
+          <com.sforce.soap.partner.PicklistEntry>
+            <active____is__set>true</active____is__set>
+            <active>true</active>
+            <defaultValue____is__set>true</defaultValue____is__set>
+            <defaultValue>false</defaultValue>
+            <label____is__set>true</label____is__set>
+            <label>Enterprise Sites</label>
+            <validFor____is__set>false</validFor____is__set>
+            <value____is__set>true</value____is__set>
+            <value>Enterprise Sites</value>
+          </com.sforce.soap.partner.PicklistEntry>
+          <com.sforce.soap.partner.PicklistEntry>
+            <active____is__set>true</active____is__set>
+            <active>true</active>
+            <defaultValue____is__set>true</defaultValue____is__set>
+            <defaultValue>false</defaultValue>
+            <label____is__set>true</label____is__set>
+            <label>Telecom / Backhaul</label>
+            <validFor____is__set>false</validFor____is__set>
+            <value____is__set>true</value____is__set>
+            <value>Telecom / Backhaul</value>
+          </com.sforce.soap.partner.PicklistEntry>
+          <com.sforce.soap.partner.PicklistEntry>
+            <active____is__set>true</active____is__set>
+            <active>true</active>
+            <defaultValue____is__set>true</defaultValue____is__set>
+            <defaultValue>false</defaultValue>
+            <label____is__set>true</label____is__set>
+            <label>Energy (Onshore)</label>
+            <validFor____is__set>false</validFor____is__set>
+            <value____is__set>true</value____is__set>
+            <value>Energy (Onshore)</value>
+          </com.sforce.soap.partner.PicklistEntry>
+          <com.sforce.soap.partner.PicklistEntry>
+            <active____is__set>true</active____is__set>
+            <active>true</active>
+            <defaultValue____is__set>true</defaultValue____is__set>
+            <defaultValue>false</defaultValue>
+            <label____is__set>true</label____is__set>
+            <label>Mining</label>
+            <validFor____is__set>false</validFor____is__set>
+            <value____is__set>true</value____is__set>
+            <value>Mining</value>
+          </com.sforce.soap.partner.PicklistEntry>
+          <com.sforce.soap.partner.PicklistEntry>
+            <active____is__set>true</active____is__set>
+            <active>true</active>
+            <defaultValue____is__set>true</defaultValue____is__set>
+            <defaultValue>false</defaultValue>
+            <label____is__set>true</label____is__set>
+            <label>Transport &amp; Logistics</label>
+            <validFor____is__set>false</validFor____is__set>
+            <value____is__set>true</value____is__set>
+            <value>Transport &amp; Logistics</value>
+          </com.sforce.soap.partner.PicklistEntry>
+          <com.sforce.soap.partner.PicklistEntry>
+            <active____is__set>true</active____is__set>
+            <active>true</active>
+            <defaultValue____is__set>true</defaultValue____is__set>
+            <defaultValue>false</defaultValue>
+            <label____is__set>true</label____is__set>
+            <label>Construction</label>
+            <validFor____is__set>false</validFor____is__set>
+            <value____is__set>true</value____is__set>
+            <value>Construction</value>
+          </com.sforce.soap.partner.PicklistEntry>
+          <com.sforce.soap.partner.PicklistEntry>
+            <active____is__set>true</active____is__set>
+            <active>true</active>
+            <defaultValue____is__set>true</defaultValue____is__set>
+            <defaultValue>false</defaultValue>
+            <label____is__set>true</label____is__set>
+            <label>Public Safety Agencies</label>
+            <validFor____is__set>false</validFor____is__set>
+            <value____is__set>true</value____is__set>
+            <value>Public Safety Agencies</value>
+          </com.sforce.soap.partner.PicklistEntry>
+          <com.sforce.soap.partner.PicklistEntry>
+            <active____is__set>true</active____is__set>
+            <active>true</active>
+            <defaultValue____is__set>true</defaultValue____is__set>
+            <defaultValue>false</defaultValue>
+            <label____is__set>true</label____is__set>
+            <label>Border Control</label>
+            <validFor____is__set>false</validFor____is__set>
+            <value____is__set>true</value____is__set>
+            <value>Border Control</value>
+          </com.sforce.soap.partner.PicklistEntry>
+          <com.sforce.soap.partner.PicklistEntry>
+            <active____is__set>true</active____is__set>
+            <active>true</active>
+            <defaultValue____is__set>true</defaultValue____is__set>
+            <defaultValue>false</defaultValue>
+            <label____is__set>true</label____is__set>
+            <label>Disaster Recovery</label>
+            <validFor____is__set>false</validFor____is__set>
+            <value____is__set>true</value____is__set>
+            <value>Disaster Recovery</value>
+          </com.sforce.soap.partner.PicklistEntry>
+          <com.sforce.soap.partner.PicklistEntry>
+            <active____is__set>true</active____is__set>
+            <active>true</active>
+            <defaultValue____is__set>true</defaultValue____is__set>
+            <defaultValue>false</defaultValue>
+            <label____is__set>true</label____is__set>
+            <label>Government Networks</label>
+            <validFor____is__set>false</validFor____is__set>
+            <value____is__set>true</value____is__set>
+            <value>Government Networks</value>
+          </com.sforce.soap.partner.PicklistEntry>
+          <com.sforce.soap.partner.PicklistEntry>
+            <active____is__set>true</active____is__set>
+            <active>true</active>
+            <defaultValue____is__set>true</defaultValue____is__set>
+            <defaultValue>false</defaultValue>
+            <label____is__set>true</label____is__set>
+            <label>Government Aviation</label>
+            <validFor____is__set>false</validFor____is__set>
+            <value____is__set>true</value____is__set>
+            <value>Government Aviation</value>
+          </com.sforce.soap.partner.PicklistEntry>
+          <com.sforce.soap.partner.PicklistEntry>
+            <active____is__set>true</active____is__set>
+            <active>true</active>
+            <defaultValue____is__set>true</defaultValue____is__set>
+            <defaultValue>false</defaultValue>
+            <label____is__set>true</label____is__set>
+            <label>Land Forces</label>
+            <validFor____is__set>false</validFor____is__set>
+            <value____is__set>true</value____is__set>
+            <value>Land Forces</value>
+          </com.sforce.soap.partner.PicklistEntry>
+          <com.sforce.soap.partner.PicklistEntry>
+            <active____is__set>true</active____is__set>
+            <active>true</active>
+            <defaultValue____is__set>true</defaultValue____is__set>
+            <defaultValue>false</defaultValue>
+            <label____is__set>true</label____is__set>
+            <label>Naval Forces</label>
+            <validFor____is__set>false</validFor____is__set>
+            <value____is__set>true</value____is__set>
+            <value>Naval Forces</value>
+          </com.sforce.soap.partner.PicklistEntry>
+          <com.sforce.soap.partner.PicklistEntry>
+            <active____is__set>true</active____is__set>
+            <active>true</active>
+            <defaultValue____is__set>true</defaultValue____is__set>
+            <defaultValue>false</defaultValue>
+            <label____is__set>true</label____is__set>
+            <label>Air Forces</label>
+            <validFor____is__set>false</validFor____is__set>
+            <value____is__set>true</value____is__set>
+            <value>Air Forces</value>
+          </com.sforce.soap.partner.PicklistEntry>
+          <com.sforce.soap.partner.PicklistEntry>
+            <active____is__set>true</active____is__set>
+            <active>true</active>
+            <defaultValue____is__set>true</defaultValue____is__set>
+            <defaultValue>false</defaultValue>
+            <label____is__set>true</label____is__set>
+            <label>Joint Operations</label>
+            <validFor____is__set>false</validFor____is__set>
+            <value____is__set>true</value____is__set>
+            <value>Joint Operations</value>
+          </com.sforce.soap.partner.PicklistEntry>
+          <com.sforce.soap.partner.PicklistEntry>
+            <active____is__set>true</active____is__set>
+            <active>true</active>
+            <defaultValue____is__set>true</defaultValue____is__set>
+            <defaultValue>false</defaultValue>
+            <label____is__set>true</label____is__set>
+            <label>Commercial Airlines</label>
+            <validFor____is__set>false</validFor____is__set>
+            <value____is__set>true</value____is__set>
+            <value>Commercial Airlines</value>
+          </com.sforce.soap.partner.PicklistEntry>
+          <com.sforce.soap.partner.PicklistEntry>
+            <active____is__set>true</active____is__set>
+            <active>true</active>
+            <defaultValue____is__set>true</defaultValue____is__set>
+            <defaultValue>false</defaultValue>
+            <label____is__set>true</label____is__set>
+            <label>Business Aviation</label>
+            <validFor____is__set>false</validFor____is__set>
+            <value____is__set>true</value____is__set>
+            <value>Business Aviation</value>
+          </com.sforce.soap.partner.PicklistEntry>
+          <com.sforce.soap.partner.PicklistEntry>
+            <active____is__set>true</active____is__set>
+            <active>true</active>
+            <defaultValue____is__set>true</defaultValue____is__set>
+            <defaultValue>false</defaultValue>
+            <label____is__set>true</label____is__set>
+            <label>Private Aviation</label>
+            <validFor____is__set>false</validFor____is__set>
+            <value____is__set>true</value____is__set>
+            <value>Private Aviation</value>
+          </com.sforce.soap.partner.PicklistEntry>
+        </picklistValues>
+        <polymorphicForeignKey____is__set>true</polymorphicForeignKey____is__set>
+        <polymorphicForeignKey>false</polymorphicForeignKey>
+        <precision____is__set>true</precision____is__set>
+        <precision>4</precision>
+        <queryByDistance____is__set>true</queryByDistance____is__set>
+        <queryByDistance>false</queryByDistance>
+        <referenceTargetField____is__set>false</referenceTargetField____is__set>
+        <referenceTo____is__set>false</referenceTo____is__set>
+        <referenceTo/>
+        <relationshipName____is__set>false</relationshipName____is__set>
+        <relationshipOrder____is__set>false</relationshipOrder____is__set>
+        <relationshipOrder>0</relationshipOrder>
+        <restrictedDelete____is__set>false</restrictedDelete____is__set>
+        <restrictedDelete>false</restrictedDelete>
+        <restrictedPicklist____is__set>true</restrictedPicklist____is__set>
+        <restrictedPicklist>true</restrictedPicklist>
+        <scale____is__set>true</scale____is__set>
+        <scale>0</scale>
+        <searchPrefilterable____is__set>true</searchPrefilterable____is__set>
+        <searchPrefilterable>false</searchPrefilterable>
+        <soapType____is__set>true</soapType____is__set>
+        <soapType>string</soapType>
+        <sortable____is__set>true</sortable____is__set>
+        <sortable>false</sortable>
+        <type____is__set>true</type____is__set>
+        <type>multipicklist</type>
+        <unique____is__set>true</unique____is__set>
+        <unique>false</unique>
+        <updateable____is__set>true</updateable____is__set>
+        <updateable>true</updateable>
+        <writeRequiresMasterRead____is__set>false</writeRequiresMasterRead____is__set>
+        <writeRequiresMasterRead>false</writeRequiresMasterRead>
+      </com.sforce.soap.partner.Field>
+      <com.sforce.soap.partner.Field>
+        <aggregatable____is__set>true</aggregatable____is__set>
+        <aggregatable>true</aggregatable>
+        <aiPredictionField____is__set>true</aiPredictionField____is__set>
+        <aiPredictionField>false</aiPredictionField>
+        <autoNumber____is__set>true</autoNumber____is__set>
+        <autoNumber>false</autoNumber>
+        <byteLength____is__set>true</byteLength____is__set>
+        <byteLength>18</byteLength>
+        <calculated____is__set>true</calculated____is__set>
+        <calculated>false</calculated>
+        <calculatedFormula____is__set>false</calculatedFormula____is__set>
+        <cascadeDelete____is__set>false</cascadeDelete____is__set>
+        <cascadeDelete>false</cascadeDelete>
+        <caseSensitive____is__set>true</caseSensitive____is__set>
+        <caseSensitive>false</caseSensitive>
+        <compoundFieldName____is__set>false</compoundFieldName____is__set>
+        <controllerName____is__set>false</controllerName____is__set>
+        <createable____is__set>true</createable____is__set>
+        <createable>false</createable>
+        <custom____is__set>true</custom____is__set>
+        <custom>true</custom>
+        <dataTranslationEnabled____is__set>false</dataTranslationEnabled____is__set>
+        <dataTranslationEnabled>false</dataTranslationEnabled>
+        <defaultValue____is__set>false</defaultValue____is__set>
+        <defaultValueFormula____is__set>false</defaultValueFormula____is__set>
+        <defaultedOnCreate____is__set>true</defaultedOnCreate____is__set>
+        <defaultedOnCreate>false</defaultedOnCreate>
+        <dependentPicklist____is__set>false</dependentPicklist____is__set>
+        <dependentPicklist>false</dependentPicklist>
+        <deprecatedAndHidden____is__set>true</deprecatedAndHidden____is__set>
+        <deprecatedAndHidden>false</deprecatedAndHidden>
+        <digits____is__set>true</digits____is__set>
+        <digits>0</digits>
+        <displayLocationInDecimal____is__set>false</displayLocationInDecimal____is__set>
+        <displayLocationInDecimal>false</displayLocationInDecimal>
+        <encrypted____is__set>false</encrypted____is__set>
+        <encrypted>false</encrypted>
+        <externalId____is__set>false</externalId____is__set>
+        <externalId>false</externalId>
+        <extraTypeInfo____is__set>false</extraTypeInfo____is__set>
+        <filterable____is__set>true</filterable____is__set>
+        <filterable>true</filterable>
+        <filteredLookupInfo____is__set>true</filteredLookupInfo____is__set>
+        <filteredLookupInfo>
+          <controllingFields____is__set>false</controllingFields____is__set>
+          <controllingFields/>
+          <dependent____is__set>true</dependent____is__set>
+          <dependent>false</dependent>
+          <optionalFilter____is__set>true</optionalFilter____is__set>
+          <optionalFilter>false</optionalFilter>
+        </filteredLookupInfo>
+        <formulaTreatNullNumberAsZero____is__set>false</formulaTreatNullNumberAsZero____is__set>
+        <formulaTreatNullNumberAsZero>false</formulaTreatNullNumberAsZero>
+        <groupable____is__set>true</groupable____is__set>
+        <groupable>true</groupable>
+        <highScaleNumber____is__set>false</highScaleNumber____is__set>
+        <highScaleNumber>false</highScaleNumber>
+        <htmlFormatted____is__set>false</htmlFormatted____is__set>
+        <htmlFormatted>false</htmlFormatted>
+        <idLookup____is__set>true</idLookup____is__set>
+        <idLookup>false</idLookup>
+        <inlineHelpText____is__set>false</inlineHelpText____is__set>
+        <label____is__set>true</label____is__set>
+        <label>Billing Entity</label>
+        <length____is__set>true</length____is__set>
+        <length>18</length>
+        <mask____is__set>false</mask____is__set>
+        <maskType____is__set>false</maskType____is__set>
+        <name____is__set>true</name____is__set>
+        <name>Billing_Entity_Subscription__c</name>
+        <nameField____is__set>true</nameField____is__set>
+        <nameField>false</nameField>
+        <namePointing____is__set>true</namePointing____is__set>
+        <namePointing>false</namePointing>
+        <nillable____is__set>true</nillable____is__set>
+        <nillable>true</nillable>
+        <permissionable____is__set>true</permissionable____is__set>
+        <permissionable>true</permissionable>
+        <picklistValues____is__set>false</picklistValues____is__set>
+        <picklistValues/>
+        <polymorphicForeignKey____is__set>true</polymorphicForeignKey____is__set>
+        <polymorphicForeignKey>false</polymorphicForeignKey>
+        <precision____is__set>true</precision____is__set>
+        <precision>0</precision>
+        <queryByDistance____is__set>true</queryByDistance____is__set>
+        <queryByDistance>false</queryByDistance>
+        <referenceTargetField____is__set>false</referenceTargetField____is__set>
+        <referenceTo____is__set>true</referenceTo____is__set>
+        <referenceTo>
+          <string>Account</string>
+        </referenceTo>
+        <relationshipName____is__set>true</relationshipName____is__set>
+        <relationshipName>Billing_Entity_Subscription__r</relationshipName>
+        <relationshipOrder____is__set>false</relationshipOrder____is__set>
+        <relationshipOrder>0</relationshipOrder>
+        <restrictedDelete____is__set>true</restrictedDelete____is__set>
+        <restrictedDelete>true</restrictedDelete>
+        <restrictedPicklist____is__set>true</restrictedPicklist____is__set>
+        <restrictedPicklist>false</restrictedPicklist>
+        <scale____is__set>true</scale____is__set>
+        <scale>0</scale>
+        <searchPrefilterable____is__set>true</searchPrefilterable____is__set>
+        <searchPrefilterable>true</searchPrefilterable>
+        <soapType____is__set>true</soapType____is__set>
+        <soapType>ID</soapType>
+        <sortable____is__set>true</sortable____is__set>
+        <sortable>true</sortable>
+        <type____is__set>true</type____is__set>
+        <type>reference</type>
+        <unique____is__set>true</unique____is__set>
+        <unique>false</unique>
+        <updateable____is__set>true</updateable____is__set>
+        <updateable>false</updateable>
+        <writeRequiresMasterRead____is__set>false</writeRequiresMasterRead____is__set>
+        <writeRequiresMasterRead>false</writeRequiresMasterRead>
+      </com.sforce.soap.partner.Field>
+      <com.sforce.soap.partner.Field>
+        <aggregatable____is__set>true</aggregatable____is__set>
+        <aggregatable>false</aggregatable>
+        <aiPredictionField____is__set>true</aiPredictionField____is__set>
+        <aiPredictionField>false</aiPredictionField>
+        <autoNumber____is__set>true</autoNumber____is__set>
+        <autoNumber>false</autoNumber>
+        <byteLength____is__set>true</byteLength____is__set>
+        <byteLength>0</byteLength>
+        <calculated____is__set>true</calculated____is__set>
+        <calculated>false</calculated>
+        <calculatedFormula____is__set>false</calculatedFormula____is__set>
+        <cascadeDelete____is__set>false</cascadeDelete____is__set>
+        <cascadeDelete>false</cascadeDelete>
+        <caseSensitive____is__set>true</caseSensitive____is__set>
+        <caseSensitive>false</caseSensitive>
+        <compoundFieldName____is__set>false</compoundFieldName____is__set>
+        <controllerName____is__set>false</controllerName____is__set>
+        <createable____is__set>true</createable____is__set>
+        <createable>true</createable>
+        <custom____is__set>true</custom____is__set>
+        <custom>true</custom>
+        <dataTranslationEnabled____is__set>false</dataTranslationEnabled____is__set>
+        <dataTranslationEnabled>false</dataTranslationEnabled>
+        <defaultValue____is__set>true</defaultValue____is__set>
+        <defaultValue class="boolean">false</defaultValue>
+        <defaultValueFormula____is__set>false</defaultValueFormula____is__set>
+        <defaultedOnCreate____is__set>true</defaultedOnCreate____is__set>
+        <defaultedOnCreate>true</defaultedOnCreate>
+        <dependentPicklist____is__set>false</dependentPicklist____is__set>
+        <dependentPicklist>false</dependentPicklist>
+        <deprecatedAndHidden____is__set>true</deprecatedAndHidden____is__set>
+        <deprecatedAndHidden>false</deprecatedAndHidden>
+        <digits____is__set>true</digits____is__set>
+        <digits>0</digits>
+        <displayLocationInDecimal____is__set>false</displayLocationInDecimal____is__set>
+        <displayLocationInDecimal>false</displayLocationInDecimal>
+        <encrypted____is__set>false</encrypted____is__set>
+        <encrypted>false</encrypted>
+        <externalId____is__set>false</externalId____is__set>
+        <externalId>false</externalId>
+        <extraTypeInfo____is__set>false</extraTypeInfo____is__set>
+        <filterable____is__set>true</filterable____is__set>
+        <filterable>true</filterable>
+        <filteredLookupInfo____is__set>false</filteredLookupInfo____is__set>
+        <formulaTreatNullNumberAsZero____is__set>false</formulaTreatNullNumberAsZero____is__set>
+        <formulaTreatNullNumberAsZero>false</formulaTreatNullNumberAsZero>
+        <groupable____is__set>true</groupable____is__set>
+        <groupable>true</groupable>
+        <highScaleNumber____is__set>false</highScaleNumber____is__set>
+        <highScaleNumber>false</highScaleNumber>
+        <htmlFormatted____is__set>false</htmlFormatted____is__set>
+        <htmlFormatted>false</htmlFormatted>
+        <idLookup____is__set>true</idLookup____is__set>
+        <idLookup>false</idLookup>
+        <inlineHelpText____is__set>false</inlineHelpText____is__set>
+        <label____is__set>true</label____is__set>
+        <label>Affiliates</label>
+        <length____is__set>true</length____is__set>
+        <length>0</length>
+        <mask____is__set>false</mask____is__set>
+        <maskType____is__set>false</maskType____is__set>
+        <name____is__set>true</name____is__set>
+        <name>Affiliates__c</name>
+        <nameField____is__set>true</nameField____is__set>
+        <nameField>false</nameField>
+        <namePointing____is__set>true</namePointing____is__set>
+        <namePointing>false</namePointing>
+        <nillable____is__set>true</nillable____is__set>
+        <nillable>false</nillable>
+        <permissionable____is__set>true</permissionable____is__set>
+        <permissionable>true</permissionable>
+        <picklistValues____is__set>false</picklistValues____is__set>
+        <picklistValues/>
+        <polymorphicForeignKey____is__set>true</polymorphicForeignKey____is__set>
+        <polymorphicForeignKey>false</polymorphicForeignKey>
+        <precision____is__set>true</precision____is__set>
+        <precision>0</precision>
+        <queryByDistance____is__set>true</queryByDistance____is__set>
+        <queryByDistance>false</queryByDistance>
+        <referenceTargetField____is__set>false</referenceTargetField____is__set>
+        <referenceTo____is__set>false</referenceTo____is__set>
+        <referenceTo/>
+        <relationshipName____is__set>false</relationshipName____is__set>
+        <relationshipOrder____is__set>false</relationshipOrder____is__set>
+        <relationshipOrder>0</relationshipOrder>
+        <restrictedDelete____is__set>false</restrictedDelete____is__set>
+        <restrictedDelete>false</restrictedDelete>
+        <restrictedPicklist____is__set>true</restrictedPicklist____is__set>
+        <restrictedPicklist>false</restrictedPicklist>
+        <scale____is__set>true</scale____is__set>
+        <scale>0</scale>
+        <searchPrefilterable____is__set>true</searchPrefilterable____is__set>
+        <searchPrefilterable>false</searchPrefilterable>
+        <soapType____is__set>true</soapType____is__set>
+        <soapType>_boolean</soapType>
+        <sortable____is__set>true</sortable____is__set>
+        <sortable>true</sortable>
+        <type____is__set>true</type____is__set>
+        <type>_boolean</type>
+        <unique____is__set>true</unique____is__set>
+        <unique>false</unique>
+        <updateable____is__set>true</updateable____is__set>
+        <updateable>true</updateable>
+        <writeRequiresMasterRead____is__set>false</writeRequiresMasterRead____is__set>
+        <writeRequiresMasterRead>false</writeRequiresMasterRead>
+      </com.sforce.soap.partner.Field>
+      <com.sforce.soap.partner.Field>
+        <aggregatable____is__set>true</aggregatable____is__set>
+        <aggregatable>true</aggregatable>
+        <aiPredictionField____is__set>true</aiPredictionField____is__set>
+        <aiPredictionField>false</aiPredictionField>
+        <autoNumber____is__set>true</autoNumber____is__set>
+        <autoNumber>false</autoNumber>
+        <byteLength____is__set>true</byteLength____is__set>
+        <byteLength>765</byteLength>
+        <calculated____is__set>true</calculated____is__set>
+        <calculated>false</calculated>
+        <calculatedFormula____is__set>false</calculatedFormula____is__set>
+        <cascadeDelete____is__set>false</cascadeDelete____is__set>
+        <cascadeDelete>false</cascadeDelete>
+        <caseSensitive____is__set>true</caseSensitive____is__set>
+        <caseSensitive>false</caseSensitive>
+        <compoundFieldName____is__set>false</compoundFieldName____is__set>
+        <controllerName____is__set>false</controllerName____is__set>
+        <createable____is__set>true</createable____is__set>
+        <createable>true</createable>
+        <custom____is__set>true</custom____is__set>
+        <custom>true</custom>
+        <dataTranslationEnabled____is__set>false</dataTranslationEnabled____is__set>
+        <dataTranslationEnabled>false</dataTranslationEnabled>
+        <defaultValue____is__set>false</defaultValue____is__set>
+        <defaultValueFormula____is__set>false</defaultValueFormula____is__set>
+        <defaultedOnCreate____is__set>true</defaultedOnCreate____is__set>
+        <defaultedOnCreate>false</defaultedOnCreate>
+        <dependentPicklist____is__set>false</dependentPicklist____is__set>
+        <dependentPicklist>false</dependentPicklist>
+        <deprecatedAndHidden____is__set>true</deprecatedAndHidden____is__set>
+        <deprecatedAndHidden>false</deprecatedAndHidden>
+        <digits____is__set>true</digits____is__set>
+        <digits>0</digits>
+        <displayLocationInDecimal____is__set>false</displayLocationInDecimal____is__set>
+        <displayLocationInDecimal>false</displayLocationInDecimal>
+        <encrypted____is__set>false</encrypted____is__set>
+        <encrypted>false</encrypted>
+        <externalId____is__set>false</externalId____is__set>
+        <externalId>false</externalId>
+        <extraTypeInfo____is__set>false</extraTypeInfo____is__set>
+        <filterable____is__set>true</filterable____is__set>
+        <filterable>true</filterable>
+        <filteredLookupInfo____is__set>false</filteredLookupInfo____is__set>
+        <formulaTreatNullNumberAsZero____is__set>false</formulaTreatNullNumberAsZero____is__set>
+        <formulaTreatNullNumberAsZero>false</formulaTreatNullNumberAsZero>
+        <groupable____is__set>true</groupable____is__set>
+        <groupable>true</groupable>
+        <highScaleNumber____is__set>false</highScaleNumber____is__set>
+        <highScaleNumber>false</highScaleNumber>
+        <htmlFormatted____is__set>false</htmlFormatted____is__set>
+        <htmlFormatted>false</htmlFormatted>
+        <idLookup____is__set>true</idLookup____is__set>
+        <idLookup>false</idLookup>
+        <inlineHelpText____is__set>false</inlineHelpText____is__set>
+        <label____is__set>true</label____is__set>
+        <label>Mobility Name</label>
+        <length____is__set>true</length____is__set>
+        <length>255</length>
+        <mask____is__set>false</mask____is__set>
+        <maskType____is__set>false</maskType____is__set>
+        <name____is__set>true</name____is__set>
+        <name>Mobility_Name__c</name>
+        <nameField____is__set>true</nameField____is__set>
+        <nameField>false</nameField>
+        <namePointing____is__set>true</namePointing____is__set>
+        <namePointing>false</namePointing>
+        <nillable____is__set>true</nillable____is__set>
+        <nillable>true</nillable>
+        <permissionable____is__set>true</permissionable____is__set>
+        <permissionable>true</permissionable>
+        <picklistValues____is__set>false</picklistValues____is__set>
+        <picklistValues/>
+        <polymorphicForeignKey____is__set>true</polymorphicForeignKey____is__set>
+        <polymorphicForeignKey>false</polymorphicForeignKey>
+        <precision____is__set>true</precision____is__set>
+        <precision>0</precision>
+        <queryByDistance____is__set>true</queryByDistance____is__set>
+        <queryByDistance>false</queryByDistance>
+        <referenceTargetField____is__set>false</referenceTargetField____is__set>
+        <referenceTo____is__set>false</referenceTo____is__set>
+        <referenceTo/>
+        <relationshipName____is__set>false</relationshipName____is__set>
+        <relationshipOrder____is__set>false</relationshipOrder____is__set>
+        <relationshipOrder>0</relationshipOrder>
+        <restrictedDelete____is__set>false</restrictedDelete____is__set>
+        <restrictedDelete>false</restrictedDelete>
+        <restrictedPicklist____is__set>true</restrictedPicklist____is__set>
+        <restrictedPicklist>false</restrictedPicklist>
+        <scale____is__set>true</scale____is__set>
+        <scale>0</scale>
+        <searchPrefilterable____is__set>true</searchPrefilterable____is__set>
+        <searchPrefilterable>false</searchPrefilterable>
+        <soapType____is__set>true</soapType____is__set>
+        <soapType>string</soapType>
+        <sortable____is__set>true</sortable____is__set>
+        <sortable>true</sortable>
+        <type____is__set>true</type____is__set>
+        <type>string</type>
+        <unique____is__set>true</unique____is__set>
+        <unique>false</unique>
+        <updateable____is__set>true</updateable____is__set>
+        <updateable>true</updateable>
+        <writeRequiresMasterRead____is__set>false</writeRequiresMasterRead____is__set>
+        <writeRequiresMasterRead>false</writeRequiresMasterRead>
+      </com.sforce.soap.partner.Field>
+      <com.sforce.soap.partner.Field>
+        <aggregatable____is__set>true</aggregatable____is__set>
+        <aggregatable>false</aggregatable>
+        <aiPredictionField____is__set>true</aiPredictionField____is__set>
+        <aiPredictionField>false</aiPredictionField>
+        <autoNumber____is__set>true</autoNumber____is__set>
+        <autoNumber>false</autoNumber>
+        <byteLength____is__set>true</byteLength____is__set>
+        <byteLength>4099</byteLength>
+        <calculated____is__set>true</calculated____is__set>
+        <calculated>false</calculated>
+        <calculatedFormula____is__set>false</calculatedFormula____is__set>
+        <cascadeDelete____is__set>false</cascadeDelete____is__set>
+        <cascadeDelete>false</cascadeDelete>
+        <caseSensitive____is__set>true</caseSensitive____is__set>
+        <caseSensitive>false</caseSensitive>
+        <compoundFieldName____is__set>false</compoundFieldName____is__set>
+        <controllerName____is__set>false</controllerName____is__set>
+        <createable____is__set>true</createable____is__set>
+        <createable>true</createable>
+        <custom____is__set>true</custom____is__set>
+        <custom>true</custom>
+        <dataTranslationEnabled____is__set>false</dataTranslationEnabled____is__set>
+        <dataTranslationEnabled>false</dataTranslationEnabled>
+        <defaultValue____is__set>true</defaultValue____is__set>
+        <defaultValue class="string">12</defaultValue>
+        <defaultValueFormula____is__set>false</defaultValueFormula____is__set>
+        <defaultedOnCreate____is__set>true</defaultedOnCreate____is__set>
+        <defaultedOnCreate>true</defaultedOnCreate>
+        <dependentPicklist____is__set>false</dependentPicklist____is__set>
+        <dependentPicklist>false</dependentPicklist>
+        <deprecatedAndHidden____is__set>true</deprecatedAndHidden____is__set>
+        <deprecatedAndHidden>false</deprecatedAndHidden>
+        <digits____is__set>true</digits____is__set>
+        <digits>0</digits>
+        <displayLocationInDecimal____is__set>false</displayLocationInDecimal____is__set>
+        <displayLocationInDecimal>false</displayLocationInDecimal>
+        <encrypted____is__set>false</encrypted____is__set>
+        <encrypted>false</encrypted>
+        <externalId____is__set>false</externalId____is__set>
+        <externalId>false</externalId>
+        <extraTypeInfo____is__set>false</extraTypeInfo____is__set>
+        <filterable____is__set>true</filterable____is__set>
+        <filterable>true</filterable>
+        <filteredLookupInfo____is__set>false</filteredLookupInfo____is__set>
+        <formulaTreatNullNumberAsZero____is__set>false</formulaTreatNullNumberAsZero____is__set>
+        <formulaTreatNullNumberAsZero>false</formulaTreatNullNumberAsZero>
+        <groupable____is__set>true</groupable____is__set>
+        <groupable>false</groupable>
+        <highScaleNumber____is__set>false</highScaleNumber____is__set>
+        <highScaleNumber>false</highScaleNumber>
+        <htmlFormatted____is__set>false</htmlFormatted____is__set>
+        <htmlFormatted>false</htmlFormatted>
+        <idLookup____is__set>true</idLookup____is__set>
+        <idLookup>false</idLookup>
+        <inlineHelpText____is__set>false</inlineHelpText____is__set>
+        <label____is__set>true</label____is__set>
+        <label>Selling Term</label>
+        <length____is__set>true</length____is__set>
+        <length>4099</length>
+        <mask____is__set>false</mask____is__set>
+        <maskType____is__set>false</maskType____is__set>
+        <name____is__set>true</name____is__set>
+        <name>Selling_Term__c</name>
+        <nameField____is__set>true</nameField____is__set>
+        <nameField>false</nameField>
+        <namePointing____is__set>true</namePointing____is__set>
+        <namePointing>false</namePointing>
+        <nillable____is__set>true</nillable____is__set>
+        <nillable>true</nillable>
+        <permissionable____is__set>true</permissionable____is__set>
+        <permissionable>true</permissionable>
+        <picklistValues____is__set>true</picklistValues____is__set>
+        <picklistValues>
+          <com.sforce.soap.partner.PicklistEntry>
+            <active____is__set>true</active____is__set>
+            <active>true</active>
+            <defaultValue____is__set>true</defaultValue____is__set>
+            <defaultValue>true</defaultValue>
+            <label____is__set>true</label____is__set>
+            <label>0-12</label>
+            <validFor____is__set>false</validFor____is__set>
+            <value____is__set>true</value____is__set>
+            <value>12</value>
+          </com.sforce.soap.partner.PicklistEntry>
+          <com.sforce.soap.partner.PicklistEntry>
+            <active____is__set>true</active____is__set>
+            <active>true</active>
+            <defaultValue____is__set>true</defaultValue____is__set>
+            <defaultValue>false</defaultValue>
+            <label____is__set>true</label____is__set>
+            <label>12-24</label>
+            <validFor____is__set>false</validFor____is__set>
+            <value____is__set>true</value____is__set>
+            <value>24</value>
+          </com.sforce.soap.partner.PicklistEntry>
+          <com.sforce.soap.partner.PicklistEntry>
+            <active____is__set>true</active____is__set>
+            <active>true</active>
+            <defaultValue____is__set>true</defaultValue____is__set>
+            <defaultValue>false</defaultValue>
+            <label____is__set>true</label____is__set>
+            <label>24-99</label>
+            <validFor____is__set>false</validFor____is__set>
+            <value____is__set>true</value____is__set>
+            <value>99</value>
+          </com.sforce.soap.partner.PicklistEntry>
+        </picklistValues>
+        <polymorphicForeignKey____is__set>true</polymorphicForeignKey____is__set>
+        <polymorphicForeignKey>false</polymorphicForeignKey>
+        <precision____is__set>true</precision____is__set>
+        <precision>4</precision>
+        <queryByDistance____is__set>true</queryByDistance____is__set>
+        <queryByDistance>false</queryByDistance>
+        <referenceTargetField____is__set>false</referenceTargetField____is__set>
+        <referenceTo____is__set>false</referenceTo____is__set>
+        <referenceTo/>
+        <relationshipName____is__set>false</relationshipName____is__set>
+        <relationshipOrder____is__set>false</relationshipOrder____is__set>
+        <relationshipOrder>0</relationshipOrder>
+        <restrictedDelete____is__set>false</restrictedDelete____is__set>
+        <restrictedDelete>false</restrictedDelete>
+        <restrictedPicklist____is__set>true</restrictedPicklist____is__set>
+        <restrictedPicklist>true</restrictedPicklist>
+        <scale____is__set>true</scale____is__set>
+        <scale>0</scale>
+        <searchPrefilterable____is__set>true</searchPrefilterable____is__set>
+        <searchPrefilterable>false</searchPrefilterable>
+        <soapType____is__set>true</soapType____is__set>
+        <soapType>string</soapType>
+        <sortable____is__set>true</sortable____is__set>
+        <sortable>false</sortable>
+        <type____is__set>true</type____is__set>
+        <type>multipicklist</type>
+        <unique____is__set>true</unique____is__set>
+        <unique>false</unique>
+        <updateable____is__set>true</updateable____is__set>
+        <updateable>true</updateable>
+        <writeRequiresMasterRead____is__set>false</writeRequiresMasterRead____is__set>
+        <writeRequiresMasterRead>false</writeRequiresMasterRead>
+      </com.sforce.soap.partner.Field>
+      <com.sforce.soap.partner.Field>
+        <aggregatable____is__set>true</aggregatable____is__set>
+        <aggregatable>false</aggregatable>
+        <aiPredictionField____is__set>true</aiPredictionField____is__set>
+        <aiPredictionField>false</aiPredictionField>
+        <autoNumber____is__set>true</autoNumber____is__set>
+        <autoNumber>false</autoNumber>
+        <byteLength____is__set>true</byteLength____is__set>
+        <byteLength>4099</byteLength>
+        <calculated____is__set>true</calculated____is__set>
+        <calculated>false</calculated>
+        <calculatedFormula____is__set>false</calculatedFormula____is__set>
+        <cascadeDelete____is__set>false</cascadeDelete____is__set>
+        <cascadeDelete>false</cascadeDelete>
+        <caseSensitive____is__set>true</caseSensitive____is__set>
+        <caseSensitive>false</caseSensitive>
+        <compoundFieldName____is__set>false</compoundFieldName____is__set>
+        <controllerName____is__set>false</controllerName____is__set>
+        <createable____is__set>true</createable____is__set>
+        <createable>true</createable>
+        <custom____is__set>true</custom____is__set>
+        <custom>true</custom>
+        <dataTranslationEnabled____is__set>false</dataTranslationEnabled____is__set>
+        <dataTranslationEnabled>false</dataTranslationEnabled>
+        <defaultValue____is__set>false</defaultValue____is__set>
+        <defaultValueFormula____is__set>false</defaultValueFormula____is__set>
+        <defaultedOnCreate____is__set>true</defaultedOnCreate____is__set>
+        <defaultedOnCreate>false</defaultedOnCreate>
+        <dependentPicklist____is__set>false</dependentPicklist____is__set>
+        <dependentPicklist>false</dependentPicklist>
+        <deprecatedAndHidden____is__set>true</deprecatedAndHidden____is__set>
+        <deprecatedAndHidden>false</deprecatedAndHidden>
+        <digits____is__set>true</digits____is__set>
+        <digits>0</digits>
+        <displayLocationInDecimal____is__set>false</displayLocationInDecimal____is__set>
+        <displayLocationInDecimal>false</displayLocationInDecimal>
+        <encrypted____is__set>false</encrypted____is__set>
+        <encrypted>false</encrypted>
+        <externalId____is__set>false</externalId____is__set>
+        <externalId>false</externalId>
+        <extraTypeInfo____is__set>false</extraTypeInfo____is__set>
+        <filterable____is__set>true</filterable____is__set>
+        <filterable>true</filterable>
+        <filteredLookupInfo____is__set>false</filteredLookupInfo____is__set>
+        <formulaTreatNullNumberAsZero____is__set>false</formulaTreatNullNumberAsZero____is__set>
+        <formulaTreatNullNumberAsZero>false</formulaTreatNullNumberAsZero>
+        <groupable____is__set>true</groupable____is__set>
+        <groupable>false</groupable>
+        <highScaleNumber____is__set>false</highScaleNumber____is__set>
+        <highScaleNumber>false</highScaleNumber>
+        <htmlFormatted____is__set>false</htmlFormatted____is__set>
+        <htmlFormatted>false</htmlFormatted>
+        <idLookup____is__set>true</idLookup____is__set>
+        <idLookup>false</idLookup>
+        <inlineHelpText____is__set>false</inlineHelpText____is__set>
+        <label____is__set>true</label____is__set>
+        <label>Terminal Model Name</label>
+        <length____is__set>true</length____is__set>
+        <length>4099</length>
+        <mask____is__set>false</mask____is__set>
+        <maskType____is__set>false</maskType____is__set>
+        <name____is__set>true</name____is__set>
+        <name>Terminal_Model_Name__c</name>
+        <nameField____is__set>true</nameField____is__set>
+        <nameField>false</nameField>
+        <namePointing____is__set>true</namePointing____is__set>
+        <namePointing>false</namePointing>
+        <nillable____is__set>true</nillable____is__set>
+        <nillable>true</nillable>
+        <permissionable____is__set>true</permissionable____is__set>
+        <permissionable>true</permissionable>
+        <picklistValues____is__set>true</picklistValues____is__set>
+        <picklistValues>
+          <com.sforce.soap.partner.PicklistEntry>
+            <active____is__set>true</active____is__set>
+            <active>true</active>
+            <defaultValue____is__set>true</defaultValue____is__set>
+            <defaultValue>false</defaultValue>
+            <label____is__set>true</label____is__set>
+            <label>HL1100W</label>
+            <validFor____is__set>false</validFor____is__set>
+            <value____is__set>true</value____is__set>
+            <value>UT0001</value>
+          </com.sforce.soap.partner.PicklistEntry>
+          <com.sforce.soap.partner.PicklistEntry>
+            <active____is__set>true</active____is__set>
+            <active>true</active>
+            <defaultValue____is__set>true</defaultValue____is__set>
+            <defaultValue>false</defaultValue>
+            <label____is__set>true</label____is__set>
+            <label>OW130L</label>
+            <validFor____is__set>false</validFor____is__set>
+            <value____is__set>true</value____is__set>
+            <value>UT0002</value>
+          </com.sforce.soap.partner.PicklistEntry>
+          <com.sforce.soap.partner.PicklistEntry>
+            <active____is__set>true</active____is__set>
+            <active>true</active>
+            <defaultValue____is__set>true</defaultValue____is__set>
+            <defaultValue>false</defaultValue>
+            <label____is__set>true</label____is__set>
+            <label>FoldSat LEo Ku OW MIL</label>
+            <validFor____is__set>false</validFor____is__set>
+            <value____is__set>true</value____is__set>
+            <value>UT0003</value>
+          </com.sforce.soap.partner.PicklistEntry>
+          <com.sforce.soap.partner.PicklistEntry>
+            <active____is__set>true</active____is__set>
+            <active>true</active>
+            <defaultValue____is__set>true</defaultValue____is__set>
+            <defaultValue>false</defaultValue>
+            <label____is__set>true</label____is__set>
+            <label>OW70M</label>
+            <validFor____is__set>false</validFor____is__set>
+            <value____is__set>true</value____is__set>
+            <value>UT0004</value>
+          </com.sforce.soap.partner.PicklistEntry>
+          <com.sforce.soap.partner.PicklistEntry>
+            <active____is__set>true</active____is__set>
+            <active>true</active>
+            <defaultValue____is__set>true</defaultValue____is__set>
+            <defaultValue>false</defaultValue>
+            <label____is__set>true</label____is__set>
+            <label>Peregrine U8</label>
+            <validFor____is__set>false</validFor____is__set>
+            <value____is__set>true</value____is__set>
+            <value>UT0005</value>
+          </com.sforce.soap.partner.PicklistEntry>
+          <com.sforce.soap.partner.PicklistEntry>
+            <active____is__set>true</active____is__set>
+            <active>true</active>
+            <defaultValue____is__set>true</defaultValue____is__set>
+            <defaultValue>false</defaultValue>
+            <label____is__set>true</label____is__set>
+            <label>OW50M</label>
+            <validFor____is__set>false</validFor____is__set>
+            <value____is__set>true</value____is__set>
+            <value>UT0006</value>
+          </com.sforce.soap.partner.PicklistEntry>
+          <com.sforce.soap.partner.PicklistEntry>
+            <active____is__set>true</active____is__set>
+            <active>true</active>
+            <defaultValue____is__set>true</defaultValue____is__set>
+            <defaultValue>false</defaultValue>
+            <label____is__set>true</label____is__set>
+            <label>OW70L-Rac</label>
+            <validFor____is__set>false</validFor____is__set>
+            <value____is__set>true</value____is__set>
+            <value>UT0008</value>
+          </com.sforce.soap.partner.PicklistEntry>
+          <com.sforce.soap.partner.PicklistEntry>
+            <active____is__set>true</active____is__set>
+            <active>true</active>
+            <defaultValue____is__set>true</defaultValue____is__set>
+            <defaultValue>false</defaultValue>
+            <label____is__set>true</label____is__set>
+            <label>Hawk U8</label>
+            <validFor____is__set>false</validFor____is__set>
+            <value____is__set>true</value____is__set>
+            <value>UT0011</value>
+          </com.sforce.soap.partner.PicklistEntry>
+          <com.sforce.soap.partner.PicklistEntry>
+            <active____is__set>true</active____is__set>
+            <active>true</active>
+            <defaultValue____is__set>true</defaultValue____is__set>
+            <defaultValue>false</defaultValue>
+            <label____is__set>true</label____is__set>
+            <label>OW50SL</label>
+            <validFor____is__set>false</validFor____is__set>
+            <value____is__set>true</value____is__set>
+            <value>UT0012</value>
+          </com.sforce.soap.partner.PicklistEntry>
+          <com.sforce.soap.partner.PicklistEntry>
+            <active____is__set>true</active____is__set>
+            <active>true</active>
+            <defaultValue____is__set>true</defaultValue____is__set>
+            <defaultValue>false</defaultValue>
+            <label____is__set>true</label____is__set>
+            <label>HL1120W</label>
+            <validFor____is__set>false</validFor____is__set>
+            <value____is__set>true</value____is__set>
+            <value>UT0013</value>
+          </com.sforce.soap.partner.PicklistEntry>
+          <com.sforce.soap.partner.PicklistEntry>
+            <active____is__set>true</active____is__set>
+            <active>true</active>
+            <defaultValue____is__set>true</defaultValue____is__set>
+            <defaultValue>false</defaultValue>
+            <label____is__set>true</label____is__set>
+            <label>OW70L</label>
+            <validFor____is__set>false</validFor____is__set>
+            <value____is__set>true</value____is__set>
+            <value>UT0014</value>
+          </com.sforce.soap.partner.PicklistEntry>
+          <com.sforce.soap.partner.PicklistEntry>
+            <active____is__set>true</active____is__set>
+            <active>true</active>
+            <defaultValue____is__set>true</defaultValue____is__set>
+            <defaultValue>false</defaultValue>
+            <label____is__set>true</label____is__set>
+            <label>OW11FL</label>
+            <validFor____is__set>false</validFor____is__set>
+            <value____is__set>true</value____is__set>
+            <value>UT0015</value>
+          </com.sforce.soap.partner.PicklistEntry>
+          <com.sforce.soap.partner.PicklistEntry>
+            <active____is__set>true</active____is__set>
+            <active>true</active>
+            <defaultValue____is__set>true</defaultValue____is__set>
+            <defaultValue>false</defaultValue>
+            <label____is__set>true</label____is__set>
+            <label>FoldSat LEo Ku OW</label>
+            <validFor____is__set>false</validFor____is__set>
+            <value____is__set>true</value____is__set>
+            <value>UT0020</value>
+          </com.sforce.soap.partner.PicklistEntry>
+          <com.sforce.soap.partner.PicklistEntry>
+            <active____is__set>true</active____is__set>
+            <active>true</active>
+            <defaultValue____is__set>true</defaultValue____is__set>
+            <defaultValue>false</defaultValue>
+            <label____is__set>true</label____is__set>
+            <label>Osprey u8 HGL</label>
+            <validFor____is__set>false</validFor____is__set>
+            <value____is__set>true</value____is__set>
+            <value>UT0023</value>
+          </com.sforce.soap.partner.PicklistEntry>
+          <com.sforce.soap.partner.PicklistEntry>
+            <active____is__set>true</active____is__set>
+            <active>true</active>
+            <defaultValue____is__set>true</defaultValue____is__set>
+            <defaultValue>false</defaultValue>
+            <label____is__set>true</label____is__set>
+            <label>OW10HV</label>
+            <validFor____is__set>false</validFor____is__set>
+            <value____is__set>true</value____is__set>
+            <value>UT0024</value>
+          </com.sforce.soap.partner.PicklistEntry>
+          <com.sforce.soap.partner.PicklistEntry>
+            <active____is__set>true</active____is__set>
+            <active>true</active>
+            <defaultValue____is__set>true</defaultValue____is__set>
+            <defaultValue>false</defaultValue>
+            <label____is__set>true</label____is__set>
+            <label>OW10HL</label>
+            <validFor____is__set>false</validFor____is__set>
+            <value____is__set>true</value____is__set>
+            <value>UT0025</value>
+          </com.sforce.soap.partner.PicklistEntry>
+          <com.sforce.soap.partner.PicklistEntry>
+            <active____is__set>true</active____is__set>
+            <active>true</active>
+            <defaultValue____is__set>true</defaultValue____is__set>
+            <defaultValue>false</defaultValue>
+            <label____is__set>true</label____is__set>
+            <label>OW10HM</label>
+            <validFor____is__set>false</validFor____is__set>
+            <value____is__set>true</value____is__set>
+            <value>UT0026</value>
+          </com.sforce.soap.partner.PicklistEntry>
+          <com.sforce.soap.partner.PicklistEntry>
+            <active____is__set>true</active____is__set>
+            <active>true</active>
+            <defaultValue____is__set>true</defaultValue____is__set>
+            <defaultValue>false</defaultValue>
+            <label____is__set>true</label____is__set>
+            <label>OW11FM</label>
+            <validFor____is__set>false</validFor____is__set>
+            <value____is__set>true</value____is__set>
+            <value>UT0027</value>
+          </com.sforce.soap.partner.PicklistEntry>
+          <com.sforce.soap.partner.PicklistEntry>
+            <active____is__set>true</active____is__set>
+            <active>true</active>
+            <defaultValue____is__set>true</defaultValue____is__set>
+            <defaultValue>false</defaultValue>
+            <label____is__set>true</label____is__set>
+            <label>OW11FV</label>
+            <validFor____is__set>false</validFor____is__set>
+            <value____is__set>true</value____is__set>
+            <value>UT0028</value>
+          </com.sforce.soap.partner.PicklistEntry>
+          <com.sforce.soap.partner.PicklistEntry>
+            <active____is__set>true</active____is__set>
+            <active>true</active>
+            <defaultValue____is__set>true</defaultValue____is__set>
+            <defaultValue>false</defaultValue>
+            <label____is__set>true</label____is__set>
+            <label>SETA-R9aT9a</label>
+            <validFor____is__set>false</validFor____is__set>
+            <value____is__set>true</value____is__set>
+            <value>UT0029</value>
+          </com.sforce.soap.partner.PicklistEntry>
+          <com.sforce.soap.partner.PicklistEntry>
+            <active____is__set>true</active____is__set>
+            <active>true</active>
+            <defaultValue____is__set>true</defaultValue____is__set>
+            <defaultValue>false</defaultValue>
+            <label____is__set>true</label____is__set>
+            <label>GG3030-HD</label>
+            <validFor____is__set>false</validFor____is__set>
+            <value____is__set>true</value____is__set>
+            <value>UT0030</value>
+          </com.sforce.soap.partner.PicklistEntry>
+          <com.sforce.soap.partner.PicklistEntry>
+            <active____is__set>true</active____is__set>
+            <active>true</active>
+            <defaultValue____is__set>true</defaultValue____is__set>
+            <defaultValue>false</defaultValue>
+            <label____is__set>true</label____is__set>
+            <label>Goshawk U8</label>
+            <validFor____is__set>false</validFor____is__set>
+            <value____is__set>true</value____is__set>
+            <value>UT0031</value>
+          </com.sforce.soap.partner.PicklistEntry>
+          <com.sforce.soap.partner.PicklistEntry>
+            <active____is__set>true</active____is__set>
+            <active>true</active>
+            <defaultValue____is__set>true</defaultValue____is__set>
+            <defaultValue>false</defaultValue>
+            <label____is__set>true</label____is__set>
+            <label>PS-ESA</label>
+            <validFor____is__set>false</validFor____is__set>
+            <value____is__set>true</value____is__set>
+            <value>UT0033</value>
+          </com.sforce.soap.partner.PicklistEntry>
+          <com.sforce.soap.partner.PicklistEntry>
+            <active____is__set>true</active____is__set>
+            <active>true</active>
+            <defaultValue____is__set>true</defaultValue____is__set>
+            <defaultValue>false</defaultValue>
+            <label____is__set>true</label____is__set>
+            <label>GG3040-FD</label>
+            <validFor____is__set>false</validFor____is__set>
+            <value____is__set>true</value____is__set>
+            <value>UT0034</value>
+          </com.sforce.soap.partner.PicklistEntry>
+          <com.sforce.soap.partner.PicklistEntry>
+            <active____is__set>true</active____is__set>
+            <active>true</active>
+            <defaultValue____is__set>true</defaultValue____is__set>
+            <defaultValue>false</defaultValue>
+            <label____is__set>true</label____is__set>
+            <label>OW11FM Primary</label>
+            <validFor____is__set>false</validFor____is__set>
+            <value____is__set>true</value____is__set>
+            <value>UT0035</value>
+          </com.sforce.soap.partner.PicklistEntry>
+          <com.sforce.soap.partner.PicklistEntry>
+            <active____is__set>true</active____is__set>
+            <active>true</active>
+            <defaultValue____is__set>true</defaultValue____is__set>
+            <defaultValue>false</defaultValue>
+            <label____is__set>true</label____is__set>
+            <label>OW11FL Primary</label>
+            <validFor____is__set>false</validFor____is__set>
+            <value____is__set>true</value____is__set>
+            <value>UT0036</value>
+          </com.sforce.soap.partner.PicklistEntry>
+          <com.sforce.soap.partner.PicklistEntry>
+            <active____is__set>true</active____is__set>
+            <active>true</active>
+            <defaultValue____is__set>true</defaultValue____is__set>
+            <defaultValue>false</defaultValue>
+            <label____is__set>true</label____is__set>
+            <label>OW70L-Rdc</label>
+            <validFor____is__set>false</validFor____is__set>
+            <value____is__set>true</value____is__set>
+            <value>UT0037</value>
+          </com.sforce.soap.partner.PicklistEntry>
+          <com.sforce.soap.partner.PicklistEntry>
+            <active____is__set>true</active____is__set>
+            <active>true</active>
+            <defaultValue____is__set>true</defaultValue____is__set>
+            <defaultValue>false</defaultValue>
+            <label____is__set>true</label____is__set>
+            <label>OW7MP</label>
+            <validFor____is__set>false</validFor____is__set>
+            <value____is__set>true</value____is__set>
+            <value>UT0038</value>
+          </com.sforce.soap.partner.PicklistEntry>
+          <com.sforce.soap.partner.PicklistEntry>
+            <active____is__set>true</active____is__set>
+            <active>true</active>
+            <defaultValue____is__set>true</defaultValue____is__set>
+            <defaultValue>false</defaultValue>
+            <label____is__set>true</label____is__set>
+            <label>HL1520</label>
+            <validFor____is__set>false</validFor____is__set>
+            <value____is__set>true</value____is__set>
+            <value>UT0039</value>
+          </com.sforce.soap.partner.PicklistEntry>
+          <com.sforce.soap.partner.PicklistEntry>
+            <active____is__set>true</active____is__set>
+            <active>true</active>
+            <defaultValue____is__set>true</defaultValue____is__set>
+            <defaultValue>false</defaultValue>
+            <label____is__set>true</label____is__set>
+            <label>OW11FVM</label>
+            <validFor____is__set>false</validFor____is__set>
+            <value____is__set>true</value____is__set>
+            <value>UT0041</value>
+          </com.sforce.soap.partner.PicklistEntry>
+          <com.sforce.soap.partner.PicklistEntry>
+            <active____is__set>true</active____is__set>
+            <active>true</active>
+            <defaultValue____is__set>true</defaultValue____is__set>
+            <defaultValue>false</defaultValue>
+            <label____is__set>true</label____is__set>
+            <label>OW11FMM</label>
+            <validFor____is__set>false</validFor____is__set>
+            <value____is__set>true</value____is__set>
+            <value>UT0042</value>
+          </com.sforce.soap.partner.PicklistEntry>
+          <com.sforce.soap.partner.PicklistEntry>
+            <active____is__set>true</active____is__set>
+            <active>true</active>
+            <defaultValue____is__set>true</defaultValue____is__set>
+            <defaultValue>false</defaultValue>
+            <label____is__set>true</label____is__set>
+            <label>OW10HVM</label>
+            <validFor____is__set>false</validFor____is__set>
+            <value____is__set>true</value____is__set>
+            <value>UT0043</value>
+          </com.sforce.soap.partner.PicklistEntry>
+          <com.sforce.soap.partner.PicklistEntry>
+            <active____is__set>true</active____is__set>
+            <active>true</active>
+            <defaultValue____is__set>true</defaultValue____is__set>
+            <defaultValue>false</defaultValue>
+            <label____is__set>true</label____is__set>
+            <label>AeroBlade_m_DUO</label>
+            <validFor____is__set>false</validFor____is__set>
+            <value____is__set>true</value____is__set>
+            <value>UT0044</value>
+          </com.sforce.soap.partner.PicklistEntry>
+          <com.sforce.soap.partner.PicklistEntry>
+            <active____is__set>true</active____is__set>
+            <active>true</active>
+            <defaultValue____is__set>true</defaultValue____is__set>
+            <defaultValue>false</defaultValue>
+            <label____is__set>true</label____is__set>
+            <label>HL1220W</label>
+            <validFor____is__set>false</validFor____is__set>
+            <value____is__set>true</value____is__set>
+            <value>UT0045</value>
+          </com.sforce.soap.partner.PicklistEntry>
+          <com.sforce.soap.partner.PicklistEntry>
+            <active____is__set>true</active____is__set>
+            <active>true</active>
+            <defaultValue____is__set>true</defaultValue____is__set>
+            <defaultValue>false</defaultValue>
+            <label____is__set>true</label____is__set>
+            <label>HL1200W</label>
+            <validFor____is__set>false</validFor____is__set>
+            <value____is__set>true</value____is__set>
+            <value>UT0046</value>
+          </com.sforce.soap.partner.PicklistEntry>
+          <com.sforce.soap.partner.PicklistEntry>
+            <active____is__set>true</active____is__set>
+            <active>true</active>
+            <defaultValue____is__set>true</defaultValue____is__set>
+            <defaultValue>false</defaultValue>
+            <label____is__set>true</label____is__set>
+            <label>OW11FA</label>
+            <validFor____is__set>false</validFor____is__set>
+            <value____is__set>true</value____is__set>
+            <value>UT0047</value>
+          </com.sforce.soap.partner.PicklistEntry>
+          <com.sforce.soap.partner.PicklistEntry>
+            <active____is__set>true</active____is__set>
+            <active>true</active>
+            <defaultValue____is__set>true</defaultValue____is__set>
+            <defaultValue>false</defaultValue>
+            <label____is__set>true</label____is__set>
+            <label>Tiny</label>
+            <validFor____is__set>false</validFor____is__set>
+            <value____is__set>true</value____is__set>
+            <value>UT0048</value>
+          </com.sforce.soap.partner.PicklistEntry>
+          <com.sforce.soap.partner.PicklistEntry>
+            <active____is__set>true</active____is__set>
+            <active>true</active>
+            <defaultValue____is__set>true</defaultValue____is__set>
+            <defaultValue>false</defaultValue>
+            <label____is__set>true</label____is__set>
+            <label>U5</label>
+            <validFor____is__set>false</validFor____is__set>
+            <value____is__set>true</value____is__set>
+            <value>UT0049</value>
+          </com.sforce.soap.partner.PicklistEntry>
+        </picklistValues>
+        <polymorphicForeignKey____is__set>true</polymorphicForeignKey____is__set>
+        <polymorphicForeignKey>false</polymorphicForeignKey>
+        <precision____is__set>true</precision____is__set>
+        <precision>4</precision>
+        <queryByDistance____is__set>true</queryByDistance____is__set>
+        <queryByDistance>false</queryByDistance>
+        <referenceTargetField____is__set>false</referenceTargetField____is__set>
+        <referenceTo____is__set>false</referenceTo____is__set>
+        <referenceTo/>
+        <relationshipName____is__set>false</relationshipName____is__set>
+        <relationshipOrder____is__set>false</relationshipOrder____is__set>
+        <relationshipOrder>0</relationshipOrder>
+        <restrictedDelete____is__set>false</restrictedDelete____is__set>
+        <restrictedDelete>false</restrictedDelete>
+        <restrictedPicklist____is__set>true</restrictedPicklist____is__set>
+        <restrictedPicklist>true</restrictedPicklist>
+        <scale____is__set>true</scale____is__set>
+        <scale>0</scale>
+        <searchPrefilterable____is__set>true</searchPrefilterable____is__set>
+        <searchPrefilterable>false</searchPrefilterable>
+        <soapType____is__set>true</soapType____is__set>
+        <soapType>string</soapType>
+        <sortable____is__set>true</sortable____is__set>
+        <sortable>false</sortable>
+        <type____is__set>true</type____is__set>
+        <type>multipicklist</type>
+        <unique____is__set>true</unique____is__set>
+        <unique>false</unique>
+        <updateable____is__set>true</updateable____is__set>
+        <updateable>true</updateable>
+        <writeRequiresMasterRead____is__set>false</writeRequiresMasterRead____is__set>
+        <writeRequiresMasterRead>false</writeRequiresMasterRead>
+      </com.sforce.soap.partner.Field>
     </fields>
     <hasSubtypes____is__set>true</hasSubtypes____is__set>
     <hasSubtypes>false</hasSubtypes>
@@ -52610,6 +54773,22 @@ IF(RecordType.Name= &apos;Virtual Subscription&apos;, &quot;Virtual Subscription
         <name>Customer Subscription GIPN</name>
         <recordTypeId____is__set>true</recordTypeId____is__set>
         <recordTypeId>0121l0000006KafAAE</recordTypeId>
+      </com.sforce.soap.partner.RecordTypeInfo>
+      <com.sforce.soap.partner.RecordTypeInfo>
+        <active____is__set>true</active____is__set>
+        <active>true</active>
+        <available____is__set>true</available____is__set>
+        <available>true</available>
+        <defaultRecordTypeMapping____is__set>true</defaultRecordTypeMapping____is__set>
+        <defaultRecordTypeMapping>false</defaultRecordTypeMapping>
+        <developerName____is__set>true</developerName____is__set>
+        <developerName>Customer_Subscription_LEO</developerName>
+        <master____is__set>true</master____is__set>
+        <master>false</master>
+        <name____is__set>true</name____is__set>
+        <name>Customer Subscription LEO</name>
+        <recordTypeId____is__set>true</recordTypeId____is__set>
+        <recordTypeId>0129M00000EJ2dxQAD</recordTypeId>
       </com.sforce.soap.partner.RecordTypeInfo>
       <com.sforce.soap.partner.RecordTypeInfo>
         <active____is__set>true</active____is__set>

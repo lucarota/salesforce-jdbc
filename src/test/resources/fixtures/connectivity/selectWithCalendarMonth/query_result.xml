@@ -2,25 +2,61 @@
   <list>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
       <fieldType>int</fieldType>
-      <name>expr0</name>
-      <value>3</value>
+      <name>CALENDAR_MONTH</name>
+      <value class="int">2</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
       <fieldType>int</fieldType>
-      <name>expr1</name>
-      <value>15</value>
+      <name>COUNT</name>
+      <value class="int">372</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
   </list>
   <list>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
       <fieldType>int</fieldType>
-      <name>expr0</name>
-      <value>5</value>
+      <name>CALENDAR_MONTH</name>
+      <value class="int">9</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
       <fieldType>int</fieldType>
-      <name>expr1</name>
-      <value>8</value>
+      <name>COUNT</name>
+      <value class="int">65</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+  </list>
+  <list>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>int</fieldType>
+      <name>CALENDAR_MONTH</name>
+      <value class="int">3</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>int</fieldType>
+      <name>COUNT</name>
+      <value class="int">159</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+  </list>
+  <list>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>int</fieldType>
+      <name>CALENDAR_MONTH</name>
+      <value class="int">11</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>int</fieldType>
+      <name>COUNT</name>
+      <value class="int">23</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+  </list>
+  <list>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>int</fieldType>
+      <name>CALENDAR_MONTH</name>
+      <value class="int">4</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>int</fieldType>
+      <name>COUNT</name>
+      <value class="int">59</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
   </list>
 </list>

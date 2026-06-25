@@ -129,6 +129,42 @@
       <cascadeDelete____is__set>true</cascadeDelete____is__set>
       <cascadeDelete>false</cascadeDelete>
       <childSObject____is__set>true</childSObject____is__set>
+      <childSObject>ApprovalSubmission</childSObject>
+      <deprecatedAndHidden____is__set>true</deprecatedAndHidden____is__set>
+      <deprecatedAndHidden>false</deprecatedAndHidden>
+      <field____is__set>true</field____is__set>
+      <field>RelatedRecordId</field>
+      <junctionIdListNames____is__set>false</junctionIdListNames____is__set>
+      <junctionIdListNames/>
+      <junctionReferenceTo____is__set>false</junctionReferenceTo____is__set>
+      <junctionReferenceTo/>
+      <relationshipName____is__set>true</relationshipName____is__set>
+      <relationshipName>ApprovalSubmissions</relationshipName>
+      <restrictedDelete____is__set>false</restrictedDelete____is__set>
+      <restrictedDelete>false</restrictedDelete>
+    </com.sforce.soap.partner.ChildRelationship>
+    <com.sforce.soap.partner.ChildRelationship>
+      <cascadeDelete____is__set>true</cascadeDelete____is__set>
+      <cascadeDelete>false</cascadeDelete>
+      <childSObject____is__set>true</childSObject____is__set>
+      <childSObject>ApprovalWorkItem</childSObject>
+      <deprecatedAndHidden____is__set>true</deprecatedAndHidden____is__set>
+      <deprecatedAndHidden>false</deprecatedAndHidden>
+      <field____is__set>true</field____is__set>
+      <field>RelatedRecordId</field>
+      <junctionIdListNames____is__set>false</junctionIdListNames____is__set>
+      <junctionIdListNames/>
+      <junctionReferenceTo____is__set>false</junctionReferenceTo____is__set>
+      <junctionReferenceTo/>
+      <relationshipName____is__set>true</relationshipName____is__set>
+      <relationshipName>ApprovalWorkItems</relationshipName>
+      <restrictedDelete____is__set>false</restrictedDelete____is__set>
+      <restrictedDelete>false</restrictedDelete>
+    </com.sforce.soap.partner.ChildRelationship>
+    <com.sforce.soap.partner.ChildRelationship>
+      <cascadeDelete____is__set>true</cascadeDelete____is__set>
+      <cascadeDelete>false</cascadeDelete>
+      <childSObject____is__set>true</childSObject____is__set>
       <childSObject>Asset</childSObject>
       <deprecatedAndHidden____is__set>true</deprecatedAndHidden____is__set>
       <deprecatedAndHidden>false</deprecatedAndHidden>
@@ -248,6 +284,23 @@
       <junctionReferenceTo/>
       <relationshipName____is__set>true</relationshipName____is__set>
       <relationshipName>RecordAssociatedGroups</relationshipName>
+      <restrictedDelete____is__set>false</restrictedDelete____is__set>
+      <restrictedDelete>false</restrictedDelete>
+    </com.sforce.soap.partner.ChildRelationship>
+    <com.sforce.soap.partner.ChildRelationship>
+      <cascadeDelete____is__set>true</cascadeDelete____is__set>
+      <cascadeDelete>false</cascadeDelete>
+      <childSObject____is__set>true</childSObject____is__set>
+      <childSObject>CollaborationGroupRecordChangeEvent</childSObject>
+      <deprecatedAndHidden____is__set>true</deprecatedAndHidden____is__set>
+      <deprecatedAndHidden>false</deprecatedAndHidden>
+      <field____is__set>true</field____is__set>
+      <field>RecordId</field>
+      <junctionIdListNames____is__set>false</junctionIdListNames____is__set>
+      <junctionIdListNames/>
+      <junctionReferenceTo____is__set>false</junctionReferenceTo____is__set>
+      <junctionReferenceTo/>
+      <relationshipName____is__set>false</relationshipName____is__set>
       <restrictedDelete____is__set>false</restrictedDelete____is__set>
       <restrictedDelete>false</restrictedDelete>
     </com.sforce.soap.partner.ChildRelationship>
@@ -693,6 +746,24 @@
       <cascadeDelete____is__set>true</cascadeDelete____is__set>
       <cascadeDelete>false</cascadeDelete>
       <childSObject____is__set>true</childSObject____is__set>
+      <childSObject>Lead</childSObject>
+      <deprecatedAndHidden____is__set>true</deprecatedAndHidden____is__set>
+      <deprecatedAndHidden>false</deprecatedAndHidden>
+      <field____is__set>true</field____is__set>
+      <field>Partner_Subscription__c</field>
+      <junctionIdListNames____is__set>false</junctionIdListNames____is__set>
+      <junctionIdListNames/>
+      <junctionReferenceTo____is__set>false</junctionReferenceTo____is__set>
+      <junctionReferenceTo/>
+      <relationshipName____is__set>true</relationshipName____is__set>
+      <relationshipName>Leads__r</relationshipName>
+      <restrictedDelete____is__set>false</restrictedDelete____is__set>
+      <restrictedDelete>false</restrictedDelete>
+    </com.sforce.soap.partner.ChildRelationship>
+    <com.sforce.soap.partner.ChildRelationship>
+      <cascadeDelete____is__set>true</cascadeDelete____is__set>
+      <cascadeDelete>false</cascadeDelete>
+      <childSObject____is__set>true</childSObject____is__set>
       <childSObject>Monthly_Statement__c</childSObject>
       <deprecatedAndHidden____is__set>true</deprecatedAndHidden____is__set>
       <deprecatedAndHidden>false</deprecatedAndHidden>
@@ -833,6 +904,23 @@
     </com.sforce.soap.partner.ChildRelationship>
     <com.sforce.soap.partner.ChildRelationship>
       <cascadeDelete____is__set>true</cascadeDelete____is__set>
+      <cascadeDelete>false</cascadeDelete>
+      <childSObject____is__set>true</childSObject____is__set>
+      <childSObject>ObjectRelatedUrlChangeEvent</childSObject>
+      <deprecatedAndHidden____is__set>true</deprecatedAndHidden____is__set>
+      <deprecatedAndHidden>false</deprecatedAndHidden>
+      <field____is__set>true</field____is__set>
+      <field>ParentId</field>
+      <junctionIdListNames____is__set>false</junctionIdListNames____is__set>
+      <junctionIdListNames/>
+      <junctionReferenceTo____is__set>false</junctionReferenceTo____is__set>
+      <junctionReferenceTo/>
+      <relationshipName____is__set>false</relationshipName____is__set>
+      <restrictedDelete____is__set>false</restrictedDelete____is__set>
+      <restrictedDelete>false</restrictedDelete>
+    </com.sforce.soap.partner.ChildRelationship>
+    <com.sforce.soap.partner.ChildRelationship>
+      <cascadeDelete____is__set>true</cascadeDelete____is__set>
       <cascadeDelete>true</cascadeDelete>
       <childSObject____is__set>true</childSObject____is__set>
       <childSObject>OpenActivity</childSObject>
@@ -935,6 +1023,23 @@
       <junctionReferenceTo/>
       <relationshipName____is__set>true</relationshipName____is__set>
       <relationshipName>ProcessExceptions</relationshipName>
+      <restrictedDelete____is__set>false</restrictedDelete____is__set>
+      <restrictedDelete>false</restrictedDelete>
+    </com.sforce.soap.partner.ChildRelationship>
+    <com.sforce.soap.partner.ChildRelationship>
+      <cascadeDelete____is__set>true</cascadeDelete____is__set>
+      <cascadeDelete>false</cascadeDelete>
+      <childSObject____is__set>true</childSObject____is__set>
+      <childSObject>ProcessExceptionChangeEvent</childSObject>
+      <deprecatedAndHidden____is__set>true</deprecatedAndHidden____is__set>
+      <deprecatedAndHidden>false</deprecatedAndHidden>
+      <field____is__set>true</field____is__set>
+      <field>AttachedToId</field>
+      <junctionIdListNames____is__set>false</junctionIdListNames____is__set>
+      <junctionIdListNames/>
+      <junctionReferenceTo____is__set>false</junctionReferenceTo____is__set>
+      <junctionReferenceTo/>
+      <relationshipName____is__set>false</relationshipName____is__set>
       <restrictedDelete____is__set>false</restrictedDelete____is__set>
       <restrictedDelete>false</restrictedDelete>
     </com.sforce.soap.partner.ChildRelationship>
@@ -1079,6 +1184,40 @@
       <relationshipName>RecordAlertWhat</relationshipName>
       <restrictedDelete____is__set>true</restrictedDelete____is__set>
       <restrictedDelete>true</restrictedDelete>
+    </com.sforce.soap.partner.ChildRelationship>
+    <com.sforce.soap.partner.ChildRelationship>
+      <cascadeDelete____is__set>true</cascadeDelete____is__set>
+      <cascadeDelete>false</cascadeDelete>
+      <childSObject____is__set>true</childSObject____is__set>
+      <childSObject>RecordAlertChangeEvent</childSObject>
+      <deprecatedAndHidden____is__set>true</deprecatedAndHidden____is__set>
+      <deprecatedAndHidden>false</deprecatedAndHidden>
+      <field____is__set>true</field____is__set>
+      <field>ParentId</field>
+      <junctionIdListNames____is__set>false</junctionIdListNames____is__set>
+      <junctionIdListNames/>
+      <junctionReferenceTo____is__set>false</junctionReferenceTo____is__set>
+      <junctionReferenceTo/>
+      <relationshipName____is__set>false</relationshipName____is__set>
+      <restrictedDelete____is__set>false</restrictedDelete____is__set>
+      <restrictedDelete>false</restrictedDelete>
+    </com.sforce.soap.partner.ChildRelationship>
+    <com.sforce.soap.partner.ChildRelationship>
+      <cascadeDelete____is__set>true</cascadeDelete____is__set>
+      <cascadeDelete>false</cascadeDelete>
+      <childSObject____is__set>true</childSObject____is__set>
+      <childSObject>RecordAlertChangeEvent</childSObject>
+      <deprecatedAndHidden____is__set>true</deprecatedAndHidden____is__set>
+      <deprecatedAndHidden>false</deprecatedAndHidden>
+      <field____is__set>true</field____is__set>
+      <field>WhatId</field>
+      <junctionIdListNames____is__set>false</junctionIdListNames____is__set>
+      <junctionIdListNames/>
+      <junctionReferenceTo____is__set>false</junctionReferenceTo____is__set>
+      <junctionReferenceTo/>
+      <relationshipName____is__set>false</relationshipName____is__set>
+      <restrictedDelete____is__set>false</restrictedDelete____is__set>
+      <restrictedDelete>false</restrictedDelete>
     </com.sforce.soap.partner.ChildRelationship>
     <com.sforce.soap.partner.ChildRelationship>
       <cascadeDelete____is__set>true</cascadeDelete____is__set>
@@ -30586,18 +30725,6 @@ IF(MONTH(TODAY())==12,1,MONTH(TODAY()) + 1),
           <defaultValue____is__set>true</defaultValue____is__set>
           <defaultValue>false</defaultValue>
           <label____is__set>true</label____is__set>
-          <label>NEWTEC E3B GLOBAL C BAND 08C</label>
-          <validFor____is__set>true</validFor____is__set>
-          <validFor>gAAA</validFor>
-          <value____is__set>true</value____is__set>
-          <value>335</value>
-        </com.sforce.soap.partner.PicklistEntry>
-        <com.sforce.soap.partner.PicklistEntry>
-          <active____is__set>true</active____is__set>
-          <active>true</active>
-          <defaultValue____is__set>true</defaultValue____is__set>
-          <defaultValue>false</defaultValue>
-          <label____is__set>true</label____is__set>
           <label>E65WA-B19</label>
           <validFor____is__set>true</validFor____is__set>
           <validFor>gAAA</validFor>
@@ -30723,18 +30850,6 @@ IF(MONTH(TODAY())==12,1,MONTH(TODAY()) + 1),
           <validFor>gAAA</validFor>
           <value____is__set>true</value____is__set>
           <value>340</value>
-        </com.sforce.soap.partner.PicklistEntry>
-        <com.sforce.soap.partner.PicklistEntry>
-          <active____is__set>true</active____is__set>
-          <active>true</active>
-          <defaultValue____is__set>true</defaultValue____is__set>
-          <defaultValue>false</defaultValue>
-          <label____is__set>true</label____is__set>
-          <label>NEWTEC E70B AFRICA GEA03</label>
-          <validFor____is__set>true</validFor____is__set>
-          <validFor>gAAA</validFor>
-          <value____is__set>true</value____is__set>
-          <value>342</value>
         </com.sforce.soap.partner.PicklistEntry>
         <com.sforce.soap.partner.PicklistEntry>
           <active____is__set>true</active____is__set>
@@ -33980,18 +34095,6 @@ IF(MONTH(TODAY())==12,1,MONTH(TODAY()) + 1),
           <defaultValue____is__set>true</defaultValue____is__set>
           <defaultValue>false</defaultValue>
           <label____is__set>true</label____is__set>
-          <label>SR NEWTEC E3B GLOBAL C BAND 08C</label>
-          <validFor____is__set>true</validFor____is__set>
-          <validFor>QAAA</validFor>
-          <value____is__set>true</value____is__set>
-          <value>SR NEWTEC E3B GLOBAL C BAND 08C</value>
-        </com.sforce.soap.partner.PicklistEntry>
-        <com.sforce.soap.partner.PicklistEntry>
-          <active____is__set>true</active____is__set>
-          <active>true</active>
-          <defaultValue____is__set>true</defaultValue____is__set>
-          <defaultValue>false</defaultValue>
-          <label____is__set>true</label____is__set>
           <label>SR NEWTEC E113WA NORTH AMERICA K07</label>
           <validFor____is__set>true</validFor____is__set>
           <validFor>QAAA</validFor>
@@ -34021,18 +34124,6 @@ IF(MONTH(TODAY())==12,1,MONTH(TODAY()) + 1),
           <validFor>QAAA</validFor>
           <value____is__set>true</value____is__set>
           <value>SR NEWTEC E3B GLOBAL C BAND 13C</value>
-        </com.sforce.soap.partner.PicklistEntry>
-        <com.sforce.soap.partner.PicklistEntry>
-          <active____is__set>true</active____is__set>
-          <active>true</active>
-          <defaultValue____is__set>true</defaultValue____is__set>
-          <defaultValue>false</defaultValue>
-          <label____is__set>true</label____is__set>
-          <label>SR NEWTEC E70B AFRICA GEA03</label>
-          <validFor____is__set>true</validFor____is__set>
-          <validFor>QAAA</validFor>
-          <value____is__set>true</value____is__set>
-          <value>SR NEWTEC E70B AFRICA GEA03</value>
         </com.sforce.soap.partner.PicklistEntry>
         <com.sforce.soap.partner.PicklistEntry>
           <active____is__set>true</active____is__set>
@@ -46333,6 +46424,123 @@ IF(MONTH(TODAY())==12,1,MONTH(TODAY()) + 1),
       <autoNumber____is__set>true</autoNumber____is__set>
       <autoNumber>false</autoNumber>
       <byteLength____is__set>true</byteLength____is__set>
+      <byteLength>3900</byteLength>
+      <calculated____is__set>true</calculated____is__set>
+      <calculated>true</calculated>
+      <calculatedFormula____is__set>true</calculatedFormula____is__set>
+      <calculatedFormula>IF(RecordType.Name= &apos;Customer Subscription&apos;, &quot;Customer Subscription&quot;,
+IF(RecordType.Name= &apos;Customer Subscription GIPN&apos;, &quot;Customer Subscription&quot;,
+IF(RecordType.Name= &apos;Distributor Subscription&apos;, &quot;Partner Subscription&quot;,
+IF(RecordType.Name= &apos;Distributor Subscription GIPN&apos;, &quot;Partner Subscription&quot;,
+IF(RecordType.Name= &apos;Distributor Subscription LEO&apos;, &quot;Partner Subscription&quot;,
+IF(RecordType.Name= &apos;Partner Subscription VNO&apos;, &quot;Partner Subscription&quot;,
+IF(RecordType.Name= &apos;Partner Subscription VNO GIPN&apos;, &quot;Partner Subscription&quot;,
+IF(RecordType.Name= &apos;Equipment Subscription&apos;, &quot;Equipment Subscription&quot;,
+IF(RecordType.Name= &apos;Virtual Subscription&apos;, &quot;Virtual Subscription&quot;,
+			&quot;To be classified&quot;)))))))))</calculatedFormula>
+      <cascadeDelete____is__set>false</cascadeDelete____is__set>
+      <cascadeDelete>false</cascadeDelete>
+      <caseSensitive____is__set>true</caseSensitive____is__set>
+      <caseSensitive>false</caseSensitive>
+      <compoundFieldName____is__set>false</compoundFieldName____is__set>
+      <controllerName____is__set>false</controllerName____is__set>
+      <createable____is__set>true</createable____is__set>
+      <createable>false</createable>
+      <custom____is__set>true</custom____is__set>
+      <custom>true</custom>
+      <dataTranslationEnabled____is__set>false</dataTranslationEnabled____is__set>
+      <dataTranslationEnabled>false</dataTranslationEnabled>
+      <defaultValue____is__set>false</defaultValue____is__set>
+      <defaultValueFormula____is__set>false</defaultValueFormula____is__set>
+      <defaultedOnCreate____is__set>true</defaultedOnCreate____is__set>
+      <defaultedOnCreate>false</defaultedOnCreate>
+      <dependentPicklist____is__set>false</dependentPicklist____is__set>
+      <dependentPicklist>false</dependentPicklist>
+      <deprecatedAndHidden____is__set>true</deprecatedAndHidden____is__set>
+      <deprecatedAndHidden>false</deprecatedAndHidden>
+      <digits____is__set>true</digits____is__set>
+      <digits>0</digits>
+      <displayLocationInDecimal____is__set>false</displayLocationInDecimal____is__set>
+      <displayLocationInDecimal>false</displayLocationInDecimal>
+      <encrypted____is__set>false</encrypted____is__set>
+      <encrypted>false</encrypted>
+      <externalId____is__set>false</externalId____is__set>
+      <externalId>false</externalId>
+      <extraTypeInfo____is__set>false</extraTypeInfo____is__set>
+      <filterable____is__set>true</filterable____is__set>
+      <filterable>true</filterable>
+      <filteredLookupInfo____is__set>false</filteredLookupInfo____is__set>
+      <formulaTreatNullNumberAsZero____is__set>true</formulaTreatNullNumberAsZero____is__set>
+      <formulaTreatNullNumberAsZero>true</formulaTreatNullNumberAsZero>
+      <groupable____is__set>true</groupable____is__set>
+      <groupable>false</groupable>
+      <highScaleNumber____is__set>false</highScaleNumber____is__set>
+      <highScaleNumber>false</highScaleNumber>
+      <htmlFormatted____is__set>false</htmlFormatted____is__set>
+      <htmlFormatted>false</htmlFormatted>
+      <idLookup____is__set>true</idLookup____is__set>
+      <idLookup>false</idLookup>
+      <inlineHelpText____is__set>true</inlineHelpText____is__set>
+      <inlineHelpText>Field to identify the type of Subscription</inlineHelpText>
+      <label____is__set>true</label____is__set>
+      <label>Type</label>
+      <length____is__set>true</length____is__set>
+      <length>1300</length>
+      <mask____is__set>false</mask____is__set>
+      <maskType____is__set>false</maskType____is__set>
+      <name____is__set>true</name____is__set>
+      <name>Type__c</name>
+      <nameField____is__set>true</nameField____is__set>
+      <nameField>false</nameField>
+      <namePointing____is__set>true</namePointing____is__set>
+      <namePointing>false</namePointing>
+      <nillable____is__set>true</nillable____is__set>
+      <nillable>true</nillable>
+      <permissionable____is__set>true</permissionable____is__set>
+      <permissionable>true</permissionable>
+      <picklistValues____is__set>false</picklistValues____is__set>
+      <picklistValues/>
+      <polymorphicForeignKey____is__set>true</polymorphicForeignKey____is__set>
+      <polymorphicForeignKey>false</polymorphicForeignKey>
+      <precision____is__set>true</precision____is__set>
+      <precision>0</precision>
+      <queryByDistance____is__set>true</queryByDistance____is__set>
+      <queryByDistance>false</queryByDistance>
+      <referenceTargetField____is__set>false</referenceTargetField____is__set>
+      <referenceTo____is__set>false</referenceTo____is__set>
+      <referenceTo/>
+      <relationshipName____is__set>false</relationshipName____is__set>
+      <relationshipOrder____is__set>false</relationshipOrder____is__set>
+      <relationshipOrder>0</relationshipOrder>
+      <restrictedDelete____is__set>false</restrictedDelete____is__set>
+      <restrictedDelete>false</restrictedDelete>
+      <restrictedPicklist____is__set>true</restrictedPicklist____is__set>
+      <restrictedPicklist>false</restrictedPicklist>
+      <scale____is__set>true</scale____is__set>
+      <scale>0</scale>
+      <searchPrefilterable____is__set>true</searchPrefilterable____is__set>
+      <searchPrefilterable>false</searchPrefilterable>
+      <soapType____is__set>true</soapType____is__set>
+      <soapType>string</soapType>
+      <sortable____is__set>true</sortable____is__set>
+      <sortable>true</sortable>
+      <type____is__set>true</type____is__set>
+      <type>string</type>
+      <unique____is__set>true</unique____is__set>
+      <unique>false</unique>
+      <updateable____is__set>true</updateable____is__set>
+      <updateable>false</updateable>
+      <writeRequiresMasterRead____is__set>false</writeRequiresMasterRead____is__set>
+      <writeRequiresMasterRead>false</writeRequiresMasterRead>
+    </com.sforce.soap.partner.Field>
+    <com.sforce.soap.partner.Field>
+      <aggregatable____is__set>true</aggregatable____is__set>
+      <aggregatable>true</aggregatable>
+      <aiPredictionField____is__set>true</aiPredictionField____is__set>
+      <aiPredictionField>false</aiPredictionField>
+      <autoNumber____is__set>true</autoNumber____is__set>
+      <autoNumber>false</autoNumber>
+      <byteLength____is__set>true</byteLength____is__set>
       <byteLength>12</byteLength>
       <calculated____is__set>true</calculated____is__set>
       <calculated>false</calculated>
@@ -49463,6 +49671,112 @@ IF(MONTH(TODAY())==12,1,MONTH(TODAY()) + 1),
       <maskType____is__set>false</maskType____is__set>
       <name____is__set>true</name____is__set>
       <name>Max_Velocity__c</name>
+      <nameField____is__set>true</nameField____is__set>
+      <nameField>false</nameField>
+      <namePointing____is__set>true</namePointing____is__set>
+      <namePointing>false</namePointing>
+      <nillable____is__set>true</nillable____is__set>
+      <nillable>true</nillable>
+      <permissionable____is__set>true</permissionable____is__set>
+      <permissionable>true</permissionable>
+      <picklistValues____is__set>false</picklistValues____is__set>
+      <picklistValues/>
+      <polymorphicForeignKey____is__set>true</polymorphicForeignKey____is__set>
+      <polymorphicForeignKey>false</polymorphicForeignKey>
+      <precision____is__set>true</precision____is__set>
+      <precision>0</precision>
+      <queryByDistance____is__set>true</queryByDistance____is__set>
+      <queryByDistance>false</queryByDistance>
+      <referenceTargetField____is__set>false</referenceTargetField____is__set>
+      <referenceTo____is__set>false</referenceTo____is__set>
+      <referenceTo/>
+      <relationshipName____is__set>false</relationshipName____is__set>
+      <relationshipOrder____is__set>false</relationshipOrder____is__set>
+      <relationshipOrder>0</relationshipOrder>
+      <restrictedDelete____is__set>false</restrictedDelete____is__set>
+      <restrictedDelete>false</restrictedDelete>
+      <restrictedPicklist____is__set>true</restrictedPicklist____is__set>
+      <restrictedPicklist>false</restrictedPicklist>
+      <scale____is__set>true</scale____is__set>
+      <scale>0</scale>
+      <searchPrefilterable____is__set>true</searchPrefilterable____is__set>
+      <searchPrefilterable>false</searchPrefilterable>
+      <soapType____is__set>true</soapType____is__set>
+      <soapType>string</soapType>
+      <sortable____is__set>true</sortable____is__set>
+      <sortable>true</sortable>
+      <type____is__set>true</type____is__set>
+      <type>string</type>
+      <unique____is__set>true</unique____is__set>
+      <unique>false</unique>
+      <updateable____is__set>true</updateable____is__set>
+      <updateable>true</updateable>
+      <writeRequiresMasterRead____is__set>false</writeRequiresMasterRead____is__set>
+      <writeRequiresMasterRead>false</writeRequiresMasterRead>
+    </com.sforce.soap.partner.Field>
+    <com.sforce.soap.partner.Field>
+      <aggregatable____is__set>true</aggregatable____is__set>
+      <aggregatable>true</aggregatable>
+      <aiPredictionField____is__set>true</aiPredictionField____is__set>
+      <aiPredictionField>false</aiPredictionField>
+      <autoNumber____is__set>true</autoNumber____is__set>
+      <autoNumber>false</autoNumber>
+      <byteLength____is__set>true</byteLength____is__set>
+      <byteLength>765</byteLength>
+      <calculated____is__set>true</calculated____is__set>
+      <calculated>false</calculated>
+      <calculatedFormula____is__set>false</calculatedFormula____is__set>
+      <cascadeDelete____is__set>false</cascadeDelete____is__set>
+      <cascadeDelete>false</cascadeDelete>
+      <caseSensitive____is__set>true</caseSensitive____is__set>
+      <caseSensitive>false</caseSensitive>
+      <compoundFieldName____is__set>false</compoundFieldName____is__set>
+      <controllerName____is__set>false</controllerName____is__set>
+      <createable____is__set>true</createable____is__set>
+      <createable>true</createable>
+      <custom____is__set>true</custom____is__set>
+      <custom>true</custom>
+      <dataTranslationEnabled____is__set>false</dataTranslationEnabled____is__set>
+      <dataTranslationEnabled>false</dataTranslationEnabled>
+      <defaultValue____is__set>false</defaultValue____is__set>
+      <defaultValueFormula____is__set>false</defaultValueFormula____is__set>
+      <defaultedOnCreate____is__set>true</defaultedOnCreate____is__set>
+      <defaultedOnCreate>false</defaultedOnCreate>
+      <dependentPicklist____is__set>false</dependentPicklist____is__set>
+      <dependentPicklist>false</dependentPicklist>
+      <deprecatedAndHidden____is__set>true</deprecatedAndHidden____is__set>
+      <deprecatedAndHidden>false</deprecatedAndHidden>
+      <digits____is__set>true</digits____is__set>
+      <digits>0</digits>
+      <displayLocationInDecimal____is__set>false</displayLocationInDecimal____is__set>
+      <displayLocationInDecimal>false</displayLocationInDecimal>
+      <encrypted____is__set>false</encrypted____is__set>
+      <encrypted>false</encrypted>
+      <externalId____is__set>false</externalId____is__set>
+      <externalId>false</externalId>
+      <extraTypeInfo____is__set>false</extraTypeInfo____is__set>
+      <filterable____is__set>true</filterable____is__set>
+      <filterable>true</filterable>
+      <filteredLookupInfo____is__set>false</filteredLookupInfo____is__set>
+      <formulaTreatNullNumberAsZero____is__set>false</formulaTreatNullNumberAsZero____is__set>
+      <formulaTreatNullNumberAsZero>false</formulaTreatNullNumberAsZero>
+      <groupable____is__set>true</groupable____is__set>
+      <groupable>true</groupable>
+      <highScaleNumber____is__set>false</highScaleNumber____is__set>
+      <highScaleNumber>false</highScaleNumber>
+      <htmlFormatted____is__set>false</htmlFormatted____is__set>
+      <htmlFormatted>false</htmlFormatted>
+      <idLookup____is__set>true</idLookup____is__set>
+      <idLookup>false</idLookup>
+      <inlineHelpText____is__set>false</inlineHelpText____is__set>
+      <label____is__set>true</label____is__set>
+      <label>Customer Subscription Terminal Class</label>
+      <length____is__set>true</length____is__set>
+      <length>255</length>
+      <mask____is__set>false</mask____is__set>
+      <maskType____is__set>false</maskType____is__set>
+      <name____is__set>true</name____is__set>
+      <name>Customer_Subscription_Terminal_Class__c</name>
       <nameField____is__set>true</nameField____is__set>
       <nameField>false</nameField>
       <namePointing____is__set>true</namePointing____is__set>

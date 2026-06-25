@@ -1,0 +1,14 @@
+<list>
+  <list>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>id</fieldType>
+      <name>Id</name>
+      <value class="string">0017a00001W7VaMAAV</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>string</fieldType>
+      <name>Name</name>
+      <value class="string">Eutelsat SA</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+  </list>
+</list>

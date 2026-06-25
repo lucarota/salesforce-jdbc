@@ -1,511 +1,641 @@
 <list>
   <list>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>id</fieldType>
       <name>Id</name>
-      <value class="string">8019M00001S8QpVQAV</value>
+      <value class="string">8019M00001dTzh7QAC</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>string</fieldType>
       <name>Name</name>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>picklist</fieldType>
       <name>Status</name>
       <value class="string">Approved</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>datetime</fieldType>
       <name>CreatedDate</name>
-      <value class="string">2026-02-18T10:48:33.000Z</value>
+      <value class="string">2026-05-25T04:08:09.000Z</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>string</fieldType>
       <name>OrderNumber</name>
-      <value class="string">00014529</value>
+      <value class="string">00014633</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>string</fieldType>
       <name>Order_Id__c</name>
-      <value class="string">bf88c6a3</value>
+      <value class="string">6a373701</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>string</fieldType>
       <name>Activation_Key__c</name>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>picklist</fieldType>
       <name>Zuora_Quote__r.zqu__Status__c</name>
-      <value class="string">Sent to Z-Billing</value>
+      <value class="string">on Hold</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>string</fieldType>
       <name>Zuora_Quote__r.Customer_Subscription__r.OSS_Technical_Account_ID__c</name>
-      <value class="string">154699</value>
+      <value class="string">154733</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>string</fieldType>
       <name>Zuora_Quote__r.Customer_Subscription__r.Name</name>
-      <value class="string">A-S00008812</value>
+      <value class="string">A-S00008842</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>reference</fieldType>
       <name>Zuora_Quote__c</name>
-      <value class="string">a1c9M00000IEThJQAX</value>
+      <value class="string">a1c9M00000LDF6nQAH</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>reference</fieldType>
       <name>RecordTypeId</name>
       <value class="string">0122o000000NxGPAA0</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>picklist</fieldType>
       <name>Terminal_Class__c</name>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
   </list>
   <list>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>id</fieldType>
       <name>Id</name>
-      <value class="string">8019M00001S7aZXQAZ</value>
+      <value class="string">8019M00001dUxobQAC</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>string</fieldType>
       <name>Name</name>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>picklist</fieldType>
       <name>Status</name>
       <value class="string">Approved</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>datetime</fieldType>
       <name>CreatedDate</name>
-      <value class="string">2026-02-18T11:00:01.000Z</value>
+      <value class="string">2026-05-25T04:09:17.000Z</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>string</fieldType>
       <name>OrderNumber</name>
-      <value class="string">00014531</value>
+      <value class="string">00014634</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>string</fieldType>
       <name>Order_Id__c</name>
-      <value class="string">58a47eb0</value>
+      <value class="string">701c420b</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>string</fieldType>
       <name>Activation_Key__c</name>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>picklist</fieldType>
       <name>Zuora_Quote__r.zqu__Status__c</name>
-      <value class="string">Sent to Z-Billing</value>
+      <value class="string">on Hold</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>string</fieldType>
       <name>Zuora_Quote__r.Customer_Subscription__r.OSS_Technical_Account_ID__c</name>
-      <value class="string">154700</value>
+      <value class="string">154733</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>string</fieldType>
       <name>Zuora_Quote__r.Customer_Subscription__r.Name</name>
-      <value class="string">A-S00008813</value>
+      <value class="string">A-S00008842</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>reference</fieldType>
       <name>Zuora_Quote__c</name>
-      <value class="string">a1c9M00000IEULdQAP</value>
+      <value class="string">a1c9M00000LDF8PQAX</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>reference</fieldType>
       <name>RecordTypeId</name>
       <value class="string">0122o000000NxGPAA0</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>picklist</fieldType>
       <name>Terminal_Class__c</name>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
   </list>
   <list>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>id</fieldType>
       <name>Id</name>
-      <value class="string">8019M00001S7YJPQA3</value>
+      <value class="string">8019M00001dWIBGQA4</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>string</fieldType>
       <name>Name</name>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>picklist</fieldType>
       <name>Status</name>
       <value class="string">Approved</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>datetime</fieldType>
       <name>CreatedDate</name>
-      <value class="string">2026-02-18T11:12:50.000Z</value>
+      <value class="string">2026-05-25T13:03:43.000Z</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>string</fieldType>
       <name>OrderNumber</name>
-      <value class="string">00014533</value>
+      <value class="string">00014638</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>string</fieldType>
       <name>Order_Id__c</name>
-      <value class="string">6f00072c</value>
+      <value class="string">83887ba0</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>string</fieldType>
       <name>Activation_Key__c</name>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>picklist</fieldType>
       <name>Zuora_Quote__r.zqu__Status__c</name>
-      <value class="string">Sent to Z-Billing</value>
+      <value class="string">on Hold</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>string</fieldType>
       <name>Zuora_Quote__r.Customer_Subscription__r.OSS_Technical_Account_ID__c</name>
-      <value class="string">154701</value>
+      <value class="string">154733</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>string</fieldType>
       <name>Zuora_Quote__r.Customer_Subscription__r.Name</name>
-      <value class="string">A-S00008814</value>
+      <value class="string">A-S00008842</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>reference</fieldType>
       <name>Zuora_Quote__c</name>
-      <value class="string">a1c9M00000IEVeHQAX</value>
+      <value class="string">a1c9M00000LDckvQAD</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>reference</fieldType>
       <name>RecordTypeId</name>
       <value class="string">0122o000000NxGPAA0</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>picklist</fieldType>
       <name>Terminal_Class__c</name>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
   </list>
   <list>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>id</fieldType>
       <name>Id</name>
-      <value class="string">8019M00001S7LgwQAF</value>
+      <value class="string">8019M00001dVJozQAG</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>string</fieldType>
       <name>Name</name>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>picklist</fieldType>
       <name>Status</name>
       <value class="string">Approved</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>datetime</fieldType>
       <name>CreatedDate</name>
-      <value class="string">2026-02-18T11:20:43.000Z</value>
+      <value class="string">2026-05-25T04:16:40.000Z</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>string</fieldType>
       <name>OrderNumber</name>
-      <value class="string">00014535</value>
+      <value class="string">00014635</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>string</fieldType>
       <name>Order_Id__c</name>
-      <value class="string">02995800</value>
+      <value class="string">3a7cd46c</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>string</fieldType>
       <name>Activation_Key__c</name>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>picklist</fieldType>
       <name>Zuora_Quote__r.zqu__Status__c</name>
-      <value class="string">Sent to Z-Billing</value>
+      <value class="string">on Hold</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>string</fieldType>
       <name>Zuora_Quote__r.Customer_Subscription__r.OSS_Technical_Account_ID__c</name>
-      <value class="string">154702</value>
+      <value class="string">154728</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>string</fieldType>
       <name>Zuora_Quote__r.Customer_Subscription__r.Name</name>
-      <value class="string">A-S00008815</value>
+      <value class="string">A-S00008838</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>reference</fieldType>
       <name>Zuora_Quote__c</name>
-      <value class="string">a1c9M00000IEVuPQAX</value>
+      <value class="string">a1c9M00000LDGE9QAP</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>reference</fieldType>
       <name>RecordTypeId</name>
       <value class="string">0122o000000NxGPAA0</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>picklist</fieldType>
       <name>Terminal_Class__c</name>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
   </list>
   <list>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>id</fieldType>
       <name>Id</name>
-      <value class="string">8019M00001S8MKfQAN</value>
+      <value class="string">8019M00001dX3ulQAC</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>string</fieldType>
       <name>Name</name>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>picklist</fieldType>
       <name>Status</name>
       <value class="string">Approved</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>datetime</fieldType>
       <name>CreatedDate</name>
-      <value class="string">2026-02-18T11:30:03.000Z</value>
+      <value class="string">2026-05-25T13:11:45.000Z</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>string</fieldType>
       <name>OrderNumber</name>
-      <value class="string">00014537</value>
+      <value class="string">00014639</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>string</fieldType>
       <name>Order_Id__c</name>
-      <value class="string">9f598110</value>
+      <value class="string">0ce24863</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>string</fieldType>
       <name>Activation_Key__c</name>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>picklist</fieldType>
       <name>Zuora_Quote__r.zqu__Status__c</name>
       <value class="string">Sent to Z-Billing</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>string</fieldType>
       <name>Zuora_Quote__r.Customer_Subscription__r.OSS_Technical_Account_ID__c</name>
-      <value class="string">154703</value>
+      <value class="string">154732</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>string</fieldType>
       <name>Zuora_Quote__r.Customer_Subscription__r.Name</name>
-      <value class="string">A-S00008816</value>
+      <value class="string">A-S00008841</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>reference</fieldType>
       <name>Zuora_Quote__c</name>
-      <value class="string">a1c9M00000IEWSHQA5</value>
+      <value class="string">a1c9M00000LDeDFQA1</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>reference</fieldType>
       <name>RecordTypeId</name>
       <value class="string">0122o000000NxGPAA0</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>picklist</fieldType>
       <name>Terminal_Class__c</name>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
   </list>
   <list>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>id</fieldType>
       <name>Id</name>
-      <value class="string">8019M00001S7oNJQAZ</value>
+      <value class="string">8019M00001dWumbQAC</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>string</fieldType>
       <name>Name</name>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>picklist</fieldType>
       <name>Status</name>
       <value class="string">Approved</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>datetime</fieldType>
       <name>CreatedDate</name>
-      <value class="string">2026-02-18T11:34:47.000Z</value>
+      <value class="string">2026-05-25T12:44:26.000Z</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>string</fieldType>
       <name>OrderNumber</name>
-      <value class="string">00014539</value>
+      <value class="string">00014637</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>string</fieldType>
       <name>Order_Id__c</name>
-      <value class="string">ff07c5e5</value>
+      <value class="string">6d4c310f</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>string</fieldType>
       <name>Activation_Key__c</name>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>picklist</fieldType>
       <name>Zuora_Quote__r.zqu__Status__c</name>
       <value class="string">Sent to Z-Billing</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>string</fieldType>
       <name>Zuora_Quote__r.Customer_Subscription__r.OSS_Technical_Account_ID__c</name>
-      <value class="string">154704</value>
+      <value class="string">154731</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>string</fieldType>
       <name>Zuora_Quote__r.Customer_Subscription__r.Name</name>
-      <value class="string">A-S00008817</value>
+      <value class="string">A-S00008840</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>reference</fieldType>
       <name>Zuora_Quote__c</name>
-      <value class="string">a1c9M00000IEHi6QAH</value>
+      <value class="string">a1c9M00000LDSSRQA5</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>reference</fieldType>
       <name>RecordTypeId</name>
       <value class="string">0122o000000NxGPAA0</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>picklist</fieldType>
       <name>Terminal_Class__c</name>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
   </list>
   <list>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>id</fieldType>
       <name>Id</name>
-      <value class="string">8019M00001S8OG0QAN</value>
+      <value class="string">8019M00001eDvk7QAC</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>string</fieldType>
       <name>Name</name>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>picklist</fieldType>
       <name>Status</name>
       <value class="string">Approved</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>datetime</fieldType>
       <name>CreatedDate</name>
-      <value class="string">2026-02-18T11:53:47.000Z</value>
+      <value class="string">2026-06-03T08:02:05.000Z</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>string</fieldType>
       <name>OrderNumber</name>
-      <value class="string">00014541</value>
+      <value class="string">00014642</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>string</fieldType>
       <name>Order_Id__c</name>
-      <value class="string">b6cdd1a3</value>
+      <value class="string">1d6b61f1</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>string</fieldType>
       <name>Activation_Key__c</name>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>picklist</fieldType>
       <name>Zuora_Quote__r.zqu__Status__c</name>
       <value class="string">Sent to Z-Billing</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>string</fieldType>
       <name>Zuora_Quote__r.Customer_Subscription__r.OSS_Technical_Account_ID__c</name>
-      <value class="string">154705</value>
+      <value class="string">154731</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>string</fieldType>
       <name>Zuora_Quote__r.Customer_Subscription__r.Name</name>
-      <value class="string">A-S00008818</value>
+      <value class="string">A-S00008840</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>reference</fieldType>
       <name>Zuora_Quote__c</name>
-      <value class="string">a1c9M00000IEXg5QAH</value>
+      <value class="string">a1c9M00000LOu1lQAD</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>reference</fieldType>
       <name>RecordTypeId</name>
       <value class="string">0122o000000NxGPAA0</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>picklist</fieldType>
       <name>Terminal_Class__c</name>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
   </list>
   <list>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>id</fieldType>
       <name>Id</name>
-      <value class="string">8019M00001S8PKBQA3</value>
+      <value class="string">8019M00001eE1JMQA0</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>string</fieldType>
       <name>Name</name>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>picklist</fieldType>
       <name>Status</name>
       <value class="string">Approved</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>datetime</fieldType>
       <name>CreatedDate</name>
-      <value class="string">2026-02-18T12:07:42.000Z</value>
+      <value class="string">2026-06-03T07:59:04.000Z</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>string</fieldType>
       <name>OrderNumber</name>
-      <value class="string">00014543</value>
+      <value class="string">00014641</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>string</fieldType>
       <name>Order_Id__c</name>
-      <value class="string">70f09856</value>
+      <value class="string">e7dd77c2</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>string</fieldType>
       <name>Activation_Key__c</name>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>picklist</fieldType>
       <name>Zuora_Quote__r.zqu__Status__c</name>
       <value class="string">Sent to Z-Billing</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>string</fieldType>
       <name>Zuora_Quote__r.Customer_Subscription__r.OSS_Technical_Account_ID__c</name>
-      <value class="string">154706</value>
+      <value class="string">154731</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>string</fieldType>
       <name>Zuora_Quote__r.Customer_Subscription__r.Name</name>
-      <value class="string">A-S00008819</value>
+      <value class="string">A-S00008840</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>reference</fieldType>
       <name>Zuora_Quote__c</name>
-      <value class="string">a1c9M00000IEYInQAP</value>
+      <value class="string">a1c9M00000LOtqTQAT</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>reference</fieldType>
       <name>RecordTypeId</name>
       <value class="string">0122o000000NxGPAA0</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>picklist</fieldType>
       <name>Terminal_Class__c</name>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
   </list>
   <list>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>id</fieldType>
       <name>Id</name>
-      <value class="string">8019M00001S8FhiQAF</value>
+      <value class="string">8019M00001eEBs5QAG</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>string</fieldType>
       <name>Name</name>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>picklist</fieldType>
       <name>Status</name>
       <value class="string">Approved</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>datetime</fieldType>
       <name>CreatedDate</name>
-      <value class="string">2026-02-18T13:13:02.000Z</value>
+      <value class="string">2026-06-03T07:51:29.000Z</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>string</fieldType>
       <name>OrderNumber</name>
-      <value class="string">00014545</value>
+      <value class="string">00014640</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>string</fieldType>
       <name>Order_Id__c</name>
-      <value class="string">e44ae3fa</value>
+      <value class="string">6a8862db</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>string</fieldType>
       <name>Activation_Key__c</name>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>picklist</fieldType>
       <name>Zuora_Quote__r.zqu__Status__c</name>
       <value class="string">Sent to Z-Billing</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>string</fieldType>
       <name>Zuora_Quote__r.Customer_Subscription__r.OSS_Technical_Account_ID__c</name>
-      <value class="string">154707</value>
+      <value class="string">154731</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>string</fieldType>
       <name>Zuora_Quote__r.Customer_Subscription__r.Name</name>
-      <value class="string">A-S00008820</value>
+      <value class="string">A-S00008840</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>reference</fieldType>
       <name>Zuora_Quote__c</name>
-      <value class="string">a1c9M00000IEg8HQAT</value>
+      <value class="string">a1c9M00000LOsmLQAT</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>reference</fieldType>
       <name>RecordTypeId</name>
       <value class="string">0122o000000NxGPAA0</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>picklist</fieldType>
       <name>Terminal_Class__c</name>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
   </list>
   <list>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>id</fieldType>
       <name>Id</name>
-      <value class="string">8019M00001SGZcjQAH</value>
+      <value class="string">8019M00001eEFR3QAO</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>string</fieldType>
       <name>Name</name>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>picklist</fieldType>
       <name>Status</name>
       <value class="string">Approved</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>datetime</fieldType>
       <name>CreatedDate</name>
-      <value class="string">2026-02-19T14:47:38.000Z</value>
+      <value class="string">2026-06-03T08:07:53.000Z</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>string</fieldType>
       <name>OrderNumber</name>
-      <value class="string">00014547</value>
+      <value class="string">00014643</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>string</fieldType>
       <name>Order_Id__c</name>
-      <value class="string">4f5cbf61</value>
+      <value class="string">fdc12fe1</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>string</fieldType>
       <name>Activation_Key__c</name>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>picklist</fieldType>
       <name>Zuora_Quote__r.zqu__Status__c</name>
       <value class="string">Sent to Z-Billing</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>string</fieldType>
       <name>Zuora_Quote__r.Customer_Subscription__r.OSS_Technical_Account_ID__c</name>
-      <value class="string">154710</value>
+      <value class="string">154731</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>string</fieldType>
       <name>Zuora_Quote__r.Customer_Subscription__r.Name</name>
-      <value class="string">A-S00008821</value>
+      <value class="string">A-S00008840</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>reference</fieldType>
       <name>Zuora_Quote__c</name>
-      <value class="string">a1c9M00000IGVjpQAH</value>
+      <value class="string">a1c9M00000LOu6bQAD</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>reference</fieldType>
       <name>RecordTypeId</name>
       <value class="string">0122o000000NxGPAA0</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>picklist</fieldType>
       <name>Terminal_Class__c</name>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
   </list>

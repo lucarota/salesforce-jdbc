@@ -1,86 +1,106 @@
 <list>
   <list>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>id</fieldType>
       <name>Id</name>
       <value class="string">0019M00000Z9akrQAB</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>string</fieldType>
       <name>Name</name>
       <value class="string">John</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>phone</fieldType>
       <name>Phone</name>
       <value class="string">+41 0011223344</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>phone</fieldType>
       <name>Fax</name>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
   </list>
   <list>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>id</fieldType>
       <name>Id</name>
       <value class="string">0019M00000ZAAIBQA5</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>string</fieldType>
       <name>Name</name>
       <value class="string">John</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>phone</fieldType>
       <name>Phone</name>
       <value class="string">+41 0011223344</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>phone</fieldType>
       <name>Fax</name>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
   </list>
   <list>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>id</fieldType>
       <name>Id</name>
       <value class="string">0019M00000ZAAICQA5</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>string</fieldType>
       <name>Name</name>
       <value class="string">John</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>phone</fieldType>
       <name>Phone</name>
       <value class="string">+41 0011223344</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>phone</fieldType>
       <name>Fax</name>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
   </list>
   <list>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>id</fieldType>
       <name>Id</name>
       <value class="string">0019M00000ZACAQQA5</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>string</fieldType>
       <name>Name</name>
       <value class="string">John</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>phone</fieldType>
       <name>Phone</name>
       <value class="string">+41 0011223344</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>phone</fieldType>
       <name>Fax</name>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
   </list>
   <list>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>id</fieldType>
       <name>Id</name>
       <value class="string">0019M00000ZAK31QAH</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>string</fieldType>
       <name>Name</name>
       <value class="string">John</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>phone</fieldType>
       <name>Phone</name>
       <value class="string">+41 0011223344</value>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
     <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>phone</fieldType>
       <name>Fax</name>
     </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
   </list>
