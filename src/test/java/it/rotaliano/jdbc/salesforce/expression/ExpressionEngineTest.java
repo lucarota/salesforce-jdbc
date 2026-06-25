@@ -227,4 +227,17 @@ public class ExpressionEngineTest {
         // NOT null -> null
         assertEquals(null, new NotExpression(nullExpr).evaluate(ctx));
     }
+
+    @Test
+    public void testAstBuilder() throws Exception {
+        net.sf.jsqlparser.expression.Expression jsqlExpr = net.sf.jsqlparser.parser.CCJSqlParserUtil.parseExpression("UPPER(TRIM(Name)) = 'ACME'");
+        Expression customExpr = AstBuilder.build(jsqlExpr);
+        assertNotNull(customExpr);
+
+        RowContext ctx = col -> {
+            if ("Name".equals(col)) return "  acme  ";
+            return null;
+        };
+        assertEquals(true, customExpr.evaluate(ctx));
+    }
 }
