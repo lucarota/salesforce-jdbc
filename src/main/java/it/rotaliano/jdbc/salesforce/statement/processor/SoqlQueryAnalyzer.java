@@ -384,7 +384,7 @@ public class SoqlQueryAnalyzer {
         select.setSelectItems(newSelectItems);
     }
 
-    private void findColumns(Expression expr, List<Column> result) {
+    public static void findColumns(Expression expr, List<Column> result) {
         if (expr == null) {
             return;
         }
@@ -417,6 +417,17 @@ public class SoqlQueryAnalyzer {
         } else if (expr instanceof WhenClause whenClause) {
             findColumns(whenClause.getWhenExpression(), result);
             findColumns(whenClause.getThenExpression(), result);
+        } else if (expr instanceof IsNullExpression isNull) {
+            findColumns(isNull.getLeftExpression(), result);
+        } else if (expr instanceof InExpression in) {
+            findColumns(in.getLeftExpression(), result);
+            findColumns(in.getRightExpression(), result);
+        } else if (expr instanceof Between between) {
+            findColumns(between.getLeftExpression(), result);
+            findColumns(between.getBetweenExpressionStart(), result);
+            findColumns(between.getBetweenExpressionEnd(), result);
+        } else if (expr instanceof NotExpression not) {
+            findColumns(not.getExpression(), result);
         }
     }
 
@@ -458,6 +469,17 @@ public class SoqlQueryAnalyzer {
         }
         if (expr instanceof net.sf.jsqlparser.expression.WhenClause whenClause) {
             return containsEmulatedFunctions(whenClause.getWhenExpression()) || containsEmulatedFunctions(whenClause.getThenExpression());
+        }
+        if (expr instanceof IsNullExpression isNull) {
+            return containsEmulatedFunctions(isNull.getLeftExpression());
+        }
+        if (expr instanceof InExpression in) {
+            return containsEmulatedFunctions(in.getLeftExpression()) || containsEmulatedFunctions(in.getRightExpression());
+        }
+        if (expr instanceof Between between) {
+            return containsEmulatedFunctions(between.getLeftExpression())
+                || containsEmulatedFunctions(between.getBetweenExpressionStart())
+                || containsEmulatedFunctions(between.getBetweenExpressionEnd());
         }
         return false;
     }

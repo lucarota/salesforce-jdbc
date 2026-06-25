@@ -622,4 +622,85 @@ public class SoqlQueryAnalyzerTest {
         };
         assertEquals(false, clientSideExpr.evaluate(falseContext));
     }
+
+    @Test
+    public void testUpperNameIsNullInWhere() {
+        String soql = "SELECT Id FROM Account WHERE UPPER(Name) IS NULL";
+        final QueryAnalyzer queryAnalyzer = new QueryAnalyzer(soql, null, partnerService);
+        SoqlQueryAnalyzer analyzer = new SoqlQueryAnalyzer(queryAnalyzer);
+
+        String result = analyzer.getSoqlQueryString();
+        assertFalse(result.toUpperCase().contains("WHERE"), "Query should clear WHERE clause: " + result);
+        assertTrue(result.contains("Name"), "Query should add Name to SELECT list: " + result);
+
+        it.rotaliano.jdbc.salesforce.expression.Expression clientSideExpr = analyzer.getClientSideWhereExpression();
+
+        it.rotaliano.jdbc.salesforce.expression.RowContext nullContext = columnName -> {
+            if ("Name".equalsIgnoreCase(columnName)) return null;
+            return "dummy";
+        };
+        assertEquals(true, clientSideExpr.evaluate(nullContext));
+
+        it.rotaliano.jdbc.salesforce.expression.RowContext nonNullContext = columnName -> {
+            if ("Name".equalsIgnoreCase(columnName)) return "ACME";
+            return null;
+        };
+        assertEquals(false, clientSideExpr.evaluate(nonNullContext));
+    }
+
+    @Test
+    public void testNotTrimNameEqualsAcmeInWhere() {
+        String soql = "SELECT Id FROM Account WHERE NOT (TRIM(Name) = 'ACME')";
+        final QueryAnalyzer queryAnalyzer = new QueryAnalyzer(soql, null, partnerService);
+        SoqlQueryAnalyzer analyzer = new SoqlQueryAnalyzer(queryAnalyzer);
+
+        String result = analyzer.getSoqlQueryString();
+        assertFalse(result.toUpperCase().contains("WHERE"), "Query should clear WHERE clause: " + result);
+        assertTrue(result.contains("Name"), "Query should add Name to SELECT list: " + result);
+
+        it.rotaliano.jdbc.salesforce.expression.Expression clientSideExpr = analyzer.getClientSideWhereExpression();
+
+        it.rotaliano.jdbc.salesforce.expression.RowContext acmeContext = columnName -> {
+            if ("Name".equalsIgnoreCase(columnName)) return "  ACME  ";
+            return null;
+        };
+        assertEquals(false, clientSideExpr.evaluate(acmeContext)); // NOT(true) -> false
+
+        it.rotaliano.jdbc.salesforce.expression.RowContext otherContext = columnName -> {
+            if ("Name".equalsIgnoreCase(columnName)) return "OTHER";
+            return null;
+        };
+        assertEquals(true, clientSideExpr.evaluate(otherContext)); // NOT(false) -> true
+    }
+
+    @Test
+    public void testReplacePhoneInWhere() {
+        String soql = "SELECT Id FROM Account WHERE REPLACE(Phone, '-', '') IN ('123', '456')";
+        final QueryAnalyzer queryAnalyzer = new QueryAnalyzer(soql, null, partnerService);
+        SoqlQueryAnalyzer analyzer = new SoqlQueryAnalyzer(queryAnalyzer);
+
+        String result = analyzer.getSoqlQueryString();
+        assertFalse(result.toUpperCase().contains("WHERE"), "Query should clear WHERE clause: " + result);
+        assertTrue(result.contains("Phone"), "Query should add Phone to SELECT list: " + result);
+
+        it.rotaliano.jdbc.salesforce.expression.Expression clientSideExpr = analyzer.getClientSideWhereExpression();
+
+        it.rotaliano.jdbc.salesforce.expression.RowContext matchContext1 = columnName -> {
+            if ("Phone".equalsIgnoreCase(columnName)) return "1-2-3";
+            return null;
+        };
+        assertEquals(true, clientSideExpr.evaluate(matchContext1)); // REPLACE("1-2-3", "-", "") -> "123" -> in ('123', '456') -> true
+
+        it.rotaliano.jdbc.salesforce.expression.RowContext matchContext2 = columnName -> {
+            if ("Phone".equalsIgnoreCase(columnName)) return "4-5-6";
+            return null;
+        };
+        assertEquals(true, clientSideExpr.evaluate(matchContext2)); // REPLACE("4-5-6", "-", "") -> "456" -> in ('123', '456') -> true
+
+        it.rotaliano.jdbc.salesforce.expression.RowContext noMatchContext = columnName -> {
+            if ("Phone".equalsIgnoreCase(columnName)) return "7-8-9";
+            return null;
+        };
+        assertEquals(false, clientSideExpr.evaluate(noMatchContext)); // REPLACE("7-8-9", "-", "") -> "789" -> false
+    }
 }

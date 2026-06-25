@@ -152,7 +152,7 @@ public class SelectSpecVisitor implements SelectItemVisitor<Expression> {
             if (functionCallSpec.getParameters() != null) {
                 for (Expression expr : functionCallSpec.getParameters()) {
                     List<Column> cols = new ArrayList<>();
-                    findColumns(expr, cols);
+                    SoqlQueryAnalyzer.findColumns(expr, cols);
                     for (Column column : cols) {
                         String name = column.getColumnName();
                         String colAlias = name;
@@ -199,7 +199,7 @@ public class SelectSpecVisitor implements SelectItemVisitor<Expression> {
         fieldDefinitions.addChild(funcField);
 
         List<Column> cols = new ArrayList<>();
-        findColumns(functionCallSpec, cols);
+        SoqlQueryAnalyzer.findColumns(functionCallSpec, cols);
         for (Column column : cols) {
             String name = column.getColumnName();
             String colAlias = name;
@@ -227,7 +227,7 @@ public class SelectSpecVisitor implements SelectItemVisitor<Expression> {
         fieldDefinitions.addChild(caseField);
 
         List<Column> cols = new ArrayList<>();
-        findColumns(caseExpr, cols);
+        SoqlQueryAnalyzer.findColumns(caseExpr, cols);
         for (Column column : cols) {
             String name = column.getColumnName();
             String colAlias = name;
@@ -246,42 +246,6 @@ public class SelectSpecVisitor implements SelectItemVisitor<Expression> {
             } else {
                 fieldDefinitions.addChild(result);
             }
-        }
-    }
-
-    private void findColumns(Expression expr, List<Column> result) {
-        if (expr == null) {
-            return;
-        }
-        if (expr instanceof Column col) {
-            result.add(col);
-        } else if (expr instanceof BinaryExpression binary) {
-            findColumns(binary.getLeftExpression(), result);
-            findColumns(binary.getRightExpression(), result);
-        } else if (expr instanceof net.sf.jsqlparser.expression.TrimFunction tf) {
-            findColumns(tf.getFromExpression(), result);
-            findColumns(tf.getExpression(), result);
-        } else if (expr instanceof net.sf.jsqlparser.expression.Function func) {
-            if (func.getParameters() != null) {
-                for (Expression param : func.getParameters()) {
-                    findColumns(param, result);
-                }
-            }
-        } else if (expr instanceof ParenthesedExpressionList parenthesis) {
-            for (Object innerExpr : parenthesis) {
-                findColumns((Expression) innerExpr, result);
-            }
-        } else if (expr instanceof CaseExpression caseExpr) {
-            findColumns(caseExpr.getSwitchExpression(), result);
-            if (caseExpr.getWhenClauses() != null) {
-                for (Expression when : caseExpr.getWhenClauses()) {
-                    findColumns(when, result);
-                }
-            }
-            findColumns(caseExpr.getElseExpression(), result);
-        } else if (expr instanceof WhenClause whenClause) {
-            findColumns(whenClause.getWhenExpression(), result);
-            findColumns(whenClause.getThenExpression(), result);
         }
     }
 

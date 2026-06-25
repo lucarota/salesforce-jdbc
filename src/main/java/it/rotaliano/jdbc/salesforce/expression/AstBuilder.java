@@ -6,6 +6,9 @@ import net.sf.jsqlparser.expression.operators.conditional.OrExpression;
 import net.sf.jsqlparser.expression.operators.relational.EqualsTo;
 import net.sf.jsqlparser.expression.operators.relational.NotEqualsTo;
 import net.sf.jsqlparser.expression.operators.relational.ParenthesedExpressionList;
+import net.sf.jsqlparser.expression.operators.relational.IsNullExpression;
+import net.sf.jsqlparser.expression.operators.relational.InExpression;
+import net.sf.jsqlparser.expression.operators.relational.Between;
 import net.sf.jsqlparser.schema.Column;
 import java.util.ArrayList;
 import java.util.List;
@@ -66,6 +69,47 @@ public class AstBuilder {
         }
         if (jsqlExpr instanceof ParenthesedExpressionList parenList && !parenList.isEmpty()) {
             return build((net.sf.jsqlparser.expression.Expression) parenList.get(0));
+        }
+        if (jsqlExpr instanceof IsNullExpression isNull) {
+            Expression left = build(isNull.getLeftExpression());
+            BinaryExpression.Operator op = isNull.isNot() ? BinaryExpression.Operator.NOT_EQUALS : BinaryExpression.Operator.EQUALS;
+            return new BinaryExpression(left, new LiteralExpression(null), op);
+        }
+        if (jsqlExpr instanceof InExpression in) {
+            Expression left = build(in.getLeftExpression());
+            net.sf.jsqlparser.expression.Expression right = in.getRightExpression();
+            if (right instanceof ParenthesedExpressionList parenList) {
+                if (parenList.isEmpty()) {
+                    Expression alwaysFalse = new BinaryExpression(new LiteralExpression(1), new LiteralExpression(2), BinaryExpression.Operator.EQUALS);
+                    return in.isNot() ? new NotExpression(alwaysFalse) : alwaysFalse;
+                }
+                Expression orChain = null;
+                for (Object item : parenList) {
+                    Expression cmp = new BinaryExpression(left, build((net.sf.jsqlparser.expression.Expression) item), BinaryExpression.Operator.EQUALS);
+                    if (orChain == null) {
+                        orChain = cmp;
+                    } else {
+                        orChain = new LogicalExpression(orChain, cmp, LogicalExpression.Operator.OR);
+                    }
+                }
+                if (in.isNot()) {
+                    return new NotExpression(orChain);
+                }
+                return orChain;
+            }
+            throw new UnsupportedOperationException("InExpression right side must be ParenthesedExpressionList: " + right);
+        }
+        if (jsqlExpr instanceof Between between) {
+            Expression left = build(between.getLeftExpression());
+            Expression start = build(between.getBetweenExpressionStart());
+            Expression end = build(between.getBetweenExpressionEnd());
+            Expression ge = new BinaryExpression(left, start, BinaryExpression.Operator.GREATER_THAN_EQUALS);
+            Expression le = new BinaryExpression(left, end, BinaryExpression.Operator.LESS_THAN_EQUALS);
+            Expression andExpr = new LogicalExpression(ge, le, LogicalExpression.Operator.AND);
+            if (between.isNot()) {
+                return new NotExpression(andExpr);
+            }
+            return andExpr;
         }
         throw new UnsupportedOperationException("Expression not supported in emulated engine: " + jsqlExpr);
     }
