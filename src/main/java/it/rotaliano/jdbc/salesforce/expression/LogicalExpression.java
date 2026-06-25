@@ -19,17 +19,29 @@ public class LogicalExpression implements Expression {
     public Object evaluate(RowContext row) {
         Object lVal = left.evaluate(row);
         if (op == Operator.AND) {
-            if (lVal == null || !((Boolean) lVal)) {
+            if (lVal instanceof Boolean && !((Boolean) lVal)) {
                 return false;
             }
             Object rVal = right.evaluate(row);
-            return rVal != null && ((Boolean) rVal);
+            if (rVal instanceof Boolean && !((Boolean) rVal)) {
+                return false;
+            }
+            if (lVal != null && rVal != null) {
+                return ((Boolean) lVal) && ((Boolean) rVal);
+            }
+            return null;
         } else {
-            if (lVal != null && ((Boolean) lVal)) {
+            if (lVal instanceof Boolean && ((Boolean) lVal)) {
                 return true;
             }
             Object rVal = right.evaluate(row);
-            return rVal != null && ((Boolean) rVal);
+            if (rVal instanceof Boolean && ((Boolean) rVal)) {
+                return true;
+            }
+            if (lVal != null && rVal != null) {
+                return ((Boolean) lVal) || ((Boolean) rVal);
+            }
+            return null;
         }
     }
 }

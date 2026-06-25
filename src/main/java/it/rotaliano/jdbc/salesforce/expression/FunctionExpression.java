@@ -52,7 +52,10 @@ public class FunctionExpression implements Expression {
                 if (startIdx >= str.length()) {
                     return "";
                 }
-                int endIdx = Math.min(str.length(), startIdx + length);
+                if (length > str.length() - startIdx) {
+                    length = str.length() - startIdx;
+                }
+                int endIdx = startIdx + length;
                 if (endIdx < startIdx) {
                     return "";
                 }

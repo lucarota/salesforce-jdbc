@@ -22,6 +22,20 @@ public class BinaryExpression implements Expression {
         Object lVal = left.evaluate(row);
         Object rVal = right.evaluate(row);
 
+        if (lVal instanceof Number && rVal instanceof Number) {
+            double d1 = ((Number) lVal).doubleValue();
+            double d2 = ((Number) rVal).doubleValue();
+            int cmp = Double.compare(d1, d2);
+            switch (op) {
+                case EQUALS: return cmp == 0;
+                case NOT_EQUALS: return cmp != 0;
+                case GREATER_THAN: return cmp > 0;
+                case GREATER_THAN_EQUALS: return cmp >= 0;
+                case LESS_THAN: return cmp < 0;
+                case LESS_THAN_EQUALS: return cmp <= 0;
+            }
+        }
+
         switch (op) {
             case EQUALS:
                 return Objects.equals(lVal, rVal);
@@ -32,7 +46,7 @@ public class BinaryExpression implements Expression {
                     return false;
                 }
                 int cmp = lVal.toString().compareTo(rVal.toString());
-                if (lVal instanceof Comparable && rVal.getClass().isInstance(lVal)) {
+                if (lVal instanceof Comparable && lVal.getClass().isInstance(rVal)) {
                     cmp = ((Comparable<Object>) lVal).compareTo(rVal);
                 }
                 switch (op) {

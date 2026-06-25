@@ -127,4 +127,104 @@ public class ExpressionEngineTest {
         Expression notFalse = new NotExpression(falseExpr);
         assertEquals(true, notFalse.evaluate(ctx));
     }
+
+    @Test
+    public void testSubstringTwoArgumentsAndOverflow() {
+        RowContext ctx = col -> null;
+
+        // 2-argument substring: "abcdef" starting at 3 (returns "cdef")
+        Expression sub2Args = new FunctionExpression("SUBSTRING", List.of(
+                new LiteralExpression("abcdef"),
+                new LiteralExpression(3)
+        ));
+        assertEquals("cdef", sub2Args.evaluate(ctx));
+
+        // 2-argument substring: "abcdef" starting at 1 (returns "abcdef")
+        Expression subStart1 = new FunctionExpression("SUBSTRING", List.of(
+                new LiteralExpression("abcdef"),
+                new LiteralExpression(1)
+        ));
+        assertEquals("abcdef", subStart1.evaluate(ctx));
+
+        // 2-argument substring: "abcdef" starting at 7 (beyond length, returns "")
+        Expression subStartOut = new FunctionExpression("SUBSTRING", List.of(
+                new LiteralExpression("abcdef"),
+                new LiteralExpression(7)
+        ));
+        assertEquals("", subStartOut.evaluate(ctx));
+
+        // Test with explicit Integer.MAX_VALUE length to ensure no overflow
+        Expression subExplicitMax = new FunctionExpression("SUBSTRING", List.of(
+                new LiteralExpression("abcdef"),
+                new LiteralExpression(3),
+                new LiteralExpression(Integer.MAX_VALUE)
+        ));
+        assertEquals("cdef", subExplicitMax.evaluate(ctx));
+    }
+
+    @Test
+    public void testMixedTypeNumericComparisons() {
+        RowContext ctx = col -> null;
+
+        // Integer 30 and Double 30.0
+        Expression eq = new BinaryExpression(new LiteralExpression(30), new LiteralExpression(30.0), BinaryExpression.Operator.EQUALS);
+        assertEquals(true, eq.evaluate(ctx));
+
+        Expression ne = new BinaryExpression(new LiteralExpression(30), new LiteralExpression(30.0), BinaryExpression.Operator.NOT_EQUALS);
+        assertEquals(false, ne.evaluate(ctx));
+
+        // Integer 30 and Double 25.5
+        Expression gt = new BinaryExpression(new LiteralExpression(30), new LiteralExpression(25.5), BinaryExpression.Operator.GREATER_THAN);
+        assertEquals(true, gt.evaluate(ctx));
+
+        Expression lt = new BinaryExpression(new LiteralExpression(25.5), new LiteralExpression(30), BinaryExpression.Operator.LESS_THAN);
+        assertEquals(true, lt.evaluate(ctx));
+
+        // Long 10L and Float 10.0f
+        Expression eqLongFloat = new BinaryExpression(new LiteralExpression(10L), new LiteralExpression(10.0f), BinaryExpression.Operator.EQUALS);
+        assertEquals(true, eqLongFloat.evaluate(ctx));
+
+        Expression gteLongFloat = new BinaryExpression(new LiteralExpression(10L), new LiteralExpression(10.0f), BinaryExpression.Operator.GREATER_THAN_EQUALS);
+        assertEquals(true, gteLongFloat.evaluate(ctx));
+
+        Expression lteLongFloat = new BinaryExpression(new LiteralExpression(10L), new LiteralExpression(10.0f), BinaryExpression.Operator.LESS_THAN_EQUALS);
+        assertEquals(true, lteLongFloat.evaluate(ctx));
+    }
+
+    @Test
+    public void testThreeValuedLogic() {
+        RowContext ctx = col -> null;
+
+        Expression trueExpr = new LiteralExpression(true);
+        Expression falseExpr = new LiteralExpression(false);
+        Expression nullExpr = new LiteralExpression(null);
+
+        // SQL Three-Valued Logic for AND:
+        // true AND null -> null
+        assertEquals(null, new LogicalExpression(trueExpr, nullExpr, LogicalExpression.Operator.AND).evaluate(ctx));
+        // null AND true -> null
+        assertEquals(null, new LogicalExpression(nullExpr, trueExpr, LogicalExpression.Operator.AND).evaluate(ctx));
+        // false AND null -> false
+        assertEquals(false, new LogicalExpression(falseExpr, nullExpr, LogicalExpression.Operator.AND).evaluate(ctx));
+        // null AND false -> false
+        assertEquals(false, new LogicalExpression(nullExpr, falseExpr, LogicalExpression.Operator.AND).evaluate(ctx));
+        // null AND null -> null
+        assertEquals(null, new LogicalExpression(nullExpr, nullExpr, LogicalExpression.Operator.AND).evaluate(ctx));
+
+        // SQL Three-Valued Logic for OR:
+        // true OR null -> true
+        assertEquals(true, new LogicalExpression(trueExpr, nullExpr, LogicalExpression.Operator.OR).evaluate(ctx));
+        // null OR true -> true
+        assertEquals(true, new LogicalExpression(nullExpr, trueExpr, LogicalExpression.Operator.OR).evaluate(ctx));
+        // false OR null -> null
+        assertEquals(null, new LogicalExpression(falseExpr, nullExpr, LogicalExpression.Operator.OR).evaluate(ctx));
+        // null OR false -> null
+        assertEquals(null, new LogicalExpression(nullExpr, falseExpr, LogicalExpression.Operator.OR).evaluate(ctx));
+        // null OR null -> null
+        assertEquals(null, new LogicalExpression(nullExpr, nullExpr, LogicalExpression.Operator.OR).evaluate(ctx));
+
+        // SQL Three-Valued Logic for NOT:
+        // NOT null -> null
+        assertEquals(null, new NotExpression(nullExpr).evaluate(ctx));
+    }
 }

@@ -10,6 +10,9 @@ public class NotExpression implements Expression {
     @Override
     public Object evaluate(RowContext row) {
         Object val = operand.evaluate(row);
+        if (val == null) {
+            return null;
+        }
         if (val instanceof Boolean b) {
             return !b;
         }
