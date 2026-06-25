@@ -1,5 +1,19 @@
 # Changelog
 
+### 2.0.3
+
+- **SQL String Functions Emulation**:
+  - Implemented Java-side emulation for standard SQL string functions: `UPPER(expr)`, `LOWER(expr)`, `TRIM(expr)`, `SUBSTRING(expr, start, [length])`, and `REPLACE(expr, search, replacement)`.
+  - Enabled string functions in both `SELECT` projections and `WHERE` clauses, including support for nested calls.
+  - Automatically rewrites SOQL queries to strip emulated functions from the query sent to Salesforce while pulling all referenced columns into the SELECT items.
+- **Client-Side AST Expression Engine**:
+  - Developed a custom Abstract Syntax Tree (AST) expression engine for Java-side evaluation.
+  - Implemented SQL three-valued logic (AND, OR, NOT) with null safety and truthiness check.
+  - Optimized execution with cached client-side expressions to prevent per-row AST recompilation.
+- **Robust SQL Parser Integrations**:
+  - Extended support to parse JSqlParser's non-standard `TrimFunction` as standard `TRIM` calls.
+  - Added support for compiling logic and comparison operators (`IS NULL`, `NOT`, `IN`, `BETWEEN`, `>=`, `<=`, etc.) client-side.
+
 ### 2.0.2
 
 - **Legacy URL Support**:

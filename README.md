@@ -139,6 +139,21 @@ You can download the latest driver JAR file from the [Releases page](https://git
 
    > **Note:** Since evaluation is client-side, all columns referenced in the `CASE` expression are fetched from Salesforce before filtering. This may impact performance and increase network traffic for large result sets.
 
+9. **Client-Side SQL String Functions Emulation**
+   The driver implements client-side emulation for standard SQL string functions that are not natively supported by Salesforce SOQL. These functions can be used in both `SELECT` projections and `WHERE` clauses, and they can be nested:
+   * **`UPPER(expr)`**: Converts a string to uppercase. Returns `null` if the primary expression evaluates to `null`.
+   * **`LOWER(expr)`**: Converts a string to lowercase. Returns `null` if the primary expression evaluates to `null`.
+   * **`TRIM(expr)`**: Trims leading and trailing whitespace. Returns `null` if the primary expression evaluates to `null`.
+   * **`SUBSTRING(expr, start, [length])`**: Extracts a substring starting from a 1-based index `start`. If `length` is omitted, extracts to the end of the string. Returns `null` if the primary expression evaluates to `null`.
+   * **`REPLACE(expr, search, replacement)`**: Replaces all occurrences of `search` with `replacement` in `expr`. Returns `null` if the primary expression evaluates to `null`.
+
+   > **Note:** Since evaluation is client-side, the rewriter will strip these functions from the generated SOQL query sent to Salesforce and pull all referenced columns into the SELECT items. The expressions (in both SELECT and WHERE) are evaluated row-by-row in Java on the retrieved data. This may impact performance and increase network traffic.
+
+   Example:
+   ```sql
+   SELECT UPPER(TRIM(Name)) FROM Account WHERE SUBSTRING(Phone, 1, 3) = '555';
+   ```
+
 ## Maven Dependency
 
 Add the following dependency to your `pom.xml`:
@@ -147,7 +162,7 @@ Add the following dependency to your `pom.xml`:
 <dependency>
     <groupId>it.rotaliano.salesforce</groupId>
     <artifactId>salesforce-jdbc</artifactId>
-    <version>2.0.2</version>
+    <version>2.0.3</version>
 </dependency>
 ```
 
