@@ -32,6 +32,8 @@ import java.util.function.Function;
 import javax.sql.rowset.RowSetMetaDataImpl;
 import javax.sql.rowset.serial.SerialBlob;
 import lombok.extern.slf4j.Slf4j;
+import it.rotaliano.jdbc.salesforce.expression.Expression;
+import it.rotaliano.jdbc.salesforce.expression.RowContext;
 
 /**
  * In-memory implementation of {@link ResultSet} that caches all rows.
@@ -96,33 +98,77 @@ public class CachedResultSet extends AbstractResultSet implements Serializable {
     private boolean wasNull;
 
     private transient Iterator<List<ColumnMap<String, Object>>> rowSupplier;
+    private transient Expression whereFilter;
 
     public CachedResultSet(List<ColumnMap<String, Object>> rows) {
-        this.rows = new ArrayList<>(rows);
-        this.index = -1;
+        this(rows, null, null);
     }
 
     public CachedResultSet(List<ColumnMap<String, Object>> rows, ResultSetMetaData metadata) {
-        this(new ArrayList<>(rows));
+        this(rows, metadata, null);
+    }
+
+    public CachedResultSet(List<ColumnMap<String, Object>> rows, ResultSetMetaData metadata, Expression whereFilter) {
+        this.whereFilter = whereFilter;
+        this.rows = new ArrayList<>();
+        this.index = -1;
+        if (rows != null) {
+            for (ColumnMap<String, Object> r : rows) {
+                if (evalFilter(r)) {
+                    this.rows.add(r);
+                }
+            }
+        }
         this.metadata = metadata;
     }
 
     public CachedResultSet(ResultSetMetaData metadata) {
-        this(new ArrayList<>());
-        this.metadata = metadata;
+        this(new ArrayList<>(), metadata, null);
     }
 
     public CachedResultSet(ColumnMap<String, Object> singleRow) {
-        this(new ArrayList<>(Collections.singletonList(singleRow)));
+        this(new ArrayList<>(Collections.singletonList(singleRow)), null, null);
     }
 
     public CachedResultSet(ColumnMap<String, Object> singleRow, ResultSetMetaData metadata) {
-        this(new ArrayList<>(Collections.singletonList(singleRow)), metadata);
+        this(new ArrayList<>(Collections.singletonList(singleRow)), metadata, null);
     }
 
     public CachedResultSet(Iterator<List<ColumnMap<String, Object>>> rowSupplier, ResultSetMetaData metadata) {
+        this(rowSupplier, metadata, null);
+    }
+
+    public CachedResultSet(Iterator<List<ColumnMap<String, Object>>> rowSupplier, ResultSetMetaData metadata, Expression whereFilter) {
         this(metadata);
         this.rowSupplier = rowSupplier;
+        this.whereFilter = whereFilter;
+    }
+
+    private boolean evalFilter(ColumnMap<String, Object> r) {
+        if (whereFilter == null) {
+            return true;
+        }
+        RowContext ctx = col -> {
+            int idx = r.getColumnNames().indexOf(col);
+            if (idx == -1) idx = r.getColumnLabels().indexOf(col);
+            if (idx != -1) return r.getValues().get(idx);
+            for (int k = 0; k < r.size(); k++) {
+                if (r.getColumnNames().get(k).endsWith("." + col)) return r.getValues().get(k);
+            }
+            return null;
+        };
+        Object filterVal = whereFilter.evaluate(ctx);
+        if (filterVal instanceof Boolean) {
+            return (Boolean) filterVal;
+        }
+        if (filterVal instanceof Number) {
+            return ((Number) filterVal).doubleValue() != 0.0;
+        }
+        if (filterVal != null) {
+            String s = filterVal.toString().trim();
+            return "true".equalsIgnoreCase(s) || "1".equals(s) || "yes".equalsIgnoreCase(s);
+        }
+        return false;
     }
 
     public Object getObject(String columnName) {
@@ -167,14 +213,22 @@ public class CachedResultSet extends AbstractResultSet implements Serializable {
 
     private boolean nextSupplied() {
         if (this.rowSupplier != null) {
-            if (this.rowSupplier.hasNext()) {
-                this.rows = this.rowSupplier.next();
-                this.index = -1;
-                return !rows.isEmpty();
-            } else {
-                this.rows = Collections.emptyList();
-                return false;
+            while (this.rowSupplier.hasNext()) {
+                List<ColumnMap<String, Object>> rawBatch = this.rowSupplier.next();
+                List<ColumnMap<String, Object>> filteredBatch = new ArrayList<>();
+                for (ColumnMap<String, Object> r : rawBatch) {
+                    if (evalFilter(r)) {
+                        filteredBatch.add(r);
+                    }
+                }
+                if (!filteredBatch.isEmpty()) {
+                    this.rows = filteredBatch;
+                    this.index = -1;
+                    return true;
+                }
             }
+            this.rows = Collections.emptyList();
+            return false;
         }
         return false;
     }

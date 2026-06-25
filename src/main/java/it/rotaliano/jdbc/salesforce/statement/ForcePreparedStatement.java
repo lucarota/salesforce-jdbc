@@ -448,6 +448,49 @@ public class ForcePreparedStatement extends AbstractPreparedStatement implements
                         if (idx != -1) {
                             columnMap.getValues().set(idx, caseValue);
                         }
+                    } else if (SoqlQueryAnalyzer.containsEmulatedFunctions(expr)) {
+                        String alias = item.getAlias() != null ? item.getAlias().getName() : expr.toString();
+
+                        // Create row context
+                        it.rotaliano.jdbc.salesforce.expression.RowContext ctx = colName -> {
+                            // Find value in columnMap
+                            int colIdx = columnMap.getColumnNames().indexOf(colName);
+                            if (colIdx == -1) colIdx = columnMap.getColumnLabels().indexOf(colName);
+                            if (colIdx != -1) {
+                                return columnMap.getValues().get(colIdx);
+                            }
+                            // Support suffix match
+                            for (int k = 0; k < columnMap.size(); k++) {
+                                String name = columnMap.getColumnNames().get(k);
+                                if (name.endsWith("." + colName)) {
+                                    return columnMap.getValues().get(k);
+                                }
+                            }
+                            return null;
+                        };
+
+                        try {
+                            it.rotaliano.jdbc.salesforce.expression.Expression customExpr = it.rotaliano.jdbc.salesforce.expression.AstBuilder.build(expr);
+                            Object evaluatedValue = customExpr.evaluate(ctx);
+
+                            // Update in columnMap
+                            int idx = -1;
+                            for (int i = 0; i < columnMap.size(); i++) {
+                                String name = columnMap.getColumnNames().get(i);
+                                if (name.equalsIgnoreCase(alias)
+                                        || name.endsWith("." + alias)
+                                        || name.equalsIgnoreCase(expr.toString())
+                                        || name.endsWith("." + expr.toString())) {
+                                    idx = i;
+                                    break;
+                                }
+                            }
+                            if (idx != -1) {
+                                columnMap.getValues().set(idx, evaluatedValue);
+                            }
+                        } catch (Exception e) {
+                            log.error("Failed evaluating client side string function", e);
+                        }
                     }
                 }
             }
@@ -695,7 +738,7 @@ public class ForcePreparedStatement extends AbstractPreparedStatement implements
         return queryAnalyzer;
     }
 
-    private SoqlQueryAnalyzer getSoqlQueryAnalyzer() {
+    public SoqlQueryAnalyzer getSoqlQueryAnalyzer() {
         if (soqlQueryAnalyzer == null) {
             soqlQueryAnalyzer = new SoqlQueryAnalyzer(getQueryAnalyzer());
             if (soqlQueryAnalyzer.isExpandedStarSyntaxForFields()) {

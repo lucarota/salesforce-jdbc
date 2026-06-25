@@ -19,29 +19,43 @@ public class LogicalExpression implements Expression {
     public Object evaluate(RowContext row) {
         Object lVal = left.evaluate(row);
         if (op == Operator.AND) {
-            if (lVal instanceof Boolean && !((Boolean) lVal)) {
+            if (lVal != null && !isTruthy(lVal)) {
                 return false;
             }
             Object rVal = right.evaluate(row);
-            if (rVal instanceof Boolean && !((Boolean) rVal)) {
+            if (rVal != null && !isTruthy(rVal)) {
                 return false;
             }
             if (lVal != null && rVal != null) {
-                return ((Boolean) lVal) && ((Boolean) rVal);
+                return isTruthy(lVal) && isTruthy(rVal);
             }
             return null;
         } else {
-            if (lVal instanceof Boolean && ((Boolean) lVal)) {
+            if (lVal != null && isTruthy(lVal)) {
                 return true;
             }
             Object rVal = right.evaluate(row);
-            if (rVal instanceof Boolean && ((Boolean) rVal)) {
+            if (rVal != null && isTruthy(rVal)) {
                 return true;
             }
             if (lVal != null && rVal != null) {
-                return ((Boolean) lVal) || ((Boolean) rVal);
+                return isTruthy(lVal) || isTruthy(rVal);
             }
             return null;
         }
+    }
+
+    private boolean isTruthy(Object val) {
+        if (val == null) {
+            return false;
+        }
+        if (val instanceof Boolean) {
+            return (Boolean) val;
+        }
+        if (val instanceof Number) {
+            return ((Number) val).doubleValue() != 0.0;
+        }
+        String s = val.toString().trim();
+        return "true".equalsIgnoreCase(s) || "1".equals(s) || "yes".equalsIgnoreCase(s);
     }
 }

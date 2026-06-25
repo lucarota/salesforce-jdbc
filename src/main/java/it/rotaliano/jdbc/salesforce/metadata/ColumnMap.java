@@ -12,6 +12,7 @@ public class ColumnMap<K, V> implements Serializable {
 
     @Getter
     private final ArrayList<K> columnNames = new ArrayList<>();
+    @Getter
     private final ArrayList<K> columnLabels = new ArrayList<>();
     @Getter
     private final ArrayList<V> values = new ArrayList<>();

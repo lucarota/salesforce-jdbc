@@ -37,13 +37,14 @@ public class FunctionExpression implements Expression {
                 if (startVal == null) {
                     return null;
                 }
-                int start = ((Number) startVal).intValue();
+                int start = parseToInt(startVal);
                 int length = Integer.MAX_VALUE;
                 if (arguments.size() >= 3) {
                     Object lenVal = arguments.get(2).evaluate(row);
-                    if (lenVal != null) {
-                        length = ((Number) lenVal).intValue();
+                    if (lenVal == null) {
+                        return null;
                     }
+                    length = parseToInt(lenVal);
                 }
                 if (length < 0) {
                     return "";
@@ -72,6 +73,18 @@ public class FunctionExpression implements Expression {
                 return str.replace(searchVal.toString(), replVal.toString());
             default:
                 throw new UnsupportedOperationException("Function " + name + " not supported");
+        }
+    }
+
+    private int parseToInt(Object val) {
+        if (val instanceof Number) {
+            return ((Number) val).intValue();
+        }
+        String str = val.toString().trim();
+        try {
+            return Integer.parseInt(str);
+        } catch (NumberFormatException e) {
+            return (int) Double.parseDouble(str);
         }
     }
 }

@@ -35,10 +35,11 @@ public class SelectQueryProcessor {
         try {
             ResultSetMetaData metaData = stmt.getMetaData();
             String preparedQuery = stmt.prepareQueryForExecution();
+            it.rotaliano.jdbc.salesforce.expression.Expression whereFilter = stmt.getSoqlQueryAnalyzer().getClientSideWhereExpression();
 
             if (stmt.isNoCacheMode()) {
                 stmt.setNeverQueriedMore(true);
-                return new CachedResultSet(stmt, metaData);
+                return new CachedResultSet(stmt, metaData, whereFilter);
             }
 
             List<List<ForceResultField>> forceQueryResult = ctx.getPartnerService()
@@ -47,9 +48,9 @@ public class SelectQueryProcessor {
             if (!forceQueryResult.isEmpty()) {
                 List<ColumnMap<String, Object>> maps = Collections.synchronizedList(new LinkedList<>());
                 forceQueryResult.forEach(rec -> maps.add(stmt.convertToColumnMap(rec)));
-                return new CachedResultSet(maps, metaData);
+                return new CachedResultSet(maps, metaData, whereFilter);
             } else {
-                return new CachedResultSet(Collections.emptyList(), metaData);
+                return new CachedResultSet(Collections.emptyList(), metaData, whereFilter);
             }
         } catch (ConnectionException e) {
             throw new SQLException(e);

@@ -9,6 +9,10 @@ import net.sf.jsqlparser.expression.operators.relational.ParenthesedExpressionLi
 import net.sf.jsqlparser.expression.operators.relational.IsNullExpression;
 import net.sf.jsqlparser.expression.operators.relational.InExpression;
 import net.sf.jsqlparser.expression.operators.relational.Between;
+import net.sf.jsqlparser.expression.operators.relational.GreaterThan;
+import net.sf.jsqlparser.expression.operators.relational.GreaterThanEquals;
+import net.sf.jsqlparser.expression.operators.relational.MinorThan;
+import net.sf.jsqlparser.expression.operators.relational.MinorThanEquals;
 import net.sf.jsqlparser.schema.Column;
 import java.util.ArrayList;
 import java.util.List;
@@ -57,6 +61,18 @@ public class AstBuilder {
         }
         if (jsqlExpr instanceof NotEqualsTo neq) {
             return new BinaryExpression(build(neq.getLeftExpression()), build(neq.getRightExpression()), BinaryExpression.Operator.NOT_EQUALS);
+        }
+        if (jsqlExpr instanceof GreaterThan gt) {
+            return new BinaryExpression(build(gt.getLeftExpression()), build(gt.getRightExpression()), BinaryExpression.Operator.GREATER_THAN);
+        }
+        if (jsqlExpr instanceof GreaterThanEquals gte) {
+            return new BinaryExpression(build(gte.getLeftExpression()), build(gte.getRightExpression()), BinaryExpression.Operator.GREATER_THAN_EQUALS);
+        }
+        if (jsqlExpr instanceof MinorThan mt) {
+            return new BinaryExpression(build(mt.getLeftExpression()), build(mt.getRightExpression()), BinaryExpression.Operator.LESS_THAN);
+        }
+        if (jsqlExpr instanceof MinorThanEquals mte) {
+            return new BinaryExpression(build(mte.getLeftExpression()), build(mte.getRightExpression()), BinaryExpression.Operator.LESS_THAN_EQUALS);
         }
         if (jsqlExpr instanceof AndExpression and) {
             return new LogicalExpression(build(and.getLeftExpression()), build(and.getRightExpression()), LogicalExpression.Operator.AND);
