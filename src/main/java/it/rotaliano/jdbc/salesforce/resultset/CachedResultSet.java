@@ -33,6 +33,7 @@ import javax.sql.rowset.RowSetMetaDataImpl;
 import javax.sql.rowset.serial.SerialBlob;
 import lombok.extern.slf4j.Slf4j;
 import it.rotaliano.jdbc.salesforce.expression.Expression;
+import it.rotaliano.jdbc.salesforce.expression.LogicalExpression;
 import it.rotaliano.jdbc.salesforce.expression.RowContext;
 
 /**
@@ -158,17 +159,7 @@ public class CachedResultSet extends AbstractResultSet implements Serializable {
             return null;
         };
         Object filterVal = whereFilter.evaluate(ctx);
-        if (filterVal instanceof Boolean) {
-            return (Boolean) filterVal;
-        }
-        if (filterVal instanceof Number) {
-            return ((Number) filterVal).doubleValue() != 0.0;
-        }
-        if (filterVal != null) {
-            String s = filterVal.toString().trim();
-            return "true".equalsIgnoreCase(s) || "1".equals(s) || "yes".equalsIgnoreCase(s);
-        }
-        return false;
+        return LogicalExpression.isTruthy(filterVal);
     }
 
     public Object getObject(String columnName) {

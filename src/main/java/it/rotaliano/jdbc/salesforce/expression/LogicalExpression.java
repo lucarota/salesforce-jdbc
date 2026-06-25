@@ -45,7 +45,7 @@ public class LogicalExpression implements Expression {
         }
     }
 
-    private boolean isTruthy(Object val) {
+    public static boolean isTruthy(Object val) {
         if (val == null) {
             return false;
         }
