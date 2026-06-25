@@ -177,6 +177,13 @@ public class EvaluateExpressionVisitor extends ExpressionVisitorAdapter<Expressi
     }
 
     @Override
+    public <S> Expression visit(BooleanValue booleanValue, S context) {
+        log.trace("[EvaluateExpressionVisitor] BooleanValue={}", booleanValue.getValue());
+        result = booleanValue.getValue();
+        return null;
+    }
+
+    @Override
     public <S> Expression visit(LongValue longValue, S context) {
         log.trace("[EvaluateExpressionVisitor] LongValue={}", longValue.getValue());
         result = longValue.getValue();

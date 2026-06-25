@@ -205,5 +205,22 @@ public class TestFixtureUtils {
             FieldDefTree expectedSchema) throws ConnectionException {
             return delegate.queryMore(queryLocator, expectedSchema);
         }
+
+        @Override
+        public com.sforce.soap.partner.SaveResult[] createRecords(String entityName, List<Map<String, Object>> recordsDefinitions)
+            throws ConnectionException {
+            return delegate.createRecords(entityName, recordsDefinitions);
+        }
+
+        @Override
+        public com.sforce.soap.partner.SaveResult[] saveRecords(String entityName, List<Map<String, Object>> recordsDefinitions)
+            throws ConnectionException {
+            return delegate.saveRecords(entityName, recordsDefinitions);
+        }
+
+        @Override
+        public com.sforce.soap.partner.DeleteResult[] deleteRecords(Collection<String> recordsIds) throws ConnectionException {
+            return delegate.deleteRecords(recordsIds);
+        }
     }
 }

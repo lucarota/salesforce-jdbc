@@ -34,6 +34,21 @@ public class AstBuilder {
         if (jsqlExpr instanceof NullValue) {
             return new LiteralExpression(null);
         }
+        if (jsqlExpr instanceof BooleanValue bv) {
+            return new LiteralExpression(bv.getValue());
+        }
+        if (jsqlExpr instanceof DateValue dv) {
+            return new LiteralExpression(dv.getValue());
+        }
+        if (jsqlExpr instanceof TimeValue tv) {
+            return new LiteralExpression(tv.getValue());
+        }
+        if (jsqlExpr instanceof TimestampValue tsv) {
+            return new LiteralExpression(tsv.getValue());
+        }
+        if (jsqlExpr instanceof HexValue hv) {
+            return new LiteralExpression(hv.getValue());
+        }
         if (jsqlExpr instanceof Column col) {
             return new ColumnExpression(col.getColumnName());
         }

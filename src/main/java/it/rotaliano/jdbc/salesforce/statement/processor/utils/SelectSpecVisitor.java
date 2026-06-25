@@ -78,6 +78,12 @@ public class SelectSpecVisitor implements SelectItemVisitor<Expression> {
             visitCaseExpressionSpec(caseExpr, alias);
         } else if (fieldSpec.getExpression() instanceof ParenthesedSelect subQuery) {
             fieldSpec.setExpression(visitSubQuery(subQuery));
+        } else {
+            String name = fieldSpec.getExpression().toString();
+            String alias = fieldSpec.getAlias() != null ? fieldSpec.getAlias().getName() : name;
+            FieldDef result = new FieldDef(name, name, alias, "string");
+            fieldDefinitions.addSqlOrderField(result);
+            fieldDefinitions.addChild(result);
         }
     }
 

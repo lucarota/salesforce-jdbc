@@ -247,7 +247,9 @@ public class ForcePreparedStatement extends AbstractPreparedStatement implements
      * @return the SOQL string ready for execution
      */
     public String prepareQueryForExecution() {
+        log.info("[DEBUG] prepareQueryForExecution BEFORE: {}", soqlQuery);
         soqlQuery = prepareQuery(getSoqlQueryAnalyzer().getSoqlQueryString(getParameters()));
+        log.info("[DEBUG] prepareQueryForExecution AFTER: {}", soqlQuery);
         return soqlQuery;
     }
 
@@ -272,6 +274,7 @@ public class ForcePreparedStatement extends AbstractPreparedStatement implements
      */
     @Override
     public List<ColumnMap<String, Object>> next() {
+        log.info("[DEBUG] next() called with soqlQuery: {}", soqlQuery);
         try {
             Map.Entry<List<List<ForceResultField>>, String> resultEntry;
             if (this.neverQueriedMore) {
@@ -450,7 +453,7 @@ public class ForcePreparedStatement extends AbstractPreparedStatement implements
                         if (idx != -1) {
                             columnMap.getValues().set(idx, caseValue);
                         }
-                    } else if (SoqlQueryAnalyzer.containsEmulatedFunctions(expr)) {
+                    } else if (SoqlQueryAnalyzer.isLiteral(expr) || SoqlQueryAnalyzer.containsEmulatedFunctions(expr)) {
                         String alias = item.getAlias() != null ? item.getAlias().getName() : expr.toString();
 
                         // Create row context
@@ -745,7 +748,7 @@ public class ForcePreparedStatement extends AbstractPreparedStatement implements
             soqlQueryAnalyzer = new SoqlQueryAnalyzer(getQueryAnalyzer());
             if (soqlQueryAnalyzer.isExpandedStarSyntaxForFields()) {
                 this.soqlQuery = soqlQueryAnalyzer.getSoqlQueryString();
-                log.debug("[PrepStat] Expanded Star Syntax to {}", soqlQuery);
+                log.debug("getSoqlQueryAnalyzer() updated soqlQuery to: {}", this.soqlQuery);
             }
         }
         return soqlQueryAnalyzer;

@@ -2,6 +2,7 @@ package it.rotaliano.jdbc.salesforce.statement.processor;
 
 import it.rotaliano.jdbc.salesforce.statement.processor.utils.SelectSpecVisitor;
 import it.rotaliano.jdbc.salesforce.utils.FieldDefTree;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.jsqlparser.expression.*;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
@@ -13,6 +14,7 @@ import net.sf.jsqlparser.statement.select.OrderByElement;
 import net.sf.jsqlparser.statement.select.OrderByVisitorAdapter;
 import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.SelectItem;
+import net.sf.jsqlparser.statement.select.ParenthesedSelect;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,14 +25,11 @@ public class SoqlQueryAnalyzer {
 
     private final QueryAnalyzer queryAnalyzer;
     private FieldDefTree fieldDefinitions;
+    @Getter
     private it.rotaliano.jdbc.salesforce.expression.Expression clientSideWhereExpression;
 
     public SoqlQueryAnalyzer(QueryAnalyzer queryAnalyzer) {
         this.queryAnalyzer = queryAnalyzer;
-    }
-
-    public it.rotaliano.jdbc.salesforce.expression.Expression getClientSideWhereExpression() {
-        return clientSideWhereExpression;
     }
 
     public String getSoqlQueryString() {
@@ -61,7 +60,10 @@ public class SoqlQueryAnalyzer {
                 } else {
                     rewriteCoalesceInWhere(select, parameters);
                 }
-                return select.toString();
+                // Clear aliases from select items because SOQL does not support AS aliasing
+                stripAliases(select);
+                String res = select.toString();
+                return res;
             }
         } catch (Exception e) {
             log.warn("Failed to rewrite query, using original", e);
@@ -351,6 +353,18 @@ public class SoqlQueryAnalyzer {
     }
 
 
+    public static boolean isLiteral(Expression expr) {
+        return expr instanceof StringValue
+            || expr instanceof LongValue
+            || expr instanceof DoubleValue
+            || expr instanceof NullValue
+            || expr instanceof BooleanValue
+            || expr instanceof HexValue
+            || expr instanceof DateValue
+            || expr instanceof TimeValue
+            || expr instanceof TimestampValue;
+    }
+
     private void rewriteSelectItems(PlainSelect select) {
         List<SelectItem<?>> newSelectItems = new ArrayList<>();
         for (SelectItem<?> item : select.getSelectItems()) {
@@ -377,9 +391,14 @@ public class SoqlQueryAnalyzer {
                 for (Column col : cols) {
                     newSelectItems.add(new SelectItem<>(col));
                 }
+            } else if (isLiteral(expr)) {
+                // Client-side evaluated literal: skip from SOQL
             } else {
                 newSelectItems.add(item);
             }
+        }
+        if (newSelectItems.isEmpty()) {
+            newSelectItems.add(new SelectItem<>(new Column("Id")));
         }
         select.setSelectItems(newSelectItems);
     }
@@ -529,5 +548,67 @@ public class SoqlQueryAnalyzer {
 
     public String getFromObjectName() {
         return queryAnalyzer.getFromObjectName();
+    }
+
+    public static void stripAliases(PlainSelect select) {
+        if (select == null) {
+            return;
+        }
+        if (select.getSelectItems() != null) {
+            for (SelectItem<?> item : select.getSelectItems()) {
+                item.setAlias(null);
+                stripAliases(item.getExpression());
+            }
+        }
+        if (select.getFromItem() != null && select.getFromItem().getAlias() != null) {
+            select.getFromItem().getAlias().setUseAs(false);
+        }
+        if (select.getWhere() != null) {
+            stripAliases(select.getWhere());
+        }
+    }
+
+    public static void stripAliases(Expression expr) {
+        if (expr == null) {
+            return;
+        }
+        if (expr instanceof ParenthesedSelect ps) {
+            stripAliases(ps.getPlainSelect());
+        } else if (expr instanceof BinaryExpression binary) {
+            stripAliases(binary.getLeftExpression());
+            stripAliases(binary.getRightExpression());
+        } else if (expr instanceof Function func) {
+            if (func.getParameters() != null) {
+                for (Object param : func.getParameters()) {
+                    stripAliases((Expression) param);
+                }
+            }
+        } else if (expr instanceof ParenthesedExpressionList paren) {
+            for (Object inner : paren) {
+                stripAliases((Expression) inner);
+            }
+        } else if (expr instanceof CaseExpression caseExpr) {
+            stripAliases(caseExpr.getSwitchExpression());
+            if (caseExpr.getWhenClauses() != null) {
+                for (Expression when : caseExpr.getWhenClauses()) {
+                    stripAliases(when);
+                }
+            }
+            stripAliases(caseExpr.getElseExpression());
+        } else if (expr instanceof WhenClause whenClause) {
+            stripAliases(whenClause.getWhenExpression());
+            stripAliases(whenClause.getThenExpression());
+        } else if (expr instanceof InExpression in) {
+            stripAliases(in.getLeftExpression());
+            stripAliases(in.getRightExpression());
+        } else if (expr instanceof IsNullExpression isNull) {
+            stripAliases(isNull.getLeftExpression());
+        } else if (expr instanceof Between between) {
+            stripAliases(between.getLeftExpression());
+            stripAliases(between.getBetweenExpressionStart());
+            stripAliases(between.getBetweenExpressionEnd());
+        } else if (expr instanceof NotExpression not) {
+            stripAliases(not.getExpression());
+        }
     }
 }

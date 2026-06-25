@@ -29,6 +29,7 @@ import net.sf.jsqlparser.statement.update.Update;
 public class QueryAnalyzer {
 
     private String soql;
+    private String originalSoql;
     private final BiFunction<String, List<Object>, List<Map<String, Object>>> subSelectResolver;
     private Statement queryData;
     private final PartnerService partnerService;
@@ -36,6 +37,7 @@ public class QueryAnalyzer {
 
     public QueryAnalyzer(String soql,
         BiFunction<String, List<Object>, List<Map<String, Object>>> subSelectResolver, PartnerService partnerService) {
+        this.originalSoql = soql;
         this.soql = soql;
         this.subSelectResolver = subSelectResolver;
         this.partnerService = partnerService;
@@ -46,7 +48,11 @@ public class QueryAnalyzer {
         if (soql == null || soql.trim().isEmpty()) {
             return false;
         }
-        this.soql = soql;
+        if (!soql.equals(this.originalSoql)) {
+            this.originalSoql = soql;
+            this.soql = soql;
+            this.queryData = null;
+        }
         return switch (getType()) {
             case INSERT -> desiredType == StatementTypeEnum.INSERT;
             case UPDATE -> desiredType == StatementTypeEnum.UPDATE;
@@ -78,6 +84,7 @@ public class QueryAnalyzer {
                 );
                 if (queryData instanceof PlainSelect select) {
                     this.expandedStarSyntaxForFields = false;
+                    log.debug("DEBUG_SELECT_ITEM: '{}'", select.getSelectItem(0).toString());
                     if ("*".equals(select.getSelectItem(0).toString())) {
                         select.getSelectItems().clear();
                         this.expandedStarSyntaxForFields = true;
