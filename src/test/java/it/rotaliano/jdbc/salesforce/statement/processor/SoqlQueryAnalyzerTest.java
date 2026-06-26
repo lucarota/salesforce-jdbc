@@ -1,8 +1,6 @@
 package it.rotaliano.jdbc.salesforce.statement.processor;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -22,6 +20,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
+import it.rotaliano.jdbc.salesforce.expression.AstBuilder;
+import it.rotaliano.jdbc.salesforce.expression.LiteralExpression;
 
 public class SoqlQueryAnalyzerTest {
 
@@ -702,5 +702,47 @@ public class SoqlQueryAnalyzerTest {
             return null;
         };
         assertEquals(false, clientSideExpr.evaluate(noMatchContext)); // REPLACE("7-8-9", "-", "") -> "789" -> false
+    }
+
+    @Test
+    public void testQueryAnalyzerAnalysePreservesRewrittenSoql() {
+        String originalSoql = "SELECT * FROM Account LIMIT 10";
+        final QueryAnalyzer queryAnalyzer = new QueryAnalyzer(originalSoql, null, partnerService);
+        
+        // At construction, it should expand * to fields (soql query is updated)
+        String rewritten = queryAnalyzer.getSoql();
+        assertTrue(rewritten.toUpperCase().contains("ID"), "Should contain Id: " + rewritten);
+        assertTrue(rewritten.toUpperCase().contains("NAME"), "Should contain Name: " + rewritten);
+        
+        // Calling analyse with the original soql should NOT overwrite queryAnalyzer.soql back to original query
+        queryAnalyzer.analyse(originalSoql, StatementTypeEnum.SELECT);
+        assertEquals(rewritten, queryAnalyzer.getSoql(), "analyse() should not discard the rewritten/expanded query");
+    }
+
+    @Test
+    public void testSelectWithLiteralsRewrittenCorrectly() {
+        String soql = "SELECT 2, true, 'foo' FROM Account LIMIT 1";
+        final QueryAnalyzer queryAnalyzer = new QueryAnalyzer(soql, null, partnerService);
+        SoqlQueryAnalyzer analyzer = new SoqlQueryAnalyzer(queryAnalyzer);
+
+        String result = analyzer.getSoqlQueryString();
+        // Since all selected items are literals (which are client-side only), they should be stripped
+        // and replaced with 'Id' fallback.
+        assertEquals("SELECT Id FROM Account LIMIT 1", result);
+    }
+
+    @Test
+    public void testAstBuilderSupportsBooleanAndHexLiterals() throws Exception {
+        // BooleanValue
+        net.sf.jsqlparser.expression.Expression jsqlTrue = net.sf.jsqlparser.parser.CCJSqlParserUtil.parseExpression("true");
+        it.rotaliano.jdbc.salesforce.expression.Expression astTrue = AstBuilder.build(jsqlTrue);
+        assertInstanceOf(LiteralExpression.class, astTrue);
+        assertEquals(Boolean.TRUE, astTrue.evaluate(null));
+
+        // HexValue
+        net.sf.jsqlparser.expression.Expression jsqlHex = net.sf.jsqlparser.parser.CCJSqlParserUtil.parseExpression("0x1A");
+        it.rotaliano.jdbc.salesforce.expression.Expression astHex = AstBuilder.build(jsqlHex);
+        assertInstanceOf(LiteralExpression.class, astHex);
+        assertEquals("0x1A", astHex.evaluate(null));
     }
 }
