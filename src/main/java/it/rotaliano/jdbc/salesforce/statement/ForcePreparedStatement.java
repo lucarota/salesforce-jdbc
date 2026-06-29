@@ -919,7 +919,11 @@ public class ForcePreparedStatement extends AbstractPreparedStatement implements
         if (parameters.size() < parameterIndex) {
             parameters.addAll(Collections.nCopies(parameterIndex - parameters.size(), null));
         }
-        parameters.add(parameterIndex, x);
+        if (parameters.size() == parameterIndex) {
+            parameters.add(parameterIndex, x);
+        } else {
+            parameters.set(parameterIndex, x);
+        }
     }
 
     @Override
