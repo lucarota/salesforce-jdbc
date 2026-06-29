@@ -1,5 +1,16 @@
 # Changelog
 
+### 2.0.4
+
+- **Legacy Driver Class Support**:
+  - Re-introduced the deprecated `com.ascendix.jdbc.salesforce.ForceDriver` class extending the standard `it.rotaliano.jdbc.salesforce.ForceDriver` to maintain backward compatibility for older driver class name references.
+- **Robust Parameter Handling**:
+  - Fixed a list-manipulation bug in `ForcePreparedStatement.setObject` where parameter index alignment could cause out-of-bounds or offset index errors.
+- **SOQL Query Parsing and Rewriting**:
+  - Ensured expanded queries (such as `*` to specific fields) are preserved during query analysis.
+  - Stripped client-side selected literal values (booleans, strings, numbers) from remote Salesforce queries, introducing a fallback `Id` column when no other database fields are selected.
+  - Added support in `AstBuilder` for parsing boolean and hexadecimal literals client-side.
+
 ### 2.0.3
 
 - **SQL String Functions Emulation**:
