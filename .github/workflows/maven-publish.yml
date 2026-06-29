@@ -25,7 +25,7 @@ jobs:
         distribution: 'temurin'
         server-id: central # Value of the distributionManagement/repository/id field of the pom.xml
         gpg-private-key: ${{ secrets.GPG_SIGNING_KEY }}
-        gpg-passphrase: ${{ secrets.GPG_PASSPHRASE }}
+        gpg-passphrase: MAVEN_GPG_PASSPHRASE
 
     - name: Publish package
       run: mvn --batch-mode deploy
