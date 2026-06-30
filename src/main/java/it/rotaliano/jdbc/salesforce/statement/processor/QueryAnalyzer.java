@@ -34,6 +34,8 @@ public class QueryAnalyzer {
     private Statement queryData;
     private final PartnerService partnerService;
     private boolean expandedStarSyntaxForFields = false;
+    @lombok.Setter
+    private boolean resolveSubqueriesClientSide = false;
 
     public QueryAnalyzer(String soql,
         BiFunction<String, List<Object>, List<Map<String, Object>>> subSelectResolver, PartnerService partnerService) {

@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import com.sforce.soap.partner.Connector;
 import com.sforce.soap.partner.DescribeSObjectResult;
@@ -403,6 +404,48 @@ class ForceDriverConnectivityTest {
 
         ResultSet result = ps.executeQuery();
         DBTablePrinter.printResultSet(result);
+    }
+
+    @Test
+    @Disabled("Live test - run manually to record fixtures")
+    void selectWithContentDocumentLinkSubquery_record() throws SQLException {
+        String query = """
+            SELECT /*+ RESOLVE_SUBQUERIES */ Title FROM ContentVersion
+            WHERE ContentDocumentId IN (
+                SELECT ContentDocumentId FROM ContentDocumentLink
+                WHERE LinkedEntityId = '0015E00001QpN0lQAF'
+            )
+            """;
+
+        Connection con = DriverManager.getConnection(url, userUAT, passUAT);
+        installRecordingPartnerService(con, "selectWithContentDocumentLinkSubquery");
+        PreparedStatement ps = con.prepareStatement(query);
+
+        ResultSet result = ps.executeQuery();
+        DBTablePrinter.printResultSet(result);
+    }
+
+    @Test
+    @Disabled("Live test - run manually to record fixtures")
+    void selectWithContentDocumentLinkSubquery_noHint_record() throws SQLException {
+        String query = """
+            SELECT Title FROM ContentVersion
+            WHERE ContentDocumentId IN (
+                SELECT ContentDocumentId FROM ContentDocumentLink
+                WHERE LinkedEntityId = '0015E00001QpN0lQAF'
+            )
+            """;
+
+        Connection con = DriverManager.getConnection(url, userUAT, passUAT);
+        installRecordingPartnerService(con, "selectWithContentDocumentLinkSubquery_noHint");
+        PreparedStatement ps = con.prepareStatement(query);
+
+        try {
+            ResultSet result = ps.executeQuery();
+            DBTablePrinter.printResultSet(result);
+        } catch (Exception e) {
+            System.out.println("Native query failed as expected: " + e.getMessage());
+        }
     }
 
     @Test
@@ -1206,6 +1249,32 @@ class ForceDriverConnectivityTest {
                 assertTrue("ONE".equals(labelVal) || "OTHER".equals(labelVal));
             }
             assertTrue(rowCount > 0, "Should return at least one row");
+        }
+
+        @Test
+        void selectWithContentDocumentLinkSubquery() throws SQLException {
+            assumeFixturesExist("selectWithContentDocumentLinkSubquery");
+            String query = """
+                SELECT /*+ RESOLVE_SUBQUERIES */ Title FROM ContentVersion
+                WHERE ContentDocumentId IN (
+                    SELECT ContentDocumentId FROM ContentDocumentLink
+                    WHERE LinkedEntityId = '0015E00001QpN0lQAF'
+                )
+                """;
+
+            ForceConnection conn = createOfflineConnection("selectWithContentDocumentLinkSubquery");
+            ForcePreparedStatement select = (ForcePreparedStatement) conn.prepareStatement(query);
+
+            ResultSet result = select.executeQuery();
+            assertNotNull(result, "ResultSet should not be null");
+
+            int rowCount = 0;
+            while (result.next()) {
+                rowCount++;
+                String title = result.getString("Title");
+                assertNotNull(title);
+            }
+            assertEquals(7, rowCount, "Should return 7 titles");
         }
     }
 }

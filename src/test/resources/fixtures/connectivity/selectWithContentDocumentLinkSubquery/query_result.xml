@@ -1,0 +1,51 @@
+<list>
+  <list>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>string</fieldType>
+      <name>Title</name>
+      <value class="string">bbb</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+  </list>
+  <list>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>string</fieldType>
+      <name>Title</name>
+      <value class="string">aaa</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+  </list>
+  <list>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>string</fieldType>
+      <name>Title</name>
+      <value class="string">aaa</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+  </list>
+  <list>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>string</fieldType>
+      <name>Title</name>
+      <value class="string">bbb</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+  </list>
+  <list>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>string</fieldType>
+      <name>Title</name>
+      <value class="string">ccc</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+  </list>
+  <list>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>string</fieldType>
+      <name>Title</name>
+      <value class="string">Cattura</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+  </list>
+  <list>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>string</fieldType>
+      <name>Title</name>
+      <value class="string">aaa</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+  </list>
+</list>

@@ -154,6 +154,29 @@ You can download the latest driver JAR file from the [Releases page](https://git
    SELECT UPPER(TRIM(Name)) FROM Account WHERE SUBSTRING(Phone, 1, 3) = '555';
    ```
 
+10. **Client-Side Subquery Resolution Hint (`/*+ RESOLVE_SUBQUERIES */`)**
+    Salesforce SOQL natively supports subqueries inside `IN` clauses (semi-joins) for standard objects, but throws `MALFORMED_QUERY` when querying restricted SObjects (such as `ContentDocumentLink` or `ContentVersion`) because they require strict equal-filters on parent/record IDs and cannot be queried inside semi-joins natively.
+    
+    You can force the driver to execute the subquery client-side first, retrieve the matching ID list, and then rewrite the main query by replacing the subquery with the list of literal values (e.g. `IN ('0695E000002EoHIQA0', '0695E000002EowfQAC', '...')`).
+    
+    To enable this client-side subquery resolution, include the SQL hint `/*+ RESOLVE_SUBQUERIES */` (case-insensitive) either before the query or immediately after the `SELECT` keyword (Oracle-style).
+    
+    > [!IMPORTANT]
+    > **Special Query-Restricted Objects:** For objects like `ContentDocumentLink` or `ContentVersion` that enforce mandatory specific filters, using this hint is **mandatory** to make subqueries work, at the cost of some execution overhead (network round-trips to resolve the subquery).
+    
+    Example (Oracle-style):
+    ```sql
+    SELECT /*+ RESOLVE_SUBQUERIES */ Title FROM ContentVersion
+    WHERE ContentDocumentId IN (
+        SELECT ContentDocumentId FROM ContentDocumentLink
+        WHERE LinkedEntityId = '0015E00001QpN0lQAF'
+    )
+    ```
+    The driver will run the subquery first on the client side:
+    `SELECT ContentDocumentId FROM ContentDocumentLink WHERE LinkedEntityId = '0015E00001QpN0lQAF'`
+    And then rewrite the main query to:
+    `SELECT Title FROM ContentVersion WHERE ContentDocumentId IN ('0695E000002EoHIQA0', '0695E000002EowfQAC', ...)`
+
 ## Maven Dependency
 
 Add the following dependency to your `pom.xml`:
@@ -162,7 +185,7 @@ Add the following dependency to your `pom.xml`:
 <dependency>
     <groupId>it.rotaliano.salesforce</groupId>
     <artifactId>salesforce-jdbc</artifactId>
-    <version>2.0.4</version>
+    <version>2.0.5</version>
 </dependency>
 ```
 

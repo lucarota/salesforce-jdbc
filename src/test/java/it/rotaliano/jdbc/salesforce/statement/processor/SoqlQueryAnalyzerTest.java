@@ -745,4 +745,46 @@ public class SoqlQueryAnalyzerTest {
         assertInstanceOf(LiteralExpression.class, astHex);
         assertEquals("0x1A", astHex.evaluate(null));
     }
+
+    @Test
+    public void testSelectWithInSubqueryResolution() {
+        String soql = "SELECT Title FROM ContentVersion WHERE ContentDocumentId IN (SELECT ContentDocumentId FROM ContentDocumentLink WHERE LinkedEntityId = '0015E00001QpN0lQAF')";
+        
+        java.util.function.BiFunction<String, java.util.List<Object>, java.util.List<java.util.Map<String, Object>>> resolver = (subQuery, params) -> {
+            if (subQuery.contains("ContentDocumentLink")) {
+                java.util.List<java.util.Map<String, Object>> mockRecords = new java.util.ArrayList<>();
+                java.util.Map<String, Object> rec1 = new java.util.HashMap<>();
+                rec1.put("ContentDocumentId", "0695E0000012345");
+                mockRecords.add(rec1);
+                java.util.Map<String, Object> rec2 = new java.util.HashMap<>();
+                rec2.put("ContentDocumentId", "0695E0000067890");
+                mockRecords.add(rec2);
+                return mockRecords;
+            }
+            return java.util.Collections.emptyList();
+        };
+
+        final QueryAnalyzer queryAnalyzer = new QueryAnalyzer(soql, resolver, partnerService);
+        queryAnalyzer.setResolveSubqueriesClientSide(true);
+        SoqlQueryAnalyzer analyzer = new SoqlQueryAnalyzer(queryAnalyzer);
+
+        String result = analyzer.getSoqlQueryString();
+        assertEquals("SELECT Title FROM ContentVersion WHERE ContentDocumentId IN ('0695E0000012345', '0695E0000067890')", result);
+    }
+
+    @Test
+    public void testSelectWithInSubqueryNoHint() {
+        String soql = "SELECT Title FROM ContentVersion WHERE ContentDocumentId IN (SELECT ContentDocumentId FROM ContentDocumentLink WHERE LinkedEntityId = '0015E00001QpN0lQAF')";
+        
+        java.util.function.BiFunction<String, java.util.List<Object>, java.util.List<java.util.Map<String, Object>>> resolver = (subQuery, params) -> {
+            throw new AssertionError("Resolver should not be called without hint");
+        };
+
+        final QueryAnalyzer queryAnalyzer = new QueryAnalyzer(soql, resolver, partnerService);
+        queryAnalyzer.setResolveSubqueriesClientSide(false);
+        SoqlQueryAnalyzer analyzer = new SoqlQueryAnalyzer(queryAnalyzer);
+
+        String result = analyzer.getSoqlQueryString();
+        assertEquals("SELECT Title FROM ContentVersion WHERE ContentDocumentId IN (SELECT ContentDocumentId FROM ContentDocumentLink WHERE LinkedEntityId = '0015E00001QpN0lQAF')", result);
+    }
 }

@@ -43,8 +43,32 @@ public class TestFixtureUtils {
         return FIXTURES_BASE.resolve(testName).resolve("describe");
     }
 
+    public static String sha256(String base) {
+        try {
+            java.security.MessageDigest digest = java.security.MessageDigest.getInstance("SHA-256");
+            byte[] hash = digest.digest(base.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+            StringBuilder hexString = new StringBuilder();
+            for (byte b : hash) {
+                String hex = Integer.toHexString(0xff & b);
+                if (hex.length() == 1) hexString.append('0');
+                hexString.append(hex);
+            }
+            return hexString.toString();
+        } catch (Exception ex) {
+            return String.valueOf(base.hashCode());
+        }
+    }
+
     public static Path queryResultPath(String testName) {
-        return FIXTURES_BASE.resolve(testName).resolve("query_result.xml");
+        return queryResultPath(testName, null);
+    }
+
+    public static Path queryResultPath(String testName, String soql) {
+        if (soql == null) {
+            return FIXTURES_BASE.resolve(testName).resolve("query_result.xml");
+        }
+        String normalized = soql.trim().replaceAll("\\s+", " ").toLowerCase();
+        return FIXTURES_BASE.resolve(testName).resolve("query_" + sha256(normalized) + ".xml");
     }
 
     public static void saveDescribe(String testName, String sObjectType, DescribeSObjectResult result) {
@@ -69,8 +93,8 @@ public class TestFixtureUtils {
         }
     }
 
-    public static void saveQueryResult(String testName, List<List<ForceResultField>> result) {
-        Path file = queryResultPath(testName);
+    public static void saveQueryResult(String testName, String soql, List<List<ForceResultField>> result) {
+        Path file = queryResultPath(testName, soql);
         try {
             Files.createDirectories(file.getParent());
             String xml = createXStream().toXML(result);
@@ -82,8 +106,11 @@ public class TestFixtureUtils {
     }
 
     @SuppressWarnings("unchecked")
-    public static List<List<ForceResultField>> loadQueryResult(String testName) {
-        Path file = queryResultPath(testName);
+    public static List<List<ForceResultField>> loadQueryResult(String testName, String soql) {
+        Path file = queryResultPath(testName, soql);
+        if (!Files.exists(file)) {
+            file = queryResultPath(testName, null);
+        }
         try {
             String xml = Files.readString(file);
             return (List<List<ForceResultField>>) createXStream().fromXML(xml);
@@ -93,7 +120,8 @@ public class TestFixtureUtils {
     }
 
     public static boolean fixturesExist(String testName) {
-        return Files.isDirectory(describeDir(testName)) && Files.exists(queryResultPath(testName));
+        return Files.isDirectory(describeDir(testName)) &&
+            (Files.exists(queryResultPath(testName, null)) || Files.isDirectory(FIXTURES_BASE.resolve(testName)));
     }
 
     /**
@@ -114,8 +142,8 @@ public class TestFixtureUtils {
             return loadDescribe(testName, sObjectType);
         }
 
-        private List<List<ForceResultField>> getExpandedQueryResult(FieldDefTree expectedSchema) {
-            List<List<ForceResultField>> rawRows = loadQueryResult(testName);
+        private List<List<ForceResultField>> getExpandedQueryResult(String soql, FieldDefTree expectedSchema) {
+            List<List<ForceResultField>> rawRows = loadQueryResult(testName, soql);
             if (expectedSchema == null) {
                 return rawRows;
             }
@@ -133,14 +161,13 @@ public class TestFixtureUtils {
         @Override
         public List<List<ForceResultField>> query(String soql, FieldDefTree expectedSchema)
             throws ConnectionException {
-            return getExpandedQueryResult(expectedSchema);
+            return getExpandedQueryResult(soql, expectedSchema);
         }
 
         @Override
         public Map.Entry<List<List<ForceResultField>>, String> queryStart(String soql,
             FieldDefTree expectedSchema) throws ConnectionException {
-            // Return full result in a single batch with null locator (= done)
-            return new java.util.AbstractMap.SimpleEntry<>(getExpandedQueryResult(expectedSchema), null);
+            return new java.util.AbstractMap.SimpleEntry<>(getExpandedQueryResult(soql, expectedSchema), null);
         }
 
         @Override
@@ -184,7 +211,7 @@ public class TestFixtureUtils {
         public List<List<ForceResultField>> query(String soql, FieldDefTree expectedSchema)
             throws ConnectionException {
             List<List<ForceResultField>> result = delegate.query(soql, expectedSchema);
-            saveQueryResult(testName, result);
+            saveQueryResult(testName, soql, result);
             log.info("[Recorder] Saved query result via query() for test {} ({} rows)", testName, result.size());
             return result;
         }
@@ -192,10 +219,8 @@ public class TestFixtureUtils {
         @Override
         public Map.Entry<List<List<ForceResultField>>, String> queryStart(String soql,
             FieldDefTree expectedSchema) throws ConnectionException {
-            // Fetch the full result via delegate.query() and save it.
-            // Return everything as a single batch (null locator = done).
             List<List<ForceResultField>> fullResult = delegate.query(soql, expectedSchema);
-            saveQueryResult(testName, fullResult);
+            saveQueryResult(testName, soql, fullResult);
             log.info("[Recorder] Saved query result via queryStart() for test {} ({} rows)", testName, fullResult.size());
             return new java.util.AbstractMap.SimpleEntry<>(fullResult, null);
         }

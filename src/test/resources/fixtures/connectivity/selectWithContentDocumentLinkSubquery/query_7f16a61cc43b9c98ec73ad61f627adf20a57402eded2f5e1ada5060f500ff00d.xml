@@ -1,0 +1,51 @@
+<list>
+  <list>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>reference</fieldType>
+      <name>ContentDocumentId</name>
+      <value class="string">0695E000002EoHIQA0</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+  </list>
+  <list>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>reference</fieldType>
+      <name>ContentDocumentId</name>
+      <value class="string">0695E000002EowfQAC</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+  </list>
+  <list>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>reference</fieldType>
+      <name>ContentDocumentId</name>
+      <value class="string">0695E000002EowpQAC</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+  </list>
+  <list>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>reference</fieldType>
+      <name>ContentDocumentId</name>
+      <value class="string">0695E000002EowuQAC</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+  </list>
+  <list>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>reference</fieldType>
+      <name>ContentDocumentId</name>
+      <value class="string">0695E000002EowzQAC</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+  </list>
+  <list>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>reference</fieldType>
+      <name>ContentDocumentId</name>
+      <value class="string">0695E000002Eox0QAC</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+  </list>
+  <list>
+    <it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+      <fieldType>reference</fieldType>
+      <name>ContentDocumentId</name>
+      <value class="string">0695E000002Eox4QAC</value>
+    </it.rotaliano.jdbc.salesforce.delegates.ForceResultField>
+  </list>
+</list>

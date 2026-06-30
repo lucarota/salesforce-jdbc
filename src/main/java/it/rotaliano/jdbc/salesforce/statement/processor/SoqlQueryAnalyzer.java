@@ -113,7 +113,56 @@ public class SoqlQueryAnalyzer {
 
         if (expr instanceof InExpression in) {
             in.setLeftExpression(rewriteExpression(in.getLeftExpression(), parameters));
-            in.setRightExpression(rewriteExpression(in.getRightExpression(), parameters));
+            if (queryAnalyzer.isResolveSubqueriesClientSide() && in.getRightExpression() instanceof ParenthesedSelect subQuery) {
+                java.util.function.BiFunction<String, List<Object>, List<java.util.Map<String, Object>>> resolver = queryAnalyzer.getSubSelectResolver();
+                if (resolver != null) {
+                    try {
+                        String subquerySql = subQuery.getPlainSelect().toString();
+                        List<java.util.Map<String, Object>> resolvedRecords = resolver.apply(subquerySql, parameters);
+                        
+                        String subqueryColumn = null;
+                        if (subQuery.getPlainSelect().getSelectItems() != null && !subQuery.getPlainSelect().getSelectItems().isEmpty()) {
+                            SelectItem<?> selectItem = subQuery.getPlainSelect().getSelectItems().get(0);
+                            Expression selectExpr = selectItem.getExpression();
+                            if (selectExpr instanceof Column col) {
+                                subqueryColumn = col.getColumnName();
+                            } else {
+                                subqueryColumn = selectExpr.toString();
+                            }
+                        }
+                        
+                        List<Expression> items = new ArrayList<>();
+                        if (subqueryColumn != null) {
+                            final String colName = subqueryColumn;
+                            for (java.util.Map<String, Object> rec : resolvedRecords) {
+                                Object val = null;
+                                for (java.util.Map.Entry<String, Object> entry : rec.entrySet()) {
+                                    if (entry.getKey().equalsIgnoreCase(colName)) {
+                                        val = entry.getValue();
+                                        break;
+                                    }
+                                }
+                                if (val != null) {
+                                    items.add(new StringValue(val.toString()));
+                                }
+                            }
+                        }
+                        
+                        if (items.isEmpty()) {
+                            items.add(new StringValue(""));
+                        }
+                        ParenthesedExpressionList<Expression> expressionList = new ParenthesedExpressionList<>(items);
+                        in.setRightExpression(expressionList);
+                    } catch (Exception e) {
+                        log.warn("Failed to resolve subquery in IN clause: {}", e.getMessage(), e);
+                        in.setRightExpression(rewriteExpression(in.getRightExpression(), parameters));
+                    }
+                } else {
+                    in.setRightExpression(rewriteExpression(in.getRightExpression(), parameters));
+                }
+            } else {
+                in.setRightExpression(rewriteExpression(in.getRightExpression(), parameters));
+            }
             return in;
         }
 

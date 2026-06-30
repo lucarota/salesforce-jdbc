@@ -1,5 +1,14 @@
 # Changelog
 
+### 2.0.5
+
+- **Client-Side Subquery Resolution Hint (`/*+ RESOLVE_SUBQUERIES */`)**:
+  - Implemented support for the query hint `/*+ RESOLVE_SUBQUERIES */` (case-insensitive, supported both before the query and after the `SELECT` keyword).
+  - Automatically intercepts and strips the hint, prompting the driver to execute the `IN` subquery client-side first, and then rewrites the main query by substituting the subquery with the literal list of resolved target values.
+  - Recommended for query-restricted SObjects (e.g., `ContentDocumentLink`, `ContentVersion`) that natively enforce strict parent/record filtering and cannot be queried inside SOQL semi-joins.
+- **Fixture Recording Enhancements**:
+  - Upgraded `TestFixtureUtils` to support recording and loading multiple different queries per test case based on query hashing.
+
 ### 2.0.4
 
 - **Legacy Driver Class Support**:
