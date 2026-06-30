@@ -3,12 +3,18 @@ package it.rotaliano.jdbc.salesforce.utils;
 import it.rotaliano.jdbc.salesforce.delegates.ForceResultField;
 import it.rotaliano.jdbc.salesforce.delegates.PartnerResultToCartesianTable;
 import it.rotaliano.jdbc.salesforce.statement.FieldDef;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class FieldDefTree extends TreeNode<FieldDef> {
+
+    @Getter
+    @Setter
+    private String relationshipName;
 
     private final List<FieldDef> sqlOrderFields = new ArrayList<>();
 
@@ -22,6 +28,31 @@ public class FieldDefTree extends TreeNode<FieldDef> {
 
     public int getSqlOrderSize() {
         return sqlOrderFields.size();
+    }
+
+    @Override
+    public List<FieldDef> flatten() {
+        List<FieldDef> all = new ArrayList<>();
+        if (getData() != null) {
+            FieldDef self = getData();
+            if (relationshipName != null) {
+                self = new FieldDef(self.getName(), relationshipName + "." + self.getFullName(), self.getAlias(), self.getType());
+            }
+            all.add(self);
+        }
+        for (TreeNode<FieldDef> child : getChildren()) {
+            List<FieldDef> childFlat = child.flatten();
+            if (relationshipName != null) {
+                childFlat = childFlat.stream()
+                        .map(f -> f == null ? null : new FieldDef(f.getName(), relationshipName + "." + f.getFullName(), f.getAlias(), f.getType()))
+                        .collect(Collectors.toList());
+            }
+            all.addAll(childFlat);
+        }
+        if (all.isEmpty()) {
+            all.add(null);
+        }
+        return all;
     }
 
     /**
@@ -62,6 +93,13 @@ public class FieldDefTree extends TreeNode<FieldDef> {
         }
         if (schemaName.equalsIgnoreCase(rowName)) {
             return true;
+        }
+        int firstDot = rowName.indexOf('.');
+        if (firstDot != -1) {
+            String strippedRowName = rowName.substring(firstDot + 1);
+            if (schemaName.equalsIgnoreCase(strippedRowName)) {
+                return true;
+            }
         }
         // If rowName is expr0, expr1, etc., it matches any function/aggregate field
         if (rowName.toLowerCase().startsWith("expr")) {

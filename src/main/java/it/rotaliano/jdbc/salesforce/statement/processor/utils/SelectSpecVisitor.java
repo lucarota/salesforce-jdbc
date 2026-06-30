@@ -1,18 +1,15 @@
 package it.rotaliano.jdbc.salesforce.statement.processor.utils;
 
+import com.sforce.soap.partner.ChildRelationship;
+import com.sforce.soap.partner.DescribeSObjectResult;
+import com.sforce.soap.partner.Field;
 import it.rotaliano.jdbc.salesforce.delegates.PartnerService;
 import it.rotaliano.jdbc.salesforce.statement.FieldDef;
 import it.rotaliano.jdbc.salesforce.statement.processor.QueryAnalyzer;
 import it.rotaliano.jdbc.salesforce.statement.processor.SoqlQueryAnalyzer;
 import it.rotaliano.jdbc.salesforce.utils.FieldDefTree;
-import com.sforce.soap.partner.ChildRelationship;
-import com.sforce.soap.partner.DescribeSObjectResult;
-import com.sforce.soap.partner.Field;
-import net.sf.jsqlparser.expression.BinaryExpression;
-import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.CaseExpression;
-import net.sf.jsqlparser.expression.WhenClause;
-import net.sf.jsqlparser.expression.operators.relational.ParenthesedExpressionList;
+import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.select.*;
@@ -275,7 +272,9 @@ public class SelectSpecVisitor implements SelectItemVisitor<Expression> {
         select.setFromItem(new Table(fromObject));
 
         SoqlQueryAnalyzer subQueryAnalyzer = new SoqlQueryAnalyzer(new QueryAnalyzer(select.toString(),null, partnerService));
-        fieldDefinitions.addTreeNode(subQueryAnalyzer.getFieldDefinitions());
+        FieldDefTree subQueryFieldDefs = subQueryAnalyzer.getFieldDefinitions();
+        subQueryFieldDefs.setRelationshipName(relationshipName);
+        fieldDefinitions.addTreeNode(subQueryFieldDefs);
 
         final PlainSelect soqlQuery = (PlainSelect)subQueryAnalyzer.getSoqlQuery();
         soqlQuery.setFromItem(from);
